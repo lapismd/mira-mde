@@ -1,0 +1,35 @@
+{
+  "name": "@mira-mde/extensions",
+  "version": "0.0.0",
+  "license": "AGPL-3.0-or-later",
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --clean",
+    "check:types": "tsc -p tsconfig.json --noEmit",
+    "check:svelte": "echo \"no svelte files\"",
+    "lint": "eslint src --ext .ts",
+    "test": "vitest run"
+  },
+  "peerDependencies": {
+    "@codemirror/language": "^6.11.3",
+    "@codemirror/state": "^6.5.2",
+    "svelte": "^5.0.0",
+    "unified": "^11.0.5"
+  },
+  "devDependencies": {
+    "@codemirror/language": "^6.11.3",
+    "@codemirror/state": "^6.5.2",
+    "svelte": "^5.46.1",
+    "unified": "^11.0.5"
+  }
+}

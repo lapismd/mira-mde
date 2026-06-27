@@ -1,0 +1,44 @@
+{
+  "name": "@mira-mde/plugin-mermaid",
+  "version": "0.0.0",
+  "license": "AGPL-3.0-or-later",
+  "type": "module",
+  "sideEffects": false,
+  "svelte": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "svelte": "./dist/index.js",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "svelte-package --input src --output dist && publint",
+    "check:types": "tsc -p tsconfig.json --noEmit",
+    "check:svelte": "svelte-check --tsconfig tsconfig.json",
+    "lint": "eslint src --ext .ts,.svelte",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@mira-mde/extensions": "workspace:*",
+    "codemirror-lang-mermaid": "^0.5.0",
+    "hast-util-to-text": "^4.0.2",
+    "mermaid": "^11.12.1",
+    "unist-util-visit": "^5.0.0"
+  },
+  "peerDependencies": {
+    "@codemirror/language": "^6.11.3",
+    "svelte": "^5.0.0",
+    "unified": "^11.0.5"
+  },
+  "devDependencies": {
+    "@codemirror/language": "^6.11.3",
+    "@types/hast": "^3.0.4",
+    "svelte": "^5.46.1",
+    "unified": "^11.0.5"
+  }
+}

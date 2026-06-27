@@ -1,0 +1,84 @@
+.mira-mde {
+  background: var(--mira-background);
+  border: 1px solid var(--mira-border);
+  border-radius: var(--mira-radius);
+  color: var(--mira-foreground);
+  display: flex;
+  flex-direction: column;
+  font-family: var(--mira-font-sans);
+  height: 100%;
+  min-height: 360px;
+  overflow: hidden;
+}
+
+.mira-mde__toolbar {
+  align-items: center;
+  background: var(--mira-background);
+  border-bottom: 1px solid var(--mira-border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  min-height: 46px;
+  padding: 0.45rem;
+}
+
+.mira-mde__toolbar-separator {
+  align-self: stretch;
+  min-height: 28px;
+}
+
+.mira-mde__actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+.mira-mde__body {
+  display: grid;
+  flex: 1;
+  grid-template-columns: 1fr;
+  min-height: 0;
+}
+
+.mira-mde[data-mode="split"] .mira-mde__body {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.mira-mde__pane {
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.mira-mde__pane--editor {
+  background: var(--mira-editor-background);
+}
+
+.mira-mde__pane--editor[data-visible="false"] {
+  display: none;
+}
+
+.mira-mde__pane--preview {
+  border-inline-start: 1px solid var(--mira-border);
+}
+
+.mira-mde:not([data-mode="split"]) .mira-mde__pane--preview {
+  border-inline-start: 0;
+}
+
+.mira-mde__editor-host {
+  height: 100%;
+}
+
+@media (max-width: 760px) {
+  .mira-mde[data-mode="split"] .mira-mde__body {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .mira-mde__pane--preview {
+    border-inline-start: 0;
+    border-top: 1px solid var(--mira-border);
+  }
+}

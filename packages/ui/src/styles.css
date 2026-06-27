@@ -1,0 +1,169 @@
+:root {
+  color-scheme: light;
+  --mira-background: #fbfbfc;
+  --mira-foreground: #1d1d20;
+  --mira-muted: #f0f1f3;
+  --mira-muted-foreground: #63656f;
+  --mira-border: #d8dbe1;
+  --mira-border-strong: #aeb4bf;
+  --mira-accent: #0f766e;
+  --mira-accent-foreground: #ffffff;
+  --mira-accent-soft: color-mix(in oklab, var(--mira-accent) 11%, transparent);
+  --mira-selection: color-mix(in oklab, var(--mira-accent) 25%, transparent);
+  --mira-popover: #ffffff;
+  --mira-popover-foreground: var(--mira-foreground);
+  --mira-editor-background: #ffffff;
+  --mira-preview-background: #ffffff;
+  --mira-code-background: #f4f5f7;
+  --mira-code-foreground: #24262d;
+  --mira-callout-background: #f7faf9;
+  --mira-tag-background: #e6f4f1;
+  --mira-tag-foreground: #0f5f59;
+  --mira-link: #0b6fcb;
+  --mira-font-sans:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  --mira-font-mono:
+    "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  --mira-font-size: 14px;
+  --mira-line-height: 1.6;
+  --mira-editor-padding: 20px;
+  --mira-preview-padding: 24px;
+  --mira-radius: 6px;
+}
+
+.mira-theme-dark {
+  color-scheme: dark;
+  --mira-background: #17181c;
+  --mira-foreground: #f1f3f7;
+  --mira-muted: #24262c;
+  --mira-muted-foreground: #a7adba;
+  --mira-border: #353944;
+  --mira-border-strong: #555d6d;
+  --mira-accent: #2dd4bf;
+  --mira-accent-foreground: #042f2e;
+  --mira-accent-soft: color-mix(in oklab, var(--mira-accent) 13%, transparent);
+  --mira-selection: color-mix(in oklab, var(--mira-accent) 30%, transparent);
+  --mira-popover: #202228;
+  --mira-popover-foreground: var(--mira-foreground);
+  --mira-editor-background: #1b1d22;
+  --mira-preview-background: #1b1d22;
+  --mira-code-background: #111318;
+  --mira-code-foreground: #edf0f5;
+  --mira-callout-background: #162522;
+  --mira-tag-background: #163a36;
+  --mira-tag-foreground: #8ee9dd;
+  --mira-link: #7cc4ff;
+}
+
+.mira-button {
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: var(--mira-radius);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-weight: 550;
+  gap: 0.4rem;
+  justify-content: center;
+  letter-spacing: 0;
+  line-height: 1;
+  transition:
+    background 120ms ease,
+    border-color 120ms ease,
+    color 120ms ease;
+  white-space: nowrap;
+}
+
+.mira-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.mira-button--default {
+  background: var(--mira-accent);
+  color: var(--mira-accent-foreground);
+}
+
+.mira-button--secondary {
+  background: var(--mira-muted);
+  color: var(--mira-foreground);
+}
+
+.mira-button--outline {
+  background: transparent;
+  border-color: var(--mira-border);
+  color: var(--mira-foreground);
+}
+
+.mira-button--ghost {
+  background: transparent;
+  color: var(--mira-foreground);
+}
+
+.mira-button--ghost:hover,
+.mira-button--outline:hover,
+.mira-button--secondary:hover {
+  background: var(--mira-accent-soft);
+}
+
+.mira-button--default-size {
+  min-height: 36px;
+  padding: 0 0.85rem;
+}
+
+.mira-button--sm {
+  min-height: 30px;
+  padding: 0 0.65rem;
+}
+
+.mira-button--icon {
+  min-height: 32px;
+  padding: 0;
+  width: 32px;
+}
+
+.mira-separator--horizontal {
+  background: var(--mira-border);
+  height: 1px;
+  width: 100%;
+}
+
+.mira-separator--vertical {
+  background: var(--mira-border);
+  height: 100%;
+  width: 1px;
+}
+
+.mira-scroll-area {
+  min-height: 0;
+  overflow: auto;
+}
+
+.mira-toggle-group {
+  align-items: center;
+  background: var(--mira-muted);
+  border: 1px solid var(--mira-border);
+  border-radius: var(--mira-radius);
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+}
+
+.mira-toggle-group__item {
+  background: transparent;
+  border: 0;
+  border-radius: calc(var(--mira-radius) - 2px);
+  color: var(--mira-muted-foreground);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 550;
+  min-height: 28px;
+  padding: 0 0.65rem;
+}
+
+.mira-toggle-group__item[data-state="on"] {
+  background: var(--mira-editor-background);
+  color: var(--mira-foreground);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 8%);
+}
