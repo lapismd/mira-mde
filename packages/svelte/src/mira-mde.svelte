@@ -25,11 +25,13 @@
     lineWrapping = true,
     spellcheck = true,
     theme = "obsidian",
+    themeConfig,
     sourcePath,
     class: className = "",
     toolbar = true,
     linkResolver,
     assetResolver,
+    fileAdapter,
     frontmatterOpen = true,
     frontmatterConfig,
     onChange,
@@ -37,8 +39,12 @@
   }: MiraMdeProps = $props();
 
   let editorHost: HTMLDivElement | null = $state(null);
+  let rootEl: HTMLDivElement | null = $state(null);
   let controller: MiraEditorController | null = $state(null);
   let cleanupExtensionMounts: Array<() => void> = [];
+  let inheritedTheme = $state<"obsidian" | "system" | "light" | "dark">(
+    "system",
+  );
 
   const resolvedExtensions = $derived(
     resolveMiraExtensions(extensions, {
@@ -61,13 +67,7 @@
   const showEditor = $derived(mode !== "preview");
   const showPreview = $derived(mode === "preview" || mode === "split");
   const themeClass = $derived(
-    theme === "dark"
-      ? "mira-theme-dark theme-dark dark"
-      : theme === "light"
-        ? "mira-theme-light theme-light"
-        : theme === "system"
-          ? "mira-theme-system"
-          : "mira-theme-obsidian theme-light",
+    themeClassName(theme === "inherit" ? inheritedTheme : theme),
   );
 
   function buildCodeMirrorExtensions(): Extension[] {
@@ -95,6 +95,7 @@
         sourcePath,
         linkResolver,
         assetResolver,
+        fileAdapter,
         frontmatterOpen,
         frontmatterConfig,
         onChange(replacement, from, to, nextValue) {
@@ -110,6 +111,7 @@
         onFrontmatterChange,
       } as Parameters<typeof createRichEditorExtensions>[0] & {
         frontmatterConfig?: unknown;
+        fileAdapter?: unknown;
       }),
       resolved.codeMirror,
     ].flat();
@@ -214,9 +216,142 @@
       runExtensionMounts(controller);
     }
   });
+
+  $effect(() => {
+    if (theme !== "inherit") {
+      return;
+    }
+
+    inheritedTheme = resolveInheritedTheme(rootEl, themeConfig);
+    const observer = new MutationObserver(() => {
+      inheritedTheme = resolveInheritedTheme(rootEl, themeConfig);
+    });
+
+    for (const element of themeObservationTargets(rootEl, themeConfig)) {
+      observer.observe(element, {
+        attributeFilter: [
+          "class",
+          ...(themeConfig?.attributeNames ?? [
+            "data-theme",
+            "data-color-scheme",
+            "data-mode",
+          ]),
+        ],
+        attributes: true,
+      });
+    }
+
+    return () => observer.disconnect();
+  });
+
+  function themeClassName(
+    value: "obsidian" | "system" | "light" | "dark" | "inherit",
+  ): string {
+    if (value === "dark") {
+      return "mira-theme-dark theme-dark dark";
+    }
+    if (value === "light") {
+      return "mira-theme-light theme-light";
+    }
+    if (value === "system") {
+      return "mira-theme-system";
+    }
+    return "mira-theme-obsidian theme-light";
+  }
+
+  function resolveInheritedTheme(
+    element: HTMLElement | null,
+    config: typeof themeConfig,
+  ): "obsidian" | "system" | "light" | "dark" {
+    const darkClasses = config?.darkClassNames ?? [
+      "dark",
+      "theme-dark",
+      "mira-theme-dark",
+    ];
+    const lightClasses = config?.lightClassNames ?? [
+      "light",
+      "theme-light",
+      "mira-theme-light",
+    ];
+    const darkValues = config?.darkDataThemeValues ?? ["dark", "theme-dark"];
+    const lightValues = config?.lightDataThemeValues ?? [
+      "light",
+      "theme-light",
+    ];
+    const attributeNames = config?.attributeNames ?? [
+      "data-theme",
+      "data-color-scheme",
+      "data-mode",
+    ];
+
+    for (const target of themeLookupTargets(element, config)) {
+      for (const className of darkClasses) {
+        if (target.classList.contains(className)) {
+          return "dark";
+        }
+      }
+      for (const className of lightClasses) {
+        if (target.classList.contains(className)) {
+          return "light";
+        }
+      }
+      for (const attribute of attributeNames) {
+        const value = target.getAttribute(attribute)?.toLowerCase();
+        if (value && darkValues.includes(value)) {
+          return "dark";
+        }
+        if (value && lightValues.includes(value)) {
+          return "light";
+        }
+      }
+    }
+
+    return config?.fallback ?? "system";
+  }
+
+  function themeLookupTargets(
+    element: HTMLElement | null,
+    config: typeof themeConfig,
+  ): HTMLElement[] {
+    if (typeof document === "undefined") {
+      return [];
+    }
+
+    const configuredRoot = config?.root;
+    const rootElement =
+      isDocument(configuredRoot)
+        ? configuredRoot.documentElement
+        : configuredRoot;
+    const targets: HTMLElement[] = [];
+    let current: HTMLElement | null =
+      rootElement ?? element?.parentElement ?? document.documentElement;
+    while (current) {
+      targets.push(current);
+      current = current.parentElement;
+    }
+    if (document.body && !targets.includes(document.body)) {
+      targets.push(document.body);
+    }
+    if (!targets.includes(document.documentElement)) {
+      targets.push(document.documentElement);
+    }
+    return targets;
+  }
+
+  function themeObservationTargets(
+    element: HTMLElement | null,
+    config: typeof themeConfig,
+  ): HTMLElement[] {
+    return themeLookupTargets(element, config);
+  }
+
+  function isDocument(value: unknown): value is Document {
+    return typeof Document !== "undefined" && value instanceof Document;
+  }
 </script>
 
 <div
+  bind:this={rootEl}
   class={`mira-mde ${themeClass} ${className}`.trim()}
   data-mode={mode}
   data-readonly={readonly}
@@ -293,6 +428,7 @@
           {extensions}
           {linkResolver}
           {assetResolver}
+          {fileAdapter}
           {frontmatterOpen}
           onChange={(replacement, from, to) => {
             const nextValue = `${value.slice(0, from)}${replacement}${value.slice(to)}`;

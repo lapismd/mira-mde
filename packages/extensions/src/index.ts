@@ -8,7 +8,17 @@ export type MiraRendererComponent =
 
 export type MiraRendererComponents = Record<string, MiraRendererComponent>;
 
-export type MiraTheme = "obsidian" | "system" | "light" | "dark";
+export type MiraTheme = "obsidian" | "system" | "light" | "dark" | "inherit";
+
+export type MiraThemeConfig = {
+  root?: HTMLElement | Document;
+  lightClassNames?: string[];
+  darkClassNames?: string[];
+  lightDataThemeValues?: string[];
+  darkDataThemeValues?: string[];
+  attributeNames?: string[];
+  fallback?: Exclude<MiraTheme, "inherit">;
+};
 
 export type MiraMode = "source" | "live-preview" | "preview" | "split";
 
@@ -35,6 +45,39 @@ export type MiraAssetResolver = (target: {
   alt?: string;
   sourcePath?: string;
 }) => string | null | undefined;
+
+export type MiraFileRef = {
+  path: string;
+  name?: string;
+  extension?: string;
+  kind?: "markdown" | "image" | "media" | "unknown";
+};
+
+export type MiraFileAdapter = {
+  resolveLink: (target: {
+    href: string;
+    sourcePath?: string;
+  }) => MiraFileRef | null | Promise<MiraFileRef | null>;
+  readMarkdown?: (
+    file: MiraFileRef,
+  ) => string | null | Promise<string | null>;
+  readAssetUrl?: (file: MiraFileRef) => string | null | Promise<string | null>;
+  openFile?: (file: MiraFileRef, event?: MouseEvent) => void | Promise<void>;
+  renderEmbed?: (
+    target: { file: MiraFileRef; sourcePath?: string; label?: string },
+    element: HTMLElement,
+  ) => void | (() => void);
+  listFiles?: () => MiraFileRef[] | Promise<MiraFileRef[]>;
+  getHeadings?: (
+    file: MiraFileRef,
+  ) =>
+    | Array<{ id: string; text: string; level: number }>
+    | Promise<Array<{ id: string; text: string; level: number }>>;
+  watchFile?: (
+    file: MiraFileRef,
+    callback: () => void,
+  ) => void | (() => void);
+};
 
 export type MiraExtensionRuntimeContext = {
   getValue: () => string;

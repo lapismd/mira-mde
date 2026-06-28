@@ -1,0 +1,35 @@
+.markdown-live-preview-mode
+  .cm-editor.markdown-live-preview-view
+  > .cm-scroller {
+  overflow-x: hidden;
+}
+
+.markdown-live-preview-mode .cm-formatting-hidden {
+  display: none;
+}
+
+.markdown-live-preview-mode .cm-math.cm-formatting-hidden,
+.markdown-live-preview-mode .cm-formatting-code .cm-formatting-hidden,
+.markdown-live-preview-mode .cm-formatting-table .cm-formatting-hidden {
+  display: inline-block;
+}
+
+.markdown-live-preview-mode .cm-formatting-code .cm-formatting-hidden {
+  visibility: hidden;
+}
+
+.markdown-live-preview-mode .cm-formatting-table .cm-formatting-hidden {
+  visibility: visible;
+}
+
+.markdown-live-preview-mode .markdown-rendered blockquote {
+  padding-inline-start: var(--size-4-6);
+}
+
+.markdown-live-preview-mode .cm-formatting-block.markdown-rendered .callout {
+  margin: 0;
+}
+
+.markdown-live-preview-mode .mira-rich-widget.markdown-rendered .callout {
+  margin: 0;
+}

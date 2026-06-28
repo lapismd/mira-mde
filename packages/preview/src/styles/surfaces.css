@@ -1,0 +1,47 @@
+.mira-markdown-preview {
+  height: 100%;
+  overflow: auto;
+}
+
+.markdown-preview-surface {
+  display: flex;
+  flex-direction: column;
+  gap: var(--size-4-5);
+  padding: var(--mira-preview-padding);
+}
+
+.markdown-preview-surface--embedded,
+.markdown-preview-surface[data-markdown-embed="true"] {
+  --mira-preview-padding: 0;
+  --mira-preview-bottom-padding: 0;
+}
+
+.markdown-preview-surface > .cm-sizer {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--size-4-5);
+  min-height: 0;
+}
+
+.markdown-preview-surface > .cm-sizer:empty {
+  display: none;
+}
+
+.markdown-preview-surface .markdown-view__document {
+  max-width: var(--file-line-width);
+  padding-bottom: var(--mira-preview-bottom-padding);
+  width: 100%;
+}
+
+.markdown-preview-surface--embedded .markdown-view__document,
+.markdown-preview-surface[data-markdown-embed="true"] .markdown-view__document {
+  max-width: none;
+  padding-bottom: 0;
+}
+
+.mira-mde .markdown-preview-surface,
+.mira-mde .markdown-editor-surface {
+  font-family: var(--mira-font-sans);
+  font-size: var(--mira-font-size);
+}

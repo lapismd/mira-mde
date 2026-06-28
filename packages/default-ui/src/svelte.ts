@@ -3,8 +3,10 @@ import MiraDefaultToolbar from "./default-toolbar.svelte";
 
 export {
   createMiraDefaultExtensions,
+  defaultMiraEditMode,
   defaultMiraFeatures,
   MiraFeature,
+  resolveMiraDefaultEditMode,
   resolveMiraDefaultFeatures,
   resolveMiraDefaultModes,
   resolveMiraDefaultToolbarActions,
@@ -13,6 +15,7 @@ export {
 } from "./features";
 export { MiraDefaultMde, MiraDefaultToolbar };
 export type {
+  MiraDefaultEditMode,
   MiraDefaultFeatureConfigs,
   MiraDefaultMermaidConfig,
   MiraDefaultToolbarAction,

@@ -1,0 +1,104 @@
+.markdown-preview-surface h1,
+.markdown-rendered h1,
+.markdown-reading-view .markdown h1,
+.markdown-editor-surface .cm-header.cm-header-1,
+.markdown-editor-surface .cm-header.cm-header-1.cm-line {
+  color: var(--markdown-h1-color);
+  font-family: var(--markdown-h1-font);
+  font-size: var(--markdown-h1-size);
+  font-style: var(--markdown-h1-style);
+  font-variant: var(--markdown-h1-variant);
+  font-weight: var(--markdown-h1-weight);
+  letter-spacing: -0.015em;
+  line-height: var(--markdown-h1-line-height);
+}
+
+.markdown-preview-surface h2,
+.markdown-rendered h2,
+.markdown-reading-view .markdown h2,
+.markdown-editor-surface .cm-header.cm-header-2,
+.markdown-editor-surface .cm-header.cm-header-2.cm-line {
+  color: var(--markdown-h2-color);
+  font-family: var(--markdown-h2-font);
+  font-size: var(--markdown-h2-size);
+  font-style: var(--markdown-h2-style);
+  font-variant: var(--markdown-h2-variant);
+  font-weight: var(--markdown-h2-weight);
+  letter-spacing: -0.015em;
+  line-height: var(--markdown-h2-line-height);
+}
+
+.markdown-preview-surface h3,
+.markdown-rendered h3,
+.markdown-reading-view .markdown h3,
+.markdown-editor-surface .cm-header.cm-header-3,
+.markdown-editor-surface .cm-header.cm-header-3.cm-line {
+  color: var(--markdown-h3-color);
+  font-family: var(--markdown-h3-font);
+  font-size: var(--markdown-h3-size);
+  font-style: var(--markdown-h3-style);
+  font-variant: var(--markdown-h3-variant);
+  font-weight: var(--markdown-h3-weight);
+  letter-spacing: -0.015em;
+  line-height: var(--markdown-h3-line-height);
+}
+
+.markdown-preview-surface h4,
+.markdown-rendered h4,
+.markdown-reading-view .markdown h4,
+.markdown-editor-surface .cm-header.cm-header-4,
+.markdown-editor-surface .cm-header.cm-header-4.cm-line {
+  color: var(--markdown-h4-color);
+  font-family: var(--markdown-h4-font);
+  font-size: var(--markdown-h4-size);
+  font-style: var(--markdown-h4-style);
+  font-variant: var(--markdown-h4-variant);
+  font-weight: var(--markdown-h4-weight);
+  letter-spacing: -0.015em;
+  line-height: var(--markdown-h4-line-height);
+}
+
+.markdown-preview-surface h5,
+.markdown-rendered h5,
+.markdown-reading-view .markdown h5,
+.markdown-editor-surface .cm-header.cm-header-5,
+.markdown-editor-surface .cm-header.cm-header-5.cm-line {
+  color: var(--markdown-h5-color);
+  font-family: var(--markdown-h5-font);
+  font-size: var(--markdown-h5-size);
+  font-style: var(--markdown-h5-style);
+  font-variant: var(--markdown-h5-variant);
+  font-weight: var(--markdown-h5-weight);
+  letter-spacing: -0.015em;
+  line-height: var(--markdown-h5-line-height);
+}
+
+.markdown-preview-surface h6,
+.markdown-rendered h6,
+.markdown-reading-view .markdown h6,
+.markdown-editor-surface .cm-header.cm-header-6,
+.markdown-editor-surface .cm-header.cm-header-6.cm-line {
+  color: var(--markdown-h6-color);
+  font-family: var(--markdown-h6-font);
+  font-size: var(--markdown-h6-size);
+  font-style: var(--markdown-h6-style);
+  font-variant: var(--markdown-h6-variant);
+  font-weight: var(--markdown-h6-weight);
+  letter-spacing: -0.015em;
+  line-height: var(--markdown-h6-line-height);
+}
+
+.markdown-rendered :is(p, h1, h2, h3, h4, h5, h6),
+.markdown-preview-surface .markdown :is(p, h1, h2, h3, h4, h5, h6) {
+  margin-block: 1rem;
+}
+
+.markdown-rendered > :first-child,
+.markdown-preview-surface .markdown > :first-child {
+  margin-block-start: 0;
+}
+
+.markdown-rendered > :last-child,
+.markdown-preview-surface .markdown > :last-child {
+  margin-block-end: 0;
+}

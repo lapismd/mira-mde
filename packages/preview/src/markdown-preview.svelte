@@ -14,6 +14,7 @@
   import type {
     MiraAssetResolver,
     MiraExtension,
+    MiraFileAdapter,
     MiraLinkResolver,
     MiraRendererComponents,
   } from "@mira-mde/extensions";
@@ -23,10 +24,13 @@
     remarkCallouts,
     remarkCustomChecklists,
     remarkDirectivesToHast,
+    remarkExternalLinks,
     remarkFrontmatterToHast,
+    remarkPathLinks,
     remarkPositionsToData,
     remarkTags,
     remarkWikiLinks,
+    isExternalMarkdownDestination,
   } from "./remark";
   import Callout from "./components/callout.svelte";
   import Checkbox from "./components/checkbox.svelte";
@@ -53,6 +57,7 @@
     highlight?: boolean;
     linkResolver?: MiraLinkResolver;
     assetResolver?: MiraAssetResolver;
+    fileAdapter?: MiraFileAdapter;
     frontmatterOpen?: boolean;
     frontmatterConfig?: FrontmatterConfig;
     dialog?: boolean;
@@ -71,6 +76,7 @@
     highlight = true,
     linkResolver,
     assetResolver,
+    fileAdapter,
     frontmatterOpen = true,
     frontmatterConfig,
     dialog = false,
@@ -106,9 +112,11 @@
     remarkGfm,
     remarkCustomChecklists,
     remarkMath,
-    remarkWikiLinks,
-    remarkTags,
     remarkCallouts,
+    remarkWikiLinks,
+    remarkPathLinks,
+    remarkExternalLinks,
+    remarkTags,
     remarkDirectivesToHast,
     remarkFrontmatterToHast,
     remarkPositionsToData,
@@ -133,8 +141,94 @@
     allowDangerousHtml: true,
     handlers: {
       [TYPE_TABLE]: mdast2hastGridTablesHandler(),
-    },
+      wikilink(state: any, node: any) {
+        return state.applyData(node, {
+          type: "element",
+          tagName: "wikilink",
+          properties: linkNodeProperties(node),
+          children: state.all(node),
+        });
+      },
+      link(state: any, node: any) {
+        if (isExternalMarkdownDestination(node.url)) {
+          const result = {
+            type: "element",
+            tagName: "a",
+            properties: {
+              href: node.url,
+              ...(node.title ? { title: node.title } : {}),
+              ...(node.data?.hProperties ?? {}),
+            },
+            children: state.all(node),
+          };
+
+          state.patch(node, result);
+          return state.applyData(node, result);
+        }
+
+        const text = nodeText(node.children ?? []);
+
+        return state.applyData(node, {
+          type: "element",
+          tagName: "pathlink",
+          properties: {
+            href: node.url,
+            id: node.url,
+            label: text,
+            text,
+          },
+          children: state.all(node),
+        });
+      },
+      pathlink(state: any, node: any) {
+        return state.applyData(node, {
+          type: "element",
+          tagName: "pathlink",
+          properties: linkNodeProperties(node),
+          children: state.all(node),
+        });
+      },
+      embed(state: any, node: any) {
+        return state.applyData(node, {
+          type: "element",
+          tagName: "embed",
+          properties: linkNodeProperties(node),
+          children: state.all(node),
+        });
+      },
+    } as any,
   });
+
+  function linkNodeProperties(node: any): Record<string, unknown> {
+    const data = node.data ?? {};
+    const hProperties = data.hProperties ?? {};
+    const id = data.id ?? hProperties.id ?? hProperties.href ?? node.value ?? "";
+    const text =
+      data.text ??
+      hProperties.text ??
+      hProperties.label ??
+      node.value ??
+      id;
+
+    return {
+      ...hProperties,
+      href: hProperties.href ?? id,
+      id,
+      label: hProperties.label ?? text,
+      text,
+    };
+  }
+
+  function nodeText(children: any[]): string {
+    return children
+      .map((child) => {
+        if (typeof child.value === "string") {
+          return child.value;
+        }
+        return Array.isArray(child.children) ? nodeText(child.children) : "";
+      })
+      .join("");
+  }
 </script>
 
 {#if inline}
@@ -147,6 +241,7 @@
     components={componentMap}
     {linkResolver}
     {assetResolver}
+    {fileAdapter}
     {frontmatterOpen}
     {frontmatterConfig}
     {dialog}
@@ -155,13 +250,11 @@
   />
 {:else}
   <div
-    class={`mira-markdown-preview markdown-reading-view markdown-preview-surface markdown-preview-surface--reading markdown-rendered flex flex-col gap-5 p-9 ${embed ? "markdown-preview-surface--embedded markdown-embed-surface" : ""} ${className}`.trim()}
+    class={`mira-markdown-preview markdown-reading-view markdown-preview-surface markdown-preview-surface--reading markdown-rendered ${embed ? "markdown-preview-surface--embedded markdown-embed-surface" : ""} ${className}`.trim()}
     data-markdown-embed={embed ? true : undefined}
   >
-    <div class="cm-sizer flex flex-col gap-5 empty:hidden">
-      <div
-        class={`markdown-view__document markdown ${embed ? "pb-0" : "pb-[50svh]"}`}
-      >
+    <div class="cm-sizer">
+      <div class="markdown-view__document markdown">
         <Markdown
           {value}
           {sourcePath}
@@ -171,6 +264,7 @@
           components={componentMap}
           {linkResolver}
           {assetResolver}
+          {fileAdapter}
           {frontmatterOpen}
           {frontmatterConfig}
           {dialog}

@@ -1,0 +1,67 @@
+.markdown-rendered code,
+.markdown-preview-surface .markdown code,
+.markdown-widget-shell code {
+  background-color: var(--markdown-code-background);
+  border: var(--markdown-code-border-width) solid
+    var(--markdown-code-border-color);
+  border-radius: var(--markdown-code-radius);
+  color: var(--markdown-code-normal);
+  font-family: var(--font-monospace);
+  font-size: var(--markdown-code-size);
+  padding: 0.15em 0.3em;
+  text-wrap: pretty;
+}
+
+.markdown-rendered pre,
+.markdown-preview-surface .markdown pre,
+.markdown-widget-shell pre {
+  margin-block: 1rem;
+}
+
+.markdown-rendered pre > div,
+.markdown-preview-surface .markdown pre > div,
+.markdown-widget-shell pre > div {
+  background: color-mix(in oklab, var(--secondary) 60%, transparent);
+  border: 2px solid var(--secondary);
+  border-radius: var(--radius-s);
+  display: flex;
+  margin: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 1rem;
+  position: relative;
+  white-space: pre;
+}
+
+.markdown-rendered pre code,
+.markdown-preview-surface .markdown pre code,
+.markdown-widget-shell pre code {
+  background-color: transparent;
+  border: 0;
+  padding: 0;
+}
+
+.mira-inline-math-widget,
+.mira-inline-math-widget p,
+.mira-inline-math-widget .katex,
+.mira-inline-math-widget .katex-display {
+  display: inline;
+  margin: 0;
+}
+
+.mira-inline-math-widget {
+  cursor: text;
+  white-space: normal;
+}
+
+.mira-inline-markdown-widget {
+  cursor: text;
+  display: inline;
+  white-space: normal;
+}
+
+.mira-inline-markdown-widget p,
+.mira-inline-markdown-widget .mira-link-preview {
+  display: inline;
+  margin: 0;
+}

@@ -1,0 +1,191 @@
+.markdown-editor-surface .cm-editor {
+  cursor: text;
+  font-family: var(--font-sans);
+  font-size: var(--font-text-size);
+  width: 100%;
+  --hmd-unordered-list-marker-slot-width: 15px;
+  --hmd-unordered-list-marker-padding-inline-start: 3px;
+  --hmd-unordered-list-marker-guide-offset: calc(
+    var(--hmd-unordered-list-marker-slot-width) / 2
+  );
+}
+
+.markdown-editor-surface .cm-editor.mod-inline {
+  background-color: var(--code-background);
+  color: var(--code-normal);
+  font-size: var(--code-size);
+}
+
+.markdown-editor-surface .cm-editor .cm-gutter.cm-foldGutter {
+  display: none;
+}
+
+.markdown-editor-surface .cm-line {
+  max-width: var(--file-line-width);
+}
+
+.markdown-editor-surface .cm-inline-code,
+.markdown-editor-surface .cm-formatting-code,
+.markdown-editor-surface .HyperMD-codeblock,
+.markdown-editor-surface .cm-label,
+.markdown-editor-surface .cm-math,
+.markdown-editor-surface .cm-line.cm-hmd-frontmatter {
+  font-family: var(--font-monospace);
+}
+
+.markdown-editor-surface .cm-inline-code,
+.markdown-editor-surface .cm-label,
+.markdown-editor-surface .cm-math {
+  color: var(--markdown-code-normal, var(--code-normal));
+}
+
+.markdown-editor-surface .cm-formatting-code,
+.markdown-editor-surface .cm-editor .cm-activeLine.cm-line.cm-formatting-code {
+  background-color: var(--markdown-code-background);
+}
+
+.markdown-editor-surface .cm-formatting-code.cm-formatting-code-start {
+  border-color: var(--border);
+  border-radius: var(--radius-m) var(--radius-m) 0 0;
+}
+
+.markdown-editor-surface .cm-formatting-code.cm-formatting-code-end {
+  border-color: var(--border);
+  border-radius: 0 0 var(--radius-m) var(--radius-m);
+}
+
+.markdown-editor-surface .cm-comment,
+.markdown-editor-surface .cm-meta {
+  color: var(--markdown-code-comment);
+}
+
+.markdown-editor-surface .cm-tag {
+  color: var(--markdown-code-tag);
+}
+
+.markdown-editor-surface .cm-punctuation,
+.markdown-editor-surface .cm-bracket,
+.markdown-editor-surface .cm-hr {
+  color: var(--markdown-code-punctuation);
+}
+
+.markdown-editor-surface .cm-number {
+  color: var(--markdown-code-value);
+}
+
+.markdown-editor-surface .cm-string,
+.markdown-editor-surface .cm-string-2,
+.markdown-editor-surface .cm-qualifier {
+  color: var(--markdown-code-string);
+}
+
+.markdown-editor-surface .cm-operator {
+  color: var(--markdown-code-operator);
+}
+
+.markdown-editor-surface .cm-variable,
+.markdown-editor-surface .cm-variable-2,
+.markdown-editor-surface .cm-variable-3 {
+  color: var(--markdown-code-property);
+}
+
+.markdown-editor-surface .cm-emphasis {
+  font-style: italic;
+}
+
+.markdown-editor-surface .cm-strong {
+  font-weight: 800;
+}
+
+.markdown-editor-surface .cm-strikethrough {
+  text-decoration: line-through;
+}
+
+.markdown-editor-surface .cm-link-text,
+.markdown-editor-surface .cm-link-string,
+.markdown-editor-surface .cm-link-target {
+  color: var(--markdown-link-color);
+}
+
+.markdown-editor-surface .cm-link-target {
+  text-decoration-line: var(--markdown-link-decoration);
+  text-decoration-thickness: var(--markdown-link-decoration-thickness);
+}
+
+.markdown-editor-surface .cm-blockquote {
+  position: relative;
+}
+
+.markdown-editor-surface .cm-blockquote-border {
+  display: inline-block;
+}
+
+.markdown-editor-surface .cm-blockquote::before,
+.markdown-editor-surface .cm-blockquote-border::before {
+  border-inline-start: var(--markdown-blockquote-border-thickness) solid
+    var(--markdown-blockquote-border-color);
+  bottom: 0;
+  color: transparent;
+  content: "\200b";
+  display: block;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  width: 1px;
+}
+
+.markdown-editor-surface .cm-blockquote::before {
+  inset-inline-start: 0;
+}
+
+.markdown-editor-surface .cm-blockquote .cm-formatting-quote > span {
+  color: transparent;
+}
+
+.markdown-editor-surface
+  .cm-blockquote.cm-activeLine
+  .cm-formatting-quote
+  > span {
+  color: var(--markdown-faint-color);
+}
+
+.markdown-editor-surface .cm-line .cm-fold-indicator {
+  display: inline-block;
+  opacity: 0;
+  overflow: visible;
+  position: relative;
+  vertical-align: middle;
+  width: 0;
+}
+
+.markdown-editor-surface .cm-line:hover .cm-fold-indicator,
+.markdown-editor-surface .cm-activeLine .cm-fold-indicator,
+.markdown-editor-surface .cm-fold-indicator:hover {
+  opacity: 1;
+}
+
+.markdown-editor-surface .cm-fold-indicator .collapse-indicator {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: var(--markdown-collapse-icon-color);
+  cursor: pointer;
+  display: flex;
+  height: 1rem;
+  inset-inline-end: 0;
+  justify-content: center;
+  min-height: 0;
+  min-width: 0;
+  padding: 0;
+  padding-inline-end: 0;
+  position: absolute;
+  top: 50%;
+  transform: translate(calc(-100% + 0.5rem), calc(-50% - 2px));
+  width: 1rem;
+}
+
+.markdown-editor-surface .cm-fold-indicator .collapse-indicator .svg-icon {
+  display: block;
+  height: 1rem;
+  width: 1rem;
+}

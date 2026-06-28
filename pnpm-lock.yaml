@@ -245,6 +245,9 @@ importers:
 
   packages/codemirror-tables:
     dependencies:
+      '@adobe/mdast-util-gridtables':
+        specifier: ^4.0.13
+        version: 4.0.19
       '@codemirror/commands':
         specifier: ^6.10.1
         version: 6.10.4
@@ -260,6 +263,9 @@ importers:
       '@lucide/svelte':
         specifier: ^0.525.0
         version: 0.525.0(svelte@5.56.4(@typescript-eslint/types@8.62.0))
+      '@mira-mde/preview':
+        specifier: workspace:*
+        version: link:../preview
       '@mira-mde/ui':
         specifier: workspace:*
         version: link:../ui
@@ -278,6 +284,12 @@ importers:
       micromark-extension-gfm-table:
         specifier: ^2.1.1
         version: 2.1.1
+      micromark-util-character:
+        specifier: ^2.1.1
+        version: 2.1.1
+      micromark-util-symbol:
+        specifier: ^2.0.1
+        version: 2.0.1
       rehype-stringify:
         specifier: ^10.0.1
         version: 10.0.1
@@ -293,6 +305,9 @@ importers:
       unified:
         specifier: ^11.0.5
         version: 11.0.5
+      unist-util-visit:
+        specifier: ^5.0.0
+        version: 5.1.0
     devDependencies:
       '@codemirror/language':
         specifier: ^6.11.3

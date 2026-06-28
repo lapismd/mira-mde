@@ -6,8 +6,10 @@ export { MiraDefaultToolbar } from "./default-toolbar";
 export { createMiraDefaultEditor } from "./create-default-editor";
 export {
   createMiraDefaultExtensions,
+  defaultMiraEditMode,
   defaultMiraFeatures,
   MiraFeature,
+  resolveMiraDefaultEditMode,
   resolveMiraDefaultFeatures,
   resolveMiraDefaultModes,
   resolveMiraDefaultToolbarActions,
@@ -20,6 +22,7 @@ export type {
   MiraDefaultEditorEventMap,
   MiraDefaultEditorEventName,
   MiraDefaultEditorOptions,
+  MiraDefaultEditMode,
   MiraDefaultFeatureConfigs,
   MiraDefaultMdeHandle,
   MiraDefaultMdeProps,

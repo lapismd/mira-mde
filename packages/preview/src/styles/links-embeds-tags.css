@@ -1,0 +1,217 @@
+.markdown-rendered a,
+.markdown-preview-surface .markdown a {
+  color: var(--markdown-link-color);
+  cursor: var(--cursor-link);
+  font-weight: var(--markdown-link-weight);
+  outline: none;
+  text-decoration-line: var(--markdown-link-decoration);
+  text-decoration-thickness: var(--markdown-link-decoration-thickness);
+  transition: opacity 150ms ease-in-out;
+}
+
+.markdown-rendered a:hover,
+.markdown-preview-surface .markdown a:hover {
+  color: var(--markdown-link-color-hover);
+  text-decoration-line: var(--markdown-link-decoration-hover);
+}
+
+.markdown-rendered a.external-link,
+.markdown-preview-surface .markdown a.external-link {
+  background-image:
+    linear-gradient(transparent, transparent),
+    url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0xNSAzaDZ2NiIvPjxwYXRoIGQ9Ik0xMCAxNCAyMSAzIi8+PHBhdGggZD0iTTE4IDEzdjZhMiAyIDAgMCAxLTIgMkg1YTIgMiAwIDAgMS0yLTJWOGEyIDIgMCAwIDEgMi0yaDYiLz48L3N2Zz4=");
+  background-position: center right;
+  background-position-y: 0.25em;
+  background-repeat: no-repeat;
+  background-size: 0.825em;
+  color: var(--markdown-link-external-color);
+  cursor: var(--cursor-link);
+  filter: var(--markdown-link-external-filter);
+  padding-inline-end: 0.9em;
+  text-decoration-line: var(--markdown-link-external-decoration);
+}
+
+.markdown-live-preview-mode .cm-external-link .cm-link,
+.markdown-live-preview-mode .cm-url.cm-external-link {
+  background-image:
+    linear-gradient(transparent, transparent),
+    url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0xNSAzaDZ2NiIvPjxwYXRoIGQ9Ik0xMCAxNCAyMSAzIi8+PHBhdGggZD0iTTE4IDEzdjZhMiAyIDAgMCAxLTIgMkg1YTIgMiAwIDAgMS0yLTJWOGEyIDIgMCAwIDEgMi0yaDYiLz48L3N2Zz4=");
+  background-position: center right;
+  background-position-y: 0.25em;
+  background-repeat: no-repeat;
+  background-size: 0.825em;
+  color: var(--markdown-link-external-color);
+  filter: var(--markdown-link-external-filter);
+  padding-inline-end: 0.9em;
+  text-decoration-line: var(--markdown-link-external-decoration);
+}
+
+.mira-link-preview {
+  display: inline;
+  position: relative;
+}
+
+.mira-link-preview__trigger {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: var(--markdown-link-color);
+  cursor: var(--cursor-link);
+  display: inline;
+  font: inherit;
+  font-weight: var(--markdown-link-weight);
+  margin: 0;
+  outline: none;
+  padding: 0;
+  text-align: inherit;
+  text-decoration-line: var(--markdown-link-decoration);
+  text-decoration-thickness: var(--markdown-link-decoration-thickness);
+}
+
+.mira-link-preview__trigger:hover,
+.mira-link-preview__trigger:focus-visible {
+  color: var(--markdown-link-color-hover);
+  text-decoration-line: var(--markdown-link-decoration-hover);
+}
+
+.mira-link-preview[data-link-preview-state="unresolved"]
+  .mira-link-preview__trigger {
+  opacity: 0.6;
+}
+
+.mira-link-preview__card {
+  background: var(--popover);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  box-shadow: 0 18px 50px rgb(0 0 0 / 14%);
+  color: var(--popover-foreground);
+  display: none;
+  font-family: var(--font-interface);
+  font-size: 0.85rem;
+  inline-size: min(28rem, 75vw);
+  inset-block-start: calc(100% + 0.45rem);
+  inset-inline-start: 0;
+  line-height: 1.45;
+  max-block-size: 22rem;
+  overflow: auto;
+  padding: 0.75rem;
+  position: absolute;
+  text-decoration: none;
+  white-space: normal;
+  z-index: var(--layer-tooltip);
+}
+
+.mira-link-preview:hover .mira-link-preview__card,
+.mira-link-preview:focus-within .mira-link-preview__card {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.mira-link-preview__title {
+  color: var(--text-normal);
+  font-weight: 600;
+}
+
+.mira-link-preview__path,
+.mira-link-preview__empty {
+  color: var(--text-muted);
+  font-family: var(--font-monospace);
+  overflow-wrap: anywhere;
+}
+
+.mira-link-preview__markdown {
+  background: var(--background-primary);
+  border-radius: var(--radius-s);
+  color: var(--text-normal);
+  display: flex;
+  font-family: var(--font-sans);
+  max-height: 18rem;
+  overflow: auto;
+  padding: 0;
+  white-space: normal;
+}
+
+.mira-link-preview__asset {
+  border-radius: var(--radius-s);
+  display: block;
+  max-height: 14rem;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.mira-embed {
+  border-inline-start: 2px solid var(--interactive-accent);
+  margin-block: var(--p-spacing);
+  padding-inline-start: var(--size-4-6);
+}
+
+.mira-embed figcaption {
+  color: var(--text-muted);
+  font-size: var(--font-smaller);
+  margin-block-end: var(--size-4-2);
+}
+
+.mira-embed__content {
+  min-width: 0;
+}
+
+.mira-embed__content img {
+  display: block;
+  max-width: 100%;
+}
+
+.mira-embed__markdown {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  color: var(--text-normal);
+  font-family: var(--font-sans);
+  margin: 0;
+  max-height: none;
+  overflow: visible;
+  padding: 0;
+  white-space: normal;
+}
+
+.mira-embedded-markdown-preview {
+  min-height: 0;
+  min-width: 0;
+}
+
+.mira-link-preview__card .mira-embedded-markdown-preview {
+  --mira-preview-bottom-padding: 0;
+  inline-size: 100%;
+}
+
+.mira-link-preview__card
+  .mira-embedded-markdown-preview
+  .markdown-view__document {
+  max-width: none;
+}
+
+.mira-embed__missing {
+  color: var(--text-muted);
+  font-family: var(--font-monospace);
+}
+
+.markdown-rendered span.tag,
+.markdown-preview-surface .markdown span.tag,
+.metadata-property-pill-chip.tag {
+  background-color: var(--markdown-tag-background);
+  border: var(--markdown-tag-border-width) solid
+    var(--markdown-tag-border-color);
+  border-radius: var(--markdown-tag-radius);
+  color: var(--markdown-tag-color);
+  font-size: var(--markdown-tag-size);
+  font-weight: var(--markdown-tag-weight);
+  line-height: 1;
+  padding: var(--markdown-tag-padding-y) var(--markdown-tag-padding-x);
+}
+
+.markdown-rendered span.tag:hover,
+.markdown-preview-surface .markdown span.tag:hover,
+.metadata-property-pill-chip.tag:hover {
+  background-color: var(--markdown-tag-background-hover);
+  border-color: var(--markdown-tag-border-color-hover);
+  color: var(--markdown-tag-color-hover);
+}

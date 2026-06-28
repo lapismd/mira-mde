@@ -1,0 +1,686 @@
+.markdown-preview-surface :is(.absolute, .mermaid-inline-controls),
+.markdown-editor-surface :is(.absolute, .mermaid-inline-controls),
+.markdown-widget-shell :is(.absolute, .mermaid-inline-controls),
+.cm-table-widget .absolute {
+  position: absolute;
+}
+
+.markdown-preview-surface .relative,
+.markdown-editor-surface .relative,
+.markdown-widget-shell .relative,
+.cm-table-widget .relative {
+  position: relative;
+}
+
+.markdown-preview-surface .flex,
+.markdown-editor-surface .flex,
+.markdown-widget-shell .flex,
+.cm-table-widget .flex {
+  display: flex;
+}
+
+.markdown-preview-surface .flex-row,
+.markdown-editor-surface .flex-row,
+.markdown-widget-shell .flex-row,
+.cm-table-widget .flex-row {
+  flex-direction: row;
+}
+
+.markdown-preview-surface .flex-col,
+.markdown-editor-surface .flex-col,
+.markdown-widget-shell .flex-col,
+.cm-table-widget .flex-col {
+  flex-direction: column;
+}
+
+.markdown-preview-surface .flex-wrap,
+.markdown-editor-surface .flex-wrap,
+.markdown-widget-shell .flex-wrap,
+.cm-table-widget .flex-wrap {
+  flex-wrap: wrap;
+}
+
+.markdown-preview-surface .grid,
+.markdown-editor-surface .grid,
+.markdown-widget-shell .grid,
+.cm-table-widget .grid {
+  display: grid;
+}
+
+.markdown-preview-surface .inline-flex,
+.markdown-editor-surface .inline-flex,
+.markdown-widget-shell .inline-flex,
+.cm-table-widget .inline-flex {
+  display: inline-flex;
+}
+
+.markdown-preview-surface .hidden,
+.markdown-editor-surface .hidden,
+.markdown-widget-shell .hidden,
+.cm-table-widget .hidden {
+  display: none;
+}
+
+.cm-table-widget .group:hover .group-hover\:inline-flex,
+.cm-table-widget tr:hover .group-hover\:inline-flex,
+.cm-table-widget th:hover .group-hover\:inline-flex {
+  display: inline-flex;
+}
+
+.markdown-preview-surface .items-center,
+.markdown-editor-surface .items-center,
+.markdown-widget-shell .items-center,
+.cm-table-widget .items-center {
+  align-items: center;
+}
+
+.markdown-preview-surface .justify-center,
+.markdown-editor-surface .justify-center,
+.markdown-widget-shell .justify-center,
+.cm-table-widget .justify-center {
+  justify-content: center;
+}
+
+.markdown-preview-surface .justify-end,
+.markdown-editor-surface .justify-end,
+.markdown-widget-shell .justify-end,
+.cm-table-widget .justify-end {
+  justify-content: flex-end;
+}
+
+.markdown-preview-surface .gap-1,
+.markdown-editor-surface .gap-1,
+.markdown-widget-shell .gap-1,
+.cm-table-widget .gap-1 {
+  gap: 0.25rem;
+}
+
+.markdown-preview-surface .gap-0\.5,
+.markdown-editor-surface .gap-0\.5,
+.markdown-widget-shell .gap-0\.5,
+.cm-table-widget .gap-0\.5 {
+  gap: 0.125rem;
+}
+
+.markdown-preview-surface .gap-2,
+.markdown-editor-surface .gap-2,
+.markdown-widget-shell .gap-2,
+.cm-table-widget .gap-2 {
+  gap: 0.5rem;
+}
+
+.markdown-preview-surface .gap-5,
+.markdown-editor-surface .gap-5,
+.markdown-widget-shell .gap-5,
+.cm-table-widget .gap-5 {
+  gap: 1.25rem;
+}
+
+.markdown-preview-surface .grow,
+.markdown-editor-surface .grow,
+.markdown-widget-shell .grow,
+.cm-table-widget .grow {
+  flex-grow: 1;
+}
+
+.markdown-preview-surface .shrink,
+.markdown-editor-surface .shrink,
+.markdown-widget-shell .shrink,
+.cm-table-widget .shrink {
+  flex-shrink: 1;
+}
+
+.markdown-preview-surface .shrink-0,
+.markdown-editor-surface .shrink-0,
+.markdown-widget-shell .shrink-0,
+.cm-table-widget .shrink-0 {
+  flex-shrink: 0;
+}
+
+.markdown-preview-surface .self-stretch,
+.markdown-editor-surface .self-stretch,
+.markdown-widget-shell .self-stretch,
+.cm-table-widget .self-stretch {
+  align-self: stretch;
+}
+
+.markdown-preview-surface .w-full,
+.markdown-editor-surface .w-full,
+.markdown-widget-shell .w-full,
+.cm-table-widget .w-full {
+  width: 100%;
+}
+
+.markdown-preview-surface .w-fit,
+.markdown-editor-surface .w-fit,
+.markdown-widget-shell .w-fit,
+.cm-table-widget .w-fit {
+  width: fit-content;
+}
+
+.markdown-preview-surface .w-10,
+.markdown-editor-surface .w-10,
+.markdown-widget-shell .w-10,
+.cm-table-widget .w-10 {
+  width: 2.5rem;
+}
+
+.markdown-preview-surface .w-\[9em\],
+.markdown-editor-surface .w-\[9em\],
+.markdown-widget-shell .w-\[9em\],
+.cm-table-widget .w-\[9em\] {
+  width: 9em;
+}
+
+.markdown-preview-surface .h-full,
+.markdown-editor-surface .h-full,
+.markdown-widget-shell .h-full,
+.cm-table-widget .h-full {
+  height: 100%;
+}
+
+.markdown-preview-surface .h-10,
+.markdown-editor-surface .h-10,
+.markdown-widget-shell .h-10,
+.cm-table-widget .h-10 {
+  height: 2.5rem;
+}
+
+.markdown-preview-surface .w-5,
+.markdown-editor-surface .w-5,
+.markdown-widget-shell .w-5,
+.cm-table-widget .w-5 {
+  width: 1.25rem;
+}
+
+.markdown-preview-surface .h-5,
+.markdown-editor-surface .h-5,
+.markdown-widget-shell .h-5,
+.cm-table-widget .h-5 {
+  height: 1.25rem;
+}
+
+.markdown-preview-surface .p-0,
+.markdown-editor-surface .p-0,
+.markdown-widget-shell .p-0,
+.cm-table-widget .p-0 {
+  padding: 0;
+}
+
+.markdown-preview-surface .p-1,
+.markdown-editor-surface .p-1,
+.markdown-widget-shell .p-1,
+.cm-table-widget .p-1 {
+  padding: 0.25rem;
+}
+
+.markdown-preview-surface .p-2,
+.markdown-editor-surface .p-2,
+.markdown-widget-shell .p-2,
+.cm-table-widget .p-2 {
+  padding: 0.5rem;
+}
+
+.markdown-preview-surface .p-9,
+.markdown-editor-surface .p-9,
+.markdown-widget-shell .p-9,
+.cm-table-widget .p-9 {
+  padding: 2.25rem;
+}
+
+.markdown-preview-surface .p-px,
+.markdown-editor-surface .p-px,
+.markdown-widget-shell .p-px,
+.cm-table-widget .p-px {
+  padding: 1px;
+}
+
+.markdown-preview-surface .px-1,
+.markdown-editor-surface .px-1,
+.markdown-widget-shell .px-1,
+.cm-table-widget .px-1 {
+  padding-inline: 0.25rem;
+}
+
+.markdown-preview-surface .px-2,
+.markdown-editor-surface .px-2,
+.markdown-widget-shell .px-2,
+.cm-table-widget .px-2 {
+  padding-inline: 0.5rem;
+}
+
+.markdown-preview-surface .px-4,
+.markdown-editor-surface .px-4,
+.markdown-widget-shell .px-4,
+.cm-table-widget .px-4 {
+  padding-inline: 1rem;
+}
+
+.markdown-preview-surface .py-0,
+.markdown-editor-surface .py-0,
+.markdown-widget-shell .py-0,
+.cm-table-widget .py-0 {
+  padding-block: 0;
+}
+
+.markdown-preview-surface .py-1,
+.markdown-editor-surface .py-1,
+.markdown-widget-shell .py-1,
+.cm-table-widget .py-1 {
+  padding-block: 0.25rem;
+}
+
+.markdown-preview-surface .py-3,
+.markdown-editor-surface .py-3,
+.markdown-widget-shell .py-3,
+.cm-table-widget .py-3 {
+  padding-block: 0.75rem;
+}
+
+.markdown-preview-surface .py-4,
+.markdown-editor-surface .py-4,
+.markdown-widget-shell .py-4,
+.cm-table-widget .py-4 {
+  padding-block: 1rem;
+}
+
+.markdown-preview-surface .pl-1,
+.markdown-editor-surface .pl-1,
+.markdown-widget-shell .pl-1,
+.cm-table-widget .pl-1 {
+  padding-left: 0.25rem;
+}
+
+.markdown-preview-surface .ps-\[20px\],
+.markdown-editor-surface .ps-\[20px\],
+.markdown-widget-shell .ps-\[20px\],
+.cm-table-widget .ps-\[20px\] {
+  padding-inline-start: 20px;
+}
+
+.markdown-preview-surface .pb-0,
+.markdown-editor-surface .pb-0,
+.markdown-widget-shell .pb-0,
+.cm-table-widget .pb-0 {
+  padding-bottom: 0;
+}
+
+.markdown-preview-surface .pb-\[50svh\],
+.markdown-editor-surface .pb-\[50svh\],
+.markdown-widget-shell .pb-\[50svh\],
+.cm-table-widget .pb-\[50svh\] {
+  padding-bottom: 50svh;
+}
+
+.markdown-preview-surface .top-0,
+.markdown-editor-surface .top-0,
+.markdown-widget-shell .top-0,
+.cm-table-widget .top-0 {
+  top: 0;
+}
+
+.markdown-preview-surface .top-2,
+.markdown-editor-surface .top-2,
+.markdown-widget-shell .top-2,
+.cm-table-widget .top-2 {
+  top: 0.5rem;
+}
+
+.markdown-preview-surface .end-2,
+.markdown-editor-surface .end-2,
+.markdown-widget-shell .end-2,
+.cm-table-widget .end-2 {
+  inset-inline-end: 0.5rem;
+}
+
+.markdown-preview-surface .z-10,
+.markdown-editor-surface .z-10,
+.markdown-widget-shell .z-10,
+.cm-table-widget .z-10 {
+  z-index: 10;
+}
+
+.markdown-preview-surface .opacity-0,
+.markdown-editor-surface .opacity-0,
+.markdown-widget-shell .opacity-0,
+.cm-table-widget .opacity-0 {
+  opacity: 0;
+}
+
+.markdown-preview-surface .opacity-40,
+.markdown-editor-surface .opacity-40,
+.markdown-widget-shell .opacity-40,
+.cm-table-widget .opacity-40 {
+  opacity: 0.4;
+}
+
+.markdown-preview-surface .rounded-sm,
+.markdown-editor-surface .rounded-sm,
+.markdown-widget-shell .rounded-sm,
+.cm-table-widget .rounded-sm {
+  border-radius: var(--radius-s);
+}
+
+.markdown-preview-surface .rounded-none,
+.markdown-editor-surface .rounded-none,
+.markdown-widget-shell .rounded-none,
+.cm-table-widget .rounded-none {
+  border-radius: 0;
+}
+
+.markdown-preview-surface .border-none,
+.markdown-editor-surface .border-none,
+.markdown-widget-shell .border-none,
+.cm-table-widget .border-none {
+  border: 0;
+}
+
+.markdown-preview-surface .border-0,
+.markdown-editor-surface .border-0,
+.markdown-widget-shell .border-0,
+.cm-table-widget .border-0 {
+  border-width: 0;
+}
+
+.markdown-preview-surface .border-b,
+.markdown-editor-surface .border-b,
+.markdown-widget-shell .border-b,
+.cm-table-widget .border-b {
+  border-bottom: 1px solid var(--border);
+}
+
+.markdown-preview-surface .border-r,
+.markdown-editor-surface .border-r,
+.markdown-widget-shell .border-r,
+.cm-table-widget .border-r {
+  border-right: 1px solid var(--border);
+}
+
+.markdown-preview-surface .border-l,
+.markdown-editor-surface .border-l,
+.markdown-widget-shell .border-l,
+.cm-table-widget .border-l {
+  border-left: 1px solid var(--border);
+}
+
+.markdown-preview-surface .border-y,
+.markdown-editor-surface .border-y,
+.markdown-widget-shell .border-y,
+.cm-table-widget .border-y {
+  border-bottom: 1px solid var(--border);
+  border-top: 1px solid var(--border);
+}
+
+.markdown-preview-surface .border-x,
+.markdown-editor-surface .border-x,
+.markdown-widget-shell .border-x,
+.cm-table-widget .border-x {
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+}
+
+.cm-table-widget .border-none {
+  border: 0;
+}
+
+.markdown-preview-surface .bg-transparent,
+.markdown-editor-surface .bg-transparent,
+.markdown-widget-shell .bg-transparent,
+.cm-table-widget .bg-transparent,
+.markdown-preview-surface .\!bg-transparent,
+.markdown-editor-surface .\!bg-transparent,
+.markdown-widget-shell .\!bg-transparent,
+.cm-table-widget .\!bg-transparent {
+  background: transparent !important;
+}
+
+.markdown-preview-surface .bg-background,
+.markdown-editor-surface .bg-background,
+.markdown-widget-shell .bg-background,
+.cm-table-widget .bg-background {
+  background: var(--background-primary, var(--background));
+}
+
+.markdown-preview-surface .bg-secondary,
+.markdown-editor-surface .bg-secondary,
+.markdown-widget-shell .bg-secondary,
+.cm-table-widget .bg-secondary {
+  background: var(--secondary);
+}
+
+.markdown-preview-surface .text-muted-foreground,
+.markdown-editor-surface .text-muted-foreground,
+.markdown-widget-shell .text-muted-foreground,
+.cm-table-widget .text-muted-foreground {
+  color: var(--muted-foreground);
+}
+
+.markdown-preview-surface .text-foreground,
+.markdown-editor-surface .text-foreground,
+.markdown-widget-shell .text-foreground,
+.cm-table-widget .text-foreground {
+  color: var(--foreground);
+}
+
+.markdown-preview-surface .text-xs,
+.markdown-editor-surface .text-xs,
+.markdown-widget-shell .text-xs,
+.cm-table-widget .text-xs {
+  font-size: 0.75rem;
+}
+
+.markdown-preview-surface .text-sm,
+.markdown-editor-surface .text-sm,
+.markdown-widget-shell .text-sm,
+.cm-table-widget .text-sm {
+  font-size: 0.875rem;
+}
+
+.markdown-preview-surface .font-mono,
+.markdown-editor-surface .font-mono,
+.markdown-widget-shell .font-mono,
+.cm-table-widget .font-mono {
+  font-family: var(--font-monospace);
+}
+
+.markdown-preview-surface .font-medium,
+.markdown-editor-surface .font-medium,
+.markdown-widget-shell .font-medium,
+.cm-table-widget .font-medium {
+  font-weight: 500;
+}
+
+.markdown-preview-surface .text-left,
+.markdown-editor-surface .text-left,
+.markdown-widget-shell .text-left,
+.cm-table-widget .text-left {
+  text-align: left;
+}
+
+.markdown-preview-surface .text-right,
+.markdown-editor-surface .text-right,
+.markdown-widget-shell .text-right,
+.cm-table-widget .text-right {
+  text-align: right;
+}
+
+.markdown-preview-surface .text-center,
+.markdown-editor-surface .text-center,
+.markdown-widget-shell .text-center,
+.cm-table-widget .text-center {
+  text-align: center;
+}
+
+.markdown-preview-surface .align-middle,
+.markdown-editor-surface .align-middle,
+.markdown-widget-shell .align-middle,
+.cm-table-widget .align-middle {
+  vertical-align: middle;
+}
+
+.markdown-preview-surface .text-ellipsis,
+.markdown-editor-surface .text-ellipsis,
+.markdown-widget-shell .text-ellipsis,
+.cm-table-widget .text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.markdown-preview-surface .overflow-auto,
+.markdown-editor-surface .overflow-auto,
+.markdown-widget-shell .overflow-auto,
+.cm-table-widget .overflow-auto {
+  overflow: auto;
+}
+
+.markdown-preview-surface .overflow-x-auto,
+.markdown-editor-surface .overflow-x-auto,
+.markdown-widget-shell .overflow-x-auto,
+.cm-table-widget .overflow-x-auto {
+  overflow-x: auto;
+}
+
+.markdown-preview-surface .overflow-y-hidden,
+.markdown-editor-surface .overflow-y-hidden,
+.markdown-widget-shell .overflow-y-hidden,
+.cm-table-widget .overflow-y-hidden {
+  overflow-y: hidden;
+}
+
+.markdown-preview-surface .overflow-hidden,
+.markdown-editor-surface .overflow-hidden,
+.markdown-widget-shell .overflow-hidden,
+.cm-table-widget .overflow-hidden {
+  overflow: hidden;
+}
+
+.markdown-preview-surface .whitespace-pre,
+.markdown-editor-surface .whitespace-pre,
+.markdown-widget-shell .whitespace-pre,
+.cm-table-widget .whitespace-pre {
+  white-space: pre;
+}
+
+.markdown-preview-surface .whitespace-nowrap,
+.markdown-editor-surface .whitespace-nowrap,
+.markdown-widget-shell .whitespace-nowrap,
+.cm-table-widget .whitespace-nowrap {
+  white-space: nowrap;
+}
+
+.markdown-preview-surface .caption-bottom,
+.markdown-editor-surface .caption-bottom,
+.markdown-widget-shell .caption-bottom,
+.cm-table-widget.caption-bottom {
+  caption-side: bottom;
+}
+
+.markdown-preview-surface .outline-none,
+.markdown-editor-surface .outline-none,
+.markdown-widget-shell .outline-none,
+.cm-table-widget .outline-none {
+  outline: none;
+}
+
+.markdown-preview-surface .empty\:hidden:empty,
+.markdown-editor-surface .empty\:hidden:empty,
+.markdown-widget-shell .empty\:hidden:empty,
+.cm-table-widget .empty\:hidden:empty {
+  display: none;
+}
+
+.markdown-preview-surface .cursor-grab,
+.markdown-editor-surface .cursor-grab,
+.markdown-widget-shell .cursor-grab,
+.cm-table-widget .cursor-grab {
+  cursor: grab;
+}
+
+.markdown-preview-surface .cursor-e-resize,
+.markdown-editor-surface .cursor-e-resize,
+.markdown-widget-shell .cursor-e-resize,
+.cm-table-widget .cursor-e-resize {
+  cursor: e-resize;
+}
+
+.markdown-preview-surface .cursor-s-resize,
+.markdown-editor-surface .cursor-s-resize,
+.markdown-widget-shell .cursor-s-resize,
+.cm-table-widget .cursor-s-resize {
+  cursor: s-resize;
+}
+
+.cm-table-widget .right-\[-4px\] {
+  right: -4px;
+}
+
+.cm-table-widget .bottom-\[-8px\] {
+  bottom: -8px;
+}
+
+.cm-table-widget .top-\[calc\(50\%-0\.75rem_\/_2\)\] {
+  top: calc(50% - 0.75rem / 2);
+}
+
+.cm-table-widget .left-\[calc\(50\%-0\.75rem_\/_2\)\] {
+  left: calc(50% - 0.75rem / 2);
+}
+
+.cm-table-widget .w-1\.5 {
+  width: 0.375rem;
+}
+
+.markdown-preview-surface .size-3\.5,
+.markdown-editor-surface .size-3\.5,
+.markdown-widget-shell .size-3\.5,
+.cm-table-widget .size-3\.5 {
+  height: 0.875rem;
+  width: 0.875rem;
+}
+
+.markdown-preview-surface .min-h-\[29px\],
+.markdown-editor-surface .min-h-\[29px\],
+.markdown-widget-shell .min-h-\[29px\],
+.cm-table-widget .min-h-\[29px\] {
+  min-height: 29px;
+}
+
+.markdown-preview-surface .min-w-0,
+.markdown-editor-surface .min-w-0,
+.markdown-widget-shell .min-w-0,
+.cm-table-widget .min-w-0 {
+  min-width: 0;
+}
+
+.markdown-preview-surface .min-w-\[8ch\],
+.markdown-editor-surface .min-w-\[8ch\],
+.markdown-widget-shell .min-w-\[8ch\],
+.cm-table-widget .min-w-\[8ch\] {
+  min-width: 8ch;
+}
+
+.markdown-preview-surface .min-w-\[9em\],
+.markdown-editor-surface .min-w-\[9em\],
+.markdown-widget-shell .min-w-\[9em\],
+.cm-table-widget .min-w-\[9em\] {
+  min-width: 9em;
+}
+
+.cm-table-widget .m-0 {
+  margin: 0;
+}
+
+.cm-table-widget .border-t-0 {
+  border-top-width: 0;
+}
+
+.cm-table-widget .\[\&_svg\]\:size-6 svg {
+  height: 1.5rem;
+  width: 1.5rem;
+}
+
+.cm-table-widget .\[\&_svg\]\:size-5 svg {
+  height: 1.25rem;
+  width: 1.25rem;
+}

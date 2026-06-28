@@ -1,6 +1,7 @@
 <script module lang="ts">
   import type {
     MiraAssetResolver,
+    MiraFileAdapter,
     MiraLinkResolver,
     MiraRendererComponents,
   } from "@mira-mde/extensions";
@@ -18,6 +19,7 @@
     components?: MiraRendererComponents;
     linkResolver?: MiraLinkResolver;
     assetResolver?: MiraAssetResolver;
+    fileAdapter?: MiraFileAdapter;
     postProcess?: MarkdownPostProcess;
     onChange?: MarkdownChangeHandler;
     onFrontmatterChange?: (nextYaml: string, nextValue: string) => void;
@@ -30,10 +32,7 @@
 <script lang="ts">
   import Renderer from "./renderer.svelte";
   import { createParser } from "./utils";
-  import {
-    setMarkdownContext,
-    type MarkdownContext,
-  } from "./context.svelte";
+  import { setMarkdownContext, type MarkdownContext } from "./context.svelte";
   import type { HastNode, Parser } from "./types";
 
   let {
@@ -45,6 +44,7 @@
     components = {},
     linkResolver,
     assetResolver,
+    fileAdapter,
     postProcess = () => {},
     onChange,
     onFrontmatterChange,
@@ -61,9 +61,13 @@
   let contextState = $state<MarkdownContext>({
     markdown: "",
     sourcePath: undefined,
+    remarkPlugins: [],
+    rehypePlugins: [],
+    remarkRehypeOptions: { allowDangerousHtml: true },
     components: {},
     linkResolver: undefined,
     assetResolver: undefined,
+    fileAdapter: undefined,
     postProcess: () => {},
     onChange: undefined,
     onFrontmatterChange: undefined,
@@ -76,9 +80,13 @@
   $effect.pre(() => {
     context.markdown = value;
     context.sourcePath = sourcePath;
+    context.remarkPlugins = remarkPlugins;
+    context.rehypePlugins = rehypePlugins;
+    context.remarkRehypeOptions = remarkRehypeOptions;
     context.components = components;
     context.linkResolver = linkResolver;
     context.assetResolver = assetResolver;
+    context.fileAdapter = fileAdapter;
     context.postProcess = postProcess;
     context.onChange = onChange;
     context.onFrontmatterChange = onFrontmatterChange;

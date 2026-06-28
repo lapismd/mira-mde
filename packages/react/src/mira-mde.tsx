@@ -7,7 +7,12 @@ import {
   createMiraEditorController,
   type MiraEditorController,
 } from "@mira-mde/core";
-import { resolveMiraExtensions, type MiraMode } from "@mira-mde/extensions";
+import {
+  resolveMiraExtensions,
+  type MiraMode,
+  type MiraTheme,
+  type MiraThemeConfig,
+} from "@mira-mde/extensions";
 import {
   forwardRef,
   useCallback,
@@ -16,6 +21,7 @@ import {
   useMemo,
   useRef,
   useState,
+  type RefObject,
 } from "react";
 import { useLatestRef, cx } from "./hooks";
 import { MarkdownPreviewHost } from "./preview-host";
@@ -31,6 +37,7 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
     defaultReadonly = false,
     defaultValue = "",
     extensions = [],
+    fileAdapter,
     frontmatterOpen = true,
     frontmatterConfig,
     lineWrapping = true,
@@ -45,12 +52,14 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
     sourcePath,
     spellcheck = true,
     theme = "obsidian",
+    themeConfig,
     toolbar = true,
     value: valueProp,
   },
   ref,
 ) {
   const editorHostRef = useRef<HTMLDivElement | null>(null);
+  const rootRef = useRef<HTMLDivElement | null>(null);
   const controllerRef = useRef<MiraEditorController | null>(null);
   const cleanupExtensionMountsRef = useRef<Array<() => void>>([]);
   const [uncontrolledValue, setUncontrolledValue] = useState(defaultValue);
@@ -130,6 +139,7 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
       createRichEditorExtensions({
         assetResolver,
         extensions,
+        fileAdapter,
         frontmatterConfig,
         frontmatterOpen,
         linkResolver,
@@ -149,6 +159,7 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
         sourcePath,
       } as Parameters<typeof createRichEditorExtensions>[0] & {
         frontmatterConfig?: unknown;
+        fileAdapter?: unknown;
       }),
       resolved.codeMirror,
     ].flat();
@@ -156,6 +167,7 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
     assetResolver,
     commitValue,
     extensions,
+    fileAdapter,
     frontmatterOpen,
     frontmatterConfig,
     lineWrapping,
@@ -282,20 +294,17 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
 
   const showEditor = mode !== "preview";
   const showPreview = mode === "preview" || mode === "split";
-  const themeClass =
-    theme === "dark"
-      ? "mira-theme-dark theme-dark dark"
-      : theme === "light"
-        ? "mira-theme-light theme-light"
-        : theme === "system"
-          ? "mira-theme-system"
-          : "mira-theme-obsidian theme-light";
+  const inheritedTheme = useInheritedTheme(theme, themeConfig, rootRef);
+  const themeClass = themeClassName(
+    theme === "inherit" ? inheritedTheme : theme,
+  );
 
   return (
     <div
       className={cx("mira-mde", themeClass, className)}
       data-mode={mode}
       data-readonly={readonly}
+      ref={rootRef}
     >
       {toolbar ? (
         <div className="mira-mde__toolbar" aria-label="Markdown editor toolbar">
@@ -362,6 +371,7 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
             <MarkdownPreviewHost
               assetResolver={assetResolver}
               extensions={extensions}
+              fileAdapter={fileAdapter}
               frontmatterConfig={frontmatterConfig}
               frontmatterOpen={frontmatterOpen}
               linkResolver={linkResolver}
@@ -378,3 +388,138 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
 });
 
 MiraMde.displayName = "MiraMde";
+
+function themeClassName(theme: MiraTheme): string {
+  if (theme === "dark") {
+    return "mira-theme-dark theme-dark dark";
+  }
+  if (theme === "light") {
+    return "mira-theme-light theme-light";
+  }
+  if (theme === "system") {
+    return "mira-theme-system";
+  }
+  return "mira-theme-obsidian theme-light";
+}
+
+function useInheritedTheme(
+  theme: MiraTheme,
+  config: MiraThemeConfig | undefined,
+  rootRef: RefObject<HTMLElement | null>,
+): Exclude<MiraTheme, "inherit"> {
+  const [inheritedTheme, setInheritedTheme] = useState<
+    Exclude<MiraTheme, "inherit">
+  >(config?.fallback ?? "system");
+
+  useEffect(() => {
+    if (theme !== "inherit" || typeof document === "undefined") {
+      return;
+    }
+
+    const updateTheme = () => {
+      setInheritedTheme(resolveInheritedTheme(rootRef.current, config));
+    };
+    updateTheme();
+
+    const observer = new MutationObserver(updateTheme);
+    for (const element of themeLookupTargets(rootRef.current, config)) {
+      observer.observe(element, {
+        attributeFilter: [
+          "class",
+          ...(config?.attributeNames ?? [
+            "data-theme",
+            "data-color-scheme",
+            "data-mode",
+          ]),
+        ],
+        attributes: true,
+      });
+    }
+
+    return () => observer.disconnect();
+  }, [config, rootRef, theme]);
+
+  return inheritedTheme;
+}
+
+function resolveInheritedTheme(
+  element: HTMLElement | null,
+  config: MiraThemeConfig | undefined,
+): Exclude<MiraTheme, "inherit"> {
+  const darkClasses = config?.darkClassNames ?? [
+    "dark",
+    "theme-dark",
+    "mira-theme-dark",
+  ];
+  const lightClasses = config?.lightClassNames ?? [
+    "light",
+    "theme-light",
+    "mira-theme-light",
+  ];
+  const darkValues = config?.darkDataThemeValues ?? ["dark", "theme-dark"];
+  const lightValues = config?.lightDataThemeValues ?? ["light", "theme-light"];
+  const attributeNames = config?.attributeNames ?? [
+    "data-theme",
+    "data-color-scheme",
+    "data-mode",
+  ];
+
+  for (const target of themeLookupTargets(element, config)) {
+    for (const className of darkClasses) {
+      if (target.classList.contains(className)) {
+        return "dark";
+      }
+    }
+    for (const className of lightClasses) {
+      if (target.classList.contains(className)) {
+        return "light";
+      }
+    }
+    for (const attribute of attributeNames) {
+      const value = target.getAttribute(attribute)?.toLowerCase();
+      if (value && darkValues.includes(value)) {
+        return "dark";
+      }
+      if (value && lightValues.includes(value)) {
+        return "light";
+      }
+    }
+  }
+
+  return config?.fallback ?? "system";
+}
+
+function themeLookupTargets(
+  element: HTMLElement | null,
+  config: MiraThemeConfig | undefined,
+): HTMLElement[] {
+  if (typeof document === "undefined") {
+    return [];
+  }
+
+  const configuredRoot = config?.root;
+  const rootElement = isDocument(configuredRoot)
+    ? configuredRoot.documentElement
+    : configuredRoot;
+  const targets: HTMLElement[] = [];
+  let current: HTMLElement | null =
+    rootElement ?? element?.parentElement ?? document.documentElement;
+
+  while (current) {
+    targets.push(current);
+    current = current.parentElement;
+  }
+
+  if (document.body && !targets.includes(document.body)) {
+    targets.push(document.body);
+  }
+  if (!targets.includes(document.documentElement)) {
+    targets.push(document.documentElement);
+  }
+
+  return targets;
+}
+
+function isDocument(value: unknown): value is Document {
+  return typeof Document !== "undefined" && value instanceof Document;
+}

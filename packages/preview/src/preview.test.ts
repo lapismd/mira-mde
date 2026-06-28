@@ -4,24 +4,10 @@ import {
   TYPE_TABLE,
   mdast2hastGridTablesHandler,
 } from "@adobe/mdast-util-gridtables";
-import remarkFrontmatter from "remark-frontmatter";
 import type { Element, Root } from "hast";
 import { remarkWikiLinks } from "./remark";
-import {
-  coerceFrontmatterValue,
-  createFrontmatterReplacement,
-  frontmatterProperties,
-  parseFrontmatterYaml,
-  resolveFrontmatterWidget,
-  serializeFrontmatterRecord,
-} from "./components/frontmatter-utils";
 import { createParser } from "./renderer/utils";
-import {
-  remarkCallouts,
-  remarkCustomChecklists,
-  remarkFrontmatterToHast,
-  remarkPositionsToData,
-} from "./remark";
+import { findElement } from "./test-utils";
 
 describe("preview exports", () => {
   it("exports built-in remark plugins", () => {
@@ -29,196 +15,14 @@ describe("preview exports", () => {
   });
 });
 
-describe("frontmatter utilities", () => {
-  it("parses, mutates, and serializes portable YAML properties", () => {
-    const parsed = parseFrontmatterYaml(
-      "title: Demo\npublished: true\ncount: 2\ntags:\n  - mira\n",
-    );
-
-    expect(parsed.ok).toBe(true);
-    if (!parsed.ok) {
-      return;
-    }
-
-    const yaml = serializeFrontmatterRecord({
-      ...parsed.value,
-      title: "Updated",
-    });
-
-    expect(yaml).toContain("title: Updated");
-    expect(createFrontmatterReplacement(yaml)).toMatch(/^---\n/);
-  });
-
-  it("derives Lapis-style property types and icons", () => {
-    const properties = frontmatterProperties({
-      aliases: ["Mira"],
-      count: 2,
-      draft: false,
-      nested: { child: true },
-      published: "2026-06-27",
-      tags: ["mira", "editor"],
-      title: "Demo",
-    });
-
-    expect(properties.map((property) => [property.key, property.type])).toEqual(
-      [
-        ["aliases", "aliases"],
-        ["count", "number"],
-        ["draft", "checkbox"],
-        ["nested", "object"],
-        ["published", "date"],
-        ["tags", "tags"],
-        ["title", "text"],
-      ],
-    );
-    expect(properties.find((property) => property.key === "tags")?.icon).toBe(
-      "lucide-tags",
-    );
-    expect(
-      properties.find((property) => property.key === "nested")?.children[0]
-        ?.type,
-    ).toBe("checkbox");
-  });
-
-  it("applies configured frontmatter property types and widgets", () => {
-    const properties = frontmatterProperties(
-      {
-        status: "draft",
-        title: "Demo",
-      },
-      {
-        types: {
-          status: {
-            type: "workflow-state",
-            label: "Workflow state",
-            icon: "lucide-workflow",
-            fallbackKind: "text",
-            defaultValue: "draft",
-            normalize: (value: unknown) => String(value).toUpperCase(),
-          },
-        },
-        widgets: [
-          {
-            type: "workflow-state",
-            label: "Workflow state",
-            icon: "lucide-workflow",
-            fallbackKind: "text",
-            render: () => undefined,
-          },
-        ],
-      },
-    );
-    const status = properties.find((property) => property.key === "status");
-
-    expect(status?.type).toBe("workflow-state");
-    expect(status?.icon).toBe("lucide-workflow");
-    expect(resolveFrontmatterWidget({ widgets: [] }, "missing")).toBeNull();
-    expect(
-      coerceFrontmatterValue("draft", "workflow-state", {
-        widgets: [
-          {
-            type: "workflow-state",
-            normalize: (value: unknown) => String(value).toUpperCase(),
-          },
-        ],
-      }),
-    ).toBe("DRAFT");
-  });
-
-  it("renders frontmatter as a component with source offsets", () => {
-    const parser = createParser([
-      remarkFrontmatter,
-      remarkFrontmatterToHast,
-      remarkPositionsToData,
-    ]);
-    const ast = parser("---\ntitle: Demo\n---\n\n# Heading") as Root;
-    const frontmatter = ast.children.find(
-      (node): node is Element =>
-        node.type === "element" && node.tagName === "frontmatter",
-    );
-
-    expect(frontmatter?.properties?.value).toBe("title: Demo");
-    expect(frontmatter?.properties?.["data-offset"]).toBe(0);
-    expect(frontmatter?.properties?.["data-offset-end"]).toBe(19);
-  });
-});
-
-describe("callout rendering", () => {
-  it("turns Obsidian callout blockquotes into callout elements", () => {
-    const parser = createParser([remarkCallouts]);
-    const ast = parser(
-      "> [!note] Portable package boundary\n> The editor works.",
-    ) as Root;
-    const callout = ast.children.find(
-      (node): node is Element =>
-        node.type === "element" && node.tagName === "callout",
-    );
-
-    expect(callout?.properties?.["data-callout"]).toBe("note");
-    expect(callout?.properties?.["data-icon"]).toBe("pencil");
-    expect(callout?.properties?.title).toBe("Portable package boundary");
-    expect(JSON.stringify(callout)).not.toContain("[!note]");
-  });
-
-  it("preserves collapsible callout state", () => {
-    const parser = createParser([remarkCallouts, remarkPositionsToData]);
-    const ast = parser("> [!warning]- Heads up\n> Hidden.") as Root;
-    const callout = ast.children.find(
-      (node): node is Element =>
-        node.type === "element" && node.tagName === "callout",
-    );
-
-    expect(callout?.properties?.["data-expandable"]).toBe("true");
-    expect(callout?.properties?.["data-expanded"]).toBe("false");
-    expect(Number(callout?.properties?.["data-expand-offset"])).toBeGreaterThan(
-      0,
-    );
-  });
-});
-
-describe("custom checklist rendering", () => {
-  it("turns custom task markers into GFM task items with data-task", () => {
-    const parser = createParser([remarkCustomChecklists]);
-    const ast = parser("- [/] Custom task marker") as Root;
-    const item = findElement(ast, "li");
-
-    expect(item?.tagName).toBe("li");
-    expect(item?.properties?.["data-task"]).toBe("/");
-    expect(JSON.stringify(item)).not.toContain("[/]");
-  });
-
-  it("preserves data-task for standard task items", () => {
-    const parser = createParser([remarkCustomChecklists]);
-    const ast = parser("- [x] Done") as Root;
-    const item = findElement(ast, "li");
-
-    expect(item?.properties?.["data-task"]).toBe("x");
-  });
-
-  it("supports Lapis custom task marker characters", () => {
-    const parser = createParser([remarkCustomChecklists]);
-    const ast = parser("- [?] Needs answer\n- [-] Cancelled") as Root;
-    const serialized = JSON.stringify(ast);
-
-    expect(serialized).toContain('"data-task":"?"');
-    expect(serialized).toContain('"data-task":"-"');
-    expect(serialized).not.toContain("[?]");
-    expect(serialized).not.toContain("[-]");
-  });
-});
-
 describe("grid table rendering", () => {
   it("renders Adobe grid tables through the preview pipeline", () => {
-    const parser = createParser(
-      [remarkGridTables],
-      [],
-      {
-        allowDangerousHtml: true,
-        handlers: {
-          [TYPE_TABLE]: mdast2hastGridTablesHandler(),
-        },
+    const parser = createParser([remarkGridTables], [], {
+      allowDangerousHtml: true,
+      handlers: {
+        [TYPE_TABLE]: mdast2hastGridTablesHandler(),
       },
-    );
+    });
     const ast = parser(
       [
         "+---------+----------+",
@@ -260,22 +64,3 @@ describe("renderer prop normalization", () => {
     expect(paragraph.properties?.className).toBeUndefined();
   });
 });
-
-function findElement(
-  node: Root | Element,
-  tagName: string,
-): Element | undefined {
-  if (node.type === "element" && node.tagName === tagName) {
-    return node;
-  }
-  for (const child of node.children ?? []) {
-    if (child.type !== "element") {
-      continue;
-    }
-    const result = findElement(child, tagName);
-    if (result) {
-      return result;
-    }
-  }
-  return undefined;
-}

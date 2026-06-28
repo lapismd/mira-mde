@@ -74,7 +74,9 @@
   async function loadSvg2Roughjs(): Promise<Svg2RoughjsConstructor> {
     const module = (await import("svg2roughjs")) as unknown as {
       Svg2Roughjs?: Svg2RoughjsConstructor;
-      default?: Svg2RoughjsConstructor | { Svg2Roughjs?: Svg2RoughjsConstructor };
+      default?:
+        | Svg2RoughjsConstructor
+        | { Svg2Roughjs?: Svg2RoughjsConstructor };
     };
     const candidate =
       module.Svg2Roughjs ??
@@ -272,6 +274,8 @@
       <Dialog.Root>
         <Dialog.Trigger
           class={buttonVariants({ size: "sm", variant: "secondary" })}
+          title="Expand Mermaid diagram"
+          aria-label="Expand Mermaid diagram"
         >
           <MoveHorizontal />
         </Dialog.Trigger>
@@ -282,7 +286,11 @@
           <Dialog.Description class="sr-only"
             >Mermaid diagram preview.</Dialog.Description
           >
-          <Self id={`dialog-${renderId}`} diagram={renderSource.diagram} dialog />
+          <Self
+            id={`dialog-${renderId}`}
+            diagram={renderSource.diagram}
+            dialog
+          />
         </Dialog.Content>
       </Dialog.Root>
       <Button

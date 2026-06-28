@@ -1,28 +1,8 @@
 import { describe, expect, it } from "vitest";
-import {
-  formatMarkdownTable,
-  parseMarkdownTable,
-  TableNode,
-} from "./index";
+import { createTableExtensions } from ".";
 
-describe("codemirror tables", () => {
-  it("parses and formats GFM tables through the public API", () => {
-    const table = parseMarkdownTable(
-      "| Package | Status |\n| :--- | ---: |\n| Mira | ready |",
-    );
-
-    expect(table).toEqual({
-      header: ["Package", "Status"],
-      align: ["left", "right"],
-      rows: [["Mira", "ready"]],
-    });
-    expect(formatMarkdownTable(table!)).toContain("| Package | Status |");
-  });
-
-  it("uses the Lapis TableNode model", () => {
-    const node = TableNode.fromMarkdown("| A |\n| --- |\n| B |");
-
-    expect(node?.getRowCount()).toBe(2);
-    expect(node?.getColCount()).toBe(1);
+describe("codemirror tables public API", () => {
+  it("creates the default table extensions", () => {
+    expect(createTableExtensions()).toHaveLength(1);
   });
 });

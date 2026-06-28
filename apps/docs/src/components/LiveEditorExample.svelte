@@ -8,6 +8,7 @@
     type MiraFeatureFlags
   } from "@mira-mde/default-ui/svelte";
   import type { MiraMode, MiraTheme } from "@mira-mde/extensions";
+  import { docsFileAdapter } from "../lib/file-adapter";
 
   type Props = {
     description?: string;
@@ -78,6 +79,7 @@
     {readonly}
     {theme}
     {sourcePath}
+    fileAdapter={docsFileAdapter}
     features={mergedFeatures}
     {featureConfigs}
     class="docs-live-editor__surface"

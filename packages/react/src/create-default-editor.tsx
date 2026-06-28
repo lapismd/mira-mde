@@ -18,7 +18,10 @@ export function createMiraDefaultEditor(
   let currentProps = { ...initialProps };
   let currentValue = initialProps.value ?? initialProps.defaultValue ?? "";
   let currentMode =
-    initialProps.mode ?? initialProps.defaultMode ?? "live-preview";
+    initialProps.mode ??
+    initialProps.defaultMode ??
+    initialProps.defaultEditMode ??
+    "live-preview";
   let currentReadonly =
     initialProps.readonly ?? initialProps.defaultReadonly ?? false;
   let handle: MiraDefaultMdeHandle | null = null;

@@ -3,6 +3,8 @@ import type { Component } from "svelte";
 import type { MiraEditorSelection } from "@mira-mde/core";
 import type { MiraExtension, MiraMode } from "@mira-mde/extensions";
 
+export type MiraDefaultEditMode = Extract<MiraMode, "live-preview" | "source">;
+
 export const MiraFeature = {
   Toolbar: "toolbar",
   ModeSwitch: "mode-switch",
@@ -162,6 +164,8 @@ export const defaultMiraFeatures: ResolvedMiraDefaultFeatures = {
   [MiraFeature.SplitMode]: true,
 };
 
+export const defaultMiraEditMode: MiraDefaultEditMode = "live-preview";
+
 const defaultToolbarItems: MiraDefaultToolbarItem[] = [
   "heading",
   "bold",
@@ -268,6 +272,22 @@ export function resolveMiraDefaultModes(
   }
 
   return modes;
+}
+
+export function resolveMiraDefaultEditMode(
+  defaultEditMode: MiraDefaultEditMode = defaultMiraEditMode,
+  modeOptions: MiraMode[] = resolveMiraDefaultModes(),
+): MiraDefaultEditMode {
+  if (modeOptions.includes(defaultEditMode)) {
+    return defaultEditMode;
+  }
+  if (modeOptions.includes(defaultMiraEditMode)) {
+    return defaultMiraEditMode;
+  }
+  if (modeOptions.includes("source")) {
+    return "source";
+  }
+  return defaultMiraEditMode;
 }
 
 function isToolbarItemAvailable(

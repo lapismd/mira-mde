@@ -1,0 +1,78 @@
+.markdown-rendered blockquote,
+.markdown-preview-surface .markdown blockquote {
+  background-color: var(--markdown-blockquote-background-color);
+  border-inline-start: var(--markdown-blockquote-border-thickness) solid
+    var(--markdown-blockquote-border-color);
+  color: var(--markdown-blockquote-color);
+  font-style: var(--markdown-blockquote-font-style);
+  margin-block: 1em;
+  margin-inline: 0;
+  padding-block: 0;
+  padding-inline-start: var(--size-4-6);
+}
+
+.markdown-rendered blockquote > :first-child,
+.markdown-preview-surface .markdown blockquote > :first-child {
+  margin-top: 0;
+}
+
+.markdown-rendered blockquote > :last-child,
+.markdown-preview-surface .markdown blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+.markdown-rendered blockquote p,
+.markdown-preview-surface .markdown blockquote p {
+  white-space: pre-line;
+}
+
+.markdown-rendered .footnotes,
+.markdown-preview-surface .markdown .footnotes {
+  border-top: 1px solid var(--background-modifier-border);
+  color: var(--text-muted);
+  font-size: var(--font-smaller);
+  margin-block-start: var(--size-4-6);
+  padding-block-start: var(--size-4-3);
+}
+
+.markdown-rendered .footnotes ol,
+.markdown-preview-surface .markdown .footnotes ol {
+  list-style: decimal;
+  margin: 0;
+  padding-inline-start: 1.5rem;
+}
+
+.markdown-rendered .footnotes li,
+.markdown-preview-surface .markdown .footnotes li {
+  margin-inline-start: 0;
+  padding-block: 0.15rem;
+}
+
+.markdown-rendered .footnotes p,
+.markdown-preview-surface .markdown .footnotes p {
+  display: inline;
+  margin: 0;
+}
+
+.markdown-rendered :is([data-footnote-ref], .footnote-ref),
+.markdown-preview-surface .markdown :is([data-footnote-ref], .footnote-ref),
+.markdown-live-preview-mode .cm-footnote-ref {
+  color: var(--text-accent);
+  font-size: 0.8em;
+  font-weight: 600;
+  text-decoration: none;
+  vertical-align: super;
+}
+
+.markdown-rendered .data-footnote-backref,
+.markdown-rendered .footnote-backref,
+.markdown-preview-surface .markdown .data-footnote-backref,
+.markdown-preview-surface .markdown .footnote-backref {
+  color: var(--text-accent);
+  margin-inline-start: 0.25rem;
+  text-decoration: none;
+}
+
+.markdown-live-preview-mode .cm-footnote-definition {
+  color: var(--text-muted);
+}

@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 
 const modeValues: Record<string, string> = {
   Live: "live-preview",
@@ -19,7 +19,7 @@ async function gotoDemo(page: Page) {
     "live-preview",
   );
   await expect(
-    page.locator(".demo-toolbar").getByRole("button", { name: "View mode" }),
+    page.locator(".demo-toolbar").getByRole("button", { name: "Reading view" }),
   ).toBeVisible();
   await expect(
     page
@@ -28,6 +28,9 @@ async function gotoDemo(page: Page) {
   ).toBeVisible();
   await expect(
     page.locator(".demo-toolbar").getByRole("button", { name: "Split" }),
+  ).toBeVisible();
+  await expect(
+    page.locator(".demo-toolbar").getByRole("button", { name: "View options" }),
   ).toBeVisible();
   await expect(
     page.locator(".demo-toolbar").getByRole("button", { name: "Obsidian" }),
@@ -65,26 +68,22 @@ async function setMode(page: Page, name: keyof typeof modeValues) {
   if (name === "Split") {
     await toolbar.getByRole("button", { name: "Split", exact: true }).click();
   } else if (name === "Live") {
-    const editButton = toolbar.getByRole("button", {
-      name: "Edit",
-      exact: true,
-    });
-    if ((await editButton.count()) > 0) {
-      await editButton.click();
-    } else {
-      await toolbar.getByRole("button", { name: "View mode" }).click();
-      await page.getByRole("menuitem", { name: "Edit", exact: true }).click();
-    }
-  } else {
     if (currentMode === "preview") {
-      await setMode(page, "Live");
+      await toolbar.getByRole("button", { name: "Edit", exact: true }).click();
+    } else {
+      await toolbar.getByRole("button", { name: "View options" }).click();
+      await page
+        .getByRole("menuitem", { name: "Live edit", exact: true })
+        .click();
     }
-    await toolbar.getByRole("button", { name: "View mode" }).click();
+  } else if (name === "Preview") {
+    await toolbar
+      .getByRole("button", { name: "Reading view", exact: true })
+      .click();
+  } else {
+    await toolbar.getByRole("button", { name: "View options" }).click();
     await page
-      .getByRole("menuitem", {
-        name: name === "Source" ? "Source mode" : "Preview",
-        exact: true,
-      })
+      .getByRole("menuitem", { name: "Source mode", exact: true })
       .click();
   }
 
@@ -104,10 +103,71 @@ async function scrollEditor(page: Page, top: number) {
     }, top);
 }
 
+async function scrollEditorUntilVisible(
+  page: Page,
+  locator: Locator,
+  options: { max?: number; step?: number } = {},
+) {
+  const max = options.max ?? 6_000;
+  const step = options.step ?? 400;
+
+  for (let top = 0; top <= max; top += step) {
+    await scrollEditor(page, top);
+    if ((await locator.count()) > 0 && (await locator.first().isVisible())) {
+      return;
+    }
+  }
+
+  await expect(locator.first()).toBeVisible();
+}
+
 function editorContent(page: Page) {
   return page
     .locator(".mira-mde__editor-host > .cm-editor > .cm-scroller .cm-content")
     .first();
+}
+
+async function hiddenFormattingCount(
+  page: Page,
+  lineSnippet: string,
+  token: string,
+) {
+  return page.evaluate(
+    ({ lineSnippet, token }) => {
+      const line = Array.from(
+        document.querySelectorAll<HTMLElement>(".cm-line"),
+      ).find((element) => element.textContent?.includes(lineSnippet));
+      if (!line) {
+        return -1;
+      }
+      return Array.from(
+        line.querySelectorAll<HTMLElement>(".cm-formatting-hidden"),
+      ).filter((element) => element.textContent?.includes(token)).length;
+    },
+    { lineSnippet, token },
+  );
+}
+
+async function expectHiddenFormattingCount(
+  page: Page,
+  lineSnippet: string,
+  token: string,
+  count: number,
+) {
+  await expect
+    .poll(() => hiddenFormattingCount(page, lineSnippet, token))
+    .toBe(count);
+}
+
+async function expectHiddenFormattingCountBelow(
+  page: Page,
+  lineSnippet: string,
+  token: string,
+  count: number,
+) {
+  await expect
+    .poll(() => hiddenFormattingCount(page, lineSnippet, token))
+    .toBeLessThan(count);
 }
 
 test("live preview renders widgets and editable frontmatter updates markdown", async ({
@@ -182,8 +242,62 @@ test("live preview renders widgets and editable frontmatter updates markdown", a
 
   const titleInput = page
     .locator('.metadata-property[data-property="title"]')
-    .locator("input");
-  await expect(titleInput).toHaveValue("Mira MDE Demo");
+    .locator('[aria-label="title value"]');
+  await expect(titleInput).toHaveText("Mira MDE Demo");
+  await expect(titleInput).toHaveAttribute("contenteditable", "true");
+  await expect(titleInput).toHaveClass(/metadata-input-longtext/);
+  const publishedProperty = page.locator(
+    '.metadata-property[data-property="published"]',
+  );
+  const publishedInput = publishedProperty.locator(
+    'input[type="date"][aria-label="published value"]',
+  );
+  await expect(
+    publishedProperty.locator(".metadata-input-leading-icon"),
+  ).toHaveCount(0);
+  await expect(publishedInput).toHaveValue("2026-06-28");
+  await expect
+    .poll(() =>
+      publishedInput.evaluate((element) => {
+        const style = getComputedStyle(element);
+        return Number.parseFloat(style.paddingInlineStart);
+      }),
+    )
+    .toBeGreaterThanOrEqual(24);
+  const priorityInput = page
+    .locator('.metadata-property[data-property="priority"]')
+    .locator('input[type="number"][aria-label="priority value"]');
+  await expect(priorityInput).toHaveValue("3");
+  await expect(priorityInput).toHaveAttribute("inputmode", "decimal");
+  await expect
+    .poll(() =>
+      page.evaluate(() => {
+        const rows = ["title", "status", "published", "featured", "priority"]
+          .map((name) =>
+            document.querySelector<HTMLElement>(
+              `.metadata-property[data-property="${name}"] .metadata-property-value`,
+            ),
+          )
+          .filter((element): element is HTMLElement => Boolean(element));
+        const lefts = rows.map(
+          (element) => element.getBoundingClientRect().left,
+        );
+        return Math.max(...lefts) - Math.min(...lefts);
+      }),
+    )
+    .toBeLessThan(2);
+  await expect
+    .poll(() =>
+      page
+        .locator(".metadata-property-value")
+        .first()
+        .evaluate((element) =>
+          getComputedStyle(element)
+            .getPropertyValue("--metadata-value-content-offset")
+            .trim(),
+        ),
+    )
+    .toBe("0");
   await expect(
     page.locator(
       '.metadata-property[data-property="tags"] .metadata-property-icon svg',
@@ -225,6 +339,37 @@ test("clicking a live-preview block restores editable source", async ({
 
   await expect(editorContent(page)).toContainText("~~~mermaid");
   await expect(editorContent(page)).toContainText("flowchart LR");
+});
+
+test("split view button toggles back to the previous view", async ({
+  page,
+}) => {
+  await gotoDemo(page);
+  const splitButton = page
+    .locator(".demo-toolbar")
+    .getByRole("button", { name: "Split", exact: true });
+
+  await setMode(page, "Source");
+  await splitButton.click();
+  await expect(page.locator(".mira-mde")).toHaveAttribute("data-mode", "split");
+  await expect(splitButton).toHaveAttribute("aria-pressed", "true");
+  await splitButton.click();
+  await expect(page.locator(".mira-mde")).toHaveAttribute(
+    "data-mode",
+    "source",
+  );
+  await expect(splitButton).not.toHaveAttribute("aria-pressed", "true");
+
+  await setMode(page, "Preview");
+  await splitButton.click();
+  await expect(page.locator(".mira-mde")).toHaveAttribute("data-mode", "split");
+  await expect(splitButton).toHaveAttribute("aria-pressed", "true");
+  await splitButton.click();
+  await expect(page.locator(".mira-mde")).toHaveAttribute(
+    "data-mode",
+    "preview",
+  );
+  await expect(splitButton).not.toHaveAttribute("aria-pressed", "true");
 });
 
 test("inline fold controls, Source Code Pro, and Obsidian tokens are present", async ({
@@ -316,10 +461,32 @@ test("task lists and live heading gutters match Lapis styling", async ({
   expect(headingMetrics.gutterLineHeight).toBe(headingMetrics.headerLineHeight);
   expect(headingMetrics.topDelta).toBeLessThan(1);
 
-  await scrollEditor(page, 650);
   const liveTask = page.locator(".HyperMD-task-line").first();
+  await scrollEditorUntilVisible(page, liveTask);
   await expect(liveTask).toBeVisible();
-  await expect(liveTask.locator(".mira-task-checkbox")).toBeVisible();
+  const liveTaskCheckbox = liveTask.locator(
+    '.mira-task-checkbox[data-task="x"]',
+  );
+  await expect(liveTaskCheckbox).toBeVisible();
+  await expect(liveTaskCheckbox).toBeChecked();
+  await expect
+    .poll(() =>
+      liveTaskCheckbox.evaluate((element) => {
+        const marker = getComputedStyle(element, "::after");
+        return {
+          backgroundColor: marker.backgroundColor,
+          display: marker.display,
+          maskImage:
+            marker.getPropertyValue("-webkit-mask-image") ||
+            marker.getPropertyValue("mask-image"),
+        };
+      }),
+    )
+    .toEqual({
+      backgroundColor: expect.not.stringMatching(/rgba\(0, 0, 0, 0\)/),
+      display: "block",
+      maskImage: expect.stringContaining("svg"),
+    });
   await expect(liveTask).not.toContainText("- [x]");
   await expect
     .poll(() =>
@@ -330,6 +497,211 @@ test("task lists and live heading gutters match Lapis styling", async ({
       }),
     )
     .toBe("none");
+  for (const top of [720, 800, 880, 960, 1040, 1120]) {
+    await scrollEditor(page, top);
+    await page.waitForTimeout(100);
+    if ((await page.locator('.HyperMD-task-line[data-task="/"]').count()) > 0) {
+      break;
+    }
+  }
+  const customTask = page.locator('.HyperMD-task-line[data-task="/"]').first();
+  await expect(customTask).toBeVisible();
+  const customTaskCheckbox = customTask.locator(
+    '.mira-task-checkbox[data-task="/"]',
+  );
+  await expect(customTaskCheckbox).toBeVisible();
+  await expect(customTask).not.toContainText("- [/]");
+  await expect
+    .poll(() =>
+      customTaskCheckbox.evaluate((element) => {
+        const rect = element.getBoundingClientRect();
+        const marker = getComputedStyle(element, "::after");
+        return {
+          afterDisplay: marker.display,
+          afterWidth: marker.width,
+          height: rect.height,
+          width: rect.width,
+        };
+      }),
+    )
+    .toEqual({
+      afterDisplay: "block",
+      afterWidth: expect.any(String),
+      height: expect.any(Number),
+      width: expect.any(Number),
+    });
+});
+
+test("live inline markdown is styled and reveals source by token", async ({
+  page,
+}) => {
+  await gotoDemo(page);
+  await setMode(page, "Live");
+  await scrollEditor(page, 0);
+
+  const lineSnippet = "Inline";
+  await expectHiddenFormattingCount(page, lineSnippet, "**", 2);
+  await expectHiddenFormattingCount(page, lineSnippet, "_", 2);
+  await expectHiddenFormattingCount(page, lineSnippet, "~~", 2);
+  await expectHiddenFormattingCount(page, lineSnippet, "`", 2);
+  const hiddenPathLinkMiddle = await hiddenFormattingCount(
+    page,
+    lineSnippet,
+    "[",
+  );
+  expect(hiddenPathLinkMiddle).toBeGreaterThan(1);
+  const renderedWikilink = page
+    .locator(".mira-inline-markdown-widget")
+    .filter({ hasText: "wikilinks" })
+    .first();
+  await expect(renderedWikilink).toBeVisible();
+  await expect(renderedWikilink).not.toContainText("[[");
+  await expect(renderedWikilink).not.toContainText("Project Plan|");
+  await expect(renderedWikilink.locator(".mira-link-preview")).toBeVisible();
+  await expect(
+    page.locator(".mira-inline-markdown-widget .mira-embed"),
+  ).toHaveCount(0);
+  await renderedWikilink.locator("[data-link-preview-trigger]").hover();
+  await expect(
+    renderedWikilink.locator(
+      ".mira-link-preview__card .mira-embedded-markdown-preview h1",
+    ),
+  ).toContainText("Project Plan");
+  await expect
+    .poll(() =>
+      renderedWikilink.evaluate((element) => {
+        const paragraph = element.querySelector<HTMLElement>("p");
+        return {
+          display: getComputedStyle(element).display,
+          linkDisplay: getComputedStyle(
+            element.querySelector<HTMLElement>(".mira-link-preview")!,
+          ).display,
+          paragraphDisplay: paragraph
+            ? getComputedStyle(paragraph).display
+            : "",
+        };
+      }),
+    )
+    .toEqual({
+      display: "inline",
+      linkDisplay: "inline",
+      paragraphDisplay: "inline",
+    });
+  const externalLiveLink = page
+    .locator(".cm-external-link .cm-link")
+    .filter({ hasText: "external links" })
+    .first();
+  await expect(externalLiveLink).toBeVisible();
+  await expect
+    .poll(() =>
+      externalLiveLink.evaluate((element) => {
+        const style = getComputedStyle(element);
+        return {
+          backgroundImage: style.backgroundImage,
+          paddingInlineEnd: Number.parseFloat(style.paddingInlineEnd),
+        };
+      }),
+    )
+    .toEqual({
+      backgroundImage: expect.stringContaining("svg"),
+      paddingInlineEnd: expect.any(Number),
+    });
+
+  const strong = page.locator(".cm-strong").filter({ hasText: "bold" }).first();
+  await expect(strong).toBeVisible();
+  await expect
+    .poll(() =>
+      strong.evaluate((element) => getComputedStyle(element).fontWeight),
+    )
+    .toMatch(/^(800|900|bold)$/);
+  await strong.click();
+  await expectHiddenFormattingCount(page, lineSnippet, "**", 0);
+
+  const emphasis = page
+    .locator(".cm-emphasis")
+    .filter({ hasText: "italic" })
+    .first();
+  await expect(emphasis).toBeVisible();
+  await expect
+    .poll(() =>
+      emphasis.evaluate((element) => getComputedStyle(element).fontStyle),
+    )
+    .toBe("italic");
+  await emphasis.click();
+  await expectHiddenFormattingCount(page, lineSnippet, "_", 0);
+
+  const strikethrough = page
+    .locator(".cm-strikethrough")
+    .filter({ hasText: "strikethrough" })
+    .first();
+  await expect(strikethrough).toBeVisible();
+  await expect
+    .poll(() =>
+      strikethrough.evaluate(
+        (element) => getComputedStyle(element).textDecorationLine,
+      ),
+    )
+    .toContain("line-through");
+  await strikethrough.click();
+  await expectHiddenFormattingCount(page, lineSnippet, "~~", 0);
+
+  const inlineCode = page
+    .locator(".cm-inline-code")
+    .filter({ hasText: "inline code" })
+    .first();
+  await expect(inlineCode).toBeVisible();
+  await expect
+    .poll(() =>
+      inlineCode.evaluate((element) => {
+        const probe = document.createElement("span");
+        probe.style.color = "var(--markdown-code-normal, var(--code-normal))";
+        element.append(probe);
+        const expectedColor = getComputedStyle(probe).color;
+        probe.remove();
+        const style = getComputedStyle(element);
+        return {
+          color: style.color,
+          expectedColor,
+          fontFamily: style.fontFamily.toLowerCase(),
+        };
+      }),
+    )
+    .toEqual({
+      color: expect.any(String),
+      expectedColor: expect.any(String),
+      fontFamily: expect.stringContaining("source code pro"),
+    });
+  const inlineCodeColor = await inlineCode.evaluate((element) => {
+    const probe = document.createElement("span");
+    probe.style.color = "var(--markdown-code-normal, var(--code-normal))";
+    element.append(probe);
+    const expectedColor = getComputedStyle(probe).color;
+    probe.remove();
+    return {
+      actual: getComputedStyle(element).color,
+      expected: expectedColor,
+    };
+  });
+  expect(inlineCodeColor.actual).toBe(inlineCodeColor.expected);
+  await inlineCode.click();
+  await expectHiddenFormattingCount(page, lineSnippet, "`", 0);
+
+  const pathLink = page
+    .locator(".cm-link-text")
+    .filter({ hasText: "path links" })
+    .first();
+  await expect(pathLink).toBeVisible();
+  await pathLink.click();
+  await expectHiddenFormattingCountBelow(
+    page,
+    lineSnippet,
+    "[",
+    hiddenPathLinkMiddle,
+  );
+  await expect(page.locator(".cm-link-target").first()).toBeVisible();
+
+  await renderedWikilink.click();
+  await expect(editorContent(page)).toContainText("[[Project Plan|wikilinks]]");
 });
 
 test("preview mode showcases the supported Markdown feature set", async ({
@@ -338,17 +710,41 @@ test("preview mode showcases the supported Markdown feature set", async ({
   await gotoDemo(page);
   await setMode(page, "Preview");
 
-  const preview = page.locator(".mira-markdown-preview");
+  const preview = page.locator(".mira-markdown-preview").first();
   await expect(preview.locator("del").first()).toContainText("strikethrough");
   await expect(
     preview.locator("code").filter({ hasText: "inline code" }),
   ).toBeVisible();
   await expect(
-    preview.locator("a[data-mira-internal-link]").first(),
+    preview.locator("[data-mira-internal-link]").first(),
   ).toBeVisible();
-  await expect(preview.locator(".mira-embed")).toContainText(
-    "Architecture diagram embed",
+  const externalLink = preview.locator(
+    'a.external-link[href="https://example.com"]',
   );
+  await expect(externalLink).toHaveCount(2);
+  await expect(
+    externalLink.filter({ hasText: "external links" }),
+  ).toHaveAttribute("target", "_blank");
+  const pathLink = preview.getByRole("button", {
+    name: "path links",
+    exact: true,
+  });
+  await pathLink.hover();
+  const pathPreview = pathLink.locator(
+    'xpath=ancestor::span[contains(@class, "mira-link-preview")][1]',
+  );
+  await expect(pathPreview.locator(".mira-link-preview__card")).toBeVisible();
+  await expect(
+    pathPreview.locator(".mira-embedded-markdown-preview h1").first(),
+  ).toContainText("Architecture");
+  await expect(
+    preview.locator(".mira-embed").filter({ hasText: "Embedded Note" }).first(),
+  ).toContainText("same preview component");
+  await expect(
+    preview.locator(".mira-embed").filter({
+      hasText: "Architecture diagram embed",
+    }),
+  ).toContainText("Architecture diagram embed");
   await expect(
     preview.locator(".tag").filter({ hasText: "#mira/editor" }),
   ).toBeVisible();
@@ -364,6 +760,125 @@ test("preview mode showcases the supported Markdown feature set", async ({
   await expect(preview).toContainText(
     "Footnotes come from the shared GFM Markdown pipeline.",
   );
+  const taskMarkers = [
+    ">",
+    "<",
+    "?",
+    "/",
+    "!",
+    '"',
+    "-",
+    "*",
+    "l",
+    "i",
+    "S",
+    "I",
+    "f",
+    "k",
+    "u",
+    "d",
+    "w",
+    "p",
+    "c",
+    "b",
+  ];
+  const renderedTaskMarkers = await preview
+    .locator("li.task-list-item")
+    .evaluateAll((elements) =>
+      elements
+        .map((element) => element.getAttribute("data-task"))
+        .filter(Boolean),
+    );
+  for (const marker of taskMarkers) {
+    expect(renderedTaskMarkers).toContain(marker);
+  }
+  const markerStyles = await preview
+    .locator(".task-list-item-checkbox")
+    .evaluateAll((elements) =>
+      Object.fromEntries(
+        elements
+          .map((element) => {
+            const marker = element.getAttribute("data-task");
+            if (!marker) {
+              return null;
+            }
+            const style = getComputedStyle(element);
+            const afterStyle = getComputedStyle(element, "::after");
+            return [
+              marker,
+              {
+                afterDisplay: afterStyle.display,
+                backgroundImage: style.backgroundImage,
+                maskImage: style.getPropertyValue("-webkit-mask-image"),
+              },
+            ];
+          })
+          .filter((entry): entry is [string, unknown] => Boolean(entry)),
+      ),
+    );
+  expect(markerStyles["-"].maskImage).toContain("svg");
+  expect(markerStyles["?"].backgroundImage).toContain("svg");
+  expect(markerStyles["/"].afterDisplay).toBe("block");
+  expect(markerStyles["S"].backgroundImage).toContain("svg");
+  expect(markerStyles["I"].maskImage).toContain("svg");
+  const calloutTypes = [
+    "note",
+    "abstract",
+    "info",
+    "tip",
+    "success",
+    "question",
+    "warning",
+    "failure",
+    "danger",
+    "bug",
+    "example",
+    "quote",
+  ];
+  const renderedCalloutTypes = await preview
+    .locator(".callout")
+    .evaluateAll((elements) =>
+      elements
+        .map((element) => element.getAttribute("data-callout"))
+        .filter(Boolean),
+    );
+  for (const type of calloutTypes) {
+    expect(renderedCalloutTypes).toContain(type);
+  }
+  const calloutTitles = await preview
+    .locator(".callout-title-inner")
+    .evaluateAll((elements) => elements.map((element) => element.textContent));
+  for (const title of [
+    "Abstract, Summary, Tldr",
+    "Info, Todo",
+    "Tip, Hint, Important",
+    "Success, Check, Done",
+    "Question, Help, FAQ",
+    "Warning, Caution, Attention",
+    "Failure, Fail, Missing",
+    "Danger, Error",
+    "Quote, Cite",
+  ]) {
+    expect(calloutTitles).toContain(title);
+  }
+});
+
+test("live preview renders markdown file embeds", async ({ page }) => {
+  await gotoDemo(page);
+  await setMode(page, "Live");
+
+  const embedWidget = page
+    .locator(".mira-rich-widget--embedlink .mira-embed")
+    .filter({ hasText: "Markdown embed preview" })
+    .first();
+  await scrollEditorUntilVisible(page, embedWidget, { max: 8_000 });
+  await expect(embedWidget).toBeVisible();
+  await expect(
+    embedWidget
+      .locator(".mira-embed__content > .mira-embedded-markdown-preview h1")
+      .first(),
+  ).toContainText("Embedded Note");
+  await expect(embedWidget).toContainText("Nested markdown stays formatted");
 });
 
 test("tables and admonition callouts render in preview and live-preview", async ({
@@ -388,10 +903,10 @@ test("tables and admonition callouts render in preview and live-preview", async 
   );
 
   await setMode(page, "Live");
-  await scrollEditor(page, 1050);
   const liveTable = page
     .locator(".mira-rich-widget--table .cm-table-widget")
     .first();
+  await scrollEditorUntilVisible(page, liveTable);
   await expect(liveTable).toBeVisible();
   await expect
     .poll(() =>
@@ -428,12 +943,15 @@ test("tables and admonition callouts render in preview and live-preview", async 
       '[data-markdown-table-drag-handle="row"]',
     );
     const rowHandleIcon = rowHandle?.querySelector<SVGElement>("svg");
+    const inlineEditorWasFocused =
+      inlineEditor?.classList.contains("cm-focused") ?? false;
+    inlineEditor?.classList.add("cm-focused");
     const rect = (node?: Element | null) => {
       const box = node?.getBoundingClientRect();
       return { height: box?.height ?? 0, width: box?.width ?? 0 };
     };
 
-    return {
+    const metrics = {
       bodyRowBorderBottom: bodyRow
         ? getComputedStyle(bodyRow).borderBottomWidth
         : "",
@@ -447,24 +965,36 @@ test("tables and admonition callouts render in preview and live-preview", async 
         : "",
       edgeIcon: rect(edgeIcon),
       inlineEditor: rect(inlineEditor),
+      inlineEditorOutlineStyle: inlineEditor
+        ? getComputedStyle(inlineEditor).outlineStyle
+        : "",
+      inlineEditorOutlineWidth: inlineEditor
+        ? getComputedStyle(inlineEditor).outlineWidth
+        : "",
       rowHandle: rect(rowHandle),
       rowHandleBorderLeft: rowHandle
         ? getComputedStyle(rowHandle).borderLeftWidth
         : "",
       rowHandleIcon: rect(rowHandleIcon),
     };
+    if (!inlineEditorWasFocused) {
+      inlineEditor?.classList.remove("cm-focused");
+    }
+    return metrics;
   });
   expect(tableMetrics.dataCell.height).toBeGreaterThan(37);
   expect(tableMetrics.dataCell.height).toBeLessThan(39);
   expect(tableMetrics.inlineEditor.height).toBeGreaterThan(21);
   expect(tableMetrics.inlineEditor.height).toBeLessThan(22);
+  expect(tableMetrics.inlineEditorOutlineStyle).toBe("none");
+  expect(tableMetrics.inlineEditorOutlineWidth).toBe("0px");
   expect(tableMetrics.cellButtonBackground).toBe("rgba(0, 0, 0, 0)");
   expect(tableMetrics.bodyRowBorderBottom).toBe("0px");
   expect(tableMetrics.edgeButtonBorderLeft).toBe("0px");
   expect(tableMetrics.edgeButton.width).toBeCloseTo(20, 1);
   expect(tableMetrics.edgeIcon.width).toBeCloseTo(16, 1);
   expect(tableMetrics.rowHandleBorderLeft).toBe("0px");
-  expect(tableMetrics.rowHandle.width).toBeCloseTo(8, 1);
+  expect(tableMetrics.rowHandle.width).toBeCloseTo(16, 1);
   expect(tableMetrics.rowHandleIcon.width).toBeCloseTo(16, 1);
   await liveTable.hover();
   await expect(
@@ -472,6 +1002,43 @@ test("tables and admonition callouts render in preview and live-preview", async 
       .locator(".mira-rich-widget--table .markdown-widget-select-control")
       .first(),
   ).toBeVisible();
+  const handleAlignment = await liveTable.evaluate((element) => {
+    const rowGutter = element.querySelector<HTMLElement>(
+      '[data-markdown-table-chrome="row-gutter"]',
+    );
+    const rowHandle = element.querySelector<HTMLElement>(
+      '[data-markdown-table-drag-handle="row"]',
+    );
+    const colHeader = element.querySelector<HTMLElement>(
+      '[data-markdown-table-chrome="col-header"]',
+    );
+    const colHandle = element.querySelector<HTMLElement>(
+      '[data-markdown-table-drag-handle="col"]',
+    );
+    const center = (rect: DOMRect) => ({
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2,
+    });
+    const rowGutterRect = rowGutter!.getBoundingClientRect();
+    const rowHandleCenter = center(rowHandle!.getBoundingClientRect());
+    const colHeaderRect = colHeader!.getBoundingClientRect();
+    const colHandleCenter = center(colHandle!.getBoundingClientRect());
+
+    return {
+      colBorderDelta: Math.abs(colHandleCenter.y - colHeaderRect.bottom),
+      colCenterDelta: Math.abs(
+        colHandleCenter.x - (colHeaderRect.left + colHeaderRect.width / 2),
+      ),
+      rowBorderDelta: Math.abs(rowHandleCenter.x - rowGutterRect.right),
+      rowCenterDelta: Math.abs(
+        rowHandleCenter.y - (rowGutterRect.top + rowGutterRect.height / 2),
+      ),
+    };
+  });
+  expect(handleAlignment.rowBorderDelta).toBeLessThan(2);
+  expect(handleAlignment.rowCenterDelta).toBeLessThan(2);
+  expect(handleAlignment.colBorderDelta).toBeLessThan(2);
+  expect(handleAlignment.colCenterDelta).toBeLessThan(2);
   await expect(
     page
       .locator(
@@ -535,6 +1102,41 @@ test("tables and admonition callouts render in preview and live-preview", async 
   await expect(
     columnMenu.locator('[data-slot="dropdown-menu-item"]'),
   ).toHaveCount(6);
+  const liveGridTable = page
+    .locator(".mira-rich-widget--gridtable .cm-table-widget")
+    .first();
+  await scrollEditorUntilVisible(page, liveGridTable);
+  await expect(liveGridTable).toBeVisible();
+  await liveGridTable.locator("tbody tr").first().hover();
+  await expect(
+    page
+      .locator(
+        '.mira-rich-widget--gridtable [data-markdown-table-drag-handle="row"]',
+      )
+      .first(),
+  ).toBeVisible();
+  await liveGridTable.locator("thead th").nth(1).hover();
+  await expect(
+    page
+      .locator(
+        '.mira-rich-widget--gridtable [data-markdown-table-drag-handle="col"]',
+      )
+      .first(),
+  ).toBeVisible();
+  await expect(
+    page
+      .locator(
+        '.mira-rich-widget--gridtable [data-markdown-table-chrome="row-gutter"] [data-slot="dropdown-menu-trigger"]',
+      )
+      .first(),
+  ).toBeVisible();
+  await expect(
+    page
+      .locator(
+        '.mira-rich-widget--gridtable [data-markdown-table-chrome="col-header"] [data-slot="dropdown-menu-trigger"]',
+      )
+      .first(),
+  ).toBeVisible();
   const liveCallout = page
     .locator(".mira-rich-widget--blockquote .callout")
     .first();
@@ -560,10 +1162,10 @@ test("Mermaid renders SVG in preview and live-preview modes", async ({
   expect(previewBox?.height ?? 0).toBeGreaterThan(20);
 
   await setMode(page, "Live");
-  await scrollEditor(page, 1500);
   const liveSvg = page
     .locator(".mira-rich-widget--fencedcode .mermaid > .mermaid svg")
     .first();
+  await scrollEditorUntilVisible(page, liveSvg, { max: 8_000 });
   await expect(liveSvg).toBeVisible();
   const liveBox = await liveSvg.boundingBox();
   expect(liveBox?.width ?? 0).toBeGreaterThan(20);
@@ -580,7 +1182,9 @@ test("Mermaid renders SVG in preview and live-preview modes", async ({
   await expect(
     mermaidWidget.getByRole("button", { name: "Copy Mermaid source" }),
   ).toBeVisible();
-  await mermaidWidget.locator("button").first().click();
+  await mermaidWidget
+    .getByRole("button", { name: "Expand Mermaid diagram" })
+    .click();
   await expect(page.locator('[data-slot="dialog-content"]')).toBeVisible();
   await expect(
     page.locator(".mermaid-viewer-control-panel .zoom-in"),

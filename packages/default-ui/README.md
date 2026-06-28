@@ -5,15 +5,13 @@ Opinionated, batteries-included Mira MDE package for quick onboarding.
 ## Vanilla
 
 ```ts
-import {
-  createMiraDefaultEditor,
-  MiraFeature,
-} from "@mira-mde/default-ui";
+import { createMiraDefaultEditor, MiraFeature } from "@mira-mde/default-ui";
 import "@mira-mde/default-ui/styles.css";
 
 const editor = createMiraDefaultEditor({
   root: document.getElementById("editor")!,
   value: "# Hello Mira",
+  defaultEditMode: "live-preview",
   mode: "live-preview",
   features: {
     [MiraFeature.Tables]: true,
@@ -107,6 +105,7 @@ createMiraDefaultEditor({
 <MiraDefaultMde
   bind:value
   bind:mode
+  defaultEditMode="live-preview"
   features={{
     [MiraFeature.Tables]: true,
     [MiraFeature.Mermaid]: true,

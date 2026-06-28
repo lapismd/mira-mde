@@ -1,0 +1,132 @@
+.markdown-editor-surface,
+.markdown-preview-surface,
+.markdown-embed-surface,
+.markdown-widget-shell {
+  --markdown-surface-background: var(--background-primary, var(--background));
+  --markdown-surface-background-alt: var(--background-primary-alt, var(--card));
+  --markdown-surface-border: var(--background-modifier-border, var(--border));
+  --markdown-normal-color: var(--text-normal, var(--foreground));
+  --markdown-muted-color: var(--text-muted, var(--muted-foreground));
+  --markdown-faint-color: var(--text-faint, var(--muted-foreground));
+  --markdown-accent: var(--interactive-accent);
+  --markdown-blockquote-color: var(--blockquote-color);
+  --markdown-blockquote-font-style: var(--blockquote-font-style);
+  --markdown-blockquote-background-color: var(--blockquote-background-color);
+  --markdown-blockquote-border-thickness: var(--blockquote-border-thickness);
+  --markdown-blockquote-border-color: var(--blockquote-border-color);
+  --markdown-code-background: var(--code-background);
+  --markdown-code-normal: var(--code-normal);
+  --markdown-code-comment: var(--code-comment);
+  --markdown-code-function: var(--code-function);
+  --markdown-code-keyword: var(--code-keyword);
+  --markdown-code-operator: var(--code-operator);
+  --markdown-code-property: var(--code-property);
+  --markdown-code-punctuation: var(--code-punctuation);
+  --markdown-code-string: var(--code-string);
+  --markdown-code-tag: var(--code-tag);
+  --markdown-code-value: var(--code-value);
+  --markdown-code-radius: var(--code-radius);
+  --markdown-code-size: var(--code-size);
+  --markdown-code-border-width: var(--code-border-width);
+  --markdown-code-border-color: var(--code-border-color);
+  --markdown-tag-color: var(--tag-color);
+  --markdown-tag-color-hover: var(--tag-color-hover);
+  --markdown-tag-background: var(--tag-background);
+  --markdown-tag-background-hover: var(--tag-background-hover);
+  --markdown-tag-border-width: var(--tag-border-width);
+  --markdown-tag-border-color: var(--tag-border-color);
+  --markdown-tag-border-color-hover: var(--tag-border-color-hover);
+  --markdown-tag-radius: var(--tag-radius);
+  --markdown-tag-size: var(--tag-size);
+  --markdown-tag-weight: var(--tag-weight);
+  --markdown-tag-padding-x: var(--tag-padding-x);
+  --markdown-tag-padding-y: var(--tag-padding-y);
+  --markdown-link-color: var(--link-color);
+  --markdown-link-color-hover: var(--link-color-hover);
+  --markdown-link-weight: var(--link-weight);
+  --markdown-link-decoration: var(--link-decoration);
+  --markdown-link-decoration-hover: var(--link-decoration-hover);
+  --markdown-link-decoration-thickness: var(--link-decoration-thickness);
+  --markdown-link-external-color: var(--link-external-color);
+  --markdown-link-external-decoration: var(--link-external-decoration);
+  --markdown-link-external-filter: var(--link-external-filter);
+  --markdown-list-marker-color-hover: var(--list-marker-color-hover);
+  --markdown-indentation-guide-color: var(--indentation-guide-color);
+  --markdown-indentation-guide-color-active: var(
+    --indentation-guide-color-active
+  );
+  --markdown-indentation-guide-width: var(--indentation-guide-width);
+  --markdown-indentation-guide-width-active: var(
+    --indentation-guide-width-active
+  );
+  --markdown-collapse-icon-color: var(--collapse-icon-color);
+  --markdown-collapse-icon-color-collapsed: var(
+    --collapse-icon-color-collapsed
+  );
+  --markdown-h1-color: var(--h1-color);
+  --markdown-h1-font: var(--h1-font);
+  --markdown-h1-line-height: var(--h1-line-height);
+  --markdown-h1-size: var(--h1-size);
+  --markdown-h1-style: var(--h1-style);
+  --markdown-h1-variant: var(--h1-variant);
+  --markdown-h1-weight: var(--h1-weight);
+  --markdown-h2-color: var(--h2-color);
+  --markdown-h2-font: var(--h2-font);
+  --markdown-h2-line-height: var(--h2-line-height);
+  --markdown-h2-size: var(--h2-size);
+  --markdown-h2-style: var(--h2-style);
+  --markdown-h2-variant: var(--h2-variant);
+  --markdown-h2-weight: var(--h2-weight);
+  --markdown-h3-color: var(--h3-color);
+  --markdown-h3-font: var(--h3-font);
+  --markdown-h3-line-height: var(--h3-line-height);
+  --markdown-h3-size: var(--h3-size);
+  --markdown-h3-style: var(--h3-style);
+  --markdown-h3-variant: var(--h3-variant);
+  --markdown-h3-weight: var(--h3-weight);
+  --markdown-h4-color: var(--h4-color);
+  --markdown-h4-font: var(--h4-font);
+  --markdown-h4-line-height: var(--h4-line-height);
+  --markdown-h4-size: var(--h4-size);
+  --markdown-h4-style: var(--h4-style);
+  --markdown-h4-variant: var(--h4-variant);
+  --markdown-h4-weight: var(--h4-weight);
+  --markdown-h5-color: var(--h5-color);
+  --markdown-h5-font: var(--h5-font);
+  --markdown-h5-line-height: var(--h5-line-height);
+  --markdown-h5-size: var(--h5-size);
+  --markdown-h5-style: var(--h5-style);
+  --markdown-h5-variant: var(--h5-variant);
+  --markdown-h5-weight: var(--h5-weight);
+  --markdown-h6-color: var(--h6-color);
+  --markdown-h6-font: var(--h6-font);
+  --markdown-h6-line-height: var(--h6-line-height);
+  --markdown-h6-size: var(--h6-size);
+  --markdown-h6-style: var(--h6-style);
+  --markdown-h6-variant: var(--h6-variant);
+  --markdown-h6-weight: var(--h6-weight);
+  background: var(--markdown-surface-background);
+  color: var(--markdown-normal-color);
+}
+
+.markdown-preview-surface .markdown,
+.markdown-rendered,
+.markdown-widget-shell .markdown,
+.markdown-embed-surface .markdown {
+  color: var(--markdown-normal-color);
+  font-family: var(--font-sans);
+  font-size: var(--font-text-size);
+  line-height: var(--line-height-normal);
+}
+
+.markdown-widget-shell p,
+.markdown-widget-shell .markdown > :first-child,
+.markdown-widget-shell .markdown > :last-child {
+  margin-block: 0;
+}
+
+.markdown-editor-surface *,
+.markdown-preview-surface *,
+.markdown-widget-shell * {
+  box-sizing: border-box;
+}

@@ -132,6 +132,55 @@ $$
 GFM footnotes render through the shared Markdown pipeline.[^docs-footnote]
 
 [^docs-footnote]: This footnote belongs to the live Markdown example.
+
+## Custom task marker gallery
+
+- [>] Forwarded task marker
+- [<] Scheduled task marker
+- [?] Question task marker
+- [/] Incomplete task marker
+- [!] Important task marker
+- ["] Quote task marker
+- [-] Cancelled task marker
+- [*] Star task marker
+- [l] Location task marker
+- [i] Info task marker
+- [S] Savings task marker
+- [I] Idea task marker
+- [f] Fire task marker
+- [k] Key task marker
+- [u] Up task marker
+- [d] Down task marker
+- [w] Win task marker
+- [p] Pro task marker
+- [c] Con task marker
+- [b] Bookmark task marker
+
+## Callout variants
+
+> [!note]
+
+> [!abstract] Abstract, Summary, Tldr
+
+> [!info] Info, Todo
+
+> [!tip] Tip, Hint, Important
+
+> [!success] Success, Check, Done
+
+> [!question] Question, Help, FAQ
+
+> [!warning] Warning, Caution, Attention
+
+> [!failure] Failure, Fail, Missing
+
+> [!danger] Danger, Error
+
+> [!bug]
+
+> [!example]
+
+> [!quote] Quote, Cite
 `;
 
 export const livePreviewMarkdown = String.raw`---

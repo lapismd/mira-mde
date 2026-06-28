@@ -3,7 +3,9 @@ import BoldIcon from "@lucide/svelte/icons/bold";
 import { createMiraDefaultEditor } from ".";
 import {
   createMiraDefaultExtensions,
+  defaultMiraEditMode,
   MiraFeature,
+  resolveMiraDefaultEditMode,
   resolveMiraDefaultFeatures,
   resolveMiraDefaultModes,
   resolveMiraDefaultToolbarActions,
@@ -42,6 +44,23 @@ describe("default UI feature resolution", () => {
         [MiraFeature.SplitMode]: false,
       }),
     ).toEqual(["live-preview", "preview"]);
+  });
+
+  it("resolves the configurable default edit mode", () => {
+    expect(defaultMiraEditMode).toBe("live-preview");
+    expect(
+      resolveMiraDefaultEditMode("source", [
+        "source",
+        "live-preview",
+        "preview",
+      ]),
+    ).toBe("source");
+    expect(
+      resolveMiraDefaultEditMode("source", ["live-preview", "preview"]),
+    ).toBe("live-preview");
+    expect(
+      resolveMiraDefaultEditMode("live-preview", ["source", "preview"]),
+    ).toBe("source");
   });
 
   it("merges configured and direct toolbar actions", () => {

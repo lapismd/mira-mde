@@ -2,9 +2,11 @@ import type { MiraEditorSelection } from "@mira-mde/core";
 import type {
   MiraAssetResolver,
   MiraExtension,
+  MiraFileAdapter,
   MiraLinkResolver,
   MiraMode,
   MiraTheme,
+  MiraThemeConfig,
 } from "@mira-mde/extensions";
 import type { ComponentType } from "react";
 
@@ -18,6 +20,8 @@ export type MiraReactIcon = ComponentType<{
   "aria-hidden"?: boolean | "true" | "false";
   className?: string;
 }>;
+
+export type MiraDefaultEditMode = Extract<MiraMode, "live-preview" | "source">;
 
 export type MiraMdeHandle = {
   focus: () => void;
@@ -43,11 +47,13 @@ export type MiraMdeProps = {
   lineWrapping?: boolean;
   spellcheck?: boolean;
   theme?: MiraTheme;
+  themeConfig?: MiraThemeConfig;
   sourcePath?: string;
   className?: string;
   toolbar?: boolean;
   linkResolver?: MiraLinkResolver;
   assetResolver?: MiraAssetResolver;
+  fileAdapter?: MiraFileAdapter;
   frontmatterOpen?: boolean;
   frontmatterConfig?: MiraFrontmatterConfig;
   onChange?: (value: string) => void;
@@ -192,6 +198,7 @@ export type MiraDefaultFeatureConfigs = {
 export type MiraDefaultToolbarProps = {
   value?: string;
   mode?: MiraMode;
+  defaultEditMode?: MiraDefaultEditMode;
   readonly?: boolean;
   className?: string;
   features?: MiraFeatureFlags;
@@ -206,6 +213,7 @@ export type MiraDefaultToolbarProps = {
 };
 
 export type MiraDefaultMdeProps = Omit<MiraMdeProps, "toolbar"> & {
+  defaultEditMode?: MiraDefaultEditMode;
   editorClassName?: string;
   features?: MiraFeatureFlags;
   featureConfigs?: MiraDefaultFeatureConfigs;

@@ -11,8 +11,10 @@ import type { MiraMode } from "@mira-mde/extensions";
 import { MiraDefaultToolbar } from "./default-toolbar";
 import {
   createMiraDefaultExtensions,
+  defaultMiraEditMode,
   MiraFeature,
   resolveMiraDefaultFeatures,
+  resolveMiraDefaultEditMode,
   resolveMiraDefaultModes,
 } from "./features";
 import { cx } from "./hooks";
@@ -31,11 +33,13 @@ export const MiraDefaultMde = forwardRef<
   {
     assetResolver,
     className,
-    defaultMode = "live-preview",
+    defaultEditMode = defaultMiraEditMode,
+    defaultMode = defaultEditMode,
     defaultReadonly = false,
     defaultValue = "",
     editorClassName,
     extensions = [],
+    fileAdapter,
     featureConfigs = {},
     features = {},
     frontmatterConfig,
@@ -52,6 +56,7 @@ export const MiraDefaultMde = forwardRef<
     sourcePath,
     spellcheck = true,
     theme = "obsidian",
+    themeConfig,
     toolbarActions = [],
     toolbars = [],
     value: valueProp,
@@ -73,6 +78,10 @@ export const MiraDefaultMde = forwardRef<
   const modeOptions = useMemo(
     () => resolveMiraDefaultModes(features),
     [features],
+  );
+  const resolvedDefaultEditMode = useMemo(
+    () => resolveMiraDefaultEditMode(defaultEditMode, modeOptions),
+    [defaultEditMode, modeOptions],
   );
   const activeExtensions = useMemo(
     () => [
@@ -203,6 +212,7 @@ export const MiraDefaultMde = forwardRef<
       {resolvedFeatures[MiraFeature.Toolbar] ? (
         <MiraDefaultToolbar
           context={toolbarContext}
+          defaultEditMode={resolvedDefaultEditMode}
           featureConfigs={featureConfigs}
           features={features}
           mode={mode}
@@ -222,6 +232,7 @@ export const MiraDefaultMde = forwardRef<
           defaultReadonly={defaultReadonly}
           defaultValue={defaultValue}
           extensions={activeExtensions}
+          fileAdapter={fileAdapter}
           frontmatterConfig={frontmatterConfig}
           frontmatterOpen={
             resolvedFeatures[MiraFeature.Frontmatter] && frontmatterOpen
@@ -239,6 +250,7 @@ export const MiraDefaultMde = forwardRef<
           sourcePath={sourcePath}
           spellcheck={spellcheck}
           theme={theme}
+          themeConfig={themeConfig}
           toolbar={false}
           value={value}
         />

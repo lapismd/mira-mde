@@ -25,41 +25,66 @@ import {
   type ViewUpdate,
   WidgetType,
 } from "@codemirror/view";
-import type {
-  MiraAssetResolver,
-  MiraExtension,
-  MiraLinkResolver,
-} from "@mira-mde/extensions";
 import { MarkdownPreview } from "@mira-mde/preview";
-import { createMarkdownTableWidget } from "@mira-mde/codemirror-tables";
+import {
+  createMarkdownGridTableWidget,
+  createMarkdownTableWidget,
+} from "@mira-mde/codemirror-tables";
 import { mount, unmount } from "svelte";
+import { miraRichEditorTheme } from "./theme";
+import type { MiraRichEditorOptions } from "./types";
+import { getFencedCodeLanguage, getFencedCodeWidgetRange } from "./utils/fenced-code";
+import { estimateMarkdownBlockHeight } from "./utils/height-estimates";
+import { findInlineCodeRanges, isPositionInsideRanges } from "./utils/inline-code";
+import { findInlineMathRanges, type InlineMathRange } from "./utils/inline-math";
+import {
+  getLineIndentInfo,
+  indentGuideDecorations,
+  normalizeIndentText,
+  selectionTouchesIndent,
+  splitIndentSegments,
+  toMarkdownColumns,
+} from "./utils/indent";
+import {
+  getMarkdownLinkTextRange,
+  isBareExternalAutolinkUrl,
+  isExternalMarkdownDestination,
+  isExternalMarkdownLink,
+} from "./utils/links";
+import {
+  hasInitialFrontmatterCursor,
+  rangeContainsSelectionCursor,
+  rangeIntersectsSelection,
+  rangesOverlap,
+  sortRanges,
+  type RangeBoundary,
+} from "./utils/ranges";
+import { foldIndicatorDecorations, getFoldAnchor } from "./decorations/fold-indicators";
+import { headingGutterExtension } from "./decorations/heading-gutter";
+import { PREVIEW_INTERACTIVE_SELECTOR, shouldActivateEditablePreview } from "./utils/activation";
+import { BlockPreviewWidget, InlineMarkdownWidget, InlineMathWidget } from "./widgets/preview-widgets";
+import { TaskCheckboxWidget } from "./widgets/task-checkbox";
 
-export type MiraRichEditorOptions = {
-  enabled?: boolean;
-  livePreview?: boolean;
-  extensions?: MiraExtension[];
-  sourcePath?: string;
-  linkResolver?: MiraLinkResolver;
-  assetResolver?: MiraAssetResolver;
-  frontmatterOpen?: boolean;
-  frontmatterConfig?: unknown;
-  onChange?: (
-    replacement: string,
-    from: number,
-    to: number,
-    nextValue: string,
-  ) => void;
-  onFrontmatterChange?: (nextYaml: string, nextValue: string) => void;
-};
+export { getFoldAnchor } from "./decorations/fold-indicators";
+export { PREVIEW_INTERACTIVE_SELECTOR, shouldActivateEditablePreview } from "./utils/activation";
 
-type RangeBoundary = {
-  from: number;
-  to: number;
-};
-
-export type InlineMathRange = RangeBoundary & {
-  source: string;
-};
+export type { MiraRichEditorOptions } from "./types";
+export { getFencedCodeLanguage, getFencedCodeWidgetRange } from "./utils/fenced-code";
+export { estimateMarkdownBlockHeight } from "./utils/height-estimates";
+export { findInlineMathRanges, type InlineMathRange } from "./utils/inline-math";
+export {
+  getLineIndentInfo,
+  normalizeIndentText,
+  selectionTouchesIndent,
+  splitIndentSegments,
+  toMarkdownColumns,
+} from "./utils/indent";
+export {
+  getMarkdownLinkTextRange,
+  isBareExternalAutolinkUrl,
+  isExternalMarkdownDestination,
+  isExternalMarkdownLink,
+} from "./utils/links";
 
 const BLOCK_WIDGET_NODE_NAMES = new Set([
   "Frontmatter",
@@ -73,18 +98,47 @@ const BLOCK_WIDGET_NODE_NAMES = new Set([
   "ContainerDirective",
 ]);
 
-const previewWidgetMounts = new WeakMap<HTMLElement, Record<string, unknown>>();
-
 const hiddenFormattingMark = Decoration.mark({
   class: "cm-formatting cm-formatting-hidden",
 });
+const strongMark = Decoration.mark({ class: "cm-strong" });
+const emphasisMark = Decoration.mark({ class: "cm-emphasis" });
+const strikethroughMark = Decoration.mark({ class: "cm-strikethrough" });
+const inlineCodeMark = Decoration.mark({ class: "cm-inline-code" });
+const internalLinkMark = Decoration.mark({ class: "cm-internal-link" });
+const externalLinkMark = Decoration.mark({ class: "cm-external-link" });
+const linkTextMark = Decoration.mark({
+  class: "cm-link-text cm-link-string",
+});
+const linkTargetMark = Decoration.mark({ class: "cm-link-target" });
+const linkPathTargetMark = Decoration.mark({
+  class: "cm-path cm-link-target",
+});
 
-const RICH_BLOCK_LINE_HEIGHT_ESTIMATE_PX = 25.5;
-const RICH_BLOCK_VERTICAL_PADDING_ESTIMATE_PX = 16;
-const RICH_MERMAID_WIDGET_MIN_HEIGHT_PX = 200;
-const RICH_TABLE_ROW_HEIGHT_ESTIMATE_PX = 48;
-const RICH_TABLE_WRAP_COLUMN_ESTIMATE_CHARS = 72;
-const RICH_TABLE_WRAPPED_ROW_EXTRA_HEIGHT_PX = 40;
+const INLINE_SOURCE_TOKEN_NAMES = new Set([
+  "Emphasis",
+  "StrongEmphasis",
+  "Strikethrough",
+  "StrikethroughEmphasis",
+  "InlineCode",
+  "CodeBlock",
+  "Link",
+  "PathLink",
+  "WikiLink",
+  "EmbedLink",
+  "Image",
+]);
+
+const INLINE_FORMATTING_NODE_NAMES = new Set([
+  "HardBreak",
+  "LinkMark",
+  "PathLinkMark",
+  "PathLinkDestination",
+  "EmphasisMark",
+  "CodeMark",
+  "StrikethroughMark",
+  "URL",
+]);
 
 export function createRichEditorExtensions(
   options: MiraRichEditorOptions = {},
@@ -98,6 +152,7 @@ export function createRichEditorExtensions(
   return [
     miraRichEditorTheme,
     headingGutterExtension(),
+    livePreview ? indentGuideDecorations() : [],
     livePreview ? blockPreviewDecorations(options) : [],
     livePreview ? inlinePreviewDecorations(options) : [],
     foldIndicatorDecorations(),
@@ -108,222 +163,6 @@ export function createRichEditorExtensions(
         })
       : [],
   ];
-}
-
-export const PREVIEW_INTERACTIVE_SELECTOR = [
-  "button",
-  "input",
-  "select",
-  "textarea",
-  "summary",
-  "details",
-  "audio",
-  "video",
-  "[contenteditable='true']",
-  "[role='button']",
-  "[role='checkbox']",
-  "[role='textbox']",
-  "[data-editable-markdown-ignore-click]",
-].join(", ");
-
-export function shouldActivateEditablePreview(event: MouseEvent): boolean {
-  if (
-    event.defaultPrevented ||
-    event.button !== 0 ||
-    event.metaKey ||
-    event.ctrlKey ||
-    event.shiftKey ||
-    event.altKey
-  ) {
-    return false;
-  }
-
-  const target = event.target instanceof Element ? event.target : null;
-  return !target?.closest(PREVIEW_INTERACTIVE_SELECTOR);
-}
-
-export function getFencedCodeLanguage(markdown: string): string {
-  const match = markdown.match(/^(```|~~~)\s*([^\s`]*)/);
-  return match?.[2]?.trim() ?? "";
-}
-
-export function getFencedCodeWidgetRange(
-  markdown: string,
-): RangeBoundary | null {
-  const opening = markdown.match(/^(```|~~~)[^\n]*(?:\n|$)/);
-  if (!opening) {
-    return null;
-  }
-
-  const fence = opening[1] ?? "";
-  if (!fence) {
-    return null;
-  }
-  const closingIndex = markdown.lastIndexOf(`\n${fence}`);
-  if (closingIndex <= 0) {
-    return {
-      from: 0,
-      to: markdown.length,
-    };
-  }
-
-  return {
-    from: 0,
-    to: closingIndex + fence.length + 1,
-  };
-}
-
-export function estimateMarkdownBlockHeight(markdown: string): number {
-  const lineCount = countSourceLines(markdown);
-  const trimmed = markdown.trimStart();
-  const fencedCode = trimmed.match(/^(```|~~~)([^\r\n]*)/);
-
-  if (fencedCode) {
-    const language = fencedCode[2]?.trim().toLowerCase() ?? "";
-    const bodyLineCount = Math.max(1, lineCount - 2);
-    const baseHeight =
-      bodyLineCount * RICH_BLOCK_LINE_HEIGHT_ESTIMATE_PX +
-      RICH_BLOCK_VERTICAL_PADDING_ESTIMATE_PX * 2;
-
-    if (language === "mermaid") {
-      return Math.max(RICH_MERMAID_WIDGET_MIN_HEIGHT_PX, baseHeight);
-    }
-
-    return Math.max(64, baseHeight);
-  }
-
-  if (isPipeTableMarkdown(markdown)) {
-    return estimateTableWidgetHeight(markdown);
-  }
-
-  if (/^\s*---(?:\r?\n|$)/.test(markdown)) {
-    return Math.max(
-      64,
-      lineCount * RICH_BLOCK_LINE_HEIGHT_ESTIMATE_PX +
-        RICH_BLOCK_VERTICAL_PADDING_ESTIMATE_PX,
-    );
-  }
-
-  return Math.max(
-    RICH_BLOCK_LINE_HEIGHT_ESTIMATE_PX,
-    lineCount * RICH_BLOCK_LINE_HEIGHT_ESTIMATE_PX +
-      RICH_BLOCK_VERTICAL_PADDING_ESTIMATE_PX,
-  );
-}
-
-function countSourceLines(source: string): number {
-  if (!source) {
-    return 1;
-  }
-
-  return source.split(/\r\n|\r|\n/).length;
-}
-
-function isPipeTableMarkdown(markdown: string): boolean {
-  const lines = markdown
-    .trim()
-    .split(/\r\n|\r|\n/)
-    .map((line) => line.trim())
-    .filter(Boolean);
-  return lines.length >= 2 && isTableSeparatorLine(lines[1] ?? "");
-}
-
-function isTableSeparatorLine(line: string): boolean {
-  const cells = line
-    .trim()
-    .replace(/^\|/, "")
-    .replace(/\|$/, "")
-    .split("|")
-    .map((cell) => cell.trim())
-    .filter(Boolean);
-
-  return cells.length > 0 && cells.every((cell) => /^:?-{3,}:?$/.test(cell));
-}
-
-function estimateTableWidgetHeight(source: string): number {
-  let height = 0;
-  let measuredRows = 0;
-
-  for (const line of source.split(/\r\n|\r|\n/)) {
-    const trimmed = line.trim();
-    if (!trimmed) {
-      continue;
-    }
-
-    measuredRows += 1;
-    if (isTableSeparatorLine(trimmed)) {
-      continue;
-    }
-
-    const cells = trimmed
-      .replace(/^\|/, "")
-      .replace(/\|$/, "")
-      .split("|")
-      .map((cell) => cell.trim());
-    const longestCellLength = Math.max(0, ...cells.map((cell) => cell.length));
-    const wrappedLines = Math.max(
-      1,
-      Math.ceil(longestCellLength / RICH_TABLE_WRAP_COLUMN_ESTIMATE_CHARS),
-    );
-
-    height +=
-      RICH_TABLE_ROW_HEIGHT_ESTIMATE_PX +
-      (wrappedLines - 1) * RICH_TABLE_WRAPPED_ROW_EXTRA_HEIGHT_PX;
-  }
-
-  return Math.max(
-    RICH_TABLE_ROW_HEIGHT_ESTIMATE_PX,
-    height || measuredRows * RICH_TABLE_ROW_HEIGHT_ESTIMATE_PX,
-  );
-}
-
-class HeadingGutterMarker extends GutterMarker {
-  override readonly elementClass: string;
-
-  constructor(readonly level: number) {
-    super();
-    this.elementClass = `cm-gutterHeader cm-gutterHeader-${level}`;
-  }
-
-  override eq(other: GutterMarker): boolean {
-    return other instanceof HeadingGutterMarker && other.level === this.level;
-  }
-}
-
-function headingGutterExtension(): Extension {
-  return StateField.define<RangeSet<GutterMarker>>({
-    create(state) {
-      return createHeadingGutterMarkers(state);
-    },
-    update(markers, transaction) {
-      if (transaction.docChanged) {
-        return createHeadingGutterMarkers(transaction.state);
-      }
-      return markers;
-    },
-    provide: (field) => gutterLineClass.from(field),
-  });
-}
-
-function createHeadingGutterMarkers(
-  state: EditorState,
-): RangeSet<GutterMarker> {
-  const markers: Range<GutterMarker>[] = [];
-
-  for (let index = 1; index <= state.doc.lines; index += 1) {
-    const line = state.doc.line(index);
-    const level = getHeadingLevel(line.text);
-    if (level !== null) {
-      markers.push(new HeadingGutterMarker(level).range(line.from));
-    }
-  }
-
-  return RangeSet.of(markers);
-}
-
-function getHeadingLevel(text: string): number | null {
-  const headingMatch = text.match(/^(#{1,6})\s/);
-  return headingMatch?.[1]?.length ?? null;
 }
 
 function blockPreviewDecorations(options: MiraRichEditorOptions): Extension {
@@ -367,12 +206,6 @@ function inlinePreviewDecorations(options: MiraRichEditorOptions): Extension {
       decorations: (value) => value.decorations,
     },
   );
-}
-
-function foldIndicatorDecorations(): Extension {
-  return ViewPlugin.fromClass(FoldIndicatorPlugin, {
-    decorations: (value) => value.decorations,
-  });
 }
 
 function buildBlockPreviewDecorations(
@@ -447,6 +280,36 @@ function buildBlockPreviewDecorations(
     },
   });
 
+  for (let lineNumber = 1; lineNumber <= state.doc.lines; lineNumber += 1) {
+    const line = state.doc.line(lineNumber);
+    if (!isStandaloneEmbedLine(line.text)) {
+      continue;
+    }
+
+    const from = line.from;
+    const to = line.to;
+    if (
+      rangeIntersectsSelection(state, from, to) ||
+      replacedRanges.some((range) => rangesOverlap(range, { from, to }))
+    ) {
+      continue;
+    }
+
+    ranges.push(
+      Decoration.replace({
+        block: true,
+        widget: new BlockPreviewWidget({
+          from,
+          to,
+          markdown: line.text,
+          nodeName: "EmbedLink",
+          options,
+        }),
+      }).range(from, to),
+    );
+    replacedRanges.push({ from, to });
+  }
+
   return Decoration.set(sortRanges(ranges), true);
 }
 
@@ -456,6 +319,15 @@ function buildInlinePreviewDecorations(
 ): DecorationSet {
   const ranges: Range<Decoration>[] = [];
   const fencedCodeLineClasses = getFencedCodeLineClasses(view.state);
+  const syntaxHiddenRanges: RangeBoundary[] = [];
+  const activeInlineSourceRanges: RangeBoundary[] = [];
+  decorateInlineSyntax(
+    view,
+    ranges,
+    syntaxHiddenRanges,
+    activeInlineSourceRanges,
+    options,
+  );
 
   for (const visibleRange of view.visibleRanges) {
     let line = view.state.doc.lineAt(visibleRange.from);
@@ -469,12 +341,34 @@ function buildInlinePreviewDecorations(
       decorateHeadingLine(line.text, line.from, ranges);
       decorateFootnotes(line.text, line.from, ranges);
       decorateTaskCheckboxes(line.text, line.from, ranges, options);
+      decorateStrikethroughRanges(
+        line.text,
+        line.from,
+        ranges,
+        syntaxHiddenRanges,
+        activeInlineSourceRanges,
+        view.state,
+      );
       const inlineMathRanges = !fencedCodeLineClass
         ? decorateInlineMath(line.text, line.from, ranges, options, view.state)
         : [];
+      const inlineMarkdownWidgetRanges = !fencedCodeLineClass
+        ? decorateInlineMarkdownWidgets(
+            line.text,
+            line.from,
+            ranges,
+            options,
+            view.state,
+          )
+        : [];
       if (!fencedCodeLineClass) {
         decorateHiddenFormatting(line.text, line.from, ranges, {
-          excludedRanges: inlineMathRanges,
+          excludedRanges: [
+            ...inlineMathRanges,
+            ...inlineMarkdownWidgetRanges,
+            ...syntaxHiddenRanges,
+            ...activeInlineSourceRanges,
+          ],
           state: view.state,
         });
       }
@@ -487,6 +381,226 @@ function buildInlinePreviewDecorations(
   }
 
   return Decoration.set(sortRanges(ranges), true);
+}
+
+function decorateInlineSyntax(
+  view: EditorView,
+  ranges: Range<Decoration>[],
+  hiddenRanges: RangeBoundary[],
+  activeSourceRanges: RangeBoundary[],
+  options: MiraRichEditorOptions,
+): void {
+  const tree =
+    ensureSyntaxTree(view.state, view.state.doc.length, 100) ??
+    syntaxTree(view.state);
+
+  for (const visibleRange of view.visibleRanges) {
+    tree.iterate({
+      from: visibleRange.from,
+      to: visibleRange.to,
+      enter(node) {
+        const parent = node.node.parent;
+        const parentName = parent?.name;
+        const parentFrom = parent?.from ?? node.from;
+        const parentTo = parent?.to ?? node.to;
+        const nodeSource = view.state.sliceDoc(node.from, node.to);
+
+        if (INLINE_SOURCE_TOKEN_NAMES.has(node.name)) {
+          decorateInlineTokenElement(
+            view,
+            node.name,
+            node.from,
+            node.to,
+            ranges,
+          );
+          if (rangeIntersectsSelection(view.state, node.from, node.to)) {
+            activeSourceRanges.push({ from: node.from, to: node.to });
+          }
+        }
+
+        decorateInlineTokenPart(
+          view,
+          node.name,
+          node.from,
+          node.to,
+          nodeSource,
+          parentName,
+          ranges,
+        );
+
+        if (
+          INLINE_FORMATTING_NODE_NAMES.has(node.name) &&
+          !isBareExternalAutolinkUrl(node.name, parentName, nodeSource) &&
+          !rangeIntersectsSelection(view.state, parentFrom, parentTo)
+        ) {
+          hiddenRanges.push({ from: node.from, to: node.to });
+          ranges.push(hiddenFormattingMark.range(node.from, node.to));
+        }
+      },
+    });
+  }
+}
+
+function decorateInlineMarkdownWidgets(
+  text: string,
+  lineStart: number,
+  ranges: Range<Decoration>[],
+  options: MiraRichEditorOptions,
+  state: EditorState,
+): RangeBoundary[] {
+  const widgetRanges: RangeBoundary[] = [];
+  const codeRanges = findInlineCodeRanges(text);
+
+  if (isStandaloneEmbedLine(text)) {
+    widgetRanges.push({ from: lineStart, to: lineStart + text.length });
+    return widgetRanges;
+  }
+
+  for (const match of text.matchAll(/\[\[[^\]\r\n]+\]\]/gu)) {
+    const localFrom = match.index ?? 0;
+    const localTo = localFrom + match[0].length;
+    if (
+      text[localFrom - 1] === "!" ||
+      isPositionInsideRanges(localFrom, codeRanges) ||
+      isPositionInsideRanges(localTo - 1, codeRanges)
+    ) {
+      continue;
+    }
+
+    const from = lineStart + localFrom;
+    const to = lineStart + localTo;
+    if (rangeContainsSelectionCursor(state, from, to)) {
+      continue;
+    }
+
+    widgetRanges.push({ from, to });
+    ranges.push(
+      Decoration.replace({
+        widget: new InlineMarkdownWidget({
+          from,
+          to,
+          markdown: match[0],
+          options,
+        }),
+      }).range(from, to),
+    );
+  }
+
+  return widgetRanges;
+}
+
+function isStandaloneEmbedLine(text: string): boolean {
+  return /^\s*!\[\[[^\]\r\n]+\]\]\s*$/u.test(text);
+}
+
+function decorateInlineTokenElement(
+  view: EditorView,
+  name: string,
+  from: number,
+  to: number,
+  ranges: Range<Decoration>[],
+): void {
+  if (name === "StrongEmphasis") {
+    ranges.push(strongMark.range(from, to));
+    return;
+  }
+  if (name === "Emphasis") {
+    ranges.push(emphasisMark.range(from, to));
+    return;
+  }
+  if (name === "Strikethrough" || name === "StrikethroughEmphasis") {
+    ranges.push(strikethroughMark.range(from, to));
+    return;
+  }
+  if (name === "InlineCode" || name === "CodeBlock") {
+    ranges.push(inlineCodeMark.range(from, to));
+    return;
+  }
+  if (name === "Link" || name === "PathLink") {
+    const source = view.state.sliceDoc(from, to);
+    ranges.push(
+      (isExternalMarkdownLink(source)
+        ? externalLinkMark
+        : internalLinkMark
+      ).range(from, to),
+    );
+    const textRange = getMarkdownLinkTextRange(source, from, to);
+    if (textRange) {
+      ranges.push(linkTextMark.range(textRange.from, textRange.to));
+    }
+    return;
+  }
+  if (name === "WikiLink" || name === "EmbedLink" || name === "Image") {
+    ranges.push(internalLinkMark.range(from, to));
+  }
+}
+
+function decorateInlineTokenPart(
+  view: EditorView,
+  name: string,
+  from: number,
+  to: number,
+  source: string,
+  parentName: string | undefined,
+  ranges: Range<Decoration>[],
+): void {
+  if (name === "URL") {
+    ranges.push(
+      (parentName === "Link" ? linkTargetMark : externalLinkMark).range(
+        from,
+        to,
+      ),
+    );
+    if (parentName !== "Link" && isExternalMarkdownLink(source)) {
+      const textRange = getMarkdownLinkTextRange(source, from, to);
+      if (textRange) {
+        ranges.push(linkTextMark.range(textRange.from, textRange.to));
+      }
+    }
+    return;
+  }
+  if (name === "PathLinkDestination") {
+    ranges.push(linkPathTargetMark.range(from, to));
+    return;
+  }
+  if (
+    name === "WikiLinkPath" ||
+    name === "WikiLinkAnchor" ||
+    name === "EmbedLinkPath" ||
+    name === "EmbedLinkAnchor"
+  ) {
+    ranges.push(linkTargetMark.range(from, to));
+    return;
+  }
+  if (name === "WikiLinkText" || name === "EmbedLinkText") {
+    ranges.push(linkTextMark.range(from, to));
+  }
+}
+
+function decorateStrikethroughRanges(
+  text: string,
+  lineStart: number,
+  ranges: Range<Decoration>[],
+  hiddenRanges: RangeBoundary[],
+  activeSourceRanges: RangeBoundary[],
+  state: EditorState,
+): void {
+  for (const match of text.matchAll(/~~(?=\S)(.+?)(?<=\S)~~/gu)) {
+    const from = lineStart + (match.index ?? 0);
+    const to = from + match[0].length;
+    const opening = { from, to: from + 2 };
+    const closing = { from: to - 2, to };
+
+    ranges.push(strikethroughMark.range(from, to));
+    if (rangeIntersectsSelection(state, from, to)) {
+      activeSourceRanges.push({ from, to });
+      continue;
+    }
+
+    hiddenRanges.push(opening, closing);
+    ranges.push(hiddenFormattingMark.range(opening.from, opening.to));
+    ranges.push(hiddenFormattingMark.range(closing.from, closing.to));
+  }
 }
 
 function getFencedCodeLineClasses(state: EditorState): Map<number, string> {
@@ -531,424 +645,6 @@ function getFencedCodeLineClasses(state: EditorState): Map<number, string> {
   return classes;
 }
 
-class BlockPreviewWidget extends WidgetType {
-  constructor(
-    private readonly config: {
-      from: number;
-      to: number;
-      markdown: string;
-      nodeName: string;
-      options: MiraRichEditorOptions;
-    },
-  ) {
-    super();
-  }
-
-  override eq(other: BlockPreviewWidget): boolean {
-    return (
-      this.config.from === other.config.from &&
-      this.config.to === other.config.to &&
-      this.config.markdown === other.config.markdown &&
-      this.config.nodeName === other.config.nodeName &&
-      this.config.options.frontmatterOpen ===
-        other.config.options.frontmatterOpen
-    );
-  }
-
-  override get estimatedHeight(): number {
-    return estimateMarkdownBlockHeight(this.config.markdown);
-  }
-
-  override toDOM(view: EditorView): HTMLElement {
-    const container = document.createElement("div");
-    container.className = [
-      "mira-rich-widget",
-      "mira-rich-widget--block",
-      `mira-rich-widget--${this.config.nodeName.toLowerCase()}`,
-      "markdown-rendered",
-    ].join(" ");
-    container.dataset.node = this.config.nodeName;
-
-    if (this.config.nodeName === "Table") {
-      container.append(
-        createMarkdownTableWidget({
-          markdown: this.config.markdown,
-          onChange: (nextMarkdown) => {
-            this.dispatchMarkdownReplacement(view, nextMarkdown);
-          },
-          onDelete: () => {
-            this.dispatchMarkdownReplacement(view, "");
-          },
-          onSource: () => {
-            selectWidgetSource(view, this.config.from, this.config.to);
-          },
-        }),
-      );
-      return container;
-    }
-
-    container.append(
-      createSourceToggleButton(() => {
-        selectWidgetSource(view, this.config.from, this.config.to);
-      }),
-    );
-
-    let pendingFrontmatterValue = "";
-    const component = mount(MarkdownPreview, {
-      target: container,
-      props: {
-        value: this.config.markdown,
-        embed: true,
-        sourcePath: this.config.options.sourcePath,
-        extensions: this.config.options.extensions ?? [],
-        linkResolver: this.config.options.linkResolver,
-        assetResolver: this.config.options.assetResolver,
-        frontmatterOpen: this.config.options.frontmatterOpen ?? true,
-        frontmatterConfig: this.config.options.frontmatterConfig as any,
-        onChange: (replacement: string, from: number, to: number) => {
-          const absoluteFrom = this.config.from + from;
-          const absoluteTo = this.config.from + to;
-          const nextValue = [
-            view.state.doc.sliceString(0, absoluteFrom),
-            replacement,
-            view.state.doc.sliceString(absoluteTo),
-          ].join("");
-          pendingFrontmatterValue = nextValue;
-          this.config.options.onChange?.(
-            replacement,
-            absoluteFrom,
-            absoluteTo,
-            nextValue,
-          );
-        },
-        onFrontmatterChange: (nextYaml: string) => {
-          this.config.options.onFrontmatterChange?.(
-            nextYaml,
-            pendingFrontmatterValue || view.state.doc.toString(),
-          );
-        },
-      },
-    });
-    previewWidgetMounts.set(container, component as Record<string, unknown>);
-
-    container.addEventListener("mousedown", (event) => {
-      if (!shouldActivateEditablePreview(event)) {
-        return;
-      }
-
-      event.preventDefault();
-      view.dispatch({
-        selection: { anchor: this.config.from, head: this.config.to },
-        scrollIntoView: true,
-      });
-      view.focus();
-    });
-
-    return container;
-  }
-
-  private dispatchMarkdownReplacement(
-    view: EditorView,
-    replacement: string,
-  ): void {
-    const nextValue = [
-      view.state.doc.sliceString(0, this.config.from),
-      replacement,
-      view.state.doc.sliceString(this.config.to),
-    ].join("");
-    this.config.options.onChange?.(
-      replacement,
-      this.config.from,
-      this.config.to,
-      nextValue,
-    );
-    view.dispatch({
-      changes: {
-        from: this.config.from,
-        to: this.config.to,
-        insert: replacement,
-      },
-      selection: {
-        anchor: this.config.from,
-        head: this.config.from + replacement.length,
-      },
-      scrollIntoView: true,
-    });
-  }
-
-  override destroy(dom: HTMLElement): void {
-    const component = previewWidgetMounts.get(dom);
-    if (component) {
-      void unmount(component);
-      previewWidgetMounts.delete(dom);
-    }
-  }
-
-  override ignoreEvent(): boolean {
-    return true;
-  }
-}
-
-class InlineMathWidget extends WidgetType {
-  constructor(
-    private readonly config: {
-      from: number;
-      to: number;
-      source: string;
-      options: MiraRichEditorOptions;
-    },
-  ) {
-    super();
-  }
-
-  override eq(other: InlineMathWidget): boolean {
-    return (
-      this.config.from === other.config.from &&
-      this.config.to === other.config.to &&
-      this.config.source === other.config.source
-    );
-  }
-
-  override toDOM(view: EditorView): HTMLElement {
-    const container = document.createElement("span");
-    container.className = "mira-inline-math-widget cm-inline-math";
-    container.dataset.math = "inline";
-
-    const component = mount(MarkdownPreview, {
-      target: container,
-      props: {
-        value: this.config.source,
-        inline: true,
-        sourcePath: this.config.options.sourcePath,
-        extensions: this.config.options.extensions ?? [],
-        linkResolver: this.config.options.linkResolver,
-        assetResolver: this.config.options.assetResolver,
-      },
-    });
-    previewWidgetMounts.set(container, component as Record<string, unknown>);
-
-    container.addEventListener("mousedown", (event) => {
-      if (!shouldActivateEditablePreview(event)) {
-        return;
-      }
-
-      event.preventDefault();
-      view.dispatch({
-        selection: { anchor: this.config.from, head: this.config.to },
-        scrollIntoView: true,
-      });
-      view.focus();
-    });
-
-    return container;
-  }
-
-  override destroy(dom: HTMLElement): void {
-    const component = previewWidgetMounts.get(dom);
-    if (component) {
-      void unmount(component);
-      previewWidgetMounts.delete(dom);
-    }
-  }
-
-  override ignoreEvent(): boolean {
-    return true;
-  }
-}
-
-class TaskCheckboxWidget extends WidgetType {
-  constructor(
-    private readonly config: {
-      from: number;
-      value: string;
-      checked: boolean;
-      options: MiraRichEditorOptions;
-    },
-  ) {
-    super();
-  }
-
-  override eq(other: TaskCheckboxWidget): boolean {
-    return (
-      this.config.from === other.config.from &&
-      this.config.value === other.config.value &&
-      this.config.checked === other.config.checked
-    );
-  }
-
-  override toDOM(view: EditorView): HTMLElement {
-    const label = document.createElement("label");
-    label.className = "task-list-label";
-    label.dataset.task = this.config.value;
-
-    const input = document.createElement("input");
-    input.type = "checkbox";
-    input.className = "task-list-item-checkbox mira-task-checkbox cm-task-checkbox";
-    input.dataset.task = this.config.value;
-    input.checked = this.config.checked;
-    input.setAttribute("aria-label", "Toggle task");
-    input.addEventListener("change", () => {
-      const replacement = input.checked ? "x" : " ";
-      view.dispatch({
-        changes: {
-          from: this.config.from + 1,
-          to: this.config.from + 2,
-          insert: replacement,
-        },
-      });
-    });
-    label.append(input);
-    return label;
-  }
-
-  override ignoreEvent(): boolean {
-    return true;
-  }
-}
-
-class FoldIndicatorPlugin implements PluginValue {
-  decorations: DecorationSet;
-
-  constructor(private readonly view: EditorView) {
-    this.decorations = buildFoldIndicatorDecorations(view);
-  }
-
-  update(update: ViewUpdate): void {
-    if (
-      update.docChanged ||
-      update.selectionSet ||
-      update.viewportChanged ||
-      update.geometryChanged
-    ) {
-      this.decorations = buildFoldIndicatorDecorations(update.view);
-    }
-  }
-}
-
-class FoldIndicatorWidget extends WidgetType {
-  constructor(
-    private readonly config: {
-      range: RangeBoundary;
-      folded: boolean;
-    },
-  ) {
-    super();
-  }
-
-  override eq(other: FoldIndicatorWidget): boolean {
-    return (
-      this.config.range.from === other.config.range.from &&
-      this.config.range.to === other.config.range.to &&
-      this.config.folded === other.config.folded
-    );
-  }
-
-  override toDOM(view: EditorView): HTMLElement {
-    const wrapper = document.createElement("span");
-    wrapper.className = "cm-fold-indicator relative";
-
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className =
-      "hover:bg-transparent p-0 collapse-indicator flex size-4 min-h-0 min-w-0 items-center justify-center collapse-icon closed-fold-icon";
-    button.dataset.folded = String(this.config.folded);
-    button.setAttribute(
-      "aria-label",
-      this.config.folded ? "Expand section" : "Collapse section",
-    );
-
-    const icon = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    icon.classList.add("svg-icon");
-    icon.setAttribute("aria-hidden", "true");
-    icon.setAttribute("viewBox", "0 0 24 24");
-    icon.setAttribute("fill", "none");
-    icon.setAttribute("stroke", "currentColor");
-    icon.setAttribute("stroke-width", "2");
-    icon.setAttribute("stroke-linecap", "round");
-    icon.setAttribute("stroke-linejoin", "round");
-    if (this.config.folded) {
-      icon.style.transform = "rotate(-90deg)";
-    }
-    const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-    path.setAttribute("d", "M3 8L12 17L21 8");
-    icon.append(path);
-    button.append(icon);
-
-    button.addEventListener("mousedown", (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-    });
-    button.addEventListener("click", (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      view.dispatch({
-        effects: this.config.folded
-          ? unfoldEffect.of(this.config.range)
-          : foldEffect.of(this.config.range),
-      });
-      view.focus();
-    });
-
-    wrapper.append(button);
-    return wrapper;
-  }
-
-  override ignoreEvent(): boolean {
-    return true;
-  }
-}
-
-function buildFoldIndicatorDecorations(view: EditorView): DecorationSet {
-  const builder = new RangeSetBuilder<Decoration>();
-
-  for (const visibleRange of view.visibleRanges) {
-    let line = view.state.doc.lineAt(visibleRange.from);
-    while (line.from <= visibleRange.to) {
-      const foldRange = foldable(view.state, line.from, line.to);
-      if (foldRange) {
-        const folded = isRangeFolded(view, foldRange);
-        const anchor = getFoldAnchor({
-          from: line.from,
-          text: line.text,
-        });
-        builder.add(
-          anchor,
-          anchor,
-          Decoration.widget({
-            side: -1,
-            widget: new FoldIndicatorWidget({
-              range: foldRange,
-              folded,
-            }),
-          }),
-        );
-      }
-
-      if (line.to >= visibleRange.to || line.number >= view.state.doc.lines) {
-        break;
-      }
-      line = view.state.doc.line(line.number + 1);
-    }
-  }
-
-  return builder.finish();
-}
-
-export function getFoldAnchor(line: { from: number; text: string }): number {
-  const contentOffset = line.text.search(/\S/);
-  return contentOffset > 0 ? line.from + contentOffset : line.from;
-}
-
-function isRangeFolded(view: EditorView, range: RangeBoundary): boolean {
-  let folded = false;
-  foldedRanges(view.state).between(range.from, range.to, (from, to) => {
-    if (from === range.from && to === range.to) {
-      folded = true;
-    }
-  });
-  return folded;
-}
-
 function decorateTaskCheckboxes(
   text: string,
   lineStart: number,
@@ -961,12 +657,11 @@ function decorateTaskCheckboxes(
     const checkboxStart = markerStart + match[2].length;
     const checkboxEnd = checkboxStart + 3;
     const taskValue = match[3] ?? " ";
-    const normalizedTaskValue = taskValue.toLowerCase();
     ranges.push(
       Decoration.line({
         class: "cm-task-line HyperMD-task-line",
         attributes: {
-          "data-task": normalizedTaskValue,
+          "data-task": taskValue,
         },
       }).range(lineStart),
     );
@@ -974,7 +669,7 @@ function decorateTaskCheckboxes(
       Decoration.replace({
         widget: new TaskCheckboxWidget({
           from: checkboxStart,
-          value: normalizedTaskValue,
+          value: taskValue,
           checked: taskValue.trim().length > 0,
           options,
         }),
@@ -1046,115 +741,6 @@ function decorateInlineMath(
   return absoluteRanges;
 }
 
-export function findInlineMathRanges(text: string): InlineMathRange[] {
-  const ranges: InlineMathRange[] = [];
-  const codeRanges = findInlineCodeRanges(text);
-  let index = 0;
-
-  while (index < text.length) {
-    if (
-      text[index] !== "$" ||
-      text[index - 1] === "$" ||
-      text[index + 1] === "$" ||
-      isEscaped(text, index) ||
-      isPositionInsideRanges(index, codeRanges) ||
-      isWhitespace(text[index + 1] ?? "")
-    ) {
-      index += 1;
-      continue;
-    }
-
-    let end = index + 1;
-    let found = false;
-    while (end < text.length) {
-      if (
-        text[end] === "$" &&
-        text[end - 1] !== "$" &&
-        text[end + 1] !== "$" &&
-        !isEscaped(text, end) &&
-        !isPositionInsideRanges(end, codeRanges) &&
-        !isWhitespace(text[end - 1] ?? "") &&
-        !/\d/u.test(text[end + 1] ?? "")
-      ) {
-        const source = text.slice(index, end + 1);
-        if (source.slice(1, -1).trim()) {
-          ranges.push({
-            from: index,
-            to: end + 1,
-            source,
-          });
-        }
-        index = end + 1;
-        found = true;
-        break;
-      }
-
-      end += 1;
-    }
-
-    if (!found) {
-      index += 1;
-    }
-  }
-
-  return ranges;
-}
-
-function findInlineCodeRanges(text: string): RangeBoundary[] {
-  const ranges: RangeBoundary[] = [];
-  let index = 0;
-
-  while (index < text.length) {
-    if (text[index] !== "`" || isEscaped(text, index)) {
-      index += 1;
-      continue;
-    }
-
-    const tickCount = countRun(text, index, "`");
-    const closingIndex = text.indexOf("`".repeat(tickCount), index + tickCount);
-    if (closingIndex === -1) {
-      break;
-    }
-
-    ranges.push({
-      from: index,
-      to: closingIndex + tickCount,
-    });
-    index = closingIndex + tickCount;
-  }
-
-  return ranges;
-}
-
-function countRun(text: string, start: number, character: string): number {
-  let count = 0;
-  while (text[start + count] === character) {
-    count += 1;
-  }
-  return count;
-}
-
-function isPositionInsideRanges(
-  position: number,
-  ranges: RangeBoundary[],
-): boolean {
-  return ranges.some((range) => position >= range.from && position < range.to);
-}
-
-function isEscaped(text: string, index: number): boolean {
-  let backslashes = 0;
-  let cursor = index - 1;
-  while (cursor >= 0 && text[cursor] === "\\") {
-    backslashes += 1;
-    cursor -= 1;
-  }
-  return backslashes % 2 === 1;
-}
-
-function isWhitespace(character: string): boolean {
-  return character.length > 0 && /\s/u.test(character);
-}
-
 const headingLineDecorations = Array.from({ length: 6 }, (_, index) =>
   Decoration.line({
     class: [
@@ -1178,56 +764,6 @@ function decorateHeadingLine(
   ranges.push(headingLineDecorations[match[1].length - 1]!.range(lineStart));
 }
 
-function createSourceToggleButton(onClick: () => void): HTMLButtonElement {
-  const button = document.createElement("button");
-  button.type = "button";
-  button.className =
-    "mira-rich-widget__source-toggle markdown-widget-select-control";
-  button.title = "Edit source";
-  button.setAttribute("aria-label", "Edit source");
-  button.append(createCodeXmlIcon());
-  button.addEventListener("mousedown", (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-  });
-  button.addEventListener("click", (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    onClick();
-  });
-  return button;
-}
-
-function createCodeXmlIcon(): SVGSVGElement {
-  const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("aria-hidden", "true");
-  svg.setAttribute("viewBox", "0 0 24 24");
-  svg.setAttribute("fill", "none");
-  svg.setAttribute("stroke", "currentColor");
-  svg.setAttribute("stroke-width", "2");
-  svg.setAttribute("stroke-linecap", "round");
-  svg.setAttribute("stroke-linejoin", "round");
-  svg.classList.add("mira-rich-widget__source-icon", "svg-icon");
-  appendSvgPath(svg, "m18 16 4-4-4-4");
-  appendSvgPath(svg, "m6 8-4 4 4 4");
-  appendSvgPath(svg, "m14.5 4-5 16");
-  return svg;
-}
-
-function appendSvgPath(svg: SVGSVGElement, d: string): void {
-  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-  path.setAttribute("d", d);
-  svg.append(path);
-}
-
-function selectWidgetSource(view: EditorView, from: number, to: number): void {
-  view.dispatch({
-    selection: { anchor: from, head: to },
-    scrollIntoView: true,
-  });
-  view.focus();
-}
-
 function decorateHiddenFormatting(
   text: string,
   lineStart: number,
@@ -1237,20 +773,8 @@ function decorateHiddenFormatting(
     state?: EditorState;
   } = {},
 ): void {
-  addRegexMarks(
-    text,
-    lineStart,
-    ranges,
-    /(\*\*|__|\*|_|~~|`)/g,
-    options,
-  );
-  addRegexMarks(
-    text,
-    lineStart,
-    ranges,
-    /(!?\[|\]\(|\)|\[\[|\]\])/g,
-    options,
-  );
+  addRegexMarks(text, lineStart, ranges, /(\*\*|__|\*|_|~~|`)/g, options);
+  addRegexMarks(text, lineStart, ranges, /(!?\[|\]\(|\)|\[\[|\]\])/g, options);
   addRegexMarks(text, lineStart, ranges, /^(#{1,6})(?=\s)/g, options);
   addRegexMarks(text, lineStart, ranges, /^(\s*>+\s?)/g, options);
 }
@@ -1282,285 +806,3 @@ function addRegexMarks(
     ranges.push(hiddenFormattingMark.range(from, to));
   }
 }
-
-function rangeIntersectsSelection(
-  state: EditorState,
-  from: number,
-  to: number,
-): boolean {
-  return state.selection.ranges.some(
-    (selection) => selection.from <= to && selection.to >= from,
-  );
-}
-
-function hasInitialFrontmatterCursor(
-  state: EditorState,
-  from: number,
-): boolean {
-  return (
-    from === 0 &&
-    state.selection.ranges.length === 1 &&
-    state.selection.main.empty &&
-    state.selection.main.from === 0
-  );
-}
-
-function rangesOverlap(left: RangeBoundary, right: RangeBoundary): boolean {
-  return left.from < right.to && right.from < left.to;
-}
-
-function sortRanges(ranges: Range<Decoration>[]): Range<Decoration>[] {
-  return ranges.sort((left, right) => {
-    if (left.from !== right.from) {
-      return left.from - right.from;
-    }
-    return left.to - right.to;
-  });
-}
-
-const miraRichEditorTheme = EditorView.theme({
-  ".cm-foldGutter": {
-    display: "none",
-  },
-  ".cm-line": {
-    position: "relative",
-  },
-  ".mira-fold-indicator": {
-    alignItems: "center",
-    display: "inline-flex",
-    height: "1rem",
-    justifyContent: "center",
-    marginInlineEnd: "0.15rem",
-    marginInlineStart: "-1.15rem",
-    position: "relative",
-    verticalAlign: "-0.1rem",
-    width: "1rem",
-  },
-  ".mira-fold-indicator__button": {
-    alignItems: "center",
-    background: "transparent",
-    border: "0",
-    borderRadius: "4px",
-    color: "var(--mira-muted-foreground)",
-    cursor: "pointer",
-    display: "inline-flex",
-    height: "1rem",
-    justifyContent: "center",
-    padding: "0",
-    width: "1rem",
-  },
-  ".mira-fold-indicator__button:hover": {
-    background: "var(--mira-accent-soft)",
-    color: "var(--mira-foreground)",
-  },
-  ".mira-fold-indicator__icon": {
-    display: "block",
-    height: "0.875rem",
-    transform: "rotate(0deg)",
-    transition: "transform 120ms ease",
-    width: "0.875rem",
-  },
-  ".mira-fold-indicator__button[data-folded='true'] .mira-fold-indicator__icon":
-    {
-      transform: "rotate(-90deg)",
-    },
-  ".cm-formatting-hidden": {
-    color: "transparent",
-    display: "inline-block",
-    overflow: "hidden",
-    width: "0",
-  },
-  ".mira-rich-widget": {
-    background: "var(--mira-widget-background, transparent)",
-    boxSizing: "border-box",
-    color: "var(--mira-foreground)",
-    margin: "0",
-    overflow: "visible",
-    position: "relative",
-  },
-  ".mira-rich-widget__source-toggle": {
-    alignItems: "center",
-    background: "var(--mira-popover)",
-    border: "1px solid var(--mira-border)",
-    borderRadius: "4px",
-    boxShadow: "var(--mira-widget-shadow)",
-    color: "var(--mira-muted-foreground)",
-    cursor: "pointer",
-    display: "inline-flex",
-    height: "1.5rem",
-    insetBlockStart: "0.25rem",
-    insetInlineEnd: "0.25rem",
-    justifyContent: "center",
-    lineHeight: "1",
-    opacity: "0",
-    padding: "0",
-    position: "absolute",
-    transition: "opacity 120ms ease, color 120ms ease",
-    width: "1.5rem",
-    zIndex: "10",
-  },
-  ".mira-rich-widget__source-icon": {
-    height: "0.95rem",
-    width: "0.95rem",
-  },
-  ".mira-rich-widget:hover .mira-rich-widget__source-toggle, .mira-rich-widget:focus-within .mira-rich-widget__source-toggle":
-    {
-      opacity: "1",
-    },
-  ".mira-rich-widget__source-toggle:hover": {
-    background: "var(--mira-accent-soft)",
-    color: "var(--mira-foreground)",
-  },
-  ".mira-table-widget-shell": {
-    display: "inline-block",
-    maxWidth: "100%",
-    position: "relative",
-  },
-  ".mira-table-widget__source-toggle": {
-    alignItems: "center",
-    background: "var(--mira-popover)",
-    border: "1px solid var(--mira-border)",
-    borderRadius: "4px",
-    boxShadow: "var(--mira-widget-shadow)",
-    color: "var(--mira-muted-foreground)",
-    cursor: "pointer",
-    display: "inline-flex",
-    height: "1.5rem",
-    insetBlockStart: "0.25rem",
-    insetInlineEnd: "0.25rem",
-    justifyContent: "center",
-    lineHeight: "1",
-    opacity: "0",
-    padding: "0",
-    position: "absolute",
-    transition: "opacity 120ms ease, color 120ms ease",
-    width: "1.5rem",
-    zIndex: "10",
-  },
-  ".mira-table-widget-shell:hover .mira-table-widget__source-toggle, .mira-table-widget-shell:focus-within .mira-table-widget__source-toggle":
-    {
-      opacity: "1",
-    },
-  ".mira-table-widget__source-toggle svg": {
-    height: "0.95rem",
-    width: "0.95rem",
-  },
-  ".mira-table-widget__source-toggle:hover": {
-    background: "var(--mira-accent-soft)",
-    color: "var(--mira-foreground)",
-  },
-  ".mira-rich-widget .mira-markdown-preview": {
-    background: "transparent",
-    height: "auto",
-    margin: "0",
-    overflow: "visible",
-    padding: "0.1rem 0",
-  },
-  ".mira-rich-widget .markdown-rendered, .mira-rich-widget .markdown-rendered > *":
-    {
-      marginBlockEnd: "0",
-      marginBlockStart: "0",
-    },
-  ".mira-rich-widget--table": {
-    borderColor: "transparent",
-    minHeight: "0 !important",
-  },
-  ".mira-rich-widget--table:hover": {
-    borderColor: "transparent",
-  },
-  ".cm-header": {
-    fontFamily: "var(--mira-font-sans)",
-    fontWeight: "700",
-    lineHeight: "var(--cm-block-line-height)",
-  },
-  ".cm-header-1": {
-    "--cm-block-line-height": "var(--mira-h1-line-height, 1.2)",
-    fontSize: "var(--mira-h1-size, 1.802em)",
-  },
-  ".cm-header-2": {
-    "--cm-block-line-height": "var(--mira-h2-line-height, 1.2)",
-    fontSize: "var(--mira-h2-size, 1.602em)",
-  },
-  ".cm-header-3": {
-    "--cm-block-line-height": "var(--mira-h3-line-height, 1.3)",
-    fontSize: "var(--mira-h3-size, 1.424em)",
-  },
-  ".cm-header-4": {
-    "--cm-block-line-height": "var(--mira-h4-line-height, 1.4)",
-    fontSize: "var(--mira-h4-size, 1.266em)",
-  },
-  ".cm-header-5": {
-    "--cm-block-line-height":
-      "var(--mira-h5-line-height, var(--mira-line-height))",
-    fontSize: "var(--mira-h5-size, 1.125em)",
-  },
-  ".cm-header-6": {
-    "--cm-block-line-height":
-      "var(--mira-h6-line-height, var(--mira-line-height))",
-    fontSize: "var(--mira-h6-size, 1em)",
-  },
-  ".cm-gutters .cm-gutterElement.cm-gutterHeader": {
-    display: "inline-flex",
-    alignItems: "center",
-  },
-  ".cm-gutters .cm-gutterElement.cm-gutterHeader-1": {
-    "--cm-block-line-height": "var(--mira-h1-line-height, 1.2)",
-  },
-  ".cm-gutters .cm-gutterElement.cm-gutterHeader-2": {
-    "--cm-block-line-height": "var(--mira-h2-line-height, 1.2)",
-  },
-  ".cm-gutters .cm-gutterElement.cm-gutterHeader-3": {
-    "--cm-block-line-height": "var(--mira-h3-line-height, 1.3)",
-  },
-  ".cm-gutters .cm-gutterElement.cm-gutterHeader-4": {
-    "--cm-block-line-height": "var(--mira-h4-line-height, 1.4)",
-  },
-  ".cm-gutters .cm-gutterElement.cm-gutterHeader-5": {
-    "--cm-block-line-height":
-      "var(--mira-h5-line-height, var(--mira-line-height))",
-  },
-  ".cm-gutters .cm-gutterElement.cm-gutterHeader-6": {
-    "--cm-block-line-height":
-      "var(--mira-h6-line-height, var(--mira-line-height))",
-  },
-  ".mira-task-checkbox": {
-    appearance: "none",
-    backgroundColor: "transparent",
-    border: "1px solid var(--mira-checkbox-border, var(--mira-border-strong))",
-    borderRadius: "var(--mira-checkbox-radius, 4px)",
-    boxSizing: "border-box",
-    cursor: "pointer",
-    height: "var(--mira-checkbox-size, 1.15em)",
-    margin: "0 0.5em 0 0",
-    position: "relative",
-    verticalAlign: "-0.18em",
-    width: "var(--mira-checkbox-size, 1.15em)",
-  },
-  ".mira-task-checkbox:hover, .mira-task-checkbox:focus": {
-    borderColor:
-      "var(--mira-checkbox-border-hover, var(--mira-muted-foreground))",
-    outline: "0",
-  },
-  ".mira-task-checkbox:focus-visible": {
-    boxShadow: "0 0 0 2px var(--mira-selection)",
-  },
-  ".mira-task-checkbox:checked": {
-    backgroundColor: "var(--mira-checkbox-color, var(--mira-accent))",
-    borderColor: "var(--mira-checkbox-color, var(--mira-accent))",
-  },
-  ".mira-task-checkbox:checked::after": {
-    backgroundColor:
-      "var(--mira-checkbox-marker, var(--mira-accent-foreground))",
-    content: "''",
-    display: "block",
-    height: "100%",
-    inset: "-1px",
-    maskImage:
-      "url(\"data:image/svg+xml,%3Csvg width='12' height='10' viewBox='0 0 12 10' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M4.2 9.2 0.7 5.7l1.4-1.4 2.1 2.1L9.9 0.8l1.4 1.4z'/%3E%3C/svg%3E\")",
-    maskPosition: "50% 52%",
-    maskRepeat: "no-repeat",
-    maskSize: "65%",
-    position: "absolute",
-    width: "100%",
-  },
-});

@@ -191,6 +191,21 @@
     );
   }
 
+  function updateEditableTextProperty(
+    event: Event,
+    property: FrontmatterProperty,
+  ): void {
+    const target = event.currentTarget as HTMLElement;
+    updateProperty(property, target.textContent ?? "");
+  }
+
+  function handleEditableTextKeydown(event: KeyboardEvent): void {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      (event.currentTarget as HTMLElement).blur();
+    }
+  }
+
   function updateBooleanProperty(
     event: Event,
     property: FrontmatterProperty,
@@ -383,7 +398,15 @@
       class="md-frontmatter__trigger"
       aria-label={frontmatterOpen ? "Collapse properties" : "Expand properties"}
       aria-expanded={frontmatterOpen}
-      onclick={() => (frontmatterOpen = !frontmatterOpen)}
+      onmousedown={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
+      }}
+      onclick={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        frontmatterOpen = !frontmatterOpen;
+      }}
     >
       <ChevronRight class="md-frontmatter__chevron" aria-hidden="true" />
       <span class="md-frontmatter__title">Properties</span>
@@ -541,6 +564,43 @@
             checked={Boolean(property.value)}
             onchange={(event) => updateBooleanProperty(event, property)}
           />
+        {:else if toBuiltinFrontmatterKind(property.kind) === "text"}
+          <div
+            class={`metadata-input metadata-input-longtext metadata-property-value-item min-w-0 grow bg-transparent px-2 py-1 outline-none ${valueClass(property.kind)}`}
+            role="textbox"
+            aria-label={`${property.pathString} value`}
+            contenteditable="true"
+            spellcheck="true"
+            tabindex="0"
+            data-placeholder="Empty"
+            onblur={(event) => updateEditableTextProperty(event, property)}
+            onkeydown={handleEditableTextKeydown}
+          >
+            {formatFrontmatterValue(property.value)}
+          </div>
+        {:else if toBuiltinFrontmatterKind(property.kind) === "number"}
+          <input
+            class={`metadata-input metadata-input-number metadata-property-value-item min-w-0 grow bg-transparent px-2 py-1 outline-none ${valueClass(property.kind)}`}
+            type="number"
+            inputmode="decimal"
+            aria-label={`${property.pathString} value`}
+            value={formatFrontmatterValue(property.value)}
+            onchange={(event) => updateTextProperty(event, property)}
+            onblur={(event) => updateTextProperty(event, property)}
+          />
+        {:else if toBuiltinFrontmatterKind(property.kind) === "date" || toBuiltinFrontmatterKind(property.kind) === "datetime"}
+          <div
+            class={`metadata-property-value-item metadata-property-value-date min-w-0 grow ${valueClass(property.kind)}`}
+          >
+            <input
+              class={`metadata-input metadata-input-text min-w-0 grow bg-transparent px-2 py-1 outline-none ${valueClass(property.kind)}`}
+              type={inputType(property.kind)}
+              aria-label={`${property.pathString} value`}
+              value={formatFrontmatterValue(property.value)}
+              onchange={(event) => updateTextProperty(event, property)}
+              onblur={(event) => updateTextProperty(event, property)}
+            />
+          </div>
         {:else if property.kind === "array" || property.kind === "object" || property.kind === "unknown"}
           <textarea
             class={`metadata-input metadata-input-longtext metadata-property-value-item min-w-0 grow bg-transparent px-2 py-1 outline-none ${valueClass(property.kind)}`}
@@ -618,7 +678,10 @@
         />
         <span
           >{option.label ??
-            frontmatterPropertyLabel(option.type, markdown.frontmatterConfig)}</span
+            frontmatterPropertyLabel(
+              option.type,
+              markdown.frontmatterConfig,
+            )}</span
         >
         {#if property.kind === option.type}
           <Icon name="check" class="metadata-property-type-menu__check" />

@@ -1,0 +1,166 @@
+.mermaid {
+  border: 2px solid transparent;
+  border-radius: var(--radius-s);
+  font-family: var(--font-monospace);
+  max-width: 100%;
+  min-height: 4rem;
+  overflow: auto;
+  position: relative;
+  touch-action: pan-y;
+  width: 100%;
+}
+
+.mermaid > svg {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  transform-origin: center;
+  transition: transform 100ms ease-in-out;
+  width: 100%;
+}
+
+.mermaid-inline-controls {
+  align-items: center;
+  display: flex;
+  gap: 0.25rem;
+}
+
+.mermaid-viewer-control-panel {
+  bottom: 102px;
+  display: grid;
+  gap: 0.2em;
+  grid-template-columns: 1fr 1fr 1fr;
+  position: absolute;
+  right: 1em;
+  z-index: 2;
+}
+
+.mermaid-viewer-control-panel > button {
+  padding: 5px 7px;
+}
+
+.mermaid-viewer-control-panel > .zoom-in {
+  grid-column: 3;
+  grid-row: 1;
+}
+
+.mermaid-viewer-control-panel > .zoom-out {
+  grid-column: 3;
+  grid-row: 3;
+}
+
+.mermaid-viewer-control-panel > .reset {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.mermaid-viewer-control-panel > .up {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.mermaid-viewer-control-panel > .down {
+  grid-column: 2;
+  grid-row: 3;
+}
+
+.mermaid-viewer-control-panel > .left {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.mermaid-viewer-control-panel > .right {
+  grid-column: 3;
+  grid-row: 2;
+}
+
+.markdown-preview-surface .hljs,
+.markdown-rendered .hljs,
+.markdown-widget-shell .hljs {
+  color: #24292e;
+  font-size: 0.875rem;
+}
+
+.markdown-preview-surface :is(.hljs-keyword, .hljs-doctag, .hljs-type),
+.markdown-rendered :is(.hljs-keyword, .hljs-doctag, .hljs-type),
+.markdown-widget-shell :is(.hljs-keyword, .hljs-doctag, .hljs-type) {
+  color: #d73a49;
+}
+
+.markdown-preview-surface :is(.hljs-title, .hljs-title.function_),
+.markdown-rendered :is(.hljs-title, .hljs-title.function_),
+.markdown-widget-shell :is(.hljs-title, .hljs-title.function_) {
+  color: #6f42c1;
+}
+
+.markdown-preview-surface :is(.hljs-number, .hljs-literal, .hljs-attr),
+.markdown-rendered :is(.hljs-number, .hljs-literal, .hljs-attr),
+.markdown-widget-shell :is(.hljs-number, .hljs-literal, .hljs-attr) {
+  color: #005cc5;
+}
+
+.markdown-preview-surface :is(.hljs-string, .hljs-regexp),
+.markdown-rendered :is(.hljs-string, .hljs-regexp),
+.markdown-widget-shell :is(.hljs-string, .hljs-regexp) {
+  color: #032f62;
+}
+
+.markdown-preview-surface :is(.hljs-comment, .hljs-code),
+.markdown-rendered :is(.hljs-comment, .hljs-code),
+.markdown-widget-shell :is(.hljs-comment, .hljs-code) {
+  color: #6a737d;
+}
+
+.theme-dark .markdown-preview-surface .hljs,
+.theme-dark .markdown-rendered .hljs,
+.theme-dark .markdown-widget-shell .hljs,
+.dark .markdown-preview-surface .hljs,
+.dark .markdown-rendered .hljs,
+.dark .markdown-widget-shell .hljs {
+  color: #c9d1d9;
+}
+
+.theme-dark
+  :is(.markdown-preview-surface, .markdown-rendered, .markdown-widget-shell)
+  :is(.hljs-keyword, .hljs-doctag, .hljs-type),
+.dark
+  :is(.markdown-preview-surface, .markdown-rendered, .markdown-widget-shell)
+  :is(.hljs-keyword, .hljs-doctag, .hljs-type) {
+  color: #ff7b72;
+}
+
+.theme-dark
+  :is(.markdown-preview-surface, .markdown-rendered, .markdown-widget-shell)
+  :is(.hljs-title, .hljs-title.function_),
+.dark
+  :is(.markdown-preview-surface, .markdown-rendered, .markdown-widget-shell)
+  :is(.hljs-title, .hljs-title.function_) {
+  color: #d2a8ff;
+}
+
+.theme-dark
+  :is(.markdown-preview-surface, .markdown-rendered, .markdown-widget-shell)
+  :is(.hljs-number, .hljs-literal, .hljs-attr),
+.dark
+  :is(.markdown-preview-surface, .markdown-rendered, .markdown-widget-shell)
+  :is(.hljs-number, .hljs-literal, .hljs-attr) {
+  color: #79c0ff;
+}
+
+.theme-dark
+  :is(.markdown-preview-surface, .markdown-rendered, .markdown-widget-shell)
+  :is(.hljs-string, .hljs-regexp),
+.dark
+  :is(.markdown-preview-surface, .markdown-rendered, .markdown-widget-shell)
+  :is(.hljs-string, .hljs-regexp) {
+  color: #a5d6ff;
+}
+
+.theme-dark
+  :is(.markdown-preview-surface, .markdown-rendered, .markdown-widget-shell)
+  :is(.hljs-comment, .hljs-code),
+.dark
+  :is(.markdown-preview-surface, .markdown-rendered, .markdown-widget-shell)
+  :is(.hljs-comment, .hljs-code) {
+  color: #8b949e;
+}

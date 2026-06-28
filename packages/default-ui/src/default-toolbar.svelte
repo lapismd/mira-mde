@@ -5,6 +5,7 @@
   import CheckIcon from "@lucide/svelte/icons/check";
   import CodeIcon from "@lucide/svelte/icons/code";
   import Columns2Icon from "@lucide/svelte/icons/columns-2";
+  import EllipsisIcon from "@lucide/svelte/icons/ellipsis";
   import FileCodeIcon from "@lucide/svelte/icons/file-code";
   import Heading1Icon from "@lucide/svelte/icons/heading-1";
   import ItalicIcon from "@lucide/svelte/icons/italic";
@@ -25,7 +26,9 @@
   import type { MiraMode } from "@mira-mde/extensions";
   import {
     MiraFeature,
+    defaultMiraEditMode,
     resolveMiraDefaultFeatures,
+    resolveMiraDefaultEditMode,
     resolveMiraDefaultModes,
     resolveMiraDefaultToolbarActions,
     resolveMiraDefaultToolbarDefinitions,
@@ -37,11 +40,22 @@
     type MiraDefaultToolbarItem,
     type MiraDefaultToolbarMenuItem,
   } from "./features";
+  import {
+    isMiraEditMode,
+    miraDefaultToolbarItemLabels,
+    miraViewOptionsLabel,
+    miraViewToggleLabel,
+    resolveMiraModeAfterSplit,
+    resolveMiraViewModeMenuItems,
+    resolveMiraViewToggleMode,
+    templateForMiraToolbarItem,
+  } from "./toolbar-model";
   import type { MiraDefaultToolbarProps } from "./types";
 
   let {
     value = "",
     mode = $bindable("live-preview"),
+    defaultEditMode = defaultMiraEditMode,
     readonly = false,
     features = {},
     featureConfigs = {},
@@ -86,42 +100,13 @@
       customToolbarActions.length > 0,
   );
 
-  type ViewModeMenuItem = {
-    mode: MiraMode;
-    label: string;
-    icon: Component<Record<string, unknown>>;
-    checked: boolean;
-  };
-
-  let lastEditMode = $state<MiraMode>("live-preview");
-
-  const modeLabels: Record<MiraMode, string> = {
-    source: "Source mode",
-    "live-preview": "Edit",
-    preview: "Preview",
-    split: "Split",
-  };
+  let lastNonSplitMode = $state<MiraMode | null>(null);
 
   const modeIcons = {
     source: FileCodeIcon,
     "live-preview": PencilLineIcon,
     preview: BookOpenIcon,
     split: Columns2Icon,
-  };
-
-  const toolbarItemLabels: Record<MiraDefaultToolbarItem, string> = {
-    heading: "Heading",
-    bold: "Bold",
-    italic: "Italic",
-    quote: "Blockquote",
-    bulletList: "Bullet list",
-    taskList: "Task list",
-    link: "Link",
-    table: "Table",
-    gridTable: "Grid table",
-    code: "Code block",
-    math: "Math",
-    mermaid: "Mermaid diagram",
   };
 
   const toolbarItemIcons = {
@@ -139,13 +124,29 @@
     mermaid: WorkflowIcon,
   };
 
-  const viewModeMenuItems = $derived(resolveViewModeMenuItems());
-  const viewModeControlVisible = $derived(
+  const resolvedDefaultEditMode = $derived(
+    resolveMiraDefaultEditMode(defaultEditMode, modeOptions),
+  );
+  const editModeOptions = $derived(
+    modeOptions.filter((modeOption) => isMiraEditMode(modeOption)),
+  );
+  const viewModeMenuItems = $derived(
+    resolveMiraViewModeMenuItems({
+      mode,
+      modeOptions,
+      resolvedDefaultEditMode,
+    }),
+  );
+  const viewModeToggleVisible = $derived(
     modeSwitchVisible &&
-      (mode === "preview" || viewModeMenuItems.length > 0),
+      modeOptions.includes("preview") &&
+      editModeOptions.length > 0,
   );
   const splitModeVisible = $derived(
     modeSwitchVisible && modeOptions.includes("split"),
+  );
+  const viewModeOverflowVisible = $derived(
+    modeSwitchVisible && viewModeMenuItems.length > 0,
   );
 
   function fallbackContext(): MiraDefaultToolbarActionContext {
@@ -235,21 +236,28 @@
     };
   }
 
-  function menuItemKey(item: MiraDefaultToolbarMenuItem, index: number): string {
+  function menuItemKey(
+    item: MiraDefaultToolbarMenuItem,
+    index: number,
+  ): string {
     const fallback = item.type === "separator" ? index : item.label;
     return `${item.type ?? "item"}-${item.id ?? fallback}`;
   }
 
   function isMenuItemDisabled(item: MiraDefaultToolbarMenuItem): boolean {
-    return item.type !== "label" &&
+    return (
+      item.type !== "label" &&
       item.type !== "separator" &&
-      dynamicBoolean(item.disabled);
+      dynamicBoolean(item.disabled)
+    );
   }
 
   function isMenuItemChecked(item: MiraDefaultToolbarMenuItem): boolean {
-    return item.type !== "label" &&
+    return (
+      item.type !== "label" &&
       item.type !== "separator" &&
-      dynamicBoolean(item.checked);
+      dynamicBoolean(item.checked)
+    );
   }
 
   function menuItemIcon(
@@ -300,89 +308,50 @@
     onModeChange?.(typedMode);
   }
 
-  function preferredEditMode(): MiraMode {
-    if (lastEditMode !== "preview" && modeOptions.includes(lastEditMode)) {
-      return lastEditMode;
-    }
-    if (modeOptions.includes("live-preview")) {
-      return "live-preview";
-    }
-    if (modeOptions.includes("source")) {
-      return "source";
-    }
-    return modeOptions.find((modeOption) => modeOption !== "preview") ?? "source";
-  }
-
-  function switchToEditMode(): void {
-    applyMode(preferredEditMode());
-  }
-
   function switchToSplitMode(): void {
-    applyMode("split");
+    if (mode === "split") {
+      applyMode(
+        resolveMiraModeAfterSplit({
+          lastNonSplitMode,
+          modeOptions,
+          resolvedDefaultEditMode,
+        }),
+      );
+    } else {
+      applyMode("split");
+    }
   }
 
-  function resolveViewModeMenuItems(): ViewModeMenuItem[] {
-    const itemModes: MiraMode[] = [];
-
-    if (mode !== "live-preview" && modeOptions.includes("live-preview")) {
-      itemModes.push("live-preview");
-    }
-    if (modeOptions.includes("source")) {
-      itemModes.push("source");
-    }
-    if (modeOptions.includes("preview")) {
-      itemModes.push("preview");
-    }
-
-    return itemModes.map((modeOption) => ({
-      mode: modeOption,
-      label: modeLabels[modeOption],
-      icon: modeIcons[modeOption],
-      checked: mode === modeOption,
-    }));
+  function viewToggleIcon(): Component<Record<string, unknown>> {
+    return mode === "preview" ? PencilLineIcon : BookOpenIcon;
   }
+
+  function handleViewToggle(): void {
+    applyMode(resolveMiraViewToggleMode(mode, resolvedDefaultEditMode));
+  }
+
+  $effect(() => {
+    if (
+      mode === "preview" &&
+      !modeOptions.includes("preview") &&
+      editModeOptions.length > 0
+    ) {
+      applyMode(resolvedDefaultEditMode);
+    }
+  });
+
+  $effect(() => {
+    if (mode !== "split" && modeOptions.includes(mode)) {
+      lastNonSplitMode = mode;
+    }
+  });
 
   function insertTemplate(item: MiraDefaultToolbarItem): void {
-    const markdown = templateForToolbarItem(item);
+    const markdown = templateForMiraToolbarItem(item);
     if (markdown) {
       actionContext().insertMarkdown(markdown);
     }
   }
-
-  function templateForToolbarItem(item: MiraDefaultToolbarItem): string {
-    switch (item) {
-      case "heading":
-        return "# Heading";
-      case "bold":
-        return "**strong**";
-      case "italic":
-        return "_emphasis_";
-      case "quote":
-        return "> Quote";
-      case "bulletList":
-        return "- List item";
-      case "taskList":
-        return "- [ ] Task";
-      case "link":
-        return "[label](https://example.com)";
-      case "table":
-        return "\n| Column | Value |\n| --- | --- |\n| Item | Detail |\n";
-      case "gridTable":
-        return "\n+--------+--------+\n| Column | Value  |\n+========+========+\n| Item   | Detail |\n+--------+--------+\n";
-      case "code":
-        return '\n```ts\nconsole.log("hello");\n```\n';
-      case "math":
-        return "$E = mc^2$";
-      case "mermaid":
-        return "\n```mermaid\nflowchart TD\n  A[Start] --> B[Done]\n```\n";
-    }
-  }
-
-  $effect(() => {
-    if (mode !== "preview") {
-      lastEditMode = mode;
-    }
-  });
 </script>
 
 {#snippet renderAction(action: MiraDefaultToolbarAction)}
@@ -468,56 +437,23 @@
 {/snippet}
 
 {#snippet renderViewModeControl()}
-  {#if mode === "preview"}
-    <Tooltip.Root>
-      <Tooltip.Trigger>
-        {#snippet child({ props })}
-          {@const triggerProps = withTooltipClickHandler(props, () =>
-            switchToEditMode(),
-          )}
-          <Toolbar.Button {...triggerProps} aria-label="Edit">
-            <PencilLineIcon class="mira-default-ui__icon" aria-hidden="true" />
-          </Toolbar.Button>
-        {/snippet}
-      </Tooltip.Trigger>
-      <Tooltip.Content>Edit</Tooltip.Content>
-    </Tooltip.Root>
-  {:else}
-    <DropdownMenu.Root>
-      <Tooltip.Root>
-        <Tooltip.Trigger>
-          {#snippet child({ props })}
-            <DropdownMenu.Trigger
-              {...props}
-              class="mira-toolbar__button"
-              aria-label="View mode"
-            >
-              <BookOpenIcon class="mira-default-ui__icon" aria-hidden="true" />
-            </DropdownMenu.Trigger>
-          {/snippet}
-        </Tooltip.Trigger>
-        <Tooltip.Content>View mode</Tooltip.Content>
-      </Tooltip.Root>
-      <DropdownMenu.Content align="end">
-        {#each viewModeMenuItems as item (item.mode)}
-          {@const ItemIcon = item.icon}
-          <DropdownMenu.Item onclick={() => applyMode(item.mode)}>
-            <ItemIcon
-              class="mira-default-toolbar__menu-icon"
-              aria-hidden="true"
-            />
-            <span>{item.label}</span>
-            {#if item.checked}
-              <CheckIcon
-                class="mira-default-toolbar__menu-check"
-                aria-hidden="true"
-              />
-            {/if}
-          </DropdownMenu.Item>
-        {/each}
-      </DropdownMenu.Content>
-    </DropdownMenu.Root>
-  {/if}
+  {@const ToggleIcon = viewToggleIcon()}
+  <Tooltip.Root>
+    <Tooltip.Trigger>
+      {#snippet child({ props })}
+        {@const triggerProps = withTooltipClickHandler(props, () =>
+          handleViewToggle(),
+        )}
+        <Toolbar.Button
+          {...triggerProps}
+          aria-label={miraViewToggleLabel(mode)}
+        >
+          <ToggleIcon class="mira-default-ui__icon" aria-hidden="true" />
+        </Toolbar.Button>
+      {/snippet}
+    </Tooltip.Trigger>
+    <Tooltip.Content>{miraViewToggleLabel(mode)}</Tooltip.Content>
+  </Tooltip.Root>
 {/snippet}
 
 {#snippet renderSplitModeButton()}
@@ -538,6 +474,43 @@
     </Tooltip.Trigger>
     <Tooltip.Content>Split</Tooltip.Content>
   </Tooltip.Root>
+{/snippet}
+
+{#snippet renderViewModeOverflow()}
+  <DropdownMenu.Root>
+    <Tooltip.Root>
+      <Tooltip.Trigger>
+        {#snippet child({ props })}
+          <DropdownMenu.Trigger
+            {...props}
+            class="mira-toolbar__button"
+            aria-label={miraViewOptionsLabel}
+          >
+            <EllipsisIcon class="mira-default-ui__icon" aria-hidden="true" />
+          </DropdownMenu.Trigger>
+        {/snippet}
+      </Tooltip.Trigger>
+      <Tooltip.Content>{miraViewOptionsLabel}</Tooltip.Content>
+    </Tooltip.Root>
+    <DropdownMenu.Content align="end">
+      {#each viewModeMenuItems as item (item.mode)}
+        {@const ItemIcon = modeIcons[item.mode]}
+        <DropdownMenu.Item onclick={() => applyMode(item.mode)}>
+          <ItemIcon
+            class="mira-default-toolbar__menu-icon"
+            aria-hidden="true"
+          />
+          <span>{item.label}</span>
+          {#if item.checked}
+            <CheckIcon
+              class="mira-default-toolbar__menu-check"
+              aria-hidden="true"
+            />
+          {/if}
+        </DropdownMenu.Item>
+      {/each}
+    </DropdownMenu.Content>
+  </DropdownMenu.Root>
 {/snippet}
 
 <Tooltip.Provider delayDuration={350}>
@@ -571,14 +544,14 @@
                   )}
                   <Toolbar.Button
                     {...triggerProps}
-                    aria-label={toolbarItemLabels[item]}
+                    aria-label={miraDefaultToolbarItemLabels[item]}
                     disabled={readonly}
                   >
                     <Icon class="mira-default-ui__icon" aria-hidden="true" />
                   </Toolbar.Button>
                 {/snippet}
               </Tooltip.Trigger>
-              <Tooltip.Content>{toolbarItemLabels[item]}</Tooltip.Content>
+              <Tooltip.Content>{miraDefaultToolbarItemLabels[item]}</Tooltip.Content>
             </Tooltip.Root>
           {/each}
         </div>
@@ -609,7 +582,7 @@
         <Separator orientation="vertical" class="mira-default-ui__separator" />
       {/each}
 
-      {#if viewModeControlVisible || splitModeVisible}
+      {#if viewModeToggleVisible || splitModeVisible || viewModeOverflowVisible}
         {#if toolbarHasStartContent || endToolbars.length > 0}
           <Separator
             orientation="vertical"
@@ -619,13 +592,16 @@
         <div
           class="mira-default-ui__toolbar-section"
           role="group"
-          aria-label="View mode"
+          aria-label="View controls"
         >
-          {#if viewModeControlVisible}
+          {#if viewModeToggleVisible}
             {@render renderViewModeControl()}
           {/if}
           {#if splitModeVisible}
             {@render renderSplitModeButton()}
+          {/if}
+          {#if viewModeOverflowVisible}
+            {@render renderViewModeOverflow()}
           {/if}
         </div>
       {/if}

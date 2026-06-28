@@ -1,6 +1,7 @@
 import { mermaidExtension } from "@mira-mde/plugin-mermaid";
 import type { MiraExtension, MiraMode } from "@mira-mde/extensions";
 import type {
+  MiraDefaultEditMode,
   MiraDefaultFeatureConfigs,
   MiraDefaultToolbarAction,
   MiraDefaultToolbarDefinition,
@@ -54,6 +55,8 @@ export const defaultMiraFeatures: ResolvedMiraDefaultFeatures = {
   [MiraFeature.PreviewMode]: true,
   [MiraFeature.SplitMode]: true,
 };
+
+export const defaultMiraEditMode: MiraDefaultEditMode = "live-preview";
 
 const defaultToolbarItems: MiraDefaultToolbarItem[] = [
   "heading",
@@ -161,6 +164,22 @@ export function resolveMiraDefaultModes(
   }
 
   return modes;
+}
+
+export function resolveMiraDefaultEditMode(
+  defaultEditMode: MiraDefaultEditMode = defaultMiraEditMode,
+  modeOptions: MiraMode[] = resolveMiraDefaultModes(),
+): MiraDefaultEditMode {
+  if (modeOptions.includes(defaultEditMode)) {
+    return defaultEditMode;
+  }
+  if (modeOptions.includes(defaultMiraEditMode)) {
+    return defaultMiraEditMode;
+  }
+  if (modeOptions.includes("source")) {
+    return "source";
+  }
+  return defaultMiraEditMode;
 }
 
 function isToolbarItemAvailable(

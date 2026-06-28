@@ -1,0 +1,361 @@
+.mira-frontmatter.metadata-container {
+  container-type: inline-size;
+  font-family: var(--font-interface);
+  font-size: 0.875rem;
+  padding: 0;
+}
+
+.metadata-properties[data-empty="true"] {
+  color: var(--text-muted);
+}
+
+.metadata-empty {
+  margin: 0;
+  padding: 0.25rem 0.5rem;
+}
+
+.metadata-add-property {
+  align-items: center;
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-s);
+  color: var(--text-normal);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-weight: 600;
+  gap: 0.5rem;
+  margin-block-start: 0.5rem;
+  padding: 0.5rem 0.25rem;
+}
+
+.metadata-add-property:hover {
+  background: var(--background-modifier-hover);
+}
+
+.metadata-add-property svg {
+  height: 1rem;
+  width: 1rem;
+}
+
+.metadata-property {
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-flow: row wrap;
+  overflow: hidden;
+  position: relative;
+}
+
+.metadata-property:focus-within {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  box-shadow: 0 0 0 2px var(--border);
+}
+
+.metadata-property-key {
+  color: var(--text-muted);
+  display: flex;
+  flex-direction: row;
+  flex-shrink: 0;
+  min-width: 9em;
+  width: 9em;
+}
+
+.metadata-property-key:focus-within,
+.metadata-property-value:focus-within {
+  background: var(--secondary);
+}
+
+.metadata-property-icon,
+.metadata-property-collapse-indicator {
+  align-items: center;
+  display: flex;
+  position: relative;
+}
+
+.metadata-property-icon {
+  gap: 0.125rem;
+  padding-block: 0.25rem;
+  padding-inline-start: 0.25rem;
+}
+
+.metadata-property-collapse-indicator,
+.metadata-property-type-button {
+  align-items: center;
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-s);
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  height: 1.25rem;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  width: 1.25rem;
+}
+
+.metadata-property-collapse-indicator:hover,
+.metadata-property-type-button:hover {
+  background: var(--background-modifier-hover);
+}
+
+.metadata-property[data-state="open"]
+  > .metadata-property-key
+  .metadata-property-collapse-indicator__icon {
+  transform: rotate(90deg);
+}
+
+.metadata-property-collapse-indicator__icon {
+  color: var(--text-accent);
+  transition: transform 120ms ease;
+}
+
+.metadata-property-icon svg,
+.metadata-property-collapse-indicator svg,
+.metadata-property-type-button svg {
+  height: 0.875rem;
+  width: 0.875rem;
+}
+
+.metadata-property-key-input {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  display: flex;
+  flex-grow: 1;
+  min-width: 0;
+  overflow: hidden;
+  padding: 0.25rem 0.5rem;
+  text-align: left;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+.metadata-property-key-input[readonly] {
+  cursor: default;
+}
+
+.metadata-property-key-input:focus {
+  outline: none;
+}
+
+.metadata-property-type-menu {
+  background: var(--popover, var(--background-primary));
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  box-shadow:
+    0 8px 28px rgb(0 0 0 / 14%),
+    0 2px 8px rgb(0 0 0 / 8%);
+  color: var(--text-normal);
+  display: grid;
+  gap: 0.125rem;
+  inset-inline-start: 0.25rem;
+  min-width: 11rem;
+  padding: 0.25rem;
+  position: absolute;
+  top: calc(100% + 0.25rem);
+  z-index: 20;
+}
+
+.metadata-property-type-menu__item {
+  align-items: center;
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-s);
+  color: inherit;
+  cursor: pointer;
+  display: grid;
+  font: inherit;
+  gap: 0.5rem;
+  grid-template-columns: 1rem 1fr 1rem;
+  min-height: 1.875rem;
+  padding: 0.375rem 0.5rem;
+  text-align: left;
+}
+
+.metadata-property-type-menu__item:hover,
+.metadata-property-type-menu__item[data-selected="true"] {
+  background: var(--background-modifier-hover);
+}
+
+.metadata-property-type-menu__check {
+  justify-self: end;
+}
+
+.metadata-property-value {
+  --metadata-value-content-offset: 0;
+
+  align-items: center;
+  display: flex;
+  flex: 1 1 0;
+  gap: 0.25rem;
+  min-height: 29px;
+  min-width: 0;
+  padding-inline-start: 0;
+}
+
+.metadata-property-value-item {
+  box-sizing: border-box;
+}
+
+.metadata-property-value-item.metadata-input,
+.metadata-property-value-date {
+  align-items: center;
+  display: flex;
+  min-height: 29px;
+}
+
+.metadata-property-value
+  > :is(
+    .metadata-input-longtext,
+    .metadata-input-number,
+    .metadata-input-text,
+    .metadata-property-value-list
+  ) {
+  padding-inline-start: var(--metadata-value-content-offset);
+}
+
+:is(.markdown-preview-surface, .markdown-editor-surface, .markdown-widget-shell)
+  .metadata-property-value
+  > :is(
+    .metadata-input-longtext,
+    .metadata-input-number,
+    .metadata-input-text,
+    .metadata-property-value-list
+  ) {
+  padding-inline-start: var(--metadata-value-content-offset);
+}
+
+.metadata-property-value-item[contenteditable="true"]:empty::before {
+  color: var(--text-faint);
+  content: attr(data-placeholder);
+  pointer-events: none;
+}
+
+.metadata-input-number {
+  font-variant-numeric: tabular-nums;
+}
+
+:is(.markdown-preview-surface, .markdown-editor-surface, .markdown-widget-shell)
+  input[type="date"],
+:is(.markdown-preview-surface, .markdown-editor-surface, .markdown-widget-shell)
+  input[type="datetime-local"] {
+  font-variant-numeric: tabular-nums;
+  padding-inline-start: var(--size-4-6);
+  position: relative;
+}
+
+:is(.markdown-preview-surface, .markdown-editor-surface, .markdown-widget-shell)
+  input[type="date"]::-webkit-datetime-edit-text,
+:is(.markdown-preview-surface, .markdown-editor-surface, .markdown-widget-shell)
+  input[type="datetime-local"]::-webkit-datetime-edit-text {
+  color: var(--text-faint);
+  padding-inline-end: 0;
+}
+
+:is(.markdown-preview-surface, .markdown-editor-surface, .markdown-widget-shell)
+  input[type="date"]::-webkit-calendar-picker-indicator,
+:is(.markdown-preview-surface, .markdown-editor-surface, .markdown-widget-shell)
+  input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  left: var(--size-4-1);
+  opacity: 0.5;
+  position: absolute;
+  right: auto;
+}
+
+@container (min-width: 250px) {
+  .metadata-property {
+    flex-wrap: nowrap;
+  }
+
+  .metadata-property-value {
+    padding-inline-start: 0;
+  }
+}
+
+.metadata-property-children {
+  flex-basis: 100%;
+  padding-inline-start: 1.5rem;
+  width: 100%;
+}
+
+.metadata-input {
+  background: transparent;
+  border: 0;
+  color: var(--text-normal);
+  font: inherit;
+  min-width: 0;
+}
+
+.metadata-input:focus {
+  outline: none;
+}
+
+.metadata-input-list {
+  flex: 1 1 0;
+  font-size: 0.75rem;
+  min-width: 8ch;
+  padding: 0.125rem 0.25rem;
+}
+
+.metadata-property-value-list {
+  padding-block: 0.25rem;
+}
+
+.metadata-property-value-custom {
+  min-height: 1.75rem;
+  padding: 0.25rem 0.5rem;
+}
+
+.metadata-property-pill-chip {
+  align-items: center;
+  display: inline-flex;
+  gap: 0.25rem;
+  padding-inline: 0.35rem 0.2rem;
+}
+
+.metadata-property-pill-chip button,
+.metadata-property-pill-chip__remove {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: 999px;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  height: 1rem;
+  justify-content: center;
+  padding: 0;
+  width: 1rem;
+}
+
+.metadata-property-pill-chip button:hover,
+.metadata-property-pill-chip__remove:hover {
+  background: color-mix(in oklab, currentColor 14%, transparent);
+}
+
+.mira-frontmatter__raw {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.mira-frontmatter__error {
+  color: var(--callout-error);
+  margin: 0;
+}
+
+.mira-frontmatter__textarea {
+  background: var(--code-background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  color: var(--code-normal);
+  font-family: var(--font-monospace);
+  min-height: 7rem;
+  padding: 0.5rem;
+  width: 100%;
+}

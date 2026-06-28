@@ -2,17 +2,22 @@ import type { MiraEditorSelection } from "@mira-mde/core";
 import type {
   MiraAssetResolver,
   MiraExtension,
+  MiraFileAdapter,
   MiraLinkResolver,
   MiraMode,
   MiraTheme,
+  MiraThemeConfig,
 } from "@mira-mde/extensions";
 import type {
   MiraDefaultFeatureConfigs,
   MiraDefaultToolbarAction,
   MiraDefaultToolbarActionContext,
   MiraDefaultToolbarDefinition,
+  MiraDefaultEditMode,
   MiraFeatureFlags,
 } from "./features";
+
+export type { MiraDefaultEditMode } from "./features";
 
 export type MiraFrontmatterConfig = {
   types?: Record<string, unknown>;
@@ -23,11 +28,13 @@ export type MiraFrontmatterConfig = {
 export type MiraDefaultMdeProps = {
   value?: string;
   mode?: MiraMode;
+  defaultEditMode?: MiraDefaultEditMode;
   readonly?: boolean;
   placeholder?: string;
   lineWrapping?: boolean;
   spellcheck?: boolean;
   theme?: MiraTheme;
+  themeConfig?: MiraThemeConfig;
   sourcePath?: string;
   class?: string;
   editorClass?: string;
@@ -38,6 +45,7 @@ export type MiraDefaultMdeProps = {
   extensions?: MiraExtension[];
   linkResolver?: MiraLinkResolver;
   assetResolver?: MiraAssetResolver;
+  fileAdapter?: MiraFileAdapter;
   frontmatterOpen?: boolean;
   frontmatterConfig?: MiraFrontmatterConfig;
   onChange?: (value: string) => void;
@@ -49,6 +57,7 @@ export type MiraDefaultMdeProps = {
 export type MiraDefaultToolbarProps = {
   value?: string;
   mode?: MiraMode;
+  defaultEditMode?: MiraDefaultEditMode;
   readonly?: boolean;
   class?: string;
   features?: MiraFeatureFlags;

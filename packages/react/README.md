@@ -13,6 +13,7 @@ export function Editor() {
   return (
     <MiraDefaultMde
       value={value}
+      defaultEditMode="live-preview"
       onChange={setValue}
       features={{ mermaid: true, "split-mode": true }}
     />

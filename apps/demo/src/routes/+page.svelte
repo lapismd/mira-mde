@@ -19,7 +19,12 @@
   import { mermaidExtension } from "@mira-mde/plugin-mermaid";
   import { MiraMde, type MiraMdeHandle } from "@mira-mde/svelte";
   import type { MiraEditorSelection } from "@mira-mde/core";
-  import type { MiraMode, MiraTheme } from "@mira-mde/extensions";
+  import type {
+    MiraFileAdapter,
+    MiraFileRef,
+    MiraMode,
+    MiraTheme,
+  } from "@mira-mde/extensions";
 
   const sample = `---
 title: Mira MDE Demo
@@ -46,7 +51,9 @@ This standalone editor is backed by CodeMirror 6, Svelte 5, unified, and the Mir
 
 ### Portable Markdown surface
 
-Inline **bold**, _italic_, ~~strikethrough~~, \`inline code\`, [path links](notes/architecture.md), [external links](https://example.com), automatic links like https://example.com, [[Project Plan|wikilinks]], embedded notes like ![[Architecture Diagram|Architecture diagram embed]], tags like #mira/editor, and inline math $E = mc^2$ all render in preview and live preview.
+![[Embedded Note|Markdown embed preview]]
+
+Inline **bold**, _italic_, ~~strikethrough~~, \`inline code\`, [path links](notes/architecture.md), [external links](https://example.com), automatic links like https://example.com, [[Project Plan|wikilinks]], embedded images like ![[Architecture Diagram|Architecture diagram embed]], tags like #mira/editor, and inline math $E = mc^2$ all render in preview and live preview.
 
 > [!note] Portable package boundary
 > The editor, preview renderer, Mermaid support, and UI shell are separate workspace packages.
@@ -91,6 +98,18 @@ Inline **bold**, _italic_, ~~strikethrough~~, \`inline code\`, [path links](note
 | Source toggle        | Edit raw Markdown      |
 +----------------------+------------------------+
 
+## Media, embeds, and raw HTML
+
+![[Embedded Note|Markdown embed preview]]
+
+![Mira Markdown demo asset](/mira-markdown-demo.svg "Mira demo asset")
+
+<mark>Raw HTML is preserved</mark> and <kbd>keyboard</kbd> elements render through the Markdown preview pipeline.
+
+:::mira{title="Directive example"}
+Directive syntax is parsed and surfaced as a portable custom element.
+:::
+
 ## Mermaid
 
 ~~~mermaid
@@ -116,16 +135,6 @@ sequenceDiagram
   Editor-->>User: update live preview
 ~~~
 
-## Media, embeds, and raw HTML
-
-![Mira Markdown demo asset](/mira-markdown-demo.svg "Mira demo asset")
-
-<mark>Raw HTML is preserved</mark> and <kbd>keyboard</kbd> elements render through the Markdown preview pipeline.
-
-:::mira{title="Directive example"}
-Directive syntax is parsed and surfaced as a portable custom element.
-:::
-
 ## Code, math, and footnotes
 
 ~~~ts
@@ -140,9 +149,122 @@ $$
 GFM footnotes are supported too.[^feature-footnote]
 
 [^feature-footnote]: Footnotes come from the shared GFM Markdown pipeline.
+
+## Custom task marker gallery
+
+- [>] Forwarded task marker
+- [<] Scheduled task marker
+- [?] Question task marker
+- [/] Incomplete task marker
+- [!] Important task marker
+- ["] Quote task marker
+- [-] Cancelled task marker
+- [*] Star task marker
+- [l] Location task marker
+- [i] Info task marker
+- [S] Savings task marker
+- [I] Idea task marker
+- [f] Fire task marker
+- [k] Key task marker
+- [u] Up task marker
+- [d] Down task marker
+- [w] Win task marker
+- [p] Pro task marker
+- [c] Con task marker
+- [b] Bookmark task marker
+
+## Callout variants
+
+> [!note]
+
+> [!abstract] Abstract, Summary, Tldr
+
+> [!info] Info, Todo
+
+> [!tip] Tip, Hint, Important
+
+> [!success] Success, Check, Done
+
+> [!question] Question, Help, FAQ
+
+> [!warning] Warning, Caution, Attention
+
+> [!failure] Failure, Fail, Missing
+
+> [!danger] Danger, Error
+
+> [!bug]
+
+> [!example]
+
+> [!quote] Quote, Cite
 `;
 
   type EditorShell = "default" | "composable";
+
+  const demoFiles = new Map<
+    string,
+    MiraFileRef & { markdown?: string; assetUrl?: string }
+  >([
+    [
+      "notes/architecture.md",
+      {
+        kind: "markdown",
+        markdown:
+          "# Architecture\n\nThe demo resolves ordinary markdown path links through `MiraFileAdapter`.",
+        name: "Architecture",
+        path: "notes/architecture.md",
+      },
+    ],
+    [
+      "Project Plan",
+      {
+        kind: "markdown",
+        markdown:
+          "# Project Plan\n\nWikilinks resolve through the same adapter surface as markdown path links.",
+        name: "Project Plan",
+        path: "Project Plan",
+      },
+    ],
+    [
+      "Embedded Note",
+      {
+        kind: "markdown",
+        markdown:
+          "# Embedded Note\n\nThis linked Markdown file is rendered through the same preview component as the main document.\n\n- Nested markdown stays formatted.\n- Links like [Architecture](notes/architecture.md) resolve through `MiraFileAdapter`.",
+        name: "Embedded Note",
+        path: "Embedded Note",
+      },
+    ],
+    [
+      "Architecture Diagram",
+      {
+        assetUrl: "/mira-markdown-demo.svg",
+        kind: "image",
+        name: "Architecture Diagram",
+        path: "Architecture Diagram",
+      },
+    ],
+  ]);
+
+  const demoFileAdapter: MiraFileAdapter = {
+    resolveLink({ href }) {
+      const path = href.split("#", 1)[0] ?? href;
+      return demoFiles.get(path) ?? null;
+    },
+    readMarkdown(file) {
+      return demoFiles.get(file.path)?.markdown ?? null;
+    },
+    readAssetUrl(file) {
+      return demoFiles.get(file.path)?.assetUrl ?? null;
+    },
+    openFile(file) {
+      console.info("Mira demo openFile", file.path);
+    },
+    listFiles() {
+      return Array.from(demoFiles.values());
+    },
+  };
 
   let value = $state(sample);
   let mode = $state<MiraMode>("live-preview");
@@ -353,7 +475,9 @@ GFM footnotes are supported too.[^feature-footnote]
         bind:this={defaultEditor}
         bind:value
         bind:mode
-        {theme}
+        theme="inherit"
+        themeConfig={{ fallback: "system" }}
+        fileAdapter={demoFileAdapter}
         features={editorFeatures}
         class="demo-editor"
         sourcePath="demo.md"
@@ -363,8 +487,10 @@ GFM footnotes are supported too.[^feature-footnote]
         bind:this={composableEditor}
         bind:value
         bind:mode
-        {theme}
+        theme="inherit"
+        themeConfig={{ fallback: "system" }}
         {extensions}
+        fileAdapter={demoFileAdapter}
         toolbar={false}
         class="demo-editor"
         sourcePath="demo.md"

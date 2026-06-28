@@ -8,9 +8,11 @@ import { EditorView } from "@codemirror/view";
 import type {
   MiraAssetResolver,
   MiraExtension,
+  MiraFileAdapter,
   MiraLinkResolver,
   MiraMode,
   MiraTheme,
+  MiraThemeConfig,
 } from "@mira-mde/extensions";
 
 export type MiraEditorPosition = {
@@ -32,9 +34,11 @@ export type MiraEditorOptions = {
   lineWrapping?: boolean;
   spellcheck?: boolean;
   theme?: MiraTheme;
+  themeConfig?: MiraThemeConfig;
   sourcePath?: string;
   linkResolver?: MiraLinkResolver;
   assetResolver?: MiraAssetResolver;
+  fileAdapter?: MiraFileAdapter;
   frontmatterOpen?: boolean;
   frontmatterConfig?: unknown;
   onChange?: (value: string, change: MiraEditorChange) => void;

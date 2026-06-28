@@ -12,6 +12,7 @@
   } from "@mira-mde/default-ui/svelte";
   import type { MiraMode } from "@mira-mde/extensions";
   import { toolbarMarkdown } from "../data/examples";
+  import { docsFileAdapter } from "../lib/file-adapter";
 
   let editor = $state<MiraDefaultMdeHandle | null>(null);
   let value = $state(toolbarMarkdown);
@@ -103,6 +104,7 @@
     bind:value
     bind:mode={mode}
     {features}
+    fileAdapter={docsFileAdapter}
     toolbars={customToolbars}
     class="docs-live-editor__surface"
     sourcePath="toolbar.md"

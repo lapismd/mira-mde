@@ -1,6 +1,7 @@
 import { getContext, setContext } from "svelte";
 import type {
   MiraAssetResolver,
+  MiraFileAdapter,
   MiraLinkResolver,
   MiraRendererComponents,
 } from "@mira-mde/extensions";
@@ -10,6 +11,8 @@ import type {
   MarkdownPostProcess,
 } from "./types";
 import type { FrontmatterConfig } from "../components/frontmatter-utils";
+import type { Pluggable } from "unified";
+import type { Options as RemarkRehypeOptions } from "remark-rehype";
 
 const MARKDOWN_CONTEXT = Symbol("mira-markdown-context");
 const AST_NODE_CONTEXT = Symbol("mira-ast-node-context");
@@ -17,9 +20,13 @@ const AST_NODE_CONTEXT = Symbol("mira-ast-node-context");
 export type MarkdownContext = {
   markdown: string;
   sourcePath?: string;
+  remarkPlugins: Pluggable[];
+  rehypePlugins: Pluggable[];
+  remarkRehypeOptions: RemarkRehypeOptions;
   components: MiraRendererComponents;
   linkResolver?: MiraLinkResolver;
   assetResolver?: MiraAssetResolver;
+  fileAdapter?: MiraFileAdapter;
   postProcess: MarkdownPostProcess;
   onChange?: MarkdownChangeHandler;
   onFrontmatterChange?: (nextYaml: string, nextValue: string) => void;

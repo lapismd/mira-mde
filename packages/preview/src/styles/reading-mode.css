@@ -1,0 +1,119 @@
+.markdown-reading-view .markdown li.rendered-list-item.rendered-list-item-ul {
+  list-style: none;
+}
+
+.markdown-reading-view .markdown li.rendered-list-item.show-guides > ul,
+.markdown-reading-view .markdown li.rendered-list-item.show-guides > ol {
+  position: relative;
+}
+
+.markdown-reading-view .markdown li.rendered-list-item.show-guides > ul::before,
+.markdown-reading-view
+  .markdown
+  li.rendered-list-item.show-guides
+  > ol::before {
+  border-inline-end: var(--markdown-indentation-guide-width) solid
+    var(--markdown-indentation-guide-color);
+  bottom: 0;
+  content: "";
+  inset-inline-start: -1.5ch;
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+}
+
+.markdown-reading-view .markdown li.rendered-list-item.is-collapsed > ul,
+.markdown-reading-view .markdown li.rendered-list-item.is-collapsed > ol {
+  display: none;
+}
+
+.markdown-reading-view .markdown .list-collapse-indicator {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: var(--markdown-collapse-icon-color);
+  cursor: pointer;
+  display: inline-flex;
+  height: 1rem;
+  inset-inline-start: 0;
+  justify-content: center;
+  opacity: 0;
+  padding: 0;
+  position: absolute;
+  top: 50%;
+  transform: translate(calc(-100% - 2.2ch), -50%);
+  transition:
+    opacity 150ms ease,
+    color 150ms ease;
+  width: 1rem;
+}
+
+.markdown-reading-view
+  .markdown
+  li.rendered-list-item:hover
+  > .list-collapse-indicator,
+.markdown-reading-view
+  .markdown
+  li.rendered-list-item:focus-within
+  > .list-collapse-indicator,
+.markdown-reading-view .markdown .list-collapse-indicator:hover,
+.markdown-reading-view
+  .markdown
+  .list-collapse-indicator[data-collapsed="true"] {
+  opacity: 1;
+}
+
+.markdown-reading-view
+  .markdown
+  .list-collapse-indicator[data-collapsed="true"] {
+  color: var(--markdown-collapse-icon-color-collapsed);
+}
+
+.markdown-reading-view .markdown .list-collapse-indicator .collapse-icon {
+  align-items: center;
+  display: inline-flex;
+  justify-content: center;
+}
+
+.markdown-reading-view .markdown .list-collapse-indicator .svg-icon {
+  height: 10px;
+  stroke-width: 4px;
+  transition: transform 100ms ease-in-out;
+  width: 10px;
+}
+
+.markdown-reading-view .markdown .list-bullet {
+  height: 1em;
+  inset-inline-start: 0;
+  left: calc(-1.4ch - 0.7ch);
+  overflow: visible;
+  pointer-events: auto;
+  position: absolute;
+  top: calc(1.4ch - 0.5em);
+  width: 1.4ch;
+}
+
+.markdown-reading-view .markdown .list-bullet::after {
+  background-color: var(--list-marker-color);
+  border-radius: var(--list-bullet-radius);
+  content: "";
+  height: var(--list-bullet-size);
+  inset-inline-start: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  transition:
+    transform 150ms ease,
+    box-shadow 150ms ease,
+    background-color 150ms ease;
+  width: var(--list-bullet-size);
+}
+
+.markdown-reading-view
+  .markdown
+  li.rendered-list-item:hover
+  > .list-bullet::after,
+.markdown-reading-view .markdown .list-bullet:hover::after {
+  background-color: var(--markdown-list-marker-color-hover);
+  box-shadow: 0 0 0 4px var(--background-modifier-hover);
+}

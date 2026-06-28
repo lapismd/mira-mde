@@ -1,9 +1,11 @@
 import type {
   MiraAssetResolver,
   MiraExtension,
+  MiraFileAdapter,
   MiraLinkResolver,
   MiraMode,
   MiraTheme,
+  MiraThemeConfig,
 } from "@mira-mde/extensions";
 import type { MiraEditorSelection } from "@mira-mde/core";
 
@@ -22,11 +24,13 @@ export type MiraMdeProps = {
   lineWrapping?: boolean;
   spellcheck?: boolean;
   theme?: MiraTheme;
+  themeConfig?: MiraThemeConfig;
   sourcePath?: string;
   class?: string;
   toolbar?: boolean;
   linkResolver?: MiraLinkResolver;
   assetResolver?: MiraAssetResolver;
+  fileAdapter?: MiraFileAdapter;
   frontmatterOpen?: boolean;
   frontmatterConfig?: MiraFrontmatterConfig;
   onChange?: (value: string) => void;

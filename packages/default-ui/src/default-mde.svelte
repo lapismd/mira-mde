@@ -5,8 +5,10 @@
   import MiraDefaultToolbar from "./default-toolbar.svelte";
   import {
     createMiraDefaultExtensions,
+    defaultMiraEditMode,
     MiraFeature,
     resolveMiraDefaultFeatures,
+    resolveMiraDefaultEditMode,
     resolveMiraDefaultModes,
     type MiraDefaultToolbarActionContext,
   } from "./features";
@@ -14,12 +16,14 @@
 
   let {
     value = $bindable(""),
-    mode = $bindable("live-preview"),
+    defaultEditMode = defaultMiraEditMode,
+    mode = $bindable(defaultEditMode),
     readonly = false,
     placeholder = "Start writing Markdown...",
     lineWrapping = true,
     spellcheck = true,
     theme = "obsidian",
+    themeConfig,
     sourcePath,
     class: className = "",
     editorClass = "",
@@ -30,6 +34,7 @@
     extensions = [],
     linkResolver,
     assetResolver,
+    fileAdapter,
     frontmatterOpen = true,
     frontmatterConfig,
     onChange,
@@ -42,6 +47,9 @@
 
   const resolvedFeatures = $derived(resolveMiraDefaultFeatures(features));
   const modeOptions = $derived(resolveMiraDefaultModes(features));
+  const resolvedDefaultEditMode = $derived(
+    resolveMiraDefaultEditMode(defaultEditMode, modeOptions),
+  );
   const activeExtensions = $derived([
     ...createMiraDefaultExtensions({ features, featureConfigs }),
     ...extensions,
@@ -146,6 +154,7 @@
       {readonly}
       {features}
       {featureConfigs}
+      defaultEditMode={resolvedDefaultEditMode}
       {toolbarActions}
       {toolbars}
       context={toolbarContext}
@@ -154,7 +163,7 @@
 
   <div class="mira-default-ui__editor">
     <MiraMde
-      {...({ frontmatterConfig } as any)}
+      {...{ frontmatterConfig } as any}
       bind:this={editor}
       bind:value
       bind:mode
@@ -164,12 +173,15 @@
       {lineWrapping}
       {spellcheck}
       {theme}
+      {themeConfig}
       {sourcePath}
       toolbar={false}
       extensions={activeExtensions}
       {linkResolver}
       {assetResolver}
-      frontmatterOpen={resolvedFeatures[MiraFeature.Frontmatter] && frontmatterOpen}
+      {fileAdapter}
+      frontmatterOpen={resolvedFeatures[MiraFeature.Frontmatter] &&
+        frontmatterOpen}
       onChange={handleChange}
       {onFrontmatterChange}
     />

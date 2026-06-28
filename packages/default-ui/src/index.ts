@@ -4,8 +4,10 @@ import MiraDefaultMde from "./default-mde.svelte";
 import MiraDefaultToolbar from "./default-toolbar.svelte";
 import {
   createMiraDefaultExtensions,
+  defaultMiraEditMode,
   defaultMiraFeatures,
   MiraFeature,
+  resolveMiraDefaultEditMode,
   resolveMiraDefaultFeatures,
   resolveMiraDefaultModes,
   resolveMiraDefaultToolbarActions,
@@ -18,6 +20,7 @@ import type {
   MiraDefaultEditorEventMap,
   MiraDefaultEditorEventName,
   MiraDefaultEditorOptions,
+  MiraDefaultEditMode,
   MiraDefaultMdeHandle,
 } from "./types";
 
@@ -27,7 +30,8 @@ export function createMiraDefaultEditor(
   const { root, ...initialProps } = options;
   let currentProps = { ...initialProps };
   let currentValue = initialProps.value ?? "";
-  let currentMode = initialProps.mode ?? "live-preview";
+  let currentMode =
+    initialProps.mode ?? initialProps.defaultEditMode ?? "live-preview";
   let currentReadonly = initialProps.readonly ?? false;
   const listeners: {
     [EventName in MiraDefaultEditorEventName]: Set<
@@ -143,22 +147,37 @@ export function createMiraDefaultEditor(
 
 export {
   createMiraDefaultExtensions,
+  defaultMiraEditMode,
   defaultMiraFeatures,
   MiraDefaultMde,
   MiraDefaultToolbar,
   MiraFeature,
+  resolveMiraDefaultEditMode,
   resolveMiraDefaultFeatures,
   resolveMiraDefaultModes,
   resolveMiraDefaultToolbarActions,
   resolveMiraDefaultToolbarDefinitions,
   resolveMiraDefaultToolbarItems,
 };
+export {
+  isMiraEditMode,
+  miraDefaultModeLabels,
+  miraDefaultToolbarItemLabels,
+  miraViewOptionsLabel,
+  miraViewToggleLabel,
+  resolveMiraAlternateEditMode,
+  resolveMiraModeAfterSplit,
+  resolveMiraViewModeMenuItems,
+  resolveMiraViewToggleMode,
+  templateForMiraToolbarItem,
+} from "./toolbar-model";
 export type {
   MiraDefaultEditor,
   MiraDefaultEditorEventHandler,
   MiraDefaultEditorEventMap,
   MiraDefaultEditorEventName,
   MiraDefaultEditorOptions,
+  MiraDefaultEditMode,
   MiraDefaultMdeHandle,
   MiraDefaultMdeProps,
   MiraDefaultToolbarProps,
@@ -182,4 +201,5 @@ export type {
   MiraFeatureName,
   ResolvedMiraDefaultFeatures,
 } from "./features";
+export type { MiraViewModeMenuItem } from "./toolbar-model";
 export default createMiraDefaultEditor;

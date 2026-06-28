@@ -6,6 +6,7 @@
   } from "@mira-mde/default-ui/svelte";
   import type { MiraMode } from "@mira-mde/extensions";
   import { featureToggleMarkdown } from "../data/examples";
+  import { docsFileAdapter } from "../lib/file-adapter";
 
   let value = $state(featureToggleMarkdown);
   let mode = $state<MiraMode>("live-preview");
@@ -53,6 +54,7 @@
     bind:value
     bind:mode={mode}
     {features}
+    fileAdapter={docsFileAdapter}
     class="docs-live-editor__surface"
     sourcePath="feature-toggles.md"
   />
