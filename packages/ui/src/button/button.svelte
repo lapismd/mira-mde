@@ -1,43 +1,42 @@
 <script lang="ts">
-  import type { Snippet } from "svelte";
-  import {
-    buttonVariants,
-    type ButtonSize,
-    type ButtonVariant,
-  } from "./variants";
-
-  type Props = {
-    variant?: ButtonVariant;
-    size?: ButtonSize;
-    class?: string;
-    disabled?: boolean;
-    type?: "button" | "submit" | "reset";
-    title?: string;
-    "aria-label"?: string;
-    onclick?: (event: MouseEvent) => void;
-    children?: Snippet;
-  };
+  import { cn } from "../utils.js";
+  import { buttonVariants, type ButtonProps } from "./button.shared";
 
   let {
+    class: className,
     variant = "default",
     size = "default",
-    class: className = "",
-    disabled = false,
+    ref = $bindable(null),
+    href = undefined,
     type = "button",
-    title,
-    "aria-label": ariaLabel,
-    onclick,
+    disabled,
     children,
-  }: Props = $props();
+    ...restProps
+  }: ButtonProps = $props();
 </script>
 
-<button
-  class={buttonVariants({ variant, size, class: className })}
-  {disabled}
-  {type}
-  {title}
-  aria-label={ariaLabel}
-  {onclick}
->
-  {@render children?.()}
-</button>
+{#if href}
+  <a
+    bind:this={ref}
+    data-slot="button"
+    class={cn(buttonVariants({ variant, size }), className)}
+    href={disabled ? undefined : href}
+    aria-disabled={disabled}
+    role={disabled ? "link" : undefined}
+    tabindex={disabled ? -1 : undefined}
+    {...restProps}
+  >
+    {@render children?.()}
+  </a>
+{:else}
+  <button
+    bind:this={ref}
+    data-slot="button"
+    class={cn(buttonVariants({ variant, size }), className)}
+    {type}
+    {disabled}
+    {...restProps}
+  >
+    {@render children?.()}
+  </button>
+{/if}

@@ -3,11 +3,12 @@
   import type { Component as SvelteComponent } from "svelte";
   import Renderer from "./renderer.svelte";
   import {
+    type AstNodeContext,
     getNodeRenderKey,
     setAstNodeContext,
     useMarkdownContext,
   } from "./context.svelte";
-  import { resolveComponent } from "./utils";
+  import { resolveComponent, svgElements, voidElements } from "./utils";
   import type { HastNode } from "./types";
 
   type Props = {
@@ -18,7 +19,11 @@
   let { astNode, parent }: Props = $props();
   const markdown = useMarkdownContext();
   let contentEl: HTMLElement | null = $state(null);
-  let astContext = setAstNodeContext({ node: {} as HastNode, parent: null });
+  let astContextState = $state<AstNodeContext>({
+    node: {} as HastNode,
+    parent: null,
+  });
+  let astContext = setAstNodeContext(astContextState);
 
   const children = $derived(
     "children" in astNode && Array.isArray(astNode.children)
@@ -38,6 +43,8 @@
   const Component = $derived(
     resolveComponent(markdown.components, componentKey),
   );
+  const isVoidElement = $derived(voidElements.has(componentKey));
+  const isSvgElement = $derived(svgElements.has(componentKey));
   const ResolvedComponent = $derived(
     typeof Component === "string"
       ? null
@@ -62,16 +69,31 @@
 </script>
 
 {#if astNode.type === "root"}
-  {#each children as child, index (getNodeRenderKey(child, index))}
+  {#each children as child, index (getNodeRenderKey(child, markdown.markdown, index))}
     <Renderer astNode={child} parent={astNode} />
   {/each}
 {:else if astNode.type === "element"}
   {#if typeof Component === "string"}
-    <svelte:element this={Component} bind:this={contentEl} {...properties}>
-      {#each children as child, index (getNodeRenderKey(child, index))}
-        <Renderer astNode={child} parent={astNode} />
-      {/each}
-    </svelte:element>
+    {#if isVoidElement}
+      <svelte:element this={Component} bind:this={contentEl} {...properties} />
+    {:else if isSvgElement}
+      <svelte:element
+        this={Component}
+        bind:this={contentEl}
+        xmlns="http://www.w3.org/2000/svg"
+        {...properties}
+      >
+        {#each children as child, index (getNodeRenderKey(child, markdown.markdown, index))}
+          <Renderer astNode={child} parent={astNode} />
+        {/each}
+      </svelte:element>
+    {:else}
+      <svelte:element this={Component} bind:this={contentEl} {...properties}>
+        {#each children as child, index (getNodeRenderKey(child, markdown.markdown, index))}
+          <Renderer astNode={child} parent={astNode} />
+        {/each}
+      </svelte:element>
+    {/if}
   {:else if ResolvedComponent}
     <ResolvedComponent
       bind:ref={contentEl}
@@ -79,7 +101,7 @@
       sourcePath={markdown.sourcePath}
       {...properties}
     >
-      {#each children as child, index (getNodeRenderKey(child, index))}
+      {#each children as child, index (getNodeRenderKey(child, markdown.markdown, index))}
         <Renderer astNode={child} parent={astNode} />
       {/each}
     </ResolvedComponent>
@@ -88,4 +110,6 @@
   {astNode.value}
 {:else if astNode.type === "comment"}
   {@html `<!-- ${astNode.value} -->`}
+{:else if astNode.type === "raw"}
+  {@html astNode.value}
 {/if}

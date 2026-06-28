@@ -24,11 +24,17 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@lucide/svelte": "^0.525.0",
+    "@mermaid-js/layout-elk": "^0.1.9",
     "@mira-mde/extensions": "workspace:*",
+    "@mira-mde/ui": "workspace:*",
     "codemirror-lang-mermaid": "^0.5.0",
-    "hast-util-to-text": "^4.0.2",
     "mermaid": "^11.12.1",
-    "unist-util-visit": "^5.0.0"
+    "svg-pan-zoom": "^3.6.2",
+    "svg2roughjs": "^3.2.1",
+    "type-fest": "^4.41.0",
+    "unist-util-visit": "^5.0.0",
+    "yaml": "^2.8.1"
   },
   "peerDependencies": {
     "@codemirror/language": "^6.11.3",

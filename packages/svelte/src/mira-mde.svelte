@@ -9,7 +9,7 @@
     createMiraEditorController,
     type MiraEditorController,
   } from "@mira-mde/core";
-  import { resolveMiraExtensions } from "@mira-mde/extensions";
+  import { resolveMiraExtensions, type MiraMode } from "@mira-mde/extensions";
   import { MarkdownPreview } from "@mira-mde/preview";
   import { Button } from "@mira-mde/ui/button";
   import { Separator } from "@mira-mde/ui/separator";
@@ -24,13 +24,15 @@
     placeholder = "Start writing Markdown...",
     lineWrapping = true,
     spellcheck = true,
-    theme = "system",
+    theme = "obsidian",
     sourcePath,
     class: className = "",
     toolbar = true,
     linkResolver,
     assetResolver,
+    frontmatterOpen = true,
     onChange,
+    onFrontmatterChange,
   }: MiraMdeProps = $props();
 
   let editorHost: HTMLDivElement | null = $state(null);
@@ -59,10 +61,12 @@
   const showPreview = $derived(mode === "preview" || mode === "split");
   const themeClass = $derived(
     theme === "dark"
-      ? "mira-theme-dark"
+      ? "mira-theme-dark theme-dark dark"
       : theme === "light"
-        ? "mira-theme-light"
-        : "",
+        ? "mira-theme-light theme-light"
+        : theme === "system"
+          ? "mira-theme-system"
+          : "mira-theme-obsidian theme-light",
   );
 
   function buildCodeMirrorExtensions(): Extension[] {
@@ -81,9 +85,28 @@
       }),
       createMarkdownCodeMirrorExtensions({
         codeLanguages: resolved.codeLanguages,
+        sourceMode: mode === "source",
       }),
       createTableExtensions(),
-      mode === "live-preview" ? createRichEditorExtensions() : [],
+      createRichEditorExtensions({
+        livePreview: mode === "live-preview",
+        extensions,
+        sourcePath,
+        linkResolver,
+        assetResolver,
+        frontmatterOpen,
+        onChange(replacement, from, to, nextValue) {
+          if (controller) {
+            controller.view.dispatch({
+              changes: { from, to, insert: replacement },
+            });
+          } else {
+            value = nextValue;
+            onChange?.(nextValue);
+          }
+        },
+        onFrontmatterChange,
+      }),
       resolved.codeMirror,
     ].flat();
   }
@@ -104,7 +127,44 @@
     }
   }
 
-  function insertMarkdown(markdown: string): void {
+  export function focus(): void {
+    controller?.focus();
+  }
+
+  export function getMarkdown(): string {
+    return controller?.getValue() ?? value;
+  }
+
+  export function setMarkdown(markdown: string): void {
+    value = markdown;
+    controller?.setValue(markdown);
+  }
+
+  export function getMode(): MiraMode {
+    return mode;
+  }
+
+  export function setMode(nextMode: MiraMode): void {
+    mode = nextMode;
+  }
+
+  export function setReadonly(nextReadonly: boolean): void {
+    readonly = nextReadonly;
+  }
+
+  export function getSelection(): ReturnType<
+    MiraEditorController["getSelection"]
+  > | null {
+    return controller?.getSelection() ?? null;
+  }
+
+  export function setSelection(
+    selection: ReturnType<MiraEditorController["getSelection"]>,
+  ): void {
+    controller?.setSelection(selection);
+  }
+
+  export function insertMarkdown(markdown: string): void {
     controller?.replaceSelection(markdown);
     controller?.focus();
   }
@@ -159,7 +219,11 @@
 >
   {#if toolbar}
     <div class="mira-mde__toolbar" aria-label="Markdown editor toolbar">
-      <ToggleGroup.Root bind:value={mode} aria-label="Editor mode">
+      <ToggleGroup.Root
+        bind:value={mode}
+        aria-label="Editor mode"
+        onValueChange={(next) => (mode = next as MiraMode)}
+      >
         <ToggleGroup.Item value="source">Source</ToggleGroup.Item>
         <ToggleGroup.Item value="live-preview">Live</ToggleGroup.Item>
         <ToggleGroup.Item value="preview">Preview</ToggleGroup.Item>
@@ -204,7 +268,11 @@
 
   <div class="mira-mde__body">
     <section
-      class="mira-mde__pane mira-mde__pane--editor"
+      class={`mira-mde__pane mira-mde__pane--editor markdown-editor-surface ${
+        mode === "source"
+          ? "markdown-view__editor--source markdown-source-mode"
+          : "markdown-view__editor--live-preview markdown-live-preview-mode"
+      }`}
       data-visible={showEditor}
       aria-hidden={showEditor ? "false" : "true"}
     >
@@ -214,11 +282,19 @@
     {#if showPreview}
       <section class="mira-mde__pane mira-mde__pane--preview">
         <MarkdownPreview
+          class="markdown-reading-view"
           {value}
           {sourcePath}
           {extensions}
           {linkResolver}
           {assetResolver}
+          {frontmatterOpen}
+          onChange={(replacement, from, to) => {
+            const nextValue = `${value.slice(0, from)}${replacement}${value.slice(to)}`;
+            value = nextValue;
+            onChange?.(nextValue);
+          }}
+          {onFrontmatterChange}
         />
       </section>
     {/if}

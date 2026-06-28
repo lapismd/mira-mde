@@ -65,26 +65,85 @@ export const remarkCallouts: Plugin<[], Root> = () => {
         return;
       }
 
-      const match = firstText.value.match(/^\[!(\w+)]\s*(.*)$/);
+      const [firstLine = "", ...remainingLines] =
+        firstText.value.split(/\r?\n/);
+      const match = firstLine.match(/^\[!([\w-]+)]([+-]?)[ \t]*(.*)$/);
       if (!match) {
         return;
       }
 
-      const calloutType = match[1] ?? "note";
-      const calloutTitle = match[2] || calloutType;
+      const calloutType = (match[1] ?? "note").toLowerCase();
+      const collapsible = match[2] ?? "";
+      const calloutTitle = match[3]?.trim() || defaultCalloutTitle(calloutType);
+      const markerOffset =
+        typeof firstText.position?.start.offset === "number"
+          ? firstText.position.start.offset +
+            firstLine.indexOf(collapsible || "]") +
+            (collapsible ? 0 : 1)
+          : -1;
+      const remainingText = remainingLines.join("\n");
 
-      firstText.value = calloutTitle;
+      if (remainingText.trim()) {
+        firstText.value = remainingText;
+      } else {
+        first.children = first.children.filter((child) => child !== firstText);
+      }
+
+      if (!first.children.length) {
+        node.children = node.children.filter((child) => child !== first);
+      }
+
       node.data = {
         ...(node.data ?? {}),
         hName: "callout",
         hProperties: {
-          type: calloutType.toLowerCase(),
+          "data-callout": calloutType,
+          "data-expand-offset": markerOffset,
+          "data-expandable": (collapsible.length > 0).toString(),
+          "data-expanded": (collapsible === "+").toString(),
+          "data-icon": calloutIcons[calloutType] ?? "info",
+          "data-type": calloutType,
           title: calloutTitle,
+          type: calloutType,
         },
       };
     });
   };
 };
+
+const calloutIcons: Record<string, string> = {
+  abstract: "clipboard-list",
+  attention: "triangle-alert",
+  bug: "bug",
+  caution: "triangle-alert",
+  check: "check",
+  cite: "bookmark",
+  danger: "zap",
+  done: "check",
+  error: "zap",
+  example: "list",
+  fail: "x",
+  failure: "x",
+  faq: "circle-help",
+  help: "circle-help",
+  hint: "flame",
+  important: "flame",
+  info: "info",
+  missing: "x",
+  note: "pencil",
+  question: "circle-help",
+  quote: "quote",
+  success: "check",
+  summary: "clipboard-list",
+  tip: "flame",
+  tldr: "clipboard-list",
+  todo: "circle-check",
+  warning: "triangle-alert",
+};
+
+function defaultCalloutTitle(type: string): string {
+  return `${type.slice(0, 1).toUpperCase()}${type.slice(1)}`;
+}
 
 export const remarkDirectivesToHast: Plugin<[], Root> = () => {
   return (tree) => {
@@ -104,6 +163,30 @@ export const remarkDirectivesToHast: Plugin<[], Root> = () => {
           ...(node.attributes ?? {}),
           "data-directive": node.name,
         },
+      };
+    });
+  };
+};
+
+export const remarkFrontmatterToHast: Plugin<[], Root> = () => {
+  return (tree) => {
+    visit(tree, (node: any) => {
+      if (node.type !== "yaml" && node.type !== "toml") {
+        return;
+      }
+
+      const frontmatterType = node.type;
+      node.type = "frontmatter";
+      node.data = {
+        ...(node.data ?? {}),
+        hName: "frontmatter",
+        hProperties: {
+          ...(node.data?.hProperties ?? {}),
+          frontmatter: node.value ?? "",
+          value: node.value ?? "",
+          "data-frontmatter": frontmatterType,
+        },
+        hChildren: [],
       };
     });
   };

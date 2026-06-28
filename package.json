@@ -17,7 +17,8 @@
     "dev": "turbo run dev --filter=@mira-mde/demo",
     "fmt": "prettier . --write",
     "lint": "eslint .",
-    "test": "turbo run test"
+    "test": "turbo run test",
+    "test:e2e": "playwright test"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",

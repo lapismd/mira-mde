@@ -8,7 +8,7 @@ export type MiraRendererComponent =
 
 export type MiraRendererComponents = Record<string, MiraRendererComponent>;
 
-export type MiraTheme = "system" | "light" | "dark";
+export type MiraTheme = "obsidian" | "system" | "light" | "dark";
 
 export type MiraMode = "source" | "live-preview" | "preview" | "split";
 

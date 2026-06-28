@@ -1,0 +1,25 @@
+{
+  "name": "@mira-mde/theme-obsidian",
+  "version": "0.0.0",
+  "license": "AGPL-3.0-or-later",
+  "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
+  "files": [
+    "styles.css"
+  ],
+  "exports": {
+    "./styles.css": "./styles.css"
+  },
+  "scripts": {
+    "build": "echo \"@mira-mde/theme-obsidian has no build step\"",
+    "check:types": "echo \"@mira-mde/theme-obsidian has no types\"",
+    "check:svelte": "echo \"@mira-mde/theme-obsidian has no svelte files\"",
+    "lint": "echo \"@mira-mde/theme-obsidian has no lintable files\"",
+    "test": "echo \"@mira-mde/theme-obsidian has no tests\""
+  },
+  "dependencies": {
+    "@fontsource/source-code-pro": "^5.2.7"
+  }
+}

@@ -14,10 +14,14 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@lucide/svelte": "^0.525.0",
+    "@mira-mde/core": "workspace:*",
+    "@mira-mde/default-ui": "workspace:*",
     "@mira-mde/extensions": "workspace:*",
     "@mira-mde/plugin-mermaid": "workspace:*",
     "@mira-mde/preview": "workspace:*",
     "@mira-mde/svelte": "workspace:*",
+    "@mira-mde/theme-obsidian": "workspace:*",
     "@mira-mde/ui": "workspace:*"
   },
   "devDependencies": {

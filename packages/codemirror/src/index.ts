@@ -14,7 +14,6 @@ import {
 import {
   bracketMatching,
   codeFolding,
-  foldGutter,
   foldKeymap,
   indentOnInput,
   indentUnit,
@@ -34,7 +33,10 @@ import {
   keymap,
   lineNumbers,
   placeholder,
+  type PluginValue,
   rectangularSelection,
+  ViewPlugin,
+  type ViewUpdate,
 } from "@codemirror/view";
 import { tagHighlighter, tags } from "@lezer/highlight";
 
@@ -102,14 +104,33 @@ export const miraEditorTheme = EditorView.theme({
     fontFamily: "var(--mira-font-mono)",
     lineHeight: "var(--mira-line-height)",
   },
+  ".cm-line, .cm-gutterElement": {
+    "--cm-base-block-content-height": "var(--mira-line-height)",
+    "--cm-block-line-height": "var(--mira-line-height)",
+    "--cm-block-padding-top": "0",
+  },
+  ".cm-line": {
+    lineHeight: "var(--cm-block-line-height)",
+    padding: "var(--cm-block-padding-top) 0 0",
+  },
   ".cm-content": {
     minHeight: "100%",
     padding: "var(--mira-editor-padding)",
   },
   ".cm-gutters": {
     backgroundColor: "var(--mira-editor-background)",
+    borderRight: "0",
     color: "var(--mira-muted-foreground)",
-    borderRight: "1px solid var(--mira-border)",
+    fontSize: "0.85em",
+    lineHeight: "var(--cm-block-line-height)",
+    marginInlineEnd: "24px",
+  },
+  ".cm-gutters .cm-lineNumbers .cm-gutterElement": {
+    alignItems: "start",
+    display: "inline-flex",
+    justifyContent: "end",
+    minWidth: "20px",
+    whiteSpace: "nowrap",
   },
   ".cm-activeLine, .cm-activeLineGutter": {
     backgroundColor: "var(--mira-accent-soft)",
@@ -123,12 +144,241 @@ export const miraEditorTheme = EditorView.theme({
   ".cm-placeholder": {
     color: "var(--mira-muted-foreground)",
   },
+  ".cm-heading": {
+    color: "var(--mira-syntax-heading)",
+    fontWeight: "650",
+  },
+  ".cm-link, .cm-url, .cm-internal-link, .cm-wikilink, .cm-embed-link": {
+    color: "var(--mira-syntax-link)",
+    cursor: "pointer",
+    textDecoration: "underline",
+    textDecorationThickness: "1px",
+    textUnderlineOffset: "3px",
+  },
+  ".cm-emphasis": {
+    fontStyle: "italic",
+  },
+  ".cm-strong": {
+    fontWeight: "700",
+  },
+  ".cm-line-through": {
+    textDecoration: "line-through",
+  },
+  ".cm-comment, .cm-meta, .cm-hmd-frontmatter": {
+    color: "var(--mira-syntax-comment)",
+  },
+  ".cm-keyword, .cm-bool, .cm-atom, .cm-literal": {
+    color: "var(--mira-syntax-keyword)",
+  },
+  ".cm-string, .cm-string-2": {
+    color: "var(--mira-syntax-string)",
+  },
+  ".cm-number": {
+    color: "var(--mira-syntax-number)",
+  },
+  ".cm-variable, .cm-variable-2, .cm-local, .cm-definition, .cm-macro, .cm-namespace":
+    {
+      color: "var(--mira-syntax-variable)",
+    },
+  ".cm-property, .cm-attribute": {
+    color: "var(--mira-syntax-property)",
+  },
+  ".cm-type, .cm-class": {
+    color: "var(--mira-syntax-type)",
+  },
+  ".cm-operator, .cm-punctuation, .cm-bracket": {
+    color: "var(--mira-syntax-operator)",
+  },
+  ".cm-label": {
+    color: "var(--mira-code-foreground)",
+    fontFamily: "var(--mira-font-mono)",
+  },
+  ".cm-hashtag": {
+    backgroundColor: "var(--mira-tag-background)",
+    borderRadius: "999px",
+    color: "var(--mira-tag-foreground)",
+    fontWeight: "550",
+    padding: "0.05em 0.35em",
+  },
+  ".cm-invalid": {
+    backgroundColor: "var(--mira-syntax-invalid-background)",
+    color: "var(--mira-syntax-invalid)",
+  },
   ".cm-tooltip": {
     border: "1px solid var(--mira-border)",
     backgroundColor: "var(--mira-popover)",
     color: "var(--mira-popover-foreground)",
   },
 });
+
+type VisibleLineStyle = {
+  top: number;
+  bottom: number;
+  lineHeight: string;
+  paddingTop: string;
+};
+
+type MeasuredGutterElement = {
+  element: HTMLElement;
+  top: number;
+  bottom: number;
+};
+
+function collectVisibleLineStyles(view: EditorView): VisibleLineStyle[] {
+  return Array.from(
+    view.dom.querySelectorAll<HTMLElement>(".cm-content .cm-line"),
+    (line) => {
+      const style = getComputedStyle(line);
+      const rect = line.getBoundingClientRect();
+      return {
+        top: rect.top,
+        bottom: rect.bottom,
+        lineHeight: style.lineHeight,
+        paddingTop: style.paddingTop,
+      };
+    },
+  );
+}
+
+function collectGutterColumns(view: EditorView): MeasuredGutterElement[][] {
+  return Array.from(
+    view.dom.querySelectorAll<HTMLElement>(".cm-gutters .cm-gutter"),
+    (gutter) =>
+      Array.from(
+        gutter.querySelectorAll<HTMLElement>(".cm-gutterElement"),
+        (element) => {
+          const rect = element.getBoundingClientRect();
+          return {
+            element,
+            top: rect.top,
+            bottom: rect.bottom,
+          };
+        },
+      ),
+  );
+}
+
+function mutationMayAffectGutters(mutation: MutationRecord): boolean {
+  if (mutation.type === "attributes") {
+    return mutation.attributeName === "class";
+  }
+
+  return mutation.addedNodes.length > 0 || mutation.removedNodes.length > 0;
+}
+
+function findMatchingLineStyle(
+  gutterElement: MeasuredGutterElement,
+  lineStyles: VisibleLineStyle[],
+): VisibleLineStyle | null {
+  let bestMatch: VisibleLineStyle | null = null;
+  let bestDistance = Number.POSITIVE_INFINITY;
+
+  for (const lineStyle of lineStyles) {
+    const overlaps =
+      gutterElement.top < lineStyle.bottom &&
+      gutterElement.bottom > lineStyle.top;
+    if (overlaps) {
+      return lineStyle;
+    }
+
+    const distance = Math.abs(gutterElement.top - lineStyle.top);
+    if (distance < bestDistance) {
+      bestDistance = distance;
+      bestMatch = lineStyle;
+    }
+  }
+
+  return bestMatch;
+}
+
+class GutterLineStyleSyncPlugin implements PluginValue {
+  private readonly mutationObserver: MutationObserver;
+
+  private readonly resizeObserver: ResizeObserver;
+
+  private syncScheduled = false;
+
+  constructor(private readonly view: EditorView) {
+    this.mutationObserver = new MutationObserver((mutations) => {
+      if (mutations.some(mutationMayAffectGutters)) {
+        this.scheduleSync();
+      }
+    });
+
+    this.mutationObserver.observe(this.view.dom, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    this.resizeObserver = new ResizeObserver(() => {
+      this.scheduleSync();
+    });
+    this.resizeObserver.observe(this.view.dom);
+    this.resizeObserver.observe(this.view.contentDOM);
+
+    this.scheduleSync();
+  }
+
+  update(update: ViewUpdate): void {
+    if (update.docChanged || update.viewportChanged || update.geometryChanged) {
+      this.scheduleSync();
+    }
+  }
+
+  destroy(): void {
+    this.mutationObserver.disconnect();
+    this.resizeObserver.disconnect();
+  }
+
+  private scheduleSync(): void {
+    if (this.syncScheduled) {
+      return;
+    }
+
+    this.syncScheduled = true;
+    this.view.requestMeasure({
+      read: (view) => ({
+        lineStyles: collectVisibleLineStyles(view),
+        gutterColumns: collectGutterColumns(view),
+      }),
+      write: ({ lineStyles, gutterColumns }) => {
+        this.syncScheduled = false;
+        this.applyLineStyles(lineStyles, gutterColumns);
+      },
+    });
+  }
+
+  private applyLineStyles(
+    lineStyles: VisibleLineStyle[],
+    gutterColumns: MeasuredGutterElement[][],
+  ): void {
+    for (const gutterElements of gutterColumns) {
+      for (const gutterElement of gutterElements) {
+        const lineStyle = findMatchingLineStyle(gutterElement, lineStyles);
+
+        if (!lineStyle) {
+          gutterElement.element.style.removeProperty("line-height");
+          gutterElement.element.style.removeProperty("padding-top");
+          continue;
+        }
+
+        if (gutterElement.element.style.lineHeight !== lineStyle.lineHeight) {
+          gutterElement.element.style.lineHeight = lineStyle.lineHeight;
+        }
+
+        if (gutterElement.element.style.paddingTop !== lineStyle.paddingTop) {
+          gutterElement.element.style.paddingTop = lineStyle.paddingTop;
+        }
+      }
+    }
+  }
+}
+
+export function gutterLineStyleSyncExtension(): Extension {
+  return ViewPlugin.fromClass(GutterLineStyleSyncPlugin);
+}
 
 export function createBaseCodeMirrorExtensions(
   options: MiraCodeMirrorOptions = {},
@@ -139,11 +389,11 @@ export function createBaseCodeMirrorExtensions(
 
   return [
     miraEditorTheme,
+    gutterLineStyleSyncExtension(),
     ...((options.lineNumbers ?? true) ? [lineNumbers()] : []),
     highlightActiveLineGutter(),
     highlightSpecialChars(),
     history(),
-    foldGutter(),
     drawSelection(),
     dropCursor(),
     EditorState.allowMultipleSelections.of(true),

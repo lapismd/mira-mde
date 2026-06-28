@@ -7,5 +7,6 @@ export default defineConfig({
     environment: "jsdom",
     include: ["src/**/*.test.ts"],
     exclude: ["dist/**", ".svelte-kit/**"],
+    setupFiles: ["src/test-setup.ts"],
   },
 });

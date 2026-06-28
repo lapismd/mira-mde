@@ -15,6 +15,7 @@ import { Table } from "@lezer/markdown";
 
 export type MiraMarkdownCodeMirrorOptions = {
   codeLanguages?: LanguageDescription[];
+  sourceMode?: boolean;
 };
 
 const wikiLinkMark = Decoration.mark({
@@ -37,7 +38,11 @@ export function createMarkdownCodeMirrorExtensions(
       }),
     }),
     markdownSourceDecorations(),
-    EditorView.editorAttributes.of({ class: "mira-mde-markdown-source" }),
+    EditorView.editorAttributes.of({
+      class: options.sourceMode
+        ? "mira-mde-markdown-source markdown-source-view"
+        : "mira-mde-markdown-source",
+    }),
   ];
 }
 

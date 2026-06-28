@@ -6,7 +6,7 @@
   } from "@mira-mde/extensions";
   import type { Pluggable } from "unified";
   import type { Options as RemarkRehypeOptions } from "remark-rehype";
-  import type { MarkdownPostProcess } from "./types";
+  import type { MarkdownChangeHandler, MarkdownPostProcess } from "./types";
 
   export type MarkdownProps = {
     value: string;
@@ -18,13 +18,19 @@
     linkResolver?: MiraLinkResolver;
     assetResolver?: MiraAssetResolver;
     postProcess?: MarkdownPostProcess;
+    onChange?: MarkdownChangeHandler;
+    onFrontmatterChange?: (nextYaml: string, nextValue: string) => void;
+    frontmatterOpen?: boolean;
   };
 </script>
 
 <script lang="ts">
   import Renderer from "./renderer.svelte";
   import { createParser } from "./utils";
-  import { setMarkdownContext } from "./context.svelte";
+  import {
+    setMarkdownContext,
+    type MarkdownContext,
+  } from "./context.svelte";
   import type { HastNode, Parser } from "./types";
 
   let {
@@ -37,6 +43,9 @@
     linkResolver,
     assetResolver,
     postProcess = () => {},
+    onChange,
+    onFrontmatterChange,
+    frontmatterOpen = true,
   }: MarkdownProps = $props();
 
   let parser = $derived<Parser>(
@@ -44,14 +53,18 @@
   );
   let ast = $derived<HastNode>(parser(value));
 
-  let context = setMarkdownContext({
+  let contextState = $state<MarkdownContext>({
     markdown: "",
     sourcePath: undefined,
     components: {},
     linkResolver: undefined,
     assetResolver: undefined,
     postProcess: () => {},
+    onChange: undefined,
+    onFrontmatterChange: undefined,
+    frontmatterOpen: true,
   });
+  let context = setMarkdownContext(contextState);
 
   $effect.pre(() => {
     context.markdown = value;
@@ -60,6 +73,9 @@
     context.linkResolver = linkResolver;
     context.assetResolver = assetResolver;
     context.postProcess = postProcess;
+    context.onChange = onChange;
+    context.onFrontmatterChange = onFrontmatterChange;
+    context.frontmatterOpen = frontmatterOpen;
   });
 </script>
 

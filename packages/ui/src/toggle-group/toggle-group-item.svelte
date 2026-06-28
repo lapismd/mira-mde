@@ -1,6 +1,5 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
-  import { useToggleGroupContext } from "./context";
 
   type Props = {
     value: string;
@@ -10,17 +9,25 @@
   };
 
   let { value, class: className = "", title, children }: Props = $props();
-  const group = useToggleGroupContext();
-  const active = $derived(group.value() === value);
+
+  function select(event: MouseEvent): void {
+    event.currentTarget?.dispatchEvent(
+      new CustomEvent("miratoggleselect", {
+        bubbles: true,
+        detail: value,
+      }),
+    );
+  }
 </script>
 
 <button
   type="button"
   class={`mira-toggle-group__item ${className}`.trim()}
-  aria-pressed={active}
-  data-state={active ? "on" : "off"}
+  aria-pressed="false"
+  data-mira-toggle-value={value}
+  data-state="off"
   {title}
-  onclick={() => group.setValue(value)}
+  onclick={select}
 >
   {@render children?.()}
 </button>

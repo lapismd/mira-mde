@@ -1,151 +1,329 @@
 @import "katex/dist/katex.css";
+@import "./lapis-markdown.css";
+
+.mira-mde,
+.mira-markdown-preview,
+.markdown-preview-surface,
+.markdown-editor-surface {
+  --background: var(--mira-background);
+  --foreground: var(--mira-foreground);
+  --card: var(--mira-widget-background, var(--mira-background));
+  --card-foreground: var(--mira-foreground);
+  --popover: var(--mira-popover, var(--mira-widget-background));
+  --popover-foreground: var(--mira-popover-foreground, var(--mira-foreground));
+  --secondary: var(--mira-muted);
+  --secondary-foreground: var(--mira-foreground);
+  --muted: var(--mira-muted);
+  --muted-foreground: var(--mira-muted-foreground);
+  --border: var(--mira-border);
+  --input: var(--mira-border);
+  --ring: var(--mira-accent);
+  --radius: var(--mira-radius);
+  --background-primary: var(--mira-preview-background, var(--mira-background));
+  --background-primary-alt: var(--mira-muted);
+  --background-secondary: var(--mira-muted);
+  --background-modifier-border: var(--mira-border);
+  --background-modifier-border-hover: var(--mira-border-strong);
+  --background-modifier-border-focus: var(--mira-border-strong);
+  --background-modifier-hover: var(--mira-accent-soft);
+  --background-modifier-active-hover: var(--mira-accent-soft);
+  --text-normal: var(--mira-foreground);
+  --text-muted: var(--mira-muted-foreground);
+  --text-faint: color-mix(in oklab, var(--mira-muted-foreground) 70%, transparent);
+  --text-accent: var(--mira-link);
+  --text-accent-hover: var(--mira-link);
+  --text-on-accent: var(--mira-accent-foreground);
+  --interactive-accent-hsl: 174, 77%, 26%;
+  --interactive-accent: var(--mira-accent);
+  --interactive-accent-hover: color-mix(in oklab, var(--mira-accent) 88%, white);
+  --interactive-accent-pressed: color-mix(in oklab, var(--mira-accent) 76%, black);
+  --font-text-size: var(--mira-font-size);
+  --font-sans: var(--mira-font-sans);
+  --font-monospace: var(--mira-font-mono);
+  --font-mono: var(--mira-font-mono);
+  --font-mono-theme: var(--mira-font-mono);
+  --font-mono-override: var(--mira-font-mono);
+  --font-interface: var(--mira-font-sans);
+  --font-weight: 400;
+  --font-normal: 400;
+  --font-semibold: 600;
+  --bold-modifier: 200;
+  --font-smaller: 0.875em;
+  --font-ui-smaller: 0.85rem;
+  --line-height-normal: var(--mira-line-height);
+  --line-height-tight: 1.3;
+  --file-line-width: 720px;
+  --p-spacing: 1rem;
+  --border-width: 1px;
+  --radius-s: 4px;
+  --radius-m: var(--mira-radius);
+  --radius-l: calc(var(--mira-radius) + 2px);
+  --list-spacing: 0.075em;
+  --size-2-1: 2px;
+  --size-2-2: 4px;
+  --size-2-3: 6px;
+  --size-4-1: 0.25rem;
+  --size-4-2: 0.5rem;
+  --size-4-3: 0.75rem;
+  --size-4-4: 1rem;
+  --size-4-5: 1.25rem;
+  --size-4-6: 1.5rem;
+  --h1-color: var(--mira-heading-color);
+  --h2-color: var(--mira-heading-color);
+  --h3-color: var(--mira-heading-color);
+  --h4-color: var(--mira-heading-color);
+  --h5-color: var(--mira-heading-color);
+  --h6-color: var(--mira-heading-color);
+  --h1-font: var(--mira-font-sans);
+  --h2-font: var(--mira-font-sans);
+  --h3-font: var(--mira-font-sans);
+  --h4-font: var(--mira-font-sans);
+  --h5-font: var(--mira-font-sans);
+  --h6-font: var(--mira-font-sans);
+  --h1-line-height: var(--mira-h1-line-height);
+  --h2-line-height: var(--mira-h2-line-height);
+  --h3-line-height: var(--mira-h3-line-height);
+  --h4-line-height: var(--mira-h4-line-height);
+  --h5-line-height: var(--mira-h5-line-height);
+  --h6-line-height: var(--mira-h6-line-height);
+  --h1-size: var(--mira-h1-size);
+  --h2-size: var(--mira-h2-size);
+  --h3-size: var(--mira-h3-size);
+  --h4-size: var(--mira-h4-size);
+  --h5-size: var(--mira-h5-size);
+  --h6-size: var(--mira-h6-size);
+  --h1-style: normal;
+  --h2-style: normal;
+  --h3-style: normal;
+  --h4-style: normal;
+  --h5-style: normal;
+  --h6-style: normal;
+  --h1-variant: normal;
+  --h2-variant: normal;
+  --h3-variant: normal;
+  --h4-variant: normal;
+  --h5-variant: normal;
+  --h6-variant: normal;
+  --h1-weight: 700;
+  --h2-weight: 650;
+  --h3-weight: 650;
+  --h4-weight: 620;
+  --h5-weight: 600;
+  --h6-weight: 600;
+  --blockquote-color: var(--mira-muted-foreground);
+  --blockquote-font-style: normal;
+  --blockquote-background-color: transparent;
+  --blockquote-border-thickness: 3px;
+  --blockquote-border-color: var(--mira-border-strong);
+  --code-background: var(--mira-code-background);
+  --code-normal: var(--mira-code-foreground);
+  --code-comment: var(--mira-syntax-comment);
+  --code-function: var(--mira-syntax-heading);
+  --code-keyword: var(--mira-syntax-keyword);
+  --code-operator: var(--mira-syntax-operator);
+  --code-property: var(--mira-syntax-property);
+  --code-punctuation: var(--mira-syntax-operator);
+  --code-string: var(--mira-syntax-string);
+  --code-tag: var(--mira-syntax-heading);
+  --code-value: var(--mira-syntax-number);
+  --code-caret: var(--mira-foreground);
+  --code-radius: 4px;
+  --code-size: 0.9em;
+  --code-border-width: 1px;
+  --code-border-color: var(--mira-border);
+  --code-highlighted-line: color-mix(in oklab, var(--mira-accent) 12%, transparent);
+  --code-highlighted-line-indicator: var(--mira-accent);
+  --color-text-weak: var(--mira-muted-foreground);
+  --tag-color: var(--mira-tag-foreground);
+  --tag-color-hover: var(--mira-tag-foreground);
+  --tag-background: var(--mira-tag-background);
+  --tag-background-hover: color-mix(in oklab, var(--mira-tag-background) 75%, var(--mira-accent));
+  --tag-border-width: 1px;
+  --tag-border-color: transparent;
+  --tag-border-color-hover: color-mix(in oklab, var(--mira-accent) 45%, transparent);
+  --tag-radius: 999px;
+  --tag-size: 0.85em;
+  --tag-weight: 550;
+  --tag-padding-x: 0.55em;
+  --tag-padding-y: 0.1em;
+  --tag-decoration: none;
+  --tag-decoration-hover: none;
+  --link-color: var(--mira-link);
+  --link-color-hover: var(--mira-link);
+  --link-weight: 500;
+  --link-decoration: underline;
+  --link-decoration-hover: underline;
+  --link-decoration-thickness: 1px;
+  --link-external-color: var(--mira-link);
+  --link-external-decoration: underline;
+  --link-external-filter: none;
+  --cursor-link: pointer;
+  --checkbox-size: var(--mira-checkbox-size);
+  --checkbox-radius: var(--mira-checkbox-radius);
+  --checkbox-border-color: var(--mira-checkbox-border);
+  --checkbox-border-color-hover: var(--mira-checkbox-border-hover);
+  --checkbox-color: var(--mira-checkbox-color);
+  --checkbox-marker-color: var(--mira-checkbox-marker);
+  --checkbox-margin-inline-start: 0;
+  --callout-border-width: 0;
+  --callout-border-opacity: 0.25;
+  --callout-default: var(--mira-callout-default);
+  --callout-summary: var(--mira-callout-summary);
+  --callout-info: var(--mira-callout-info);
+  --callout-todo: var(--mira-callout-info);
+  --callout-important: var(--mira-callout-tip);
+  --callout-tip: var(--mira-callout-tip);
+  --callout-success: var(--mira-callout-success);
+  --callout-question: var(--mira-callout-question);
+  --callout-warning: var(--mira-callout-warning);
+  --callout-fail: var(--mira-callout-error);
+  --callout-error: var(--mira-callout-error);
+  --callout-bug: var(--mira-callout-bug);
+  --callout-example: var(--mira-callout-example);
+  --callout-quote: var(--mira-callout-quote);
+  --table-background: transparent;
+  --table-border-width: 1px;
+  --table-border-color: var(--mira-border);
+  --table-white-space: break-spaces;
+  --table-header-background: var(--table-background);
+  --table-header-background-hover: inherit;
+  --table-header-border-width: var(--table-border-width);
+  --table-header-border-color: var(--table-border-color);
+  --table-header-font: inherit;
+  --table-header-size: var(--table-text-size);
+  --table-header-weight: calc(var(--font-weight) + var(--bold-modifier));
+  --table-header-color: var(--mira-foreground);
+  --table-line-height: var(--line-height-tight);
+  --table-text-size: var(--mira-font-size);
+  --table-text-color: inherit;
+  --table-column-min-width: 6ch;
+  --table-column-max-width: none;
+  --table-row-background-hover: var(--table-background);
+  --table-row-alt-background: var(--table-background);
+  --table-row-alt-background-hover: var(--table-background);
+  --table-row-last-border-width: var(--table-border-width);
+  --table-selection: color-mix(in oklab, var(--mira-accent) 18%, transparent);
+  --table-selection-border-color: var(--mira-accent);
+  --table-selection-border-width: 2px;
+  --table-selection-border-radius: 4px;
+  --table-selection-blend-mode: normal;
+  --table-cell-vertical-alignment: top;
+  --table-drag-handle-background: transparent;
+  --table-drag-handle-background-active: var(--table-selection-border-color);
+  --table-drag-handle-color: var(--text-faint);
+  --table-drag-handle-color-active: var(--text-on-accent);
+  --table-add-button-background: transparent;
+  --table-add-button-border-width: var(--table-border-width);
+  --table-add-button-border-color: var(--background-modifier-border);
+  --list-marker-color: var(--mira-muted-foreground);
+  --list-marker-color-hover: var(--mira-foreground);
+  --list-bullet-size: 0.35em;
+  --list-bullet-radius: 999px;
+  --indentation-guide-color: var(--mira-border);
+  --indentation-guide-color-active: var(--mira-border-strong);
+  --indentation-guide-width: 1px;
+  --indentation-guide-width-active: 1px;
+  --collapse-icon-color: var(--mira-muted-foreground);
+  --collapse-icon-color-collapsed: var(--mira-foreground);
+  --layer-tooltip: 1200;
+}
 
 .mira-markdown-preview {
   height: 100%;
   overflow: auto;
-  background: var(--mira-preview-background, var(--mira-background));
-  color: var(--mira-foreground);
+}
+
+.mira-mde .markdown-preview-surface,
+.mira-mde .markdown-editor-surface {
   font-family: var(--mira-font-sans);
-  line-height: var(--mira-line-height);
-  padding: var(--mira-preview-padding, 24px);
+  font-size: var(--mira-font-size);
 }
 
-.markdown-rendered {
-  overflow-wrap: break-word;
+.md-frontmatter {
+  font-family: var(--font-interface);
+  margin: 0;
+  padding: var(--size-2-2) 0 var(--size-4-4);
 }
 
-.markdown-rendered > * + * {
-  margin-block-start: 1rem;
-}
-
-.markdown-rendered h1,
-.markdown-rendered h2,
-.markdown-rendered h3,
-.markdown-rendered h4,
-.markdown-rendered h5,
-.markdown-rendered h6 {
-  color: var(--mira-heading-color, var(--mira-foreground));
-  font-weight: 650;
-  line-height: 1.2;
-  letter-spacing: 0;
-}
-
-.markdown-rendered h1 {
-  font-size: 2rem;
-}
-
-.markdown-rendered h2 {
-  border-bottom: 1px solid var(--mira-border);
-  font-size: 1.5rem;
-  padding-bottom: 0.35rem;
-}
-
-.markdown-rendered h3 {
-  font-size: 1.25rem;
-}
-
-.markdown-rendered a {
-  color: var(--mira-link);
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 3px;
-}
-
-.markdown-rendered blockquote {
-  border-inline-start: 3px solid var(--mira-border-strong);
-  color: var(--mira-muted-foreground);
-  margin-inline: 0;
-  padding-inline-start: 1rem;
-}
-
-.markdown-rendered code {
-  background: var(--mira-code-background);
-  border: 1px solid var(--mira-border);
-  border-radius: 4px;
-  color: var(--mira-code-foreground);
-  font-family: var(--mira-font-mono);
-  font-size: 0.9em;
-  padding: 0.1rem 0.25rem;
-}
-
-.markdown-rendered pre {
-  background: var(--mira-code-background);
-  border: 1px solid var(--mira-border);
-  border-radius: 6px;
-  overflow: auto;
-  padding: 0.9rem;
-}
-
-.markdown-rendered pre code {
-  background: transparent;
-  border: 0;
-  padding: 0;
-}
-
-.markdown-rendered table {
-  border-collapse: collapse;
-  display: block;
-  overflow: auto;
+.md-frontmatter__collapsible {
+  border-radius: var(--radius-s);
+  display: flex;
+  flex-direction: column;
+  gap: 0;
   width: 100%;
 }
 
-.markdown-rendered th,
-.markdown-rendered td {
-  border: 1px solid var(--mira-border);
-  padding: 0.4rem 0.6rem;
-}
-
-.markdown-rendered th {
-  background: var(--mira-muted);
-  font-weight: 600;
-}
-
-.markdown-rendered ul,
-.markdown-rendered ol {
-  padding-inline-start: 1.5rem;
-}
-
-.mira-callout {
-  background: var(--mira-callout-background);
-  border: 1px solid var(--mira-border);
-  border-inline-start: 4px solid var(--mira-accent);
-  border-radius: 6px;
-  padding: 0.85rem 1rem;
-}
-
-.mira-callout__title {
-  color: var(--mira-foreground);
-  font-weight: 650;
-  margin-bottom: 0.35rem;
-}
-
-.mira-callout__content > *:first-child {
-  margin-top: 0;
-}
-
-.mira-callout__content > *:last-child {
-  margin-bottom: 0;
-}
-
-.mira-tag {
-  background: var(--mira-tag-background);
-  border: 1px solid var(--mira-border);
-  border-radius: 999px;
-  color: var(--mira-tag-foreground);
-  display: inline-flex;
-  font-size: 0.85em;
+.md-frontmatter__trigger {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-m);
+  color: var(--text-normal);
+  cursor: pointer;
+  display: flex;
+  font: inherit;
+  font-size: 0.875rem;
   font-weight: 500;
-  padding: 0.05rem 0.45rem;
+  gap: 0.5rem;
+  height: 2.25rem;
+  justify-content: center;
+  margin: 0;
+  outline: none;
+  padding: 0.5rem 1rem 0.5rem 0;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease,
+    box-shadow 150ms ease;
+  user-select: none;
+  white-space: nowrap;
+  width: 100%;
 }
 
-.mira-frontmatter,
-.mira-embed {
-  background: var(--mira-muted);
-  border: 1px solid var(--mira-border);
-  border-radius: 6px;
-  padding: 0.75rem;
+.md-frontmatter__trigger:hover {
+  background: transparent;
 }
 
-.mira-frontmatter pre {
-  margin: 0.75rem 0 0;
+.md-frontmatter__trigger:focus-visible {
+  border-color: var(--ring);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--ring) 50%, transparent);
+}
+
+.md-frontmatter__chevron {
+  color: var(--text-accent);
+  flex: 0 0 auto;
+  height: 0.875rem;
+  margin-left: -6px;
+  transition: transform 150ms ease;
+  width: 0.875rem;
+}
+
+.md-frontmatter__collapsible[data-state="open"] .md-frontmatter__chevron {
+  transform: rotate(90deg);
+}
+
+.md-frontmatter__title {
+  flex: 1 1 auto;
+  min-width: 0;
+  text-align: left;
+}
+
+.md-frontmatter__content {
+  width: 100%;
+}
+
+.markdown-live-preview-mode .cm-formatting-block.markdown-rendered > *,
+.markdown-live-preview-mode .markdown-widget-shell > *,
+.markdown-live-preview-mode .cm-table-widget,
+.markdown-live-preview-mode .md-frontmatter {
+  margin-block: 0;
+}
+
+.markdown-live-preview-mode .mira-rich-widget--frontmatter .md-frontmatter {
+  padding-block: 0;
+}
+
+.markdown-live-preview-mode .HyperMD-task-line[data-task="x"] > span:last-child,
+.markdown-live-preview-mode .HyperMD-task-line[data-task="X"] > span:last-child {
+  color: inherit;
+  text-decoration: none;
 }

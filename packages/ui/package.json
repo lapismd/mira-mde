@@ -32,10 +32,48 @@
       "svelte": "./dist/toggle-group/index.js",
       "import": "./dist/toggle-group/index.js"
     },
+    "./toolbar": {
+      "types": "./dist/toolbar/index.d.ts",
+      "svelte": "./dist/toolbar/index.js",
+      "import": "./dist/toolbar/index.js"
+    },
     "./scroll-area": {
       "types": "./dist/scroll-area/index.d.ts",
       "svelte": "./dist/scroll-area/index.js",
       "import": "./dist/scroll-area/index.js"
+    },
+    "./context-menu": {
+      "types": "./dist/context-menu/index.d.ts",
+      "svelte": "./dist/context-menu/index.js",
+      "import": "./dist/context-menu/index.js"
+    },
+    "./dialog": {
+      "types": "./dist/dialog/index.d.ts",
+      "svelte": "./dist/dialog/index.js",
+      "import": "./dist/dialog/index.js"
+    },
+    "./dropdown-menu": {
+      "types": "./dist/dropdown-menu/index.d.ts",
+      "svelte": "./dist/dropdown-menu/index.js",
+      "import": "./dist/dropdown-menu/index.js"
+    },
+    "./table": {
+      "types": "./dist/table/index.d.ts",
+      "svelte": "./dist/table/index.js",
+      "import": "./dist/table/index.js"
+    },
+    "./table-dnd/sensors": {
+      "types": "./dist/table-dnd/table-dnd-sensors.d.ts",
+      "import": "./dist/table-dnd/table-dnd-sensors.js"
+    },
+    "./table-dnd/utils": {
+      "types": "./dist/table-dnd/table-dnd-utils.d.ts",
+      "import": "./dist/table-dnd/table-dnd-utils.js"
+    },
+    "./tooltip": {
+      "types": "./dist/tooltip/index.d.ts",
+      "svelte": "./dist/tooltip/index.js",
+      "import": "./dist/tooltip/index.js"
     },
     "./styles.css": "./dist/styles.css"
   },
@@ -55,7 +93,12 @@
     "tailwind-merge": "^3.4.0"
   },
   "dependencies": {
+    "@dnd-kit/dom": "^0.4.0",
+    "@dnd-kit/svelte": "^0.4.0",
+    "@lucide/svelte": "^0.525.0",
+    "bits-ui": "2.18.1",
     "clsx": "^2.1.1",
-    "tailwind-merge": "^3.4.0"
+    "tailwind-merge": "^3.4.0",
+    "tailwind-variants": "^1.0.0"
   }
 }
