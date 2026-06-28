@@ -34,6 +34,11 @@ import { mount, unmount } from "svelte";
 import { miraRichEditorTheme } from "./theme";
 import type { MiraRichEditorOptions } from "./types";
 import { getFencedCodeLanguage, getFencedCodeWidgetRange } from "./utils/fenced-code";
+import {
+  getAtxHeadingMarkerRange,
+  selectionTouchesLine,
+} from "./utils/headings";
+import { getTaskMarkerRange, selectionTouchesTaskMarker } from "./utils/tasks";
 import { estimateMarkdownBlockHeight } from "./utils/height-estimates";
 import { findInlineCodeRanges, isPositionInsideRanges } from "./utils/inline-code";
 import { findInlineMathRanges, type InlineMathRange } from "./utils/inline-math";
@@ -70,6 +75,8 @@ export { PREVIEW_INTERACTIVE_SELECTOR, shouldActivateEditablePreview } from "./u
 
 export type { MiraRichEditorOptions } from "./types";
 export { getFencedCodeLanguage, getFencedCodeWidgetRange } from "./utils/fenced-code";
+export { getAtxHeadingMarkerRange, selectionTouchesLine } from "./utils/headings";
+export { getTaskMarkerRange, selectionTouchesTaskMarker } from "./utils/tasks";
 export { estimateMarkdownBlockHeight } from "./utils/height-estimates";
 export { findInlineMathRanges, type InlineMathRange } from "./utils/inline-math";
 export {
@@ -321,6 +328,7 @@ function buildInlinePreviewDecorations(
   const fencedCodeLineClasses = getFencedCodeLineClasses(view.state);
   const syntaxHiddenRanges: RangeBoundary[] = [];
   const activeInlineSourceRanges: RangeBoundary[] = [];
+  collectActiveTaskMarkerRanges(view, activeInlineSourceRanges);
   decorateInlineSyntax(
     view,
     ranges,
@@ -340,7 +348,14 @@ function buildInlinePreviewDecorations(
       }
       decorateHeadingLine(line.text, line.from, ranges);
       decorateFootnotes(line.text, line.from, ranges);
-      decorateTaskCheckboxes(line.text, line.from, ranges, options);
+      decorateTaskCheckboxes(
+        line.text,
+        line.from,
+        ranges,
+        options,
+        view.state,
+        activeInlineSourceRanges,
+      );
       decorateStrikethroughRanges(
         line.text,
         line.from,
@@ -431,13 +446,46 @@ function decorateInlineSyntax(
         if (
           INLINE_FORMATTING_NODE_NAMES.has(node.name) &&
           !isBareExternalAutolinkUrl(node.name, parentName, nodeSource) &&
-          !rangeIntersectsSelection(view.state, parentFrom, parentTo)
+          !rangeIntersectsSelection(view.state, parentFrom, parentTo) &&
+          !activeSourceRanges.some((range) =>
+            rangesOverlap(range, { from: node.from, to: node.to }),
+          )
         ) {
           hiddenRanges.push({ from: node.from, to: node.to });
           ranges.push(hiddenFormattingMark.range(node.from, node.to));
         }
       },
     });
+  }
+}
+
+function collectActiveTaskMarkerRanges(
+  view: EditorView,
+  activeSourceRanges: RangeBoundary[],
+): void {
+  for (const visibleRange of view.visibleRanges) {
+    let line = view.state.doc.lineAt(visibleRange.from);
+    while (line.from <= visibleRange.to) {
+      const taskRange = getTaskMarkerRange(line.text, line.from);
+      if (
+        taskRange &&
+        selectionTouchesTaskMarker(
+          view.state,
+          line.from,
+          taskRange.markerEnd,
+        )
+      ) {
+        activeSourceRanges.push({
+          from: taskRange.markerStart,
+          to: taskRange.markerEnd,
+        });
+      }
+
+      if (line.to >= visibleRange.to || line.number >= view.state.doc.lines) {
+        break;
+      }
+      line = view.state.doc.line(line.number + 1);
+    }
   }
 }
 
@@ -650,30 +698,35 @@ function decorateTaskCheckboxes(
   lineStart: number,
   ranges: Range<Decoration>[],
   options: MiraRichEditorOptions,
+  state: EditorState,
+  activeSourceRanges: RangeBoundary[],
 ): void {
-  const match = text.match(/^(\s*)((?:[-*+]|\d+[.)])\s+)\[([^\]\r\n])\]\s/u);
-  if (match && match[1] !== undefined && match[2] !== undefined) {
-    const markerStart = lineStart + match[1].length;
-    const checkboxStart = markerStart + match[2].length;
-    const checkboxEnd = checkboxStart + 3;
-    const taskValue = match[3] ?? " ";
+  const taskRange = getTaskMarkerRange(text, lineStart);
+  if (taskRange) {
     ranges.push(
       Decoration.line({
         class: "cm-task-line HyperMD-task-line",
         attributes: {
-          "data-task": taskValue,
+          "data-task": taskRange.taskValue,
         },
       }).range(lineStart),
     );
+    if (selectionTouchesTaskMarker(state, lineStart, taskRange.markerEnd)) {
+      activeSourceRanges.push({
+        from: taskRange.markerStart,
+        to: taskRange.markerEnd,
+      });
+      return;
+    }
     ranges.push(
       Decoration.replace({
         widget: new TaskCheckboxWidget({
-          from: checkboxStart,
-          value: taskValue,
-          checked: taskValue.trim().length > 0,
+          from: taskRange.checkboxStart,
+          value: taskRange.taskValue,
+          checked: taskRange.taskValue.trim().length > 0,
           options,
         }),
-      }).range(markerStart, checkboxEnd),
+      }).range(taskRange.markerStart, taskRange.checkboxEnd),
     );
   }
 }
@@ -775,8 +828,30 @@ function decorateHiddenFormatting(
 ): void {
   addRegexMarks(text, lineStart, ranges, /(\*\*|__|\*|_|~~|`)/g, options);
   addRegexMarks(text, lineStart, ranges, /(!?\[|\]\(|\)|\[\[|\]\])/g, options);
-  addRegexMarks(text, lineStart, ranges, /^(#{1,6})(?=\s)/g, options);
+  decorateHeadingFormatting(text, lineStart, ranges, options);
   addRegexMarks(text, lineStart, ranges, /^(\s*>+\s?)/g, options);
+}
+
+function decorateHeadingFormatting(
+  text: string,
+  lineStart: number,
+  ranges: Range<Decoration>[],
+  options: {
+    excludedRanges?: RangeBoundary[];
+    state?: EditorState;
+  },
+): void {
+  const markerRange = getAtxHeadingMarkerRange(text, lineStart);
+  if (
+    !markerRange ||
+    options.excludedRanges?.some((range) => rangesOverlap(range, markerRange)) ||
+    (options.state &&
+      selectionTouchesLine(options.state, lineStart, lineStart + text.length))
+  ) {
+    return;
+  }
+
+  ranges.push(hiddenFormattingMark.range(markerRange.from, markerRange.to));
 }
 
 function addRegexMarks(

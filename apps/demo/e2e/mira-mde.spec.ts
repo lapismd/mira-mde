@@ -422,6 +422,9 @@ test("task lists and live heading gutters match Lapis styling", async ({
   await setMode(page, "Live");
   await scrollEditor(page, 0);
   await expect(page.locator(".cm-line.cm-header-1")).toBeVisible();
+  await expectHiddenFormattingCount(page, "Mira MDE", "#", 1);
+  await page.locator(".cm-line.cm-header-1").first().click();
+  await expectHiddenFormattingCount(page, "Mira MDE", "#", 0);
   await expect(
     page.locator(".cm-content .mira-inline-math-widget .katex").first(),
   ).toBeVisible();
@@ -497,6 +500,17 @@ test("task lists and live heading gutters match Lapis styling", async ({
       }),
     )
     .toBe("none");
+  await liveTask
+    .getByText("Completed task without live-edit strikethrough")
+    .click();
+  await page.keyboard.press("Home");
+  await expect(liveTask).toContainText("- [x]");
+  await expectHiddenFormattingCount(
+    page,
+    "Completed task without live-edit strikethrough",
+    "[",
+    0,
+  );
   for (const top of [720, 800, 880, 960, 1040, 1120]) {
     await scrollEditor(page, top);
     await page.waitForTimeout(100);
@@ -530,6 +544,10 @@ test("task lists and live heading gutters match Lapis styling", async ({
       height: expect.any(Number),
       width: expect.any(Number),
     });
+  await customTask.getByText("Custom task marker").click();
+  await page.keyboard.press("Home");
+  await expect(customTask).toContainText("- [/]");
+  await expectHiddenFormattingCount(page, "Custom task marker", "[", 0);
 });
 
 test("live inline markdown is styled and reveals source by token", async ({
