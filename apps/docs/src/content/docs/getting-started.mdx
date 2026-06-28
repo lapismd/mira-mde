@@ -1,0 +1,63 @@
+---
+title: Getting Started
+description: Install Mira MDE and mount the default editor in Svelte, React, or plain DOM code.
+---
+
+## Svelte
+
+```svelte
+<script lang="ts">
+  import { MiraDefaultMde } from "@mira-mde/default-ui/svelte";
+  import "@mira-mde/default-ui/styles.css";
+
+  let value = $state("# Hello Mira");
+</script>
+
+<MiraDefaultMde bind:value sourcePath="note.md" />
+```
+
+## React
+
+```tsx
+import { useState } from "react";
+import { MiraDefaultMde } from "@mira-mde/react";
+import "@mira-mde/react/styles.css";
+
+export function Editor() {
+  const [value, setValue] = useState("# Hello Mira");
+
+  return <MiraDefaultMde value={value} onChange={setValue} />;
+}
+```
+
+## DOM Mount
+
+```ts
+import { createMiraDefaultEditor } from "@mira-mde/default-ui";
+import "@mira-mde/default-ui/styles.css";
+
+const editor = createMiraDefaultEditor({
+  root: document.querySelector("#editor")!,
+  value: "# Hello Mira",
+  sourcePath: "note.md"
+});
+
+editor.on("change", (markdown) => {
+  console.log(markdown);
+});
+```
+
+## Styles
+
+Import one package stylesheet for the surface you use:
+
+| Surface | Stylesheet |
+| :--- | :--- |
+| Svelte default UI | `@mira-mde/default-ui/styles.css` |
+| React default UI | `@mira-mde/react/styles.css` |
+| Lower-level Svelte editor | `@mira-mde/svelte/styles.css` |
+| Rendered preview only | `@mira-mde/preview/styles.css` |
+
+## Modes
+
+The default editor supports `source`, `live-preview`, `preview`, and `split` modes. Feature flags can remove modes from the toolbar and prevent switching into disabled modes.

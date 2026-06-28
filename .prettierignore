@@ -5,3 +5,5 @@ build
 .turbo
 coverage
 pnpm-lock.yaml
+apps/demo/static/mira-markdown-demo.svg
+apps/docs/public/mira-markdown-demo.svg

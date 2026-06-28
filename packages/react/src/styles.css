@@ -1,0 +1,35 @@
+@import "@mira-mde/default-ui/styles.css";
+
+.mira-react-dropdown {
+  display: inline-flex;
+  position: relative;
+}
+
+.mira-react-dropdown__content {
+  left: 0;
+  position: absolute;
+  top: calc(100% + 0.25rem);
+}
+
+.mira-react-dropdown__content--end {
+  left: auto;
+  right: 0;
+}
+
+.mira-react-menu-button {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  text-align: inherit;
+  width: 100%;
+}
+
+.mira-react-menu-button:hover {
+  background: var(--background-modifier-hover, var(--mira-accent-soft));
+}
+
+.mira-react-preview-host,
+.mira-react-preview-host > .mira-markdown-preview {
+  height: 100%;
+}

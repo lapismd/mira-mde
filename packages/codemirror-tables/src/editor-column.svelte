@@ -88,14 +88,14 @@
   }
 </script>
 
-<div class={cn("table-cell-wrapper w-full", className)}>
+<div class={cn("table-cell-wrapper h-full w-full", className)}>
   {#if editing}
     <div use:codeMirror={content} class="p-2"></div>
   {:else}
     <button
       onclick={(evt) => enableEdit(evt)}
       onfocus={(evt) => (editing = true)}
-      class={cn("w-full p-2", className)}
+      class={cn("h-full w-full p-2", className)}
     >
       <div class="cm-editor cm-focused mod-inline">
         <div class="cm-scroller">

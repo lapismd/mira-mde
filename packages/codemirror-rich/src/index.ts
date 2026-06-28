@@ -42,6 +42,7 @@ export type MiraRichEditorOptions = {
   linkResolver?: MiraLinkResolver;
   assetResolver?: MiraAssetResolver;
   frontmatterOpen?: boolean;
+  frontmatterConfig?: unknown;
   onChange?: (
     replacement: string,
     from: number,
@@ -56,6 +57,10 @@ type RangeBoundary = {
   to: number;
 };
 
+export type InlineMathRange = RangeBoundary & {
+  source: string;
+};
+
 const BLOCK_WIDGET_NODE_NAMES = new Set([
   "Frontmatter",
   "FencedCode",
@@ -68,7 +73,7 @@ const BLOCK_WIDGET_NODE_NAMES = new Set([
   "ContainerDirective",
 ]);
 
-const blockWidgetMounts = new WeakMap<HTMLElement, Record<string, unknown>>();
+const previewWidgetMounts = new WeakMap<HTMLElement, Record<string, unknown>>();
 
 const hiddenFormattingMark = Decoration.mark({
   class: "cm-formatting cm-formatting-hidden",
@@ -396,6 +401,28 @@ function buildBlockPreviewDecorations(
           : rangeIntersectsSelection(state, from, to);
 
       if (
+        selectionInside &&
+        (node.name === "BlockMathDollar" || node.name === "BlockMathBracket") &&
+        !replacedRanges.some((range) => rangesOverlap(range, { from, to }))
+      ) {
+        const markdown = state.doc.sliceString(from, to);
+        ranges.push(
+          Decoration.widget({
+            block: true,
+            side: 1,
+            widget: new BlockPreviewWidget({
+              from,
+              to,
+              markdown,
+              nodeName: node.name,
+              options,
+            }),
+          }).range(to),
+        );
+        return false;
+      }
+
+      if (
         selectionInside ||
         replacedRanges.some((range) => rangesOverlap(range, { from, to }))
       ) {
@@ -429,16 +456,10 @@ function buildInlinePreviewDecorations(
 ): DecorationSet {
   const ranges: Range<Decoration>[] = [];
   const fencedCodeLineClasses = getFencedCodeLineClasses(view.state);
-  const activeLines = new Set(
-    view.state.selection.ranges.map(
-      (selection) => view.state.doc.lineAt(selection.head).number,
-    ),
-  );
 
   for (const visibleRange of view.visibleRanges) {
     let line = view.state.doc.lineAt(visibleRange.from);
     while (line.from <= visibleRange.to) {
-      const isActiveLine = activeLines.has(line.number);
       const fencedCodeLineClass = fencedCodeLineClasses.get(line.number);
       if (fencedCodeLineClass) {
         ranges.push(
@@ -446,9 +467,16 @@ function buildInlinePreviewDecorations(
         );
       }
       decorateHeadingLine(line.text, line.from, ranges);
+      decorateFootnotes(line.text, line.from, ranges);
       decorateTaskCheckboxes(line.text, line.from, ranges, options);
-      if (!isActiveLine && !fencedCodeLineClass) {
-        decorateHiddenFormatting(line.text, line.from, ranges);
+      const inlineMathRanges = !fencedCodeLineClass
+        ? decorateInlineMath(line.text, line.from, ranges, options, view.state)
+        : [];
+      if (!fencedCodeLineClass) {
+        decorateHiddenFormatting(line.text, line.from, ranges, {
+          excludedRanges: inlineMathRanges,
+          state: view.state,
+        });
       }
 
       if (line.to >= visibleRange.to || line.number >= view.state.doc.lines) {
@@ -463,7 +491,8 @@ function buildInlinePreviewDecorations(
 
 function getFencedCodeLineClasses(state: EditorState): Map<number, string> {
   const classes = new Map<number, string>();
-  const tree = ensureSyntaxTree(state, state.doc.length, 100) ?? syntaxTree(state);
+  const tree =
+    ensureSyntaxTree(state, state.doc.length, 100) ?? syntaxTree(state);
 
   tree.iterate({
     from: 0,
@@ -575,6 +604,7 @@ class BlockPreviewWidget extends WidgetType {
         linkResolver: this.config.options.linkResolver,
         assetResolver: this.config.options.assetResolver,
         frontmatterOpen: this.config.options.frontmatterOpen ?? true,
+        frontmatterConfig: this.config.options.frontmatterConfig as any,
         onChange: (replacement: string, from: number, to: number) => {
           const absoluteFrom = this.config.from + from;
           const absoluteTo = this.config.from + to;
@@ -599,7 +629,7 @@ class BlockPreviewWidget extends WidgetType {
         },
       },
     });
-    blockWidgetMounts.set(container, component as Record<string, unknown>);
+    previewWidgetMounts.set(container, component as Record<string, unknown>);
 
     container.addEventListener("mousedown", (event) => {
       if (!shouldActivateEditablePreview(event)) {
@@ -647,10 +677,77 @@ class BlockPreviewWidget extends WidgetType {
   }
 
   override destroy(dom: HTMLElement): void {
-    const component = blockWidgetMounts.get(dom);
+    const component = previewWidgetMounts.get(dom);
     if (component) {
       void unmount(component);
-      blockWidgetMounts.delete(dom);
+      previewWidgetMounts.delete(dom);
+    }
+  }
+
+  override ignoreEvent(): boolean {
+    return true;
+  }
+}
+
+class InlineMathWidget extends WidgetType {
+  constructor(
+    private readonly config: {
+      from: number;
+      to: number;
+      source: string;
+      options: MiraRichEditorOptions;
+    },
+  ) {
+    super();
+  }
+
+  override eq(other: InlineMathWidget): boolean {
+    return (
+      this.config.from === other.config.from &&
+      this.config.to === other.config.to &&
+      this.config.source === other.config.source
+    );
+  }
+
+  override toDOM(view: EditorView): HTMLElement {
+    const container = document.createElement("span");
+    container.className = "mira-inline-math-widget cm-inline-math";
+    container.dataset.math = "inline";
+
+    const component = mount(MarkdownPreview, {
+      target: container,
+      props: {
+        value: this.config.source,
+        inline: true,
+        sourcePath: this.config.options.sourcePath,
+        extensions: this.config.options.extensions ?? [],
+        linkResolver: this.config.options.linkResolver,
+        assetResolver: this.config.options.assetResolver,
+      },
+    });
+    previewWidgetMounts.set(container, component as Record<string, unknown>);
+
+    container.addEventListener("mousedown", (event) => {
+      if (!shouldActivateEditablePreview(event)) {
+        return;
+      }
+
+      event.preventDefault();
+      view.dispatch({
+        selection: { anchor: this.config.from, head: this.config.to },
+        scrollIntoView: true,
+      });
+      view.focus();
+    });
+
+    return container;
+  }
+
+  override destroy(dom: HTMLElement): void {
+    const component = previewWidgetMounts.get(dom);
+    if (component) {
+      void unmount(component);
+      previewWidgetMounts.delete(dom);
     }
   }
 
@@ -663,6 +760,7 @@ class TaskCheckboxWidget extends WidgetType {
   constructor(
     private readonly config: {
       from: number;
+      value: string;
       checked: boolean;
       options: MiraRichEditorOptions;
     },
@@ -673,14 +771,20 @@ class TaskCheckboxWidget extends WidgetType {
   override eq(other: TaskCheckboxWidget): boolean {
     return (
       this.config.from === other.config.from &&
+      this.config.value === other.config.value &&
       this.config.checked === other.config.checked
     );
   }
 
   override toDOM(view: EditorView): HTMLElement {
+    const label = document.createElement("label");
+    label.className = "task-list-label";
+    label.dataset.task = this.config.value;
+
     const input = document.createElement("input");
     input.type = "checkbox";
-    input.className = "mira-task-checkbox cm-task-checkbox";
+    input.className = "task-list-item-checkbox mira-task-checkbox cm-task-checkbox";
+    input.dataset.task = this.config.value;
     input.checked = this.config.checked;
     input.setAttribute("aria-label", "Toggle task");
     input.addEventListener("change", () => {
@@ -693,7 +797,8 @@ class TaskCheckboxWidget extends WidgetType {
         },
       });
     });
-    return input;
+    label.append(input);
+    return label;
   }
 
   override ignoreEvent(): boolean {
@@ -850,17 +955,18 @@ function decorateTaskCheckboxes(
   ranges: Range<Decoration>[],
   options: MiraRichEditorOptions,
 ): void {
-  const match = text.match(/^(\s*)((?:[-*+]|\d+[.)])\s+)\[([ xX])]\s/);
+  const match = text.match(/^(\s*)((?:[-*+]|\d+[.)])\s+)\[([^\]\r\n])\]\s/u);
   if (match && match[1] !== undefined && match[2] !== undefined) {
     const markerStart = lineStart + match[1].length;
     const checkboxStart = markerStart + match[2].length;
     const checkboxEnd = checkboxStart + 3;
     const taskValue = match[3] ?? " ";
+    const normalizedTaskValue = taskValue.toLowerCase();
     ranges.push(
       Decoration.line({
         class: "cm-task-line HyperMD-task-line",
         attributes: {
-          "data-task": taskValue.trim().toLowerCase(),
+          "data-task": normalizedTaskValue,
         },
       }).range(lineStart),
     );
@@ -868,12 +974,185 @@ function decorateTaskCheckboxes(
       Decoration.replace({
         widget: new TaskCheckboxWidget({
           from: checkboxStart,
-          checked: taskValue.toLowerCase() === "x",
+          value: normalizedTaskValue,
+          checked: taskValue.trim().length > 0,
           options,
         }),
       }).range(markerStart, checkboxEnd),
     );
   }
+}
+
+function decorateFootnotes(
+  text: string,
+  lineStart: number,
+  ranges: Range<Decoration>[],
+): void {
+  const definition = text.match(/^\[\^([^\]\r\n]+)\]:/u);
+  if (definition) {
+    ranges.push(
+      Decoration.line({
+        class: "cm-footnote cm-footnote-definition",
+      }).range(lineStart),
+    );
+  }
+
+  for (const match of text.matchAll(/\[\^([^\]\r\n]+)\]/gu)) {
+    const from = lineStart + (match.index ?? 0);
+    ranges.push(
+      Decoration.mark({
+        class: "cm-footnote cm-footnote-ref",
+      }).range(from, from + match[0].length),
+    );
+  }
+}
+
+function decorateInlineMath(
+  text: string,
+  lineStart: number,
+  ranges: Range<Decoration>[],
+  options: MiraRichEditorOptions,
+  state: EditorState,
+): RangeBoundary[] {
+  const mathRanges = findInlineMathRanges(text);
+  const absoluteRanges: RangeBoundary[] = [];
+
+  for (const range of mathRanges) {
+    const from = lineStart + range.from;
+    const to = lineStart + range.to;
+    absoluteRanges.push({ from, to });
+    const widget = new InlineMathWidget({
+      from,
+      to,
+      source: range.source,
+      options,
+    });
+    if (rangeIntersectsSelection(state, from, to)) {
+      ranges.push(
+        Decoration.widget({
+          side: 1,
+          widget,
+        }).range(to),
+      );
+    } else {
+      ranges.push(
+        Decoration.replace({
+          widget,
+        }).range(from, to),
+      );
+    }
+  }
+
+  return absoluteRanges;
+}
+
+export function findInlineMathRanges(text: string): InlineMathRange[] {
+  const ranges: InlineMathRange[] = [];
+  const codeRanges = findInlineCodeRanges(text);
+  let index = 0;
+
+  while (index < text.length) {
+    if (
+      text[index] !== "$" ||
+      text[index - 1] === "$" ||
+      text[index + 1] === "$" ||
+      isEscaped(text, index) ||
+      isPositionInsideRanges(index, codeRanges) ||
+      isWhitespace(text[index + 1] ?? "")
+    ) {
+      index += 1;
+      continue;
+    }
+
+    let end = index + 1;
+    let found = false;
+    while (end < text.length) {
+      if (
+        text[end] === "$" &&
+        text[end - 1] !== "$" &&
+        text[end + 1] !== "$" &&
+        !isEscaped(text, end) &&
+        !isPositionInsideRanges(end, codeRanges) &&
+        !isWhitespace(text[end - 1] ?? "") &&
+        !/\d/u.test(text[end + 1] ?? "")
+      ) {
+        const source = text.slice(index, end + 1);
+        if (source.slice(1, -1).trim()) {
+          ranges.push({
+            from: index,
+            to: end + 1,
+            source,
+          });
+        }
+        index = end + 1;
+        found = true;
+        break;
+      }
+
+      end += 1;
+    }
+
+    if (!found) {
+      index += 1;
+    }
+  }
+
+  return ranges;
+}
+
+function findInlineCodeRanges(text: string): RangeBoundary[] {
+  const ranges: RangeBoundary[] = [];
+  let index = 0;
+
+  while (index < text.length) {
+    if (text[index] !== "`" || isEscaped(text, index)) {
+      index += 1;
+      continue;
+    }
+
+    const tickCount = countRun(text, index, "`");
+    const closingIndex = text.indexOf("`".repeat(tickCount), index + tickCount);
+    if (closingIndex === -1) {
+      break;
+    }
+
+    ranges.push({
+      from: index,
+      to: closingIndex + tickCount,
+    });
+    index = closingIndex + tickCount;
+  }
+
+  return ranges;
+}
+
+function countRun(text: string, start: number, character: string): number {
+  let count = 0;
+  while (text[start + count] === character) {
+    count += 1;
+  }
+  return count;
+}
+
+function isPositionInsideRanges(
+  position: number,
+  ranges: RangeBoundary[],
+): boolean {
+  return ranges.some((range) => position >= range.from && position < range.to);
+}
+
+function isEscaped(text: string, index: number): boolean {
+  let backslashes = 0;
+  let cursor = index - 1;
+  while (cursor >= 0 && text[cursor] === "\\") {
+    backslashes += 1;
+    cursor -= 1;
+  }
+  return backslashes % 2 === 1;
+}
+
+function isWhitespace(character: string): boolean {
+  return character.length > 0 && /\s/u.test(character);
 }
 
 const headingLineDecorations = Array.from({ length: 6 }, (_, index) =>
@@ -953,11 +1232,27 @@ function decorateHiddenFormatting(
   text: string,
   lineStart: number,
   ranges: Range<Decoration>[],
+  options: {
+    excludedRanges?: RangeBoundary[];
+    state?: EditorState;
+  } = {},
 ): void {
-  addRegexMarks(text, lineStart, ranges, /(\*\*|__|\*|_|~~|`)/g);
-  addRegexMarks(text, lineStart, ranges, /(!?\[|\]\(|\)|\[\[|]])/g);
-  addRegexMarks(text, lineStart, ranges, /^(#{1,6})(?=\s)/g);
-  addRegexMarks(text, lineStart, ranges, /^(\s*>+\s?)/g);
+  addRegexMarks(
+    text,
+    lineStart,
+    ranges,
+    /(\*\*|__|\*|_|~~|`)/g,
+    options,
+  );
+  addRegexMarks(
+    text,
+    lineStart,
+    ranges,
+    /(!?\[|\]\(|\)|\[\[|\]\])/g,
+    options,
+  );
+  addRegexMarks(text, lineStart, ranges, /^(#{1,6})(?=\s)/g, options);
+  addRegexMarks(text, lineStart, ranges, /^(\s*>+\s?)/g, options);
 }
 
 function addRegexMarks(
@@ -965,13 +1260,26 @@ function addRegexMarks(
   lineStart: number,
   ranges: Range<Decoration>[],
   regexp: RegExp,
+  options: {
+    excludedRanges?: RangeBoundary[];
+    state?: EditorState;
+  } = {},
 ): void {
   for (const match of text.matchAll(regexp)) {
     const token = match[1] ?? match[0];
     const start = lineStart + (match.index ?? 0);
     const tokenStart = match[0].indexOf(token);
     const from = start + Math.max(0, tokenStart);
-    ranges.push(hiddenFormattingMark.range(from, from + token.length));
+    const to = from + token.length;
+    if (
+      options.excludedRanges?.some((range) =>
+        rangesOverlap(range, { from, to }),
+      ) ||
+      (options.state && rangeIntersectsSelection(options.state, from, to))
+    ) {
+      continue;
+    }
+    ranges.push(hiddenFormattingMark.range(from, to));
   }
 }
 
@@ -1108,39 +1416,6 @@ const miraRichEditorTheme = EditorView.theme({
     maxWidth: "100%",
     position: "relative",
   },
-  ".mira-table-widget-shell .cm-table-widget": {
-    height: "1px !important",
-    maxWidth: "100%",
-    width: "fit-content !important",
-  },
-  ".mira-table-widget-shell .cm-table-widget tr": {
-    height: "auto",
-  },
-  ".mira-table-widget-shell .cm-table-widget tr, .mira-table-widget-shell .cm-table-widget th, .mira-table-widget-shell .cm-table-widget td":
-    {
-      height: "2.5rem !important",
-    },
-  ".mira-table-widget-shell .cm-table-widget th, .mira-table-widget-shell .cm-table-widget td":
-    {
-      padding: "0 !important",
-    },
-  ".mira-table-widget-shell .cm-table-widget .table-cell-wrapper, .mira-table-widget-shell .cm-table-widget .table-cell-wrapper > button":
-    {
-      height: "auto !important",
-      minHeight: "2.5rem",
-    },
-  ".mira-table-widget-shell .cm-editor.mod-inline, .mira-table-widget-shell .cm-editor.mod-inline .cm-scroller, .mira-table-widget-shell .cm-editor.mod-inline .cm-content":
-    {
-      background: "transparent !important",
-      height: "auto !important",
-      minHeight: "0 !important",
-    },
-  ".mira-table-widget-shell .cm-editor.mod-inline .cm-content": {
-    padding: "0 !important",
-  },
-  ".mira-table-widget-shell .cm-editor.mod-inline .cm-content p": {
-    margin: "0 !important",
-  },
   ".mira-table-widget__source-toggle": {
     alignItems: "center",
     background: "var(--mira-popover)",
@@ -1215,11 +1490,13 @@ const miraRichEditorTheme = EditorView.theme({
     fontSize: "var(--mira-h4-size, 1.266em)",
   },
   ".cm-header-5": {
-    "--cm-block-line-height": "var(--mira-h5-line-height, var(--mira-line-height))",
+    "--cm-block-line-height":
+      "var(--mira-h5-line-height, var(--mira-line-height))",
     fontSize: "var(--mira-h5-size, 1.125em)",
   },
   ".cm-header-6": {
-    "--cm-block-line-height": "var(--mira-h6-line-height, var(--mira-line-height))",
+    "--cm-block-line-height":
+      "var(--mira-h6-line-height, var(--mira-line-height))",
     fontSize: "var(--mira-h6-size, 1em)",
   },
   ".cm-gutters .cm-gutterElement.cm-gutterHeader": {
@@ -1239,10 +1516,12 @@ const miraRichEditorTheme = EditorView.theme({
     "--cm-block-line-height": "var(--mira-h4-line-height, 1.4)",
   },
   ".cm-gutters .cm-gutterElement.cm-gutterHeader-5": {
-    "--cm-block-line-height": "var(--mira-h5-line-height, var(--mira-line-height))",
+    "--cm-block-line-height":
+      "var(--mira-h5-line-height, var(--mira-line-height))",
   },
   ".cm-gutters .cm-gutterElement.cm-gutterHeader-6": {
-    "--cm-block-line-height": "var(--mira-h6-line-height, var(--mira-line-height))",
+    "--cm-block-line-height":
+      "var(--mira-h6-line-height, var(--mira-line-height))",
   },
   ".mira-task-checkbox": {
     appearance: "none",
@@ -1258,7 +1537,8 @@ const miraRichEditorTheme = EditorView.theme({
     width: "var(--mira-checkbox-size, 1.15em)",
   },
   ".mira-task-checkbox:hover, .mira-task-checkbox:focus": {
-    borderColor: "var(--mira-checkbox-border-hover, var(--mira-muted-foreground))",
+    borderColor:
+      "var(--mira-checkbox-border-hover, var(--mira-muted-foreground))",
     outline: "0",
   },
   ".mira-task-checkbox:focus-visible": {
@@ -1269,7 +1549,8 @@ const miraRichEditorTheme = EditorView.theme({
     borderColor: "var(--mira-checkbox-color, var(--mira-accent))",
   },
   ".mira-task-checkbox:checked::after": {
-    backgroundColor: "var(--mira-checkbox-marker, var(--mira-accent-foreground))",
+    backgroundColor:
+      "var(--mira-checkbox-marker, var(--mira-accent-foreground))",
     content: "''",
     display: "block",
     height: "100%",

@@ -22,7 +22,9 @@ async function gotoDemo(page: Page) {
     page.locator(".demo-toolbar").getByRole("button", { name: "View mode" }),
   ).toBeVisible();
   await expect(
-    page.locator(".demo-toolbar").getByRole("button", { name: "Demo settings" }),
+    page
+      .locator(".demo-toolbar")
+      .getByRole("button", { name: "Demo settings" }),
   ).toBeVisible();
   await expect(
     page.locator(".demo-toolbar").getByRole("button", { name: "Split" }),
@@ -63,7 +65,10 @@ async function setMode(page: Page, name: keyof typeof modeValues) {
   if (name === "Split") {
     await toolbar.getByRole("button", { name: "Split", exact: true }).click();
   } else if (name === "Live") {
-    const editButton = toolbar.getByRole("button", { name: "Edit", exact: true });
+    const editButton = toolbar.getByRole("button", {
+      name: "Edit",
+      exact: true,
+    });
     if ((await editButton.count()) > 0) {
       await editButton.click();
     } else {
@@ -128,6 +133,17 @@ test("live preview renders widgets and editable frontmatter updates markdown", a
   await expect
     .poll(() =>
       frontmatterWidget.evaluate((element) => {
+        const widget = element.getBoundingClientRect();
+        const frontmatter = element
+          .querySelector<HTMLElement>(".mira-frontmatter")
+          ?.getBoundingClientRect();
+        return frontmatter ? frontmatter.width / widget.width : 0;
+      }),
+    )
+    .toBeGreaterThan(0.9);
+  await expect
+    .poll(() =>
+      frontmatterWidget.evaluate((element) => {
         const trigger = element.querySelector<HTMLElement>(
           ".md-frontmatter__trigger",
         );
@@ -137,8 +153,10 @@ test("live preview renders widgets and editable frontmatter updates markdown", a
         if (!trigger || !content) {
           return Number.POSITIVE_INFINITY;
         }
-        return content.getBoundingClientRect().top -
-          trigger.getBoundingClientRect().bottom;
+        return (
+          content.getBoundingClientRect().top -
+          trigger.getBoundingClientRect().bottom
+        );
       }),
     )
     .toBeLessThan(1);
@@ -154,8 +172,10 @@ test("live preview renders widgets and editable frontmatter updates markdown", a
         if (!content || !heading) {
           return Number.POSITIVE_INFINITY;
         }
-        return heading.getBoundingClientRect().top -
-          content.getBoundingClientRect().bottom;
+        return (
+          heading.getBoundingClientRect().top -
+          content.getBoundingClientRect().bottom
+        );
       }),
     )
     .toBeLessThan(4);
@@ -193,17 +213,17 @@ test("clicking a live-preview block restores editable source", async ({
 }) => {
   await gotoDemo(page);
   await setMode(page, "Live");
-  await scrollEditor(page, 900);
 
   const fencedWidget = page
     .locator(".mira-rich-widget--fencedcode")
     .filter({ has: page.locator(".mermaid") })
     .first();
+  await scrollEditor(page, 1500);
   await expect(fencedWidget).toBeVisible();
   await fencedWidget.hover();
   await fencedWidget.locator(".mira-rich-widget__source-toggle").click();
 
-  await expect(editorContent(page)).toContainText("```mermaid");
+  await expect(editorContent(page)).toContainText("~~~mermaid");
   await expect(editorContent(page)).toContainText("flowchart LR");
 });
 
@@ -241,23 +261,33 @@ test("task lists and live heading gutters match Lapis styling", async ({
   await gotoDemo(page);
 
   await setMode(page, "Preview");
-  const previewTask = page.locator(".mira-markdown-preview li.task-list-item").first();
+  const previewTask = page
+    .locator(".mira-markdown-preview li.task-list-item")
+    .first();
   await expect(previewTask).toBeVisible();
   await expect(previewTask.locator(".task-list-item-checkbox")).toBeVisible();
   await expect
     .poll(() =>
-      previewTask.evaluate((element) => getComputedStyle(element).listStyleType),
+      previewTask.evaluate(
+        (element) => getComputedStyle(element).listStyleType,
+      ),
     )
     .toBe("none");
 
   await setMode(page, "Live");
   await scrollEditor(page, 0);
   await expect(page.locator(".cm-line.cm-header-1")).toBeVisible();
+  await expect(
+    page.locator(".cm-content .mira-inline-math-widget .katex").first(),
+  ).toBeVisible();
   await expect
     .poll(async () =>
       page.evaluate(() => {
-        const header = document.querySelector<HTMLElement>(".cm-line.cm-header-1");
-        const gutter = document.querySelector<HTMLElement>(".cm-gutterHeader-1");
+        const header = document.querySelector<HTMLElement>(
+          ".cm-line.cm-header-1",
+        );
+        const gutter =
+          document.querySelector<HTMLElement>(".cm-gutterHeader-1");
         if (!header || !gutter) {
           return false;
         }
@@ -286,7 +316,7 @@ test("task lists and live heading gutters match Lapis styling", async ({
   expect(headingMetrics.gutterLineHeight).toBe(headingMetrics.headerLineHeight);
   expect(headingMetrics.topDelta).toBeLessThan(1);
 
-  await scrollEditor(page, 900);
+  await scrollEditor(page, 650);
   const liveTask = page.locator(".HyperMD-task-line").first();
   await expect(liveTask).toBeVisible();
   await expect(liveTask.locator(".mira-task-checkbox")).toBeVisible();
@@ -300,6 +330,40 @@ test("task lists and live heading gutters match Lapis styling", async ({
       }),
     )
     .toBe("none");
+});
+
+test("preview mode showcases the supported Markdown feature set", async ({
+  page,
+}) => {
+  await gotoDemo(page);
+  await setMode(page, "Preview");
+
+  const preview = page.locator(".mira-markdown-preview");
+  await expect(preview.locator("del").first()).toContainText("strikethrough");
+  await expect(
+    preview.locator("code").filter({ hasText: "inline code" }),
+  ).toBeVisible();
+  await expect(
+    preview.locator("a[data-mira-internal-link]").first(),
+  ).toBeVisible();
+  await expect(preview.locator(".mira-embed")).toContainText(
+    "Architecture diagram embed",
+  );
+  await expect(
+    preview.locator(".tag").filter({ hasText: "#mira/editor" }),
+  ).toBeVisible();
+  await expect(preview.locator(".katex").first()).toBeVisible();
+  await expect(
+    preview.locator('img[alt="Mira Markdown demo asset"]'),
+  ).toBeVisible();
+  await expect(preview.locator("mark")).toContainText("Raw HTML is preserved");
+  await expect(preview.locator("kbd")).toContainText("keyboard");
+  await expect(
+    preview.locator('directive[data-directive="mira"]'),
+  ).toContainText("Directive syntax is parsed");
+  await expect(preview).toContainText(
+    "Footnotes come from the shared GFM Markdown pipeline.",
+  );
 });
 
 test("tables and admonition callouts render in preview and live-preview", async ({
@@ -324,25 +388,88 @@ test("tables and admonition callouts render in preview and live-preview", async 
   );
 
   await setMode(page, "Live");
-  await scrollEditor(page, 300);
+  await scrollEditor(page, 1050);
   const liveTable = page
     .locator(".mira-rich-widget--table .cm-table-widget")
     .first();
   await expect(liveTable).toBeVisible();
   await expect
     .poll(() =>
-      liveTable
-        .locator(".cm-editor.mod-inline")
-        .first()
-        .evaluate((element) => getComputedStyle(element).backgroundColor),
+      liveTable.evaluate((element) => {
+        const rect = element.getBoundingClientRect();
+        return {
+          display: getComputedStyle(element).display,
+          height: rect.height,
+          width: rect.width,
+        };
+      }),
     )
-    .toBe("rgba(0, 0, 0, 0)");
+    .toEqual({
+      display: "table",
+      height: expect.any(Number),
+      width: expect.any(Number),
+    });
+  const tableMetrics = await liveTable.evaluate((element) => {
+    const dataCell = element.querySelector<HTMLElement>(
+      "tbody td:not(.markdown-table-chrome)",
+    );
+    const inlineEditor = dataCell?.querySelector<HTMLElement>(
+      ".cm-editor.mod-inline",
+    );
+    const cellButton = dataCell?.querySelector<HTMLElement>(
+      ".table-cell-wrapper > button",
+    );
+    const bodyRow = element.querySelector<HTMLElement>("tbody tr");
+    const edgeButton = element.querySelector<HTMLElement>(
+      '[data-markdown-table-chrome="add-col"] button',
+    );
+    const edgeIcon = edgeButton?.querySelector<SVGElement>("svg");
+    const rowHandle = element.querySelector<HTMLElement>(
+      '[data-markdown-table-drag-handle="row"]',
+    );
+    const rowHandleIcon = rowHandle?.querySelector<SVGElement>("svg");
+    const rect = (node?: Element | null) => {
+      const box = node?.getBoundingClientRect();
+      return { height: box?.height ?? 0, width: box?.width ?? 0 };
+    };
+
+    return {
+      bodyRowBorderBottom: bodyRow
+        ? getComputedStyle(bodyRow).borderBottomWidth
+        : "",
+      cellButtonBackground: cellButton
+        ? getComputedStyle(cellButton).backgroundColor
+        : "",
+      dataCell: rect(dataCell),
+      edgeButton: rect(edgeButton),
+      edgeButtonBorderLeft: edgeButton
+        ? getComputedStyle(edgeButton).borderLeftWidth
+        : "",
+      edgeIcon: rect(edgeIcon),
+      inlineEditor: rect(inlineEditor),
+      rowHandle: rect(rowHandle),
+      rowHandleBorderLeft: rowHandle
+        ? getComputedStyle(rowHandle).borderLeftWidth
+        : "",
+      rowHandleIcon: rect(rowHandleIcon),
+    };
+  });
+  expect(tableMetrics.dataCell.height).toBeGreaterThan(37);
+  expect(tableMetrics.dataCell.height).toBeLessThan(39);
+  expect(tableMetrics.inlineEditor.height).toBeGreaterThan(21);
+  expect(tableMetrics.inlineEditor.height).toBeLessThan(22);
+  expect(tableMetrics.cellButtonBackground).toBe("rgba(0, 0, 0, 0)");
+  expect(tableMetrics.bodyRowBorderBottom).toBe("0px");
+  expect(tableMetrics.edgeButtonBorderLeft).toBe("0px");
+  expect(tableMetrics.edgeButton.width).toBeCloseTo(20, 1);
+  expect(tableMetrics.edgeIcon.width).toBeCloseTo(16, 1);
+  expect(tableMetrics.rowHandleBorderLeft).toBe("0px");
+  expect(tableMetrics.rowHandle.width).toBeCloseTo(8, 1);
+  expect(tableMetrics.rowHandleIcon.width).toBeCloseTo(16, 1);
   await liveTable.hover();
   await expect(
     page
-      .locator(
-        ".mira-rich-widget--table .markdown-widget-select-control",
-      )
+      .locator(".mira-rich-widget--table .markdown-widget-select-control")
       .first(),
   ).toBeVisible();
   await expect(
@@ -376,9 +503,9 @@ test("tables and admonition callouts render in preview and live-preview", async 
   await expect(
     rowMenu.locator('[data-slot="dropdown-menu-item"]').first(),
   ).toBeVisible();
-  await expect(
-    rowMenu.locator('[data-slot="dropdown-menu-item"]'),
-  ).toHaveCount(3);
+  await expect(rowMenu.locator('[data-slot="dropdown-menu-item"]')).toHaveCount(
+    3,
+  );
   await rowActions.click();
   await page.locator(".mira-rich-widget--table th").nth(1).hover();
   await expect(
@@ -411,6 +538,7 @@ test("tables and admonition callouts render in preview and live-preview", async 
   const liveCallout = page
     .locator(".mira-rich-widget--blockquote .callout")
     .first();
+  await scrollEditor(page, 320);
   await expect(liveCallout).toHaveAttribute("data-callout", "note");
   await expect(liveCallout.locator(".callout-content")).toContainText(
     "The editor, preview renderer",
@@ -423,14 +551,16 @@ test("Mermaid renders SVG in preview and live-preview modes", async ({
   await gotoDemo(page);
 
   await setMode(page, "Preview");
-  const previewSvg = page.locator(".mira-markdown-preview .mermaid > .mermaid svg").first();
+  const previewSvg = page
+    .locator(".mira-markdown-preview .mermaid > .mermaid svg")
+    .first();
   await expect(previewSvg).toBeVisible();
   const previewBox = await previewSvg.boundingBox();
   expect(previewBox?.width ?? 0).toBeGreaterThan(20);
   expect(previewBox?.height ?? 0).toBeGreaterThan(20);
 
   await setMode(page, "Live");
-  await scrollEditor(page, 900);
+  await scrollEditor(page, 1500);
   const liveSvg = page
     .locator(".mira-rich-widget--fencedcode .mermaid > .mermaid svg")
     .first();

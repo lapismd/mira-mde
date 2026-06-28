@@ -1,0 +1,52 @@
+---
+title: Extensions API
+description: Build portable editor and preview extensions for Mira MDE.
+---
+
+Mira extensions let packages add CodeMirror behavior, preview rendering, toolbar behavior, and resolvers without tying the editor to a workspace app.
+
+## Extension Shape
+
+```ts
+import type { MiraExtension } from "@mira-mde/extensions";
+
+export function myExtension(): MiraExtension {
+  return {
+    name: "my-extension",
+    codemirror: [],
+    preview: {
+      rehypePlugins: []
+    }
+  };
+}
+```
+
+## Resolvers
+
+Resolvers keep app-specific behavior outside the Markdown components.
+
+```ts
+const linkResolver = {
+  resolveLink(href, context) {
+    return {
+      href,
+      title: context.sourcePath
+    };
+  }
+};
+```
+
+```svelte
+<MiraDefaultMde {linkResolver} {assetResolver} sourcePath="notes/demo.md" />
+```
+
+## Public Entry Points
+
+| Entry point | Purpose |
+| :--- | :--- |
+| `MiraMde` | Svelte editor component for custom shells. |
+| `createRichEditorExtensions` | CodeMirror rich editor/live-preview behavior. |
+| `createTableExtensions` | Editable table and grid-table behavior. |
+| `mermaidExtension` | Mermaid rendering and live-widget support. |
+| `MarkdownPreview` | Rendered Markdown surface. |
+| `MiraDefaultMde` | Default editor and toolbar package. |

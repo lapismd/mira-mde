@@ -1,0 +1,118 @@
+@import "@mira-mde/default-ui/styles.css";
+
+:root {
+  --docs-live-editor-border: color-mix(in srgb, var(--sl-color-gray-5), transparent 15%);
+  --docs-live-editor-header: color-mix(in srgb, var(--sl-color-gray-6), transparent 65%);
+}
+
+.sl-markdown-content .docs-live-editor {
+  margin-block: 1.25rem 1.75rem;
+}
+
+.docs-live-editor {
+  background: var(--mira-background);
+  border: 1px solid var(--docs-live-editor-border);
+  border-radius: 0.5rem;
+  color: var(--mira-foreground);
+  overflow: hidden;
+}
+
+.docs-live-editor__header {
+  align-items: center;
+  background: var(--docs-live-editor-header);
+  border-bottom: 1px solid var(--docs-live-editor-border);
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+  padding: 0.75rem 0.9rem;
+}
+
+.docs-live-editor__title {
+  color: var(--mira-foreground);
+  font-size: 0.95rem;
+  font-weight: 650;
+  line-height: 1.25;
+  margin: 0;
+}
+
+.docs-live-editor__description {
+  color: var(--mira-muted-foreground);
+  font-size: 0.82rem;
+  line-height: 1.35;
+  margin: 0.2rem 0 0;
+}
+
+.docs-live-editor__reset {
+  align-items: center;
+  background: var(--mira-background);
+  border: 1px solid var(--mira-border);
+  border-radius: 0.35rem;
+  color: var(--mira-foreground);
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 550;
+  gap: 0.35rem;
+  min-height: 2rem;
+  padding: 0.25rem 0.55rem;
+  white-space: nowrap;
+}
+
+.docs-live-editor__reset:hover {
+  background: var(--mira-accent);
+}
+
+.docs-live-editor__reset-icon {
+  height: 0.9rem;
+  width: 0.9rem;
+}
+
+.docs-live-editor__surface {
+  border: 0;
+  border-radius: 0;
+  height: var(--docs-live-editor-height, 34rem);
+  min-height: min(28rem, var(--docs-live-editor-height, 34rem));
+}
+
+.docs-live-editor__toggles {
+  align-items: center;
+  border-bottom: 1px solid var(--docs-live-editor-border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  padding: 0.55rem 0.9rem;
+}
+
+.docs-live-editor__toggle {
+  align-items: center;
+  color: var(--mira-muted-foreground);
+  display: inline-flex;
+  font-size: 0.82rem;
+  gap: 0.35rem;
+  line-height: 1.2;
+}
+
+.docs-live-editor__toggle input {
+  accent-color: var(--mira-primary);
+}
+
+.docs-api-table {
+  font-size: 0.92rem;
+}
+
+.docs-api-table code {
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  .docs-live-editor__header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+
+  .docs-live-editor__surface {
+    height: min(80vh, var(--docs-live-editor-height, 34rem));
+  }
+}

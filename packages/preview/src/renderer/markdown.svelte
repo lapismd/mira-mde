@@ -7,6 +7,7 @@
   import type { Pluggable } from "unified";
   import type { Options as RemarkRehypeOptions } from "remark-rehype";
   import type { MarkdownChangeHandler, MarkdownPostProcess } from "./types";
+  import type { FrontmatterConfig } from "../components/frontmatter-utils";
 
   export type MarkdownProps = {
     value: string;
@@ -21,6 +22,8 @@
     onChange?: MarkdownChangeHandler;
     onFrontmatterChange?: (nextYaml: string, nextValue: string) => void;
     frontmatterOpen?: boolean;
+    frontmatterConfig?: FrontmatterConfig;
+    dialog?: boolean;
   };
 </script>
 
@@ -46,6 +49,8 @@
     onChange,
     onFrontmatterChange,
     frontmatterOpen = true,
+    frontmatterConfig,
+    dialog = false,
   }: MarkdownProps = $props();
 
   let parser = $derived<Parser>(
@@ -63,6 +68,8 @@
     onChange: undefined,
     onFrontmatterChange: undefined,
     frontmatterOpen: true,
+    frontmatterConfig: undefined,
+    dialog: false,
   });
   let context = setMarkdownContext(contextState);
 
@@ -76,6 +83,8 @@
     context.onChange = onChange;
     context.onFrontmatterChange = onFrontmatterChange;
     context.frontmatterOpen = frontmatterOpen;
+    context.frontmatterConfig = frontmatterConfig;
+    context.dialog = dialog;
   });
 </script>
 

@@ -1,16 +1,24 @@
 import { describe, expect, it } from "vitest";
+import remarkGridTables from "@adobe/remark-gridtables";
+import {
+  TYPE_TABLE,
+  mdast2hastGridTablesHandler,
+} from "@adobe/mdast-util-gridtables";
 import remarkFrontmatter from "remark-frontmatter";
 import type { Element, Root } from "hast";
 import { remarkWikiLinks } from "./remark";
 import {
+  coerceFrontmatterValue,
   createFrontmatterReplacement,
   frontmatterProperties,
   parseFrontmatterYaml,
+  resolveFrontmatterWidget,
   serializeFrontmatterRecord,
 } from "./components/frontmatter-utils";
 import { createParser } from "./renderer/utils";
 import {
   remarkCallouts,
+  remarkCustomChecklists,
   remarkFrontmatterToHast,
   remarkPositionsToData,
 } from "./remark";
@@ -72,6 +80,51 @@ describe("frontmatter utilities", () => {
     ).toBe("checkbox");
   });
 
+  it("applies configured frontmatter property types and widgets", () => {
+    const properties = frontmatterProperties(
+      {
+        status: "draft",
+        title: "Demo",
+      },
+      {
+        types: {
+          status: {
+            type: "workflow-state",
+            label: "Workflow state",
+            icon: "lucide-workflow",
+            fallbackKind: "text",
+            defaultValue: "draft",
+            normalize: (value: unknown) => String(value).toUpperCase(),
+          },
+        },
+        widgets: [
+          {
+            type: "workflow-state",
+            label: "Workflow state",
+            icon: "lucide-workflow",
+            fallbackKind: "text",
+            render: () => undefined,
+          },
+        ],
+      },
+    );
+    const status = properties.find((property) => property.key === "status");
+
+    expect(status?.type).toBe("workflow-state");
+    expect(status?.icon).toBe("lucide-workflow");
+    expect(resolveFrontmatterWidget({ widgets: [] }, "missing")).toBeNull();
+    expect(
+      coerceFrontmatterValue("draft", "workflow-state", {
+        widgets: [
+          {
+            type: "workflow-state",
+            normalize: (value: unknown) => String(value).toUpperCase(),
+          },
+        ],
+      }),
+    ).toBe("DRAFT");
+  });
+
   it("renders frontmatter as a component with source offsets", () => {
     const parser = createParser([
       remarkFrontmatter,
@@ -123,6 +176,64 @@ describe("callout rendering", () => {
   });
 });
 
+describe("custom checklist rendering", () => {
+  it("turns custom task markers into GFM task items with data-task", () => {
+    const parser = createParser([remarkCustomChecklists]);
+    const ast = parser("- [/] Custom task marker") as Root;
+    const item = findElement(ast, "li");
+
+    expect(item?.tagName).toBe("li");
+    expect(item?.properties?.["data-task"]).toBe("/");
+    expect(JSON.stringify(item)).not.toContain("[/]");
+  });
+
+  it("preserves data-task for standard task items", () => {
+    const parser = createParser([remarkCustomChecklists]);
+    const ast = parser("- [x] Done") as Root;
+    const item = findElement(ast, "li");
+
+    expect(item?.properties?.["data-task"]).toBe("x");
+  });
+
+  it("supports Lapis custom task marker characters", () => {
+    const parser = createParser([remarkCustomChecklists]);
+    const ast = parser("- [?] Needs answer\n- [-] Cancelled") as Root;
+    const serialized = JSON.stringify(ast);
+
+    expect(serialized).toContain('"data-task":"?"');
+    expect(serialized).toContain('"data-task":"-"');
+    expect(serialized).not.toContain("[?]");
+    expect(serialized).not.toContain("[-]");
+  });
+});
+
+describe("grid table rendering", () => {
+  it("renders Adobe grid tables through the preview pipeline", () => {
+    const parser = createParser(
+      [remarkGridTables],
+      [],
+      {
+        allowDangerousHtml: true,
+        handlers: {
+          [TYPE_TABLE]: mdast2hastGridTablesHandler(),
+        },
+      },
+    );
+    const ast = parser(
+      [
+        "+---------+----------+",
+        "| Feature | Behavior |",
+        "+=========+==========+",
+        "| Menus   | Actions  |",
+        "+---------+----------+",
+      ].join("\n"),
+    ) as Root;
+
+    expect(findElement(ast, "table")).toBeDefined();
+    expect(JSON.stringify(ast)).toContain("Feature");
+  });
+});
+
 describe("renderer prop normalization", () => {
   it("normalizes props added by rehype plugins", () => {
     const parser = createParser(
@@ -149,3 +260,22 @@ describe("renderer prop normalization", () => {
     expect(paragraph.properties?.className).toBeUndefined();
   });
 });
+
+function findElement(
+  node: Root | Element,
+  tagName: string,
+): Element | undefined {
+  if (node.type === "element" && node.tagName === tagName) {
+    return node;
+  }
+  for (const child of node.children ?? []) {
+    if (child.type !== "element") {
+      continue;
+    }
+    const result = findElement(child, tagName);
+    if (result) {
+      return result;
+    }
+  }
+  return undefined;
+}

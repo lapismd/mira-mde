@@ -31,6 +31,7 @@
     linkResolver,
     assetResolver,
     frontmatterOpen = true,
+    frontmatterConfig,
     onChange,
     onModeChange,
     onReadonlyChange,
@@ -153,6 +154,7 @@
 
   <div class="mira-default-ui__editor">
     <MiraMde
+      {...({ frontmatterConfig } as any)}
       bind:this={editor}
       bind:value
       bind:mode

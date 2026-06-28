@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
   import { useMarkdownContext } from "../renderer/context.svelte";
+  import ChevronRight from "@lucide/svelte/icons/chevron-right";
   import Icon from "./icon.svelte";
 
   type Props = {
@@ -49,6 +50,10 @@
     if (offset === null) {
       return;
     }
+    const currentMarker = markdown.markdown.slice(offset, offset + 1);
+    if (currentMarker !== "+" && currentMarker !== "-") {
+      return;
+    }
 
     markdown.onChange?.(open ? "+" : "-", offset, offset + 1);
   }
@@ -90,14 +95,11 @@
         {heading}
       </span>
       <span class="callout-fold mira-callout__fold">
-        <svg
+        <ChevronRight
           class="mira-callout__fold-icon"
           data-open={open}
           aria-hidden="true"
-          viewBox="0 0 24 24"
-        >
-          <path d="M9 18l6-6-6-6" />
-        </svg>
+        />
       </span>
     </button>
   {:else}

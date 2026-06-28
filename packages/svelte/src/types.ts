@@ -7,6 +7,12 @@ import type {
 } from "@mira-mde/extensions";
 import type { MiraEditorSelection } from "@mira-mde/core";
 
+export type MiraFrontmatterConfig = {
+  types?: Record<string, unknown>;
+  properties?: Record<string, unknown>;
+  widgets?: unknown[];
+};
+
 export type MiraMdeProps = {
   value: string;
   mode?: MiraMode;
@@ -22,6 +28,7 @@ export type MiraMdeProps = {
   linkResolver?: MiraLinkResolver;
   assetResolver?: MiraAssetResolver;
   frontmatterOpen?: boolean;
+  frontmatterConfig?: MiraFrontmatterConfig;
   onChange?: (value: string) => void;
   onFrontmatterChange?: (nextYaml: string, nextValue: string) => void;
 };

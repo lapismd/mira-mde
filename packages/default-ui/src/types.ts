@@ -14,6 +14,12 @@ import type {
   MiraFeatureFlags,
 } from "./features";
 
+export type MiraFrontmatterConfig = {
+  types?: Record<string, unknown>;
+  properties?: Record<string, unknown>;
+  widgets?: unknown[];
+};
+
 export type MiraDefaultMdeProps = {
   value?: string;
   mode?: MiraMode;
@@ -33,6 +39,7 @@ export type MiraDefaultMdeProps = {
   linkResolver?: MiraLinkResolver;
   assetResolver?: MiraAssetResolver;
   frontmatterOpen?: boolean;
+  frontmatterConfig?: MiraFrontmatterConfig;
   onChange?: (value: string) => void;
   onModeChange?: (mode: MiraMode) => void;
   onReadonlyChange?: (readonly: boolean) => void;

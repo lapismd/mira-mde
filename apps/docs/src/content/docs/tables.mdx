@@ -1,0 +1,37 @@
+---
+title: Tables
+description: Explore editable pipe tables, grid tables, source fallback, and table widget controls.
+---
+
+import LiveEditorExample from "../../components/LiveEditorExample.svelte";
+import { tableMarkdown } from "../../data/examples";
+
+Tables are part of the portable Markdown editor behavior. Live preview uses the rich table widget, while preview mode renders the same table styling through the Markdown renderer.
+
+<LiveEditorExample
+  client:only="svelte"
+  title="Editable tables"
+  description="Click a table cell in live preview to edit it, and use the table widget controls for source fallback and table actions."
+  initialValue={tableMarkdown}
+  height="34rem"
+  sourcePath="tables.md"
+/>
+
+## Included Behavior
+
+- editable pipe table cells
+- grid table parsing and rendering
+- row and column chrome
+- kebab menu actions
+- add, delete, move, align, sort, and transpose commands
+- drag/drop row and column movement
+- source fallback to raw Markdown
+- shared preview/live-preview table styling
+
+## Package
+
+```ts
+import { createTableExtensions } from "@mira-mde/codemirror-tables";
+```
+
+The default UI enables table behavior unless `MiraFeature.Tables` is disabled.

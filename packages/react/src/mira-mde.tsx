@@ -1,0 +1,380 @@
+import type { Extension } from "@codemirror/state";
+import { createBaseCodeMirrorExtensions } from "@mira-mde/codemirror";
+import { createMarkdownCodeMirrorExtensions } from "@mira-mde/codemirror-markdown";
+import { createRichEditorExtensions } from "@mira-mde/codemirror-rich";
+import { createTableExtensions } from "@mira-mde/codemirror-tables";
+import {
+  createMiraEditorController,
+  type MiraEditorController,
+} from "@mira-mde/core";
+import { resolveMiraExtensions, type MiraMode } from "@mira-mde/extensions";
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { useLatestRef, cx } from "./hooks";
+import { MarkdownPreviewHost } from "./preview-host";
+import type { MiraMdeHandle, MiraMdeProps } from "./types";
+
+const defaultMode: MiraMode = "live-preview";
+
+export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
+  {
+    assetResolver,
+    className,
+    defaultMode: defaultModeProp = defaultMode,
+    defaultReadonly = false,
+    defaultValue = "",
+    extensions = [],
+    frontmatterOpen = true,
+    frontmatterConfig,
+    lineWrapping = true,
+    linkResolver,
+    mode: modeProp,
+    onChange,
+    onFrontmatterChange,
+    onModeChange,
+    onReadonlyChange,
+    placeholder = "Start writing Markdown...",
+    readonly: readonlyProp,
+    sourcePath,
+    spellcheck = true,
+    theme = "obsidian",
+    toolbar = true,
+    value: valueProp,
+  },
+  ref,
+) {
+  const editorHostRef = useRef<HTMLDivElement | null>(null);
+  const controllerRef = useRef<MiraEditorController | null>(null);
+  const cleanupExtensionMountsRef = useRef<Array<() => void>>([]);
+  const [uncontrolledValue, setUncontrolledValue] = useState(defaultValue);
+  const [uncontrolledMode, setUncontrolledMode] = useState(defaultModeProp);
+  const [uncontrolledReadonly, setUncontrolledReadonly] =
+    useState(defaultReadonly);
+  const value = valueProp ?? uncontrolledValue;
+  const mode = modeProp ?? uncontrolledMode;
+  const readonly = readonlyProp ?? uncontrolledReadonly;
+  const valueRef = useLatestRef(value);
+  const modeRef = useLatestRef(mode);
+  const readonlyRef = useLatestRef(readonly);
+  const onChangeRef = useLatestRef(onChange);
+  const onModeChangeRef = useLatestRef(onModeChange);
+  const onReadonlyChangeRef = useLatestRef(onReadonlyChange);
+  const onFrontmatterChangeRef = useLatestRef(onFrontmatterChange);
+
+  const resolvedExtensions = useMemo(
+    () =>
+      resolveMiraExtensions(extensions, {
+        mode,
+        readonly,
+        sourcePath,
+      }),
+    [extensions, mode, readonly, sourcePath],
+  );
+
+  const commitValue = useCallback(
+    (nextValue: string) => {
+      if (valueProp === undefined) {
+        setUncontrolledValue(nextValue);
+      }
+      onChangeRef.current?.(nextValue);
+    },
+    [onChangeRef, valueProp],
+  );
+
+  const setMode = useCallback(
+    (nextMode: MiraMode) => {
+      if (modeProp === undefined) {
+        setUncontrolledMode(nextMode);
+      }
+      onModeChangeRef.current?.(nextMode);
+    },
+    [modeProp, onModeChangeRef],
+  );
+
+  const setReadonly = useCallback(
+    (nextReadonly: boolean) => {
+      if (readonlyProp === undefined) {
+        setUncontrolledReadonly(nextReadonly);
+      }
+      onReadonlyChangeRef.current?.(nextReadonly);
+    },
+    [onReadonlyChangeRef, readonlyProp],
+  );
+
+  const buildCodeMirrorExtensions = useCallback((): Extension[] => {
+    const resolved = resolveMiraExtensions(extensions, {
+      mode: modeRef.current,
+      readonly: readonlyRef.current,
+      sourcePath,
+    });
+
+    return [
+      createBaseCodeMirrorExtensions({
+        lineWrapping,
+        placeholder,
+        readonly: readonlyRef.current,
+        spellcheck,
+      }),
+      createMarkdownCodeMirrorExtensions({
+        codeLanguages: resolved.codeLanguages,
+        sourceMode: modeRef.current === "source",
+      }),
+      createTableExtensions(),
+      createRichEditorExtensions({
+        assetResolver,
+        extensions,
+        frontmatterConfig,
+        frontmatterOpen,
+        linkResolver,
+        livePreview: modeRef.current === "live-preview",
+        onChange(replacement, from, to, nextValue) {
+          const controller = controllerRef.current;
+          if (controller) {
+            controller.view.dispatch({
+              changes: { from, insert: replacement, to },
+            });
+          } else {
+            commitValue(nextValue);
+          }
+        },
+        onFrontmatterChange: (...args) =>
+          onFrontmatterChangeRef.current?.(...args),
+        sourcePath,
+      } as Parameters<typeof createRichEditorExtensions>[0] & {
+        frontmatterConfig?: unknown;
+      }),
+      resolved.codeMirror,
+    ].flat();
+  }, [
+    assetResolver,
+    commitValue,
+    extensions,
+    frontmatterOpen,
+    frontmatterConfig,
+    lineWrapping,
+    linkResolver,
+    modeRef,
+    onFrontmatterChangeRef,
+    placeholder,
+    readonlyRef,
+    sourcePath,
+    spellcheck,
+  ]);
+
+  const runExtensionMounts = useCallback(
+    (activeController: MiraEditorController) => {
+      for (const cleanup of cleanupExtensionMountsRef.current) {
+        cleanup();
+      }
+      cleanupExtensionMountsRef.current = [];
+
+      for (const mountExtension of resolvedExtensions.onMount) {
+        const cleanup = mountExtension({
+          focus: () => activeController.focus(),
+          getValue: () => activeController.getValue(),
+          setValue: (nextValue) => activeController.setValue(nextValue),
+        });
+        if (typeof cleanup === "function") {
+          cleanupExtensionMountsRef.current.push(cleanup);
+        }
+      }
+    },
+    [resolvedExtensions.onMount],
+  );
+
+  useEffect(() => {
+    if (!editorHostRef.current) {
+      return;
+    }
+
+    const activeController = createMiraEditorController({
+      codeMirrorExtensions: buildCodeMirrorExtensions(),
+      onChange(nextValue) {
+        commitValue(nextValue);
+      },
+      value,
+    });
+
+    activeController.mount(editorHostRef.current);
+    controllerRef.current = activeController;
+    runExtensionMounts(activeController);
+
+    return () => {
+      for (const cleanup of cleanupExtensionMountsRef.current) {
+        cleanup();
+      }
+      cleanupExtensionMountsRef.current = [];
+      activeController.destroy();
+      controllerRef.current = null;
+    };
+  }, []);
+
+  useEffect(() => {
+    const controller = controllerRef.current;
+    if (controller && value !== controller.getValue()) {
+      controller.setValue(value);
+    }
+  }, [value]);
+
+  useEffect(() => {
+    const controller = controllerRef.current;
+    if (!controller) {
+      return;
+    }
+    controller.update({
+      codeMirrorExtensions: buildCodeMirrorExtensions(),
+    });
+    runExtensionMounts(controller);
+  }, [buildCodeMirrorExtensions, runExtensionMounts]);
+
+  const handlePreviewChange = useCallback(
+    (replacement: string, from: number, to: number) => {
+      const currentValue = valueRef.current;
+      const nextValue = `${currentValue.slice(0, from)}${replacement}${currentValue.slice(to)}`;
+      commitValue(nextValue);
+    },
+    [commitValue, valueRef],
+  );
+
+  const handleInsertMarkdown = useCallback((markdown: string) => {
+    const controller = controllerRef.current;
+    controller?.replaceSelection(markdown);
+    controller?.focus();
+  }, []);
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      focus() {
+        controllerRef.current?.focus();
+      },
+      getMarkdown() {
+        return controllerRef.current?.getValue() ?? valueRef.current;
+      },
+      getMode() {
+        return modeRef.current;
+      },
+      getSelection() {
+        return controllerRef.current?.getSelection() ?? null;
+      },
+      insertMarkdown: handleInsertMarkdown,
+      setMarkdown(markdown) {
+        if (valueProp === undefined) {
+          setUncontrolledValue(markdown);
+        }
+        controllerRef.current?.setValue(markdown);
+      },
+      setMode,
+      setReadonly,
+      setSelection(selection) {
+        controllerRef.current?.setSelection(selection);
+      },
+    }),
+    [handleInsertMarkdown, modeRef, setMode, setReadonly, valueProp, valueRef],
+  );
+
+  const showEditor = mode !== "preview";
+  const showPreview = mode === "preview" || mode === "split";
+  const themeClass =
+    theme === "dark"
+      ? "mira-theme-dark theme-dark dark"
+      : theme === "light"
+        ? "mira-theme-light theme-light"
+        : theme === "system"
+          ? "mira-theme-system"
+          : "mira-theme-obsidian theme-light";
+
+  return (
+    <div
+      className={cx("mira-mde", themeClass, className)}
+      data-mode={mode}
+      data-readonly={readonly}
+    >
+      {toolbar ? (
+        <div className="mira-mde__toolbar" aria-label="Markdown editor toolbar">
+          <div className="mira-toggle-group" aria-label="Editor mode">
+            {(["source", "live-preview", "preview", "split"] as MiraMode[]).map(
+              (modeOption) => (
+                <button
+                  className="mira-toggle-group__item"
+                  data-state={mode === modeOption ? "on" : "off"}
+                  key={modeOption}
+                  onClick={() => setMode(modeOption)}
+                  type="button"
+                >
+                  {modeOption === "live-preview" ? "Live" : modeOption}
+                </button>
+              ),
+            )}
+          </div>
+          <div className="mira-separator--vertical mira-mde__toolbar-separator" />
+          <div className="mira-mde__actions">
+            <button
+              className="mira-ui-button mira-ui-button--ghost mira-ui-button--sm"
+              onClick={() => handleInsertMarkdown("**strong**")}
+              type="button"
+            >
+              B
+            </button>
+            <button
+              className="mira-ui-button mira-ui-button--ghost mira-ui-button--sm"
+              onClick={() => handleInsertMarkdown("_emphasis_")}
+              type="button"
+            >
+              I
+            </button>
+            <button
+              className="mira-ui-button mira-ui-button--ghost mira-ui-button--sm"
+              onClick={() =>
+                handleInsertMarkdown("[label](https://example.com)")
+              }
+              type="button"
+            >
+              Link
+            </button>
+          </div>
+        </div>
+      ) : null}
+
+      <div className="mira-mde__body">
+        <section
+          aria-hidden={showEditor ? "false" : "true"}
+          className={cx(
+            "mira-mde__pane mira-mde__pane--editor markdown-editor-surface",
+            mode === "source"
+              ? "markdown-view__editor--source markdown-source-mode"
+              : "markdown-view__editor--live-preview markdown-live-preview-mode",
+          )}
+          data-visible={showEditor}
+        >
+          <div className="mira-mde__editor-host" ref={editorHostRef} />
+        </section>
+
+        {showPreview ? (
+          <section className="mira-mde__pane mira-mde__pane--preview">
+            <MarkdownPreviewHost
+              assetResolver={assetResolver}
+              extensions={extensions}
+              frontmatterConfig={frontmatterConfig}
+              frontmatterOpen={frontmatterOpen}
+              linkResolver={linkResolver}
+              onChange={handlePreviewChange}
+              onFrontmatterChange={onFrontmatterChange}
+              sourcePath={sourcePath}
+              value={value}
+            />
+          </section>
+        ) : null}
+      </div>
+    </div>
+  );
+});
+
+MiraMde.displayName = "MiraMde";

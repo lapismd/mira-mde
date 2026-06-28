@@ -12,6 +12,8 @@ import {
   type ViewUpdate,
 } from "@codemirror/view";
 import { Table } from "@lezer/markdown";
+import { GridTable } from "./grid-table";
+import { parseLatex } from "./latex";
 
 export type MiraMarkdownCodeMirrorOptions = {
   codeLanguages?: LanguageDescription[];
@@ -34,7 +36,7 @@ export function createMarkdownCodeMirrorExtensions(
     yamlFrontmatter({
       content: markdown({
         codeLanguages: [...languages, ...(options.codeLanguages ?? [])],
-        extensions: [Table],
+        extensions: [Table, GridTable, parseLatex()],
       }),
     }),
     markdownSourceDecorations(),

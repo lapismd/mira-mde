@@ -26,6 +26,7 @@
     "list",
     "list-tree",
     "pencil",
+    "plus",
     "quote",
     "tags",
     "text",
@@ -123,6 +124,9 @@
   {:else if icon === "pencil"}
     <path d="M12 20h9" />
     <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+  {:else if icon === "plus"}
+    <path d="M5 12h14" />
+    <path d="M12 5v14" />
   {:else if icon === "clipboard-list"}
     <rect x="8" y="2" width="8" height="4" rx="1" />
     <path

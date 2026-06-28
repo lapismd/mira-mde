@@ -31,6 +31,7 @@
     linkResolver,
     assetResolver,
     frontmatterOpen = true,
+    frontmatterConfig,
     onChange,
     onFrontmatterChange,
   }: MiraMdeProps = $props();
@@ -95,6 +96,7 @@
         linkResolver,
         assetResolver,
         frontmatterOpen,
+        frontmatterConfig,
         onChange(replacement, from, to, nextValue) {
           if (controller) {
             controller.view.dispatch({
@@ -106,6 +108,8 @@
           }
         },
         onFrontmatterChange,
+      } as Parameters<typeof createRichEditorExtensions>[0] & {
+        frontmatterConfig?: unknown;
       }),
       resolved.codeMirror,
     ].flat();
@@ -282,6 +286,7 @@
     {#if showPreview}
       <section class="mira-mde__pane mira-mde__pane--preview">
         <MarkdownPreview
+          {...({ frontmatterConfig } as any)}
           class="markdown-reading-view"
           {value}
           {sourcePath}

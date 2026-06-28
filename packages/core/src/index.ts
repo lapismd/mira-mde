@@ -36,6 +36,7 @@ export type MiraEditorOptions = {
   linkResolver?: MiraLinkResolver;
   assetResolver?: MiraAssetResolver;
   frontmatterOpen?: boolean;
+  frontmatterConfig?: unknown;
   onChange?: (value: string, change: MiraEditorChange) => void;
   onFrontmatterChange?: (nextYaml: string, nextValue: string) => void;
   onSelectionChange?: (selection: MiraEditorSelection) => void;

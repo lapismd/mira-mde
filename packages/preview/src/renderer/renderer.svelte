@@ -99,6 +99,7 @@
       bind:ref={contentEl}
       {tagName}
       sourcePath={markdown.sourcePath}
+      dialog={markdown.dialog}
       {...properties}
     >
       {#each children as child, index (getNodeRenderKey(child, markdown.markdown, index))}

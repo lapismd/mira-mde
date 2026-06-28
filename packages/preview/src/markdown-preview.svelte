@@ -2,6 +2,11 @@
   import rehypeHighlight from "rehype-highlight";
   import rehypeKatex from "rehype-katex";
   import rehypeRaw from "rehype-raw";
+  import remarkGridTables from "@adobe/remark-gridtables";
+  import {
+    TYPE_TABLE,
+    mdast2hastGridTablesHandler,
+  } from "@adobe/mdast-util-gridtables";
   import remarkDirective from "remark-directive";
   import remarkFrontmatter from "remark-frontmatter";
   import remarkGfm from "remark-gfm";
@@ -16,6 +21,7 @@
   import Markdown from "./renderer/markdown.svelte";
   import {
     remarkCallouts,
+    remarkCustomChecklists,
     remarkDirectivesToHast,
     remarkFrontmatterToHast,
     remarkPositionsToData,
@@ -33,6 +39,8 @@
   import Tag from "./components/tag.svelte";
   import rehypeCodeContext from "./rehype-code-context";
   import type { Pluggable } from "unified";
+  import type { Options as RemarkRehypeOptions } from "remark-rehype";
+  import type { FrontmatterConfig } from "./components/frontmatter-utils";
 
   type Props = {
     value: string;
@@ -46,6 +54,8 @@
     linkResolver?: MiraLinkResolver;
     assetResolver?: MiraAssetResolver;
     frontmatterOpen?: boolean;
+    frontmatterConfig?: FrontmatterConfig;
+    dialog?: boolean;
     onChange?: (replacement: string, from: number, to: number) => void;
     onFrontmatterChange?: (nextYaml: string, nextValue: string) => void;
   };
@@ -62,6 +72,8 @@
     linkResolver,
     assetResolver,
     frontmatterOpen = true,
+    frontmatterConfig,
+    dialog = false,
     onChange,
     onFrontmatterChange,
   }: Props = $props();
@@ -90,7 +102,9 @@
   const remarkPlugins = $derived<Pluggable[]>([
     remarkFrontmatter,
     remarkDirective,
+    remarkGridTables,
     remarkGfm,
+    remarkCustomChecklists,
     remarkMath,
     remarkWikiLinks,
     remarkTags,
@@ -114,6 +128,13 @@
     ...resolvedExtensions.components,
     ...components,
   });
+
+  const remarkRehypeOptions = $derived<RemarkRehypeOptions>({
+    allowDangerousHtml: true,
+    handlers: {
+      [TYPE_TABLE]: mdast2hastGridTablesHandler(),
+    },
+  });
 </script>
 
 {#if inline}
@@ -122,10 +143,13 @@
     {sourcePath}
     {remarkPlugins}
     {rehypePlugins}
+    {remarkRehypeOptions}
     components={componentMap}
     {linkResolver}
     {assetResolver}
     {frontmatterOpen}
+    {frontmatterConfig}
+    {dialog}
     {onChange}
     {onFrontmatterChange}
   />
@@ -143,10 +167,13 @@
           {sourcePath}
           {remarkPlugins}
           {rehypePlugins}
+          {remarkRehypeOptions}
           components={componentMap}
           {linkResolver}
           {assetResolver}
           {frontmatterOpen}
+          {frontmatterConfig}
+          {dialog}
           {onChange}
           {onFrontmatterChange}
         />

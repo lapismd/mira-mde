@@ -9,6 +9,7 @@ import type {
   MarkdownChangeHandler,
   MarkdownPostProcess,
 } from "./types";
+import type { FrontmatterConfig } from "../components/frontmatter-utils";
 
 const MARKDOWN_CONTEXT = Symbol("mira-markdown-context");
 const AST_NODE_CONTEXT = Symbol("mira-ast-node-context");
@@ -23,6 +24,8 @@ export type MarkdownContext = {
   onChange?: MarkdownChangeHandler;
   onFrontmatterChange?: (nextYaml: string, nextValue: string) => void;
   frontmatterOpen: boolean;
+  frontmatterConfig?: FrontmatterConfig;
+  dialog: boolean;
 };
 
 export type AstNodeContext = {

@@ -1,0 +1,154 @@
+---
+title: Default Editor
+description: Configure the default editor package with feature flags, callbacks, resolvers, and imperative handles.
+---
+
+import FeatureToggleExample from "../../components/FeatureToggleExample.svelte";
+
+The default UI package is the fastest way to embed Mira MDE. It combines the Svelte editor, Lapis-aligned Markdown preview, toolbar, Mermaid support, and mode controls.
+
+<FeatureToggleExample client:only="svelte" />
+
+## Common Props
+
+<table class="docs-api-table">
+  <thead>
+    <tr>
+      <th>Prop</th>
+      <th>Type</th>
+      <th>Purpose</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <code>value</code>
+      </td>
+      <td>
+        <code>string</code>
+      </td>
+      <td>Current Markdown value.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>mode</code>
+      </td>
+      <td>
+        <code>"source" | "live-preview" | "preview" | "split"</code>
+      </td>
+      <td>Active editor mode.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>features</code>
+      </td>
+      <td>
+        <code>MiraFeatureFlags</code>
+      </td>
+      <td>Enable or disable default UI capabilities.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>featureConfigs</code>
+      </td>
+      <td>
+        <code>MiraDefaultFeatureConfigs</code>
+      </td>
+      <td>Configure feature-specific behavior such as toolbar items.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>extensions</code>
+      </td>
+      <td>
+        <code>MiraExtension[]</code>
+      </td>
+      <td>Add portable editor or preview extensions.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>linkResolver</code>
+      </td>
+      <td>
+        <code>MiraLinkResolver</code>
+      </td>
+      <td>Resolve links and wikilinks for preview output.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>assetResolver</code>
+      </td>
+      <td>
+        <code>MiraAssetResolver</code>
+      </td>
+      <td>Resolve image and embed assets.</td>
+    </tr>
+    <tr>
+      <td>
+        <code>sourcePath</code>
+      </td>
+      <td>
+        <code>string</code>
+      </td>
+      <td>Document path used by resolvers and source-aware behavior.</td>
+    </tr>
+  </tbody>
+</table>
+
+## Feature Flags
+
+```ts
+import { MiraFeature } from "@mira-mde/default-ui";
+
+const features = {
+  [MiraFeature.Mermaid]: true,
+  [MiraFeature.Tables]: true,
+  [MiraFeature.SplitMode]: false,
+};
+```
+
+Feature flags apply to the toolbar, extension setup, and valid mode list. A disabled mode is removed from the mode switcher and ignored by `setMode()`.
+
+| Feature flag                  | Controls                                       |
+| :---------------------------- | :--------------------------------------------- |
+| `MiraFeature.Toolbar`         | Default toolbar visibility.                    |
+| `MiraFeature.ModeSwitch`      | View-mode toolbar control.                     |
+| `MiraFeature.Formatting`      | Bold and italic toolbar actions.               |
+| `MiraFeature.Headings`        | Heading toolbar actions and heading controls.  |
+| `MiraFeature.Lists`           | Bullet, ordered, quote, and task list actions. |
+| `MiraFeature.Links`           | Link insertion actions.                        |
+| `MiraFeature.Tables`          | Pipe-table toolbar and live widgets.           |
+| `MiraFeature.GridTables`      | Grid-table toolbar and live widgets.           |
+| `MiraFeature.Mermaid`         | Mermaid extension and toolbar actions.         |
+| `MiraFeature.Code`            | Fenced-code toolbar actions.                   |
+| `MiraFeature.Math`            | Math toolbar actions and rendering.            |
+| `MiraFeature.Frontmatter`     | Frontmatter property widget.                   |
+| `MiraFeature.Images`          | Image behavior and toolbar availability.       |
+| `MiraFeature.Embeds`          | Markdown embed behavior.                       |
+| `MiraFeature.Wikilinks`       | Wikilink behavior.                             |
+| `MiraFeature.Tags`            | Tag rendering behavior.                        |
+| `MiraFeature.SourceMode`      | Source mode availability.                      |
+| `MiraFeature.LivePreviewMode` | Live preview mode availability.                |
+| `MiraFeature.PreviewMode`     | Reading/preview mode availability.             |
+| `MiraFeature.SplitMode`       | Split mode availability.                       |
+
+## Imperative Handle
+
+```svelte
+<script lang="ts">
+  import {
+    MiraDefaultMde,
+    type MiraDefaultMdeHandle,
+  } from "@mira-mde/default-ui/svelte";
+
+  let editor = $state<MiraDefaultMdeHandle | null>(null);
+
+  function insertSummary() {
+    editor?.insertMarkdown("\n## Summary\n");
+  }
+</script>
+
+<MiraDefaultMde bind:this={editor} />
+```
+
+The handle exposes `focus`, `getMarkdown`, `setMarkdown`, `getMode`, `setMode`, `getSelection`, `setSelection`, `insertMarkdown`, and `setReadonly`.

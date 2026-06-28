@@ -3,6 +3,7 @@ packages:
   - "packages/*"
 allowBuilds:
   esbuild: true
+  sharp: true
 minimumReleaseAgeExclude:
   - '@lezer/css@1.3.4'
   - '@marijn/find-cluster-break@1.0.3'

@@ -1,6 +1,6 @@
 import { parseDocument, stringify } from "yaml";
 
-export type FrontmatterPropertyKind =
+export type BuiltinFrontmatterPropertyKind =
   | "unknown"
   | "tags"
   | "aliases"
@@ -14,7 +14,42 @@ export type FrontmatterPropertyKind =
   | "datetime"
   | "null";
 
+export type FrontmatterPropertyKind =
+  | BuiltinFrontmatterPropertyKind
+  | (string & {});
+
 export type FrontmatterPathSegment = string | number;
+
+export type FrontmatterWidgetContext = {
+  property: FrontmatterProperty;
+  sourcePath?: string;
+  setValue: (value: unknown) => void;
+};
+
+export type FrontmatterWidgetRenderer = (
+  element: HTMLElement,
+  context: FrontmatterWidgetContext,
+) => void | (() => void);
+
+export type FrontmatterTypeDefinition = {
+  type: FrontmatterPropertyKind;
+  label?: string;
+  icon?: string;
+  fallbackKind?: BuiltinFrontmatterPropertyKind;
+  defaultValue?: unknown | (() => unknown);
+  validate?: (value: unknown, property: FrontmatterProperty) => boolean;
+  normalize?: (value: unknown, property?: FrontmatterProperty) => unknown;
+  render?: FrontmatterWidgetRenderer;
+};
+
+export type FrontmatterConfig = {
+  types?: Record<string, FrontmatterPropertyKind | FrontmatterTypeDefinition>;
+  properties?: Record<
+    string,
+    FrontmatterPropertyKind | FrontmatterTypeDefinition
+  >;
+  widgets?: FrontmatterTypeDefinition[];
+};
 
 export type FrontmatterParseResult =
   | {
@@ -41,6 +76,38 @@ export type FrontmatterProperty = {
   value: unknown;
   kind: FrontmatterPropertyKind;
   valid: boolean;
+};
+
+export const frontmatterPropertyKindOptions = [
+  "text",
+  "number",
+  "checkbox",
+  "date",
+  "datetime",
+  "tags",
+  "aliases",
+  "multitext",
+  "array",
+  "object",
+  "null",
+] as const satisfies readonly BuiltinFrontmatterPropertyKind[];
+
+export const frontmatterPropertyKindLabels: Record<
+  BuiltinFrontmatterPropertyKind,
+  string
+> = {
+  aliases: "Aliases",
+  array: "List",
+  checkbox: "Checkbox",
+  date: "Date",
+  datetime: "Date and time",
+  multitext: "Text list",
+  null: "Empty",
+  number: "Number",
+  object: "Object",
+  tags: "Tags",
+  text: "Text",
+  unknown: "Unknown",
 };
 
 export function normalizeFrontmatterYaml(frontmatter: string): string {
@@ -96,19 +163,31 @@ export function parseFrontmatterYaml(yaml: string): FrontmatterParseResult {
 
 export function frontmatterProperties(
   value: Record<string, unknown>,
+  config?: FrontmatterConfig,
   parentPath: FrontmatterPathSegment[] = [],
   depth = 0,
 ): FrontmatterProperty[] {
   return Object.entries(value).map(([key, propertyValue]) =>
-    createFrontmatterProperty(key, propertyValue, [...parentPath, key], depth),
+    createFrontmatterProperty(
+      key,
+      propertyValue,
+      [...parentPath, key],
+      depth,
+      config,
+    ),
   );
 }
 
 export function frontmatterPropertyKind(
   value: unknown,
   key = "",
+  config?: FrontmatterConfig,
+  pathString = key,
 ): FrontmatterPropertyKind {
-  return deriveFrontmatterPropertyType(key, value);
+  return (
+    resolveConfiguredFrontmatterType(config, pathString, key)?.type ??
+    deriveFrontmatterPropertyType(key, value)
+  );
 }
 
 export function deriveFrontmatterPropertyType(
@@ -149,8 +228,16 @@ export function deriveFrontmatterPropertyType(
   return "unknown";
 }
 
-export function frontmatterPropertyIcon(kind: FrontmatterPropertyKind): string {
-  const icons: Record<FrontmatterPropertyKind, string> = {
+export function frontmatterPropertyIcon(
+  kind: FrontmatterPropertyKind,
+  config?: FrontmatterConfig,
+): string {
+  const configured = resolveFrontmatterWidget(config, kind);
+  if (configured?.icon) {
+    return configured.icon;
+  }
+
+  const icons: Record<BuiltinFrontmatterPropertyKind, string> = {
     aliases: "lucide-at-sign",
     array: "lucide-brackets",
     checkbox: "lucide-check-square",
@@ -165,7 +252,58 @@ export function frontmatterPropertyIcon(kind: FrontmatterPropertyKind): string {
     unknown: "lucide-file-question",
   };
 
-  return icons[kind];
+  return icons[toBuiltinFrontmatterKind(kind)] ?? icons.unknown;
+}
+
+export function frontmatterPropertyLabel(
+  kind: FrontmatterPropertyKind,
+  config?: FrontmatterConfig,
+): string {
+  const configured = resolveFrontmatterWidget(config, kind);
+  if (configured?.label) {
+    return configured.label;
+  }
+  return (
+    frontmatterPropertyKindLabels[toBuiltinFrontmatterKind(kind)] ??
+    String(kind)
+  );
+}
+
+export function frontmatterTypeOptions(
+  config?: FrontmatterConfig,
+): FrontmatterTypeDefinition[] {
+  const options = new Map<string, FrontmatterTypeDefinition>();
+  for (const kind of frontmatterPropertyKindOptions) {
+    options.set(kind, {
+      type: kind,
+      label: frontmatterPropertyKindLabels[kind],
+      icon: frontmatterPropertyIcon(kind),
+    });
+  }
+  for (const definition of Object.values(config?.properties ?? {})) {
+    const normalized = normalizeTypeDefinition(definition);
+    options.set(normalized.type, {
+      ...normalized,
+      label: normalized.label ?? frontmatterPropertyLabel(normalized.type),
+      icon: normalized.icon ?? frontmatterPropertyIcon(normalized.type),
+    });
+  }
+  for (const definition of Object.values(config?.types ?? {})) {
+    const normalized = normalizeTypeDefinition(definition);
+    options.set(normalized.type, {
+      ...normalized,
+      label: normalized.label ?? frontmatterPropertyLabel(normalized.type),
+      icon: normalized.icon ?? frontmatterPropertyIcon(normalized.type),
+    });
+  }
+  for (const definition of config?.widgets ?? []) {
+    options.set(definition.type, {
+      ...definition,
+      label: definition.label ?? frontmatterPropertyLabel(definition.type),
+      icon: definition.icon ?? frontmatterPropertyIcon(definition.type),
+    });
+  }
+  return [...options.values()];
 }
 
 export function formatFrontmatterValue(value: unknown): string {
@@ -188,27 +326,36 @@ export function parseFrontmatterValue(
   value: string,
   kind: FrontmatterPropertyKind,
 ): unknown {
-  if (kind === "number") {
+  const builtinKind = toBuiltinFrontmatterKind(kind);
+  if (builtinKind === "number") {
     const nextNumber = Number(value);
     return Number.isFinite(nextNumber) ? nextNumber : value;
   }
-  if (kind === "checkbox") {
+  if (builtinKind === "checkbox") {
     return value === "true";
   }
-  if (kind === "tags" || kind === "aliases" || kind === "multitext") {
+  if (
+    builtinKind === "tags" ||
+    builtinKind === "aliases" ||
+    builtinKind === "multitext"
+  ) {
     return value
       .split(",")
       .map((item) => item.trim())
       .filter(Boolean);
   }
-  if (kind === "array" || kind === "object" || kind === "unknown") {
+  if (
+    builtinKind === "array" ||
+    builtinKind === "object" ||
+    builtinKind === "unknown"
+  ) {
     const document = parseDocument(value, { prettyErrors: false });
     if (document.errors.length || document.warnings.length) {
       return value;
     }
     return document.toJS();
   }
-  if (kind === "null") {
+  if (builtinKind === "null") {
     return value.trim() ? value : null;
   }
   return value;
@@ -221,6 +368,108 @@ export function updateFrontmatterRecord(
 ): Record<string, unknown> {
   const next = setValueAtPath(value, path, nextValue);
   return isRecord(next) ? next : value;
+}
+
+export function renameFrontmatterRecordProperty(
+  value: Record<string, unknown>,
+  path: FrontmatterPathSegment[],
+  nextKey: string,
+): Record<string, unknown> {
+  const currentKey = path.at(-1);
+  if (typeof currentKey !== "string" || !nextKey || currentKey === nextKey) {
+    return value;
+  }
+
+  const parentPath = path.slice(0, -1);
+  const parent = getValueAtPath(value, parentPath);
+  if (!isRecord(parent) || Object.hasOwn(parent, nextKey)) {
+    return value;
+  }
+
+  const renamedParent = Object.fromEntries(
+    Object.entries(parent).map(([key, propertyValue]) =>
+      key === currentKey ? [nextKey, propertyValue] : [key, propertyValue],
+    ),
+  );
+
+  if (!parentPath.length) {
+    return renamedParent;
+  }
+
+  const next = setValueAtPath(value, parentPath, renamedParent);
+  return isRecord(next) ? next : value;
+}
+
+export function addFrontmatterRecordProperty(
+  value: Record<string, unknown>,
+  kind: FrontmatterPropertyKind = "text",
+  config?: FrontmatterConfig,
+): { name: string; value: Record<string, unknown> } {
+  const name = createUniquePropertyName(value, "property");
+  return {
+    name,
+    value: {
+      ...value,
+      [name]: defaultFrontmatterValue(kind, config),
+    },
+  };
+}
+
+export function coerceFrontmatterValue(
+  value: unknown,
+  kind: FrontmatterPropertyKind,
+  config?: FrontmatterConfig,
+  property?: FrontmatterProperty,
+): unknown {
+  const widget = resolveFrontmatterWidget(config, kind);
+  if (widget?.normalize) {
+    return widget.normalize(value, property);
+  }
+  const builtinKind = toBuiltinFrontmatterKind(widget?.fallbackKind ?? kind);
+  if (builtinKind === "number") {
+    const numberValue = Number(value);
+    return Number.isFinite(numberValue) ? numberValue : 0;
+  }
+  if (builtinKind === "checkbox") {
+    return Boolean(value);
+  }
+  if (
+    builtinKind === "date" ||
+    builtinKind === "datetime" ||
+    builtinKind === "text"
+  ) {
+    return value === null || value === undefined
+      ? ""
+      : Array.isArray(value)
+        ? value.join(", ")
+        : String(value);
+  }
+  if (
+    builtinKind === "tags" ||
+    builtinKind === "aliases" ||
+    builtinKind === "multitext"
+  ) {
+    if (Array.isArray(value)) {
+      return value.map((item) => String(item)).filter(Boolean);
+    }
+    if (typeof value === "string") {
+      return value
+        .split(/[,;]+/)
+        .map((item) => item.trim())
+        .filter(Boolean);
+    }
+    return [];
+  }
+  if (builtinKind === "array") {
+    return Array.isArray(value) ? value : [];
+  }
+  if (builtinKind === "object") {
+    return isRecord(value) ? value : {};
+  }
+  if (builtinKind === "null") {
+    return null;
+  }
+  return value;
 }
 
 export function serializeFrontmatterRecord(
@@ -254,17 +503,17 @@ function createFrontmatterProperty(
   value: unknown,
   path: FrontmatterPathSegment[],
   depth: number,
+  config?: FrontmatterConfig,
 ): FrontmatterProperty {
-  const kind = deriveFrontmatterPropertyType(key, value);
-  const children = shouldDeriveChildren(kind, value)
-    ? deriveChildren(value, path, depth + 1)
-    : [];
   const pathString = formatPath(path);
-
-  return {
+  const kind = frontmatterPropertyKind(value, key, config, pathString);
+  const children = shouldDeriveChildren(kind, value)
+    ? deriveChildren(value, path, depth + 1, config)
+    : [];
+  const property: FrontmatterProperty = {
     children,
     depth,
-    icon: frontmatterPropertyIcon(children.length ? "object" : kind),
+    icon: frontmatterPropertyIcon(children.length ? "object" : kind, config),
     id: pathString,
     key,
     kind,
@@ -272,15 +521,24 @@ function createFrontmatterProperty(
     path,
     pathString,
     type: kind,
-    valid: validateFrontmatterPropertyValue(kind, value),
+    valid: true,
     value,
-  };
+  } satisfies FrontmatterProperty;
+
+  property.valid = validateFrontmatterPropertyValue(
+    kind,
+    value,
+    property,
+    config,
+  );
+  return property;
 }
 
 function deriveChildren(
   value: unknown,
   parentPath: FrontmatterPathSegment[],
   depth: number,
+  config?: FrontmatterConfig,
 ): FrontmatterProperty[] {
   if (Array.isArray(value)) {
     return value.map((item, index) =>
@@ -289,6 +547,7 @@ function deriveChildren(
         item,
         [...parentPath, index],
         depth,
+        config,
       ),
     );
   }
@@ -298,7 +557,13 @@ function deriveChildren(
   }
 
   return Object.entries(value).map(([key, childValue]) =>
-    createFrontmatterProperty(key, childValue, [...parentPath, key], depth),
+    createFrontmatterProperty(
+      key,
+      childValue,
+      [...parentPath, key],
+      depth,
+      config,
+    ),
   );
 }
 
@@ -306,35 +571,51 @@ function shouldDeriveChildren(
   kind: FrontmatterPropertyKind,
   value: unknown,
 ): boolean {
-  if (kind === "object") {
+  const builtinKind = toBuiltinFrontmatterKind(kind);
+  if (builtinKind === "object") {
     return Object.keys(value as Record<string, unknown>).length > 0;
   }
-  return kind === "array" && Array.isArray(value) && value.length > 0;
+  return builtinKind === "array" && Array.isArray(value) && value.length > 0;
 }
 
 function validateFrontmatterPropertyValue(
   kind: FrontmatterPropertyKind,
   value: unknown,
+  property?: FrontmatterProperty,
+  config?: FrontmatterConfig,
 ): boolean {
-  if (kind === "tags" || kind === "aliases" || kind === "multitext") {
+  const widget = resolveFrontmatterWidget(config, kind);
+  if (widget?.validate && property) {
+    return widget.validate(value, property);
+  }
+  const builtinKind = toBuiltinFrontmatterKind(widget?.fallbackKind ?? kind);
+  if (
+    builtinKind === "tags" ||
+    builtinKind === "aliases" ||
+    builtinKind === "multitext"
+  ) {
     return isTextNumberArray(value) || typeof value === "string";
   }
-  if (kind === "array") {
+  if (builtinKind === "array") {
     return Array.isArray(value) && !isTextNumberArray(value);
   }
-  if (kind === "object") {
+  if (builtinKind === "object") {
     return isRecord(value);
   }
-  if (kind === "text" || kind === "date" || kind === "datetime") {
+  if (
+    builtinKind === "text" ||
+    builtinKind === "date" ||
+    builtinKind === "datetime"
+  ) {
     return typeof value === "string";
   }
-  if (kind === "number") {
+  if (builtinKind === "number") {
     return typeof value === "number";
   }
-  if (kind === "checkbox") {
+  if (builtinKind === "checkbox") {
     return typeof value === "boolean";
   }
-  if (kind === "null") {
+  if (builtinKind === "null") {
     return value === null;
   }
   return true;
@@ -366,6 +647,139 @@ function setValueAtPath(
   }
 
   return current;
+}
+
+function getValueAtPath(
+  current: unknown,
+  path: FrontmatterPathSegment[],
+): unknown {
+  let value = current;
+  for (const segment of path) {
+    if (Array.isArray(value) && typeof segment === "number") {
+      value = value[segment];
+      continue;
+    }
+    if (isRecord(value) && typeof segment === "string") {
+      value = value[segment];
+      continue;
+    }
+    return undefined;
+  }
+  return value;
+}
+
+function createUniquePropertyName(
+  value: Record<string, unknown>,
+  base: string,
+): string {
+  if (!Object.hasOwn(value, base)) {
+    return base;
+  }
+
+  let index = 2;
+  while (Object.hasOwn(value, `${base}${index}`)) {
+    index += 1;
+  }
+  return `${base}${index}`;
+}
+
+function defaultFrontmatterValue(
+  kind: FrontmatterPropertyKind,
+  config?: FrontmatterConfig,
+): unknown {
+  const widget = resolveFrontmatterWidget(config, kind);
+  if (typeof widget?.defaultValue === "function") {
+    return widget.defaultValue();
+  }
+  if (widget && "defaultValue" in widget) {
+    return widget.defaultValue;
+  }
+  const builtinKind = toBuiltinFrontmatterKind(widget?.fallbackKind ?? kind);
+  if (builtinKind === "number") {
+    return 0;
+  }
+  if (builtinKind === "checkbox") {
+    return false;
+  }
+  if (
+    builtinKind === "tags" ||
+    builtinKind === "aliases" ||
+    builtinKind === "multitext"
+  ) {
+    return [];
+  }
+  if (builtinKind === "array") {
+    return [];
+  }
+  if (builtinKind === "object") {
+    return {};
+  }
+  if (builtinKind === "null") {
+    return null;
+  }
+  return "";
+}
+
+function normalizeTypeDefinition(
+  definition: FrontmatterPropertyKind | FrontmatterTypeDefinition,
+): FrontmatterTypeDefinition {
+  if (typeof definition === "string") {
+    return { type: definition };
+  }
+  return definition;
+}
+
+function resolveConfiguredFrontmatterType(
+  config: FrontmatterConfig | undefined,
+  pathString: string,
+  key: string,
+): FrontmatterTypeDefinition | null {
+  const candidate =
+    config?.types?.[pathString] ??
+    config?.types?.[key] ??
+    config?.properties?.[pathString] ??
+    config?.properties?.[key];
+  return candidate ? normalizeTypeDefinition(candidate) : null;
+}
+
+export function resolveFrontmatterWidget(
+  config: FrontmatterConfig | undefined,
+  kind: FrontmatterPropertyKind,
+): FrontmatterTypeDefinition | null {
+  const configured =
+    config?.widgets?.find((widget) => widget.type === kind) ??
+    Object.values(config?.properties ?? {})
+      .map(normalizeTypeDefinition)
+      .find((definition) => definition.type === kind) ??
+    Object.values(config?.types ?? {})
+      .map(normalizeTypeDefinition)
+      .find((definition) => definition.type === kind);
+  return configured ?? null;
+}
+
+export function toBuiltinFrontmatterKind(
+  kind: FrontmatterPropertyKind,
+): BuiltinFrontmatterPropertyKind {
+  return isBuiltinFrontmatterKind(kind) ? kind : "text";
+}
+
+export function isBuiltinFrontmatterKind(
+  kind: FrontmatterPropertyKind,
+): kind is BuiltinFrontmatterPropertyKind {
+  return (
+    kind === "unknown" ||
+    kind === "tags" ||
+    kind === "aliases" ||
+    kind === "multitext" ||
+    kind === "array" ||
+    kind === "object" ||
+    kind === "text" ||
+    kind === "number" ||
+    kind === "checkbox" ||
+    kind === "date" ||
+    kind === "datetime" ||
+    kind === "null"
+  );
 }
 
 function formatPath(path: FrontmatterPathSegment[]): string {

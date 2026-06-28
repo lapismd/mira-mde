@@ -84,7 +84,7 @@
     data-grab-handle=""
     data-markdown-table-drag-handle="col"
     data-markdown-table-drag-index={index}
-    class="markdown-table-chrome markdown-table-chrome--drag-handle bg-accent absolute bottom-[-8px] left-[calc(50%-0.75rem_/_2)] z-10 cursor-grab opacity-0 group-hover:opacity-100"
+    class="markdown-table-chrome markdown-table-chrome--drag-handle absolute bottom-[-0.5rem] left-1/2 z-10 cursor-grab opacity-0 group-hover:opacity-100"
     aria-label="Drag column"
     onclick={(event) => {
       event.stopPropagation();

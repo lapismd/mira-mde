@@ -597,7 +597,7 @@
       <Table.Root
         bind:ref={tableRoot}
         class={cn(
-          "cm-table-widget w-fit",
+          "cm-table-widget h-full w-fit",
           dragSource && "is-table-chrome-dragging",
         )}
         className="overflow-x-auto overflow-y-hidden"

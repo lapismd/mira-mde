@@ -1,0 +1,29 @@
+{
+  "name": "@mira-mde/docs",
+  "version": "0.0.0",
+  "private": true,
+  "license": "AGPL-3.0-or-later",
+  "type": "module",
+  "scripts": {
+    "build": "astro check && astro build",
+    "check:svelte": "echo \"Astro checks Svelte islands via astro check\"",
+    "check:types": "astro check",
+    "dev": "astro dev --host 127.0.0.1",
+    "lint": "eslint src/content.config.ts src/data e2e --ext .ts",
+    "preview": "astro preview --host 127.0.0.1",
+    "test": "playwright test -c playwright.config.ts"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.9.9",
+    "@astrojs/starlight": "^0.41.1",
+    "@astrojs/svelte": "^9.0.0",
+    "@lucide/svelte": "^0.525.0",
+    "@mira-mde/default-ui": "workspace:*",
+    "@mira-mde/extensions": "workspace:*",
+    "astro": "^7.0.3",
+    "typescript": "^5.9.3"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.57.0"
+  }
+}

@@ -24,19 +24,56 @@
   const sample = `---
 title: Mira MDE Demo
 status: portable-v1
+published: 2026-06-28
+featured: true
+priority: 3
 tags:
   - markdown
   - editor
+aliases:
+  - Mira Markdown demo
+summary: Portable markdown feature coverage for the default editor.
+related:
+  package: "@mira-mde/default-ui"
+  surface: live-preview
 ---
 
 # Mira MDE
 
 This standalone editor is backed by CodeMirror 6, Svelte 5, unified, and the Mira extension contract.
 
+## Headings and inline formatting
+
+### Portable Markdown surface
+
+Inline **bold**, _italic_, ~~strikethrough~~, \`inline code\`, [path links](notes/architecture.md), [external links](https://example.com), automatic links like https://example.com, [[Project Plan|wikilinks]], embedded notes like ![[Architecture Diagram|Architecture diagram embed]], tags like #mira/editor, and inline math $E = mc^2$ all render in preview and live preview.
+
 > [!note] Portable package boundary
 > The editor, preview renderer, Mermaid support, and UI shell are separate workspace packages.
 
-## Tables
+> [!tip]+ Expanded callout
+> Collapsible callouts preserve the Lapis-style title, icon, and fold state.
+
+> [!warning]- Collapsed callout
+> This content starts collapsed in rendered Markdown.
+
+> Regular blockquotes remain regular blockquotes and are not converted into callouts.
+
+## Lists and tasks
+
+- Unordered item
+  - Nested unordered item
+- [x] Completed task without live-edit strikethrough
+- [ ] Open task with editable checkbox
+- [/] Custom task marker
+- [?] Question task marker
+- [-] Cancelled task marker
+
+1. Ordered item
+2. Ordered item with nested tasks
+   - [ ] Nested task
+
+## Tables and grid tables
 
 | Package | Role | Status |
 | :--- | :--- | ---: |
@@ -44,27 +81,65 @@ This standalone editor is backed by CodeMirror 6, Svelte 5, unified, and the Mir
 | @mira-mde/preview | rendered markdown | ready |
 | @mira-mde/plugin-mermaid | optional extension | ready |
 
++----------------------+------------------------+
+| Feature              | Behavior               |
++======================+========================+
+| Row and column menus | Kebab dropdown actions |
++----------------------+------------------------+
+| Drag handles         | Reorder rows/columns   |
++----------------------+------------------------+
+| Source toggle        | Edit raw Markdown      |
++----------------------+------------------------+
+
 ## Mermaid
 
-\`\`\`mermaid
+~~~mermaid
 flowchart LR
   Core["@mira-mde/core"] --> Svelte["@mira-mde/svelte"]
   Extensions["@mira-mde/extensions"] --> Svelte
   Mermaid["@mira-mde/plugin-mermaid"] --> Preview["@mira-mde/preview"]
   Svelte --> Demo["apps/demo"]
-\`\`\`
+~~~
 
-## Markdown Features
+~~~mermaid
+---
+look: rough
+rough:
+  seed: 4
+---
+sequenceDiagram
+  participant User
+  participant Toolbar
+  participant Editor
+  User->>Toolbar: choose mode or insert block
+  Toolbar->>Editor: dispatch editor action
+  Editor-->>User: update live preview
+~~~
 
-- [x] GFM task lists
-- [x] Wikilinks like [[Project Plan|Project Plan]]
-- [x] Tags like #mira/editor
-- [x] Math: $E = mc^2$
+## Media, embeds, and raw HTML
 
-\`\`\`ts
+![Mira Markdown demo asset](/mira-markdown-demo.svg "Mira demo asset")
+
+<mark>Raw HTML is preserved</mark> and <kbd>keyboard</kbd> elements render through the Markdown preview pipeline.
+
+:::mira{title="Directive example"}
+Directive syntax is parsed and surfaced as a portable custom element.
+:::
+
+## Code, math, and footnotes
+
+~~~ts
 import { createMiraDefaultEditor } from "@mira-mde/default-ui";
 import "@mira-mde/default-ui/styles.css";
-\`\`\`
+~~~
+
+$$
+\\int_0^1 x^2 dx = \\frac{1}{3}
+$$
+
+GFM footnotes are supported too.[^feature-footnote]
+
+[^feature-footnote]: Footnotes come from the shared GFM Markdown pipeline.
 `;
 
   type EditorShell = "default" | "composable";

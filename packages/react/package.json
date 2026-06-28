@@ -1,14 +1,52 @@
 {
   "name": "@mira-mde/react",
   "version": "0.0.0",
-  "private": true,
   "license": "AGPL-3.0-or-later",
   "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./styles.css": "./dist/styles.css"
+  },
   "scripts": {
-    "build": "echo \"@mira-mde/react is planned after the core API stabilizes\"",
-    "check:types": "echo \"@mira-mde/react is planned\"",
+    "build": "tsup src/index.ts --format esm --dts --clean && cp src/styles.css dist/styles.css && publint",
+    "check:types": "tsc -p tsconfig.json --noEmit",
     "check:svelte": "echo \"no svelte files\"",
-    "lint": "echo \"@mira-mde/react is planned\"",
-    "test": "echo \"@mira-mde/react is planned\""
+    "lint": "eslint src --ext .ts,.tsx",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@mira-mde/codemirror": "workspace:*",
+    "@mira-mde/codemirror-markdown": "workspace:*",
+    "@mira-mde/codemirror-rich": "workspace:*",
+    "@mira-mde/codemirror-tables": "workspace:*",
+    "@mira-mde/core": "workspace:*",
+    "@mira-mde/default-ui": "workspace:*",
+    "@mira-mde/extensions": "workspace:*",
+    "@mira-mde/plugin-mermaid": "workspace:*",
+    "@mira-mde/preview": "workspace:*",
+    "lucide-react": "^0.525.0"
+  },
+  "peerDependencies": {
+    "@codemirror/state": "^6.5.2",
+    "react": "^18.3.0 || ^19.0.0",
+    "react-dom": "^18.3.0 || ^19.0.0",
+    "svelte": "^5.0.0"
+  },
+  "devDependencies": {
+    "@codemirror/state": "^6.5.2",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "svelte": "^5.46.1"
   }
 }

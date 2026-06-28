@@ -34,3 +34,13 @@ export type MarkdownParserOptions = {
   remarkPlugins?: Pluggable[];
   rehypePlugins?: Pluggable[];
 };
+
+export type {
+  FrontmatterConfig,
+  FrontmatterPathSegment,
+  FrontmatterProperty,
+  FrontmatterPropertyKind,
+  FrontmatterTypeDefinition,
+  FrontmatterWidgetContext,
+  FrontmatterWidgetRenderer,
+} from "../components/frontmatter-utils";

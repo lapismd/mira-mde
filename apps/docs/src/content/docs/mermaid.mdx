@@ -1,0 +1,39 @@
+---
+title: Mermaid
+description: Render Mermaid diagrams with hover controls, dialog controls, pan, zoom, reset, and source fallback.
+---
+
+import LiveEditorExample from "../../components/LiveEditorExample.svelte";
+import { mermaidMarkdown } from "../../data/examples";
+
+Mermaid support is packaged as an optional extension. The default UI enables it by default and includes the same rendered controls in live preview and reading mode.
+
+<LiveEditorExample
+  client:only="svelte"
+  title="Mermaid controls"
+  description="Hover diagrams to inspect controls. Expanded diagrams use the pan, zoom, reset, and copy controls."
+  initialValue={mermaidMarkdown}
+  height="36rem"
+  sourcePath="mermaid.md"
+/>
+
+## Enable Mermaid
+
+```ts
+import { mermaidExtension } from "@mira-mde/plugin-mermaid";
+
+const extensions = [mermaidExtension()];
+```
+
+`MiraDefaultMde` adds this extension automatically when `MiraFeature.Mermaid` is enabled.
+
+## Behavior
+
+- instance-safe render IDs
+- responsive SVG layout
+- hover controls
+- copy source action
+- expanded dialog
+- pan, zoom, reset, and center controls
+- source toggle back to the fenced code block
+- optional rough/sketch rendering where supported by the plugin
