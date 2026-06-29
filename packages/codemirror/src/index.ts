@@ -40,6 +40,18 @@ import {
 } from "@codemirror/view";
 import { tagHighlighter, tags } from "@lezer/highlight";
 
+export {
+  applyMarkdownTemplate,
+  createSlashCommandCompletionSource,
+  createSlashCommandExtensions,
+  type MiraMarkdownTemplate,
+  type MiraSlashCommand,
+  type MiraSlashCommandContext,
+  type MiraSlashCommandOptions,
+  type MiraTemplateSelection,
+  type MiraTextRange,
+} from "./slash-commands";
+
 export type MiraCodeMirrorOptions = {
   readonly?: boolean;
   placeholder?: string;

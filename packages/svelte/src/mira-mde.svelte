@@ -1,7 +1,10 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import type { Extension } from "@codemirror/state";
-  import { createBaseCodeMirrorExtensions } from "@mira-mde/codemirror";
+  import {
+    createBaseCodeMirrorExtensions,
+    createSlashCommandExtensions,
+  } from "@mira-mde/codemirror";
   import { createMarkdownCodeMirrorExtensions } from "@mira-mde/codemirror-markdown";
   import { createRichEditorExtensions } from "@mira-mde/codemirror-rich";
   import { createTableExtensions } from "@mira-mde/codemirror-tables";
@@ -69,6 +72,18 @@
       indentWidth,
       sourcePath,
       extensions.map((extension) => extension.name).join(","),
+      resolvedExtensions.slashCommands
+        .map((command) =>
+          [
+            command.id,
+            command.label,
+            typeof command.insert === "string"
+              ? command.insert
+              : (command.insert?.markdown ?? ""),
+            command.run ? "run" : "insert",
+          ].join(":"),
+        )
+        .join(","),
     ].join("|"),
   );
   const showEditor = $derived(mode !== "preview");
@@ -92,6 +107,9 @@
         spellcheck,
         indentWithTabs,
         indentWidth,
+      }),
+      createSlashCommandExtensions({
+        commands: resolved.slashCommands,
       }),
       createMarkdownCodeMirrorExtensions({
         codeLanguages: resolved.codeLanguages,
@@ -136,6 +154,7 @@
         getValue: () => activeController.getValue(),
         setValue: (next) => activeController.setValue(next),
         focus: () => activeController.focus(),
+        insertMarkdown,
       });
       if (typeof cleanup === "function") {
         cleanupExtensionMounts.push(cleanup);

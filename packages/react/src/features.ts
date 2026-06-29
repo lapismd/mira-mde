@@ -1,4 +1,9 @@
 import { mermaidExtension } from "@mira-mde/plugin-mermaid";
+import {
+  resolveMiraDefaultSlashCommands as resolveBaseMiraDefaultSlashCommands,
+  type MiraDefaultFeatureConfigs as BaseMiraDefaultFeatureConfigs,
+  type MiraFeatureFlags as BaseMiraFeatureFlags,
+} from "@mira-mde/default-ui";
 import type { MiraExtension, MiraMode } from "@mira-mde/extensions";
 import type {
   MiraDefaultEditMode,
@@ -27,6 +32,7 @@ export const MiraFeature = {
   Embeds: "embeds",
   Wikilinks: "wikilinks",
   Tags: "tags",
+  SlashCommands: "slash-commands",
   SourceMode: "source-mode",
   LivePreviewMode: "live-preview-mode",
   PreviewMode: "preview-mode",
@@ -50,6 +56,7 @@ export const defaultMiraFeatures: ResolvedMiraDefaultFeatures = {
   [MiraFeature.Embeds]: true,
   [MiraFeature.Wikilinks]: true,
   [MiraFeature.Tags]: true,
+  [MiraFeature.SlashCommands]: true,
   [MiraFeature.SourceMode]: true,
   [MiraFeature.LivePreviewMode]: true,
   [MiraFeature.PreviewMode]: true,
@@ -99,7 +106,33 @@ export function createMiraDefaultExtensions({
     extensions.push(mermaidExtension());
   }
 
+  if (resolvedFeatures[MiraFeature.SlashCommands]) {
+    const slashCommands = resolveMiraDefaultSlashCommands({
+      featureConfigs,
+      features,
+    });
+    if (slashCommands.length > 0) {
+      extensions.push({
+        name: "default-slash-commands",
+        slashCommands,
+      });
+    }
+  }
+
   return extensions;
+}
+
+export function resolveMiraDefaultSlashCommands({
+  featureConfigs = {},
+  features = {},
+}: {
+  featureConfigs?: MiraDefaultFeatureConfigs;
+  features?: MiraFeatureFlags;
+} = {}) {
+  return resolveBaseMiraDefaultSlashCommands({
+    featureConfigs: featureConfigs as BaseMiraDefaultFeatureConfigs,
+    features: features as BaseMiraFeatureFlags,
+  });
 }
 
 export function resolveMiraDefaultToolbarItems({

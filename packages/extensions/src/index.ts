@@ -28,7 +28,48 @@ export type MiraMode = "source" | "live-preview" | "preview" | "split";
 export type MiraCommand = {
   id: string;
   label: string;
+  description?: string;
+  group?: string;
+  keywords?: string[];
   run: (context: MiraExtensionRuntimeContext) => void;
+};
+
+export type MiraTextRange = {
+  from: number;
+  to: number;
+};
+
+export type MiraTemplateSelection =
+  | number
+  | {
+      anchor: number;
+      head?: number;
+    };
+
+export type MiraMarkdownTemplate = {
+  markdown: string;
+  selection?: MiraTemplateSelection;
+};
+
+export type MiraSlashCommandContext = MiraExtensionRuntimeContext & {
+  query: string;
+  range: MiraTextRange;
+  replaceRange: (
+    markdown: string,
+    range?: Partial<MiraTextRange>,
+    selection?: MiraTemplateSelection,
+  ) => void;
+};
+
+export type MiraSlashCommand = {
+  id: string;
+  label: string;
+  description?: string;
+  group?: string;
+  keywords?: string[];
+  boost?: number;
+  insert?: string | MiraMarkdownTemplate;
+  run?: (context: MiraSlashCommandContext) => void;
 };
 
 export type MiraToolbarItem = {
@@ -81,6 +122,7 @@ export type MiraExtensionRuntimeContext = {
   getValue: () => string;
   setValue: (value: string) => void;
   focus: () => void;
+  insertMarkdown: (markdown: string, selection?: MiraTemplateSelection) => void;
 };
 
 export type MiraExtensionContext = {
@@ -103,6 +145,7 @@ export type MiraExtension = {
   rehypePlugins?: Pluggable[];
   components?: MiraRendererComponents;
   commands?: MiraCommand[];
+  slashCommands?: MiraSlashCommand[];
   toolbarItems?: MiraToolbarItem[];
   styles?: string[];
   onMount?: (context: MiraExtensionRuntimeContext) => void | (() => void);
@@ -115,6 +158,7 @@ export type ResolvedMiraExtensions = {
   rehypePlugins: Pluggable[];
   components: MiraRendererComponents;
   commands: MiraCommand[];
+  slashCommands: MiraSlashCommand[];
   toolbarItems: MiraToolbarItem[];
   styles: string[];
   onMount: NonNullable<MiraExtension["onMount"]>[];
@@ -132,6 +176,7 @@ export function emptyResolvedMiraExtensions(): ResolvedMiraExtensions {
     rehypePlugins: [],
     components: {},
     commands: [],
+    slashCommands: [],
     toolbarItems: [],
     styles: [],
     onMount: [],
@@ -155,6 +200,7 @@ export function resolveMiraExtensions(
     resolved.rehypePlugins.push(...(extension.rehypePlugins ?? []));
     Object.assign(resolved.components, extension.components);
     resolved.commands.push(...(extension.commands ?? []));
+    resolved.slashCommands.push(...(extension.slashCommands ?? []));
     resolved.toolbarItems.push(...(extension.toolbarItems ?? []));
     resolved.styles.push(...(extension.styles ?? []));
     if (extension.onMount) {

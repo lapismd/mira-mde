@@ -23,4 +23,40 @@ describe("resolveMiraExtensions", () => {
     expect(resolved.rehypePlugins).toHaveLength(1);
     expect(resolved.components).toEqual({ a: "span", b: "div" });
   });
+
+  it("merges slash commands in extension order", () => {
+    const resolved = resolveMiraExtensions(
+      [
+        defineMiraExtension({
+          name: "first",
+          slashCommands: [
+            {
+              id: "heading",
+              label: "Heading",
+              insert: "# ",
+            },
+          ],
+        }),
+        defineMiraExtension({
+          name: "second",
+          slashCommands: [
+            {
+              id: "callout",
+              label: "Callout",
+              insert: "> [!note] ",
+            },
+          ],
+        }),
+      ],
+      {
+        mode: "source",
+        readonly: false,
+      },
+    );
+
+    expect(resolved.slashCommands.map((command) => command.id)).toEqual([
+      "heading",
+      "callout",
+    ]);
+  });
 });

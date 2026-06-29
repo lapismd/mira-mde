@@ -1,7 +1,12 @@
 import { mermaidExtension } from "@mira-mde/plugin-mermaid";
 import type { Component } from "svelte";
 import type { MiraEditorSelection } from "@mira-mde/core";
-import type { MiraExtension, MiraMode } from "@mira-mde/extensions";
+import type {
+  MiraExtension,
+  MiraMarkdownTemplate,
+  MiraMode,
+  MiraSlashCommand,
+} from "@mira-mde/extensions";
 
 export type MiraDefaultEditMode = Extract<MiraMode, "live-preview" | "source">;
 
@@ -22,6 +27,7 @@ export const MiraFeature = {
   Embeds: "embeds",
   Wikilinks: "wikilinks",
   Tags: "tags",
+  SlashCommands: "slash-commands",
   SourceMode: "source-mode",
   LivePreviewMode: "live-preview-mode",
   PreviewMode: "preview-mode",
@@ -140,9 +146,30 @@ export type MiraDefaultMermaidConfig = {
   enabled?: boolean;
 };
 
+export type MiraDefaultSlashCommandId =
+  | "heading1"
+  | "heading2"
+  | "heading3"
+  | "numberedList"
+  | "bulletList"
+  | "taskList"
+  | "quote"
+  | "callout"
+  | "code"
+  | "math"
+  | "table"
+  | "gridTable"
+  | "mermaid";
+
+export type MiraDefaultSlashCommandConfig = {
+  commands?: MiraSlashCommand[];
+  disableDefaultCommands?: MiraDefaultSlashCommandId[] | true;
+};
+
 export type MiraDefaultFeatureConfigs = {
   [MiraFeature.Toolbar]?: MiraDefaultToolbarConfig;
   [MiraFeature.Mermaid]?: MiraDefaultMermaidConfig;
+  [MiraFeature.SlashCommands]?: MiraDefaultSlashCommandConfig;
 };
 
 export type ResolvedMiraDefaultFeatures = Record<MiraFeatureName, boolean>;
@@ -164,6 +191,7 @@ export const defaultMiraFeatures: ResolvedMiraDefaultFeatures = {
   [MiraFeature.Embeds]: true,
   [MiraFeature.Wikilinks]: true,
   [MiraFeature.Tags]: true,
+  [MiraFeature.SlashCommands]: true,
   [MiraFeature.SourceMode]: true,
   [MiraFeature.LivePreviewMode]: true,
   [MiraFeature.PreviewMode]: true,
@@ -185,6 +213,118 @@ const defaultToolbarItems: MiraDefaultToolbarItem[] = [
   "code",
   "math",
   "mermaid",
+];
+
+const defaultSlashCommands: Array<
+  MiraSlashCommand & { id: MiraDefaultSlashCommandId }
+> = [
+  {
+    id: "heading1",
+    label: "Heading 1",
+    description: "Large section heading",
+    group: "Basic",
+    keywords: ["h1", "title"],
+    insert: slashTemplate("# <|>"),
+  },
+  {
+    id: "heading2",
+    label: "Heading 2",
+    description: "Section heading",
+    group: "Basic",
+    keywords: ["h2"],
+    insert: slashTemplate("## <|>"),
+  },
+  {
+    id: "heading3",
+    label: "Heading 3",
+    description: "Subsection heading",
+    group: "Basic",
+    keywords: ["h3"],
+    insert: slashTemplate("### <|>"),
+  },
+  {
+    id: "numberedList",
+    label: "Numbered list",
+    description: "Start an ordered list",
+    group: "Basic",
+    keywords: ["ordered list", "ol"],
+    insert: slashTemplate("1. <|>"),
+  },
+  {
+    id: "bulletList",
+    label: "Bullet list",
+    description: "Start an unordered list",
+    group: "Basic",
+    keywords: ["unordered list", "ul"],
+    insert: slashTemplate("- <|>"),
+  },
+  {
+    id: "taskList",
+    label: "Task list",
+    description: "Start a checklist",
+    group: "Basic",
+    keywords: ["checkbox", "todo"],
+    insert: slashTemplate("- [ ] <|>"),
+  },
+  {
+    id: "quote",
+    label: "Blockquote",
+    description: "Start a quote block",
+    group: "Basic",
+    keywords: ["quote"],
+    insert: slashTemplate("> <|>"),
+  },
+  {
+    id: "callout",
+    label: "Callout",
+    description: "Insert an Obsidian-style callout",
+    group: "Basic",
+    keywords: ["admonition", "note"],
+    insert: slashTemplate("> [!note] <|>\n> "),
+  },
+  {
+    id: "code",
+    label: "Code block",
+    description: "Insert a fenced code block",
+    group: "Blocks",
+    keywords: ["fence", "pre"],
+    insert: slashTemplate("```\n<|>\n```"),
+  },
+  {
+    id: "math",
+    label: "Math block",
+    description: "Insert a KaTeX block",
+    group: "Blocks",
+    keywords: ["katex", "latex", "equation"],
+    insert: slashTemplate("$$\n<|>\n$$"),
+  },
+  {
+    id: "table",
+    label: "Table",
+    description: "Insert a pipe table",
+    group: "Blocks",
+    keywords: ["pipe table"],
+    insert: "| Column | Value |\n| --- | --- |\n| Item | Detail |\n",
+  },
+  {
+    id: "gridTable",
+    label: "Grid table",
+    description: "Insert a grid table",
+    group: "Blocks",
+    keywords: ["rst table"],
+    insert:
+      "+--------+--------+\n| Column | Value  |\n+========+========+\n| Item   | Detail |\n+--------+--------+\n",
+  },
+  {
+    id: "mermaid",
+    label: "Mermaid diagram",
+    description: "Insert a Mermaid fenced block",
+    group: "Blocks",
+    keywords: ["diagram", "flowchart"],
+    insert: slashTemplate(
+      "```mermaid\nflowchart TD\n  <|>A[Start] --> B[Done]\n```\n",
+    ),
+  },
 ];
 
 export function resolveMiraDefaultFeatures(
@@ -213,7 +353,38 @@ export function createMiraDefaultExtensions({
     extensions.push(mermaidExtension());
   }
 
+  if (resolvedFeatures[MiraFeature.SlashCommands]) {
+    const slashCommands = resolveMiraDefaultSlashCommands({
+      featureConfigs,
+      features,
+    });
+    if (slashCommands.length > 0) {
+      extensions.push({
+        name: "default-slash-commands",
+        slashCommands,
+      });
+    }
+  }
+
   return extensions;
+}
+
+export function resolveMiraDefaultSlashCommands({
+  featureConfigs = {},
+  features = {},
+}: {
+  featureConfigs?: MiraDefaultFeatureConfigs;
+  features?: MiraFeatureFlags;
+} = {}): MiraSlashCommand[] {
+  const resolvedFeatures = resolveMiraDefaultFeatures(features);
+  const config = featureConfigs[MiraFeature.SlashCommands];
+  const defaultCommands = defaultSlashCommands
+    .filter((command) =>
+      isDefaultSlashCommandEnabled(command.id, config?.disableDefaultCommands),
+    )
+    .filter((command) => isSlashCommandAvailable(command.id, resolvedFeatures));
+
+  return [...defaultCommands, ...(config?.commands ?? [])];
 }
 
 export function resolveMiraDefaultToolbarItems({
@@ -323,4 +494,53 @@ function isToolbarItemAvailable(
     case "math":
       return features[MiraFeature.Math];
   }
+}
+
+function isDefaultSlashCommandEnabled(
+  command: MiraDefaultSlashCommandId,
+  disabled: MiraDefaultSlashCommandId[] | true | undefined,
+): boolean {
+  return disabled === true ? false : !disabled?.includes(command);
+}
+
+function isSlashCommandAvailable(
+  command: MiraDefaultSlashCommandId,
+  features: ResolvedMiraDefaultFeatures,
+): boolean {
+  switch (command) {
+    case "heading1":
+    case "heading2":
+    case "heading3":
+      return features[MiraFeature.Headings];
+    case "numberedList":
+    case "bulletList":
+    case "taskList":
+    case "quote":
+    case "callout":
+      return features[MiraFeature.Lists];
+    case "table":
+      return features[MiraFeature.Tables];
+    case "gridTable":
+      return features[MiraFeature.GridTables];
+    case "mermaid":
+      return features[MiraFeature.Mermaid];
+    case "code":
+      return features[MiraFeature.Code];
+    case "math":
+      return features[MiraFeature.Math];
+  }
+}
+
+function slashTemplate(markdown: string): MiraMarkdownTemplate {
+  const marker = "<|>";
+  const selection = markdown.indexOf(marker);
+
+  if (selection === -1) {
+    return { markdown };
+  }
+
+  return {
+    markdown: markdown.replace(marker, ""),
+    selection,
+  };
 }

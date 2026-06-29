@@ -8,6 +8,7 @@ import {
   resolveMiraDefaultEditMode,
   resolveMiraDefaultFeatures,
   resolveMiraDefaultModes,
+  resolveMiraDefaultSlashCommands,
   resolveMiraDefaultToolbarActions,
   resolveMiraDefaultToolbarDefinitions,
   resolveMiraDefaultToolbarItems,
@@ -23,6 +24,7 @@ describe("default UI feature resolution", () => {
 
     expect(features[MiraFeature.Toolbar]).toBe(true);
     expect(features[MiraFeature.Mermaid]).toBe(true);
+    expect(features[MiraFeature.SlashCommands]).toBe(true);
     expect(features[MiraFeature.LivePreviewMode]).toBe(true);
   });
 
@@ -113,13 +115,59 @@ describe("default UI feature resolution", () => {
   });
 
   it("adds Mermaid by default and omits it when disabled", () => {
-    expect(createMiraDefaultExtensions()).toHaveLength(1);
+    expect(
+      createMiraDefaultExtensions().some(
+        (extension) => extension.name === "mermaid",
+      ),
+    ).toBe(true);
     expect(
       createMiraDefaultExtensions({
         features: {
           [MiraFeature.Mermaid]: false,
         },
       }),
-    ).toHaveLength(0);
+    ).not.toEqual(
+      expect.arrayContaining([expect.objectContaining({ name: "mermaid" })]),
+    );
+  });
+
+  it("adds slash commands by default and filters them by feature flags", () => {
+    expect(
+      createMiraDefaultExtensions().some(
+        (extension) => extension.name === "default-slash-commands",
+      ),
+    ).toBe(true);
+    expect(
+      resolveMiraDefaultSlashCommands({
+        features: {
+          [MiraFeature.Tables]: false,
+        },
+      }).map((command) => command.id),
+    ).not.toContain("table");
+  });
+
+  it("supports custom slash commands", () => {
+    expect(
+      resolveMiraDefaultSlashCommands({
+        featureConfigs: {
+          [MiraFeature.SlashCommands]: {
+            disableDefaultCommands: true,
+            commands: [
+              {
+                id: "custom",
+                label: "Custom",
+                insert: "custom",
+              },
+            ],
+          },
+        },
+      }),
+    ).toEqual([
+      {
+        id: "custom",
+        label: "Custom",
+        insert: "custom",
+      },
+    ]);
   });
 });

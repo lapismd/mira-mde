@@ -8,6 +8,10 @@ import type {
   MiraTheme,
   MiraThemeConfig,
 } from "@mira-mde/extensions";
+import type {
+  MiraDefaultSlashCommandConfig,
+  MiraDefaultSlashCommandId,
+} from "@mira-mde/default-ui";
 import type { ComponentType } from "react";
 
 export type MiraFrontmatterConfig = {
@@ -82,6 +86,7 @@ export type MiraFeatureName =
   | "embeds"
   | "wikilinks"
   | "tags"
+  | "slash-commands"
   | "source-mode"
   | "live-preview-mode"
   | "preview-mode"
@@ -202,7 +207,10 @@ export type MiraDefaultMermaidConfig = {
 export type MiraDefaultFeatureConfigs = {
   toolbar?: MiraDefaultToolbarConfig;
   mermaid?: MiraDefaultMermaidConfig;
+  "slash-commands"?: MiraDefaultSlashCommandConfig;
 };
+
+export type { MiraDefaultSlashCommandConfig, MiraDefaultSlashCommandId };
 
 export type MiraDefaultToolbarProps = {
   value?: string;

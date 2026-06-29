@@ -1,5 +1,8 @@
 import type { Extension } from "@codemirror/state";
-import { createBaseCodeMirrorExtensions } from "@mira-mde/codemirror";
+import {
+  createBaseCodeMirrorExtensions,
+  createSlashCommandExtensions,
+} from "@mira-mde/codemirror";
 import { createMarkdownCodeMirrorExtensions } from "@mira-mde/codemirror-markdown";
 import { createRichEditorExtensions } from "@mira-mde/codemirror-rich";
 import { createTableExtensions } from "@mira-mde/codemirror-tables";
@@ -121,6 +124,12 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
     [onReadonlyChangeRef, readonlyProp],
   );
 
+  const handleInsertMarkdown = useCallback((markdown: string) => {
+    const controller = controllerRef.current;
+    controller?.replaceSelection(markdown);
+    controller?.focus();
+  }, []);
+
   const buildCodeMirrorExtensions = useCallback((): Extension[] => {
     const resolved = resolveMiraExtensions(extensions, {
       mode: modeRef.current,
@@ -136,6 +145,9 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
         placeholder,
         readonly: readonlyRef.current,
         spellcheck,
+      }),
+      createSlashCommandExtensions({
+        commands: resolved.slashCommands,
       }),
       createMarkdownCodeMirrorExtensions({
         codeLanguages: resolved.codeLanguages,
@@ -201,6 +213,7 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
         const cleanup = mountExtension({
           focus: () => activeController.focus(),
           getValue: () => activeController.getValue(),
+          insertMarkdown: handleInsertMarkdown,
           setValue: (nextValue) => activeController.setValue(nextValue),
         });
         if (typeof cleanup === "function") {
@@ -208,7 +221,7 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
         }
       }
     },
-    [resolvedExtensions.onMount],
+    [handleInsertMarkdown, resolvedExtensions.onMount],
   );
 
   useEffect(() => {
@@ -264,12 +277,6 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
     },
     [commitValue, valueRef],
   );
-
-  const handleInsertMarkdown = useCallback((markdown: string) => {
-    const controller = controllerRef.current;
-    controller?.replaceSelection(markdown);
-    controller?.focus();
-  }, []);
 
   useImperativeHandle(
     ref,
