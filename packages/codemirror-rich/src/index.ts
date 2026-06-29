@@ -129,6 +129,7 @@ export {
 const BLOCK_WIDGET_NODE_NAMES = new Set([
   "Frontmatter",
   "FencedCode",
+  "HorizontalRule",
   "BlockMathDollar",
   "BlockMathBracket",
   "Blockquote",
@@ -192,7 +193,9 @@ export function createRichEditorExtensions(
   return [
     miraRichEditorTheme,
     headingGutterExtension(),
-    livePreview ? indentGuideDecorations() : [],
+    livePreview && options.indentGuides !== false
+      ? indentGuideDecorations()
+      : [],
     livePreview ? blockPreviewDecorations(options) : [],
     livePreview ? inlinePreviewDecorations(options) : [],
     foldIndicatorDecorations(),

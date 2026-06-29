@@ -8,6 +8,7 @@ import type {
 export type MiraRichEditorOptions = {
   enabled?: boolean;
   livePreview?: boolean;
+  indentGuides?: boolean;
   extensions?: MiraExtension[];
   sourcePath?: string;
   linkResolver?: MiraLinkResolver;

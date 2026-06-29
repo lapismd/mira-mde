@@ -118,24 +118,35 @@ export class BlockPreviewWidget extends WidgetType {
     });
     previewWidgetMounts.set(container, component as Record<string, unknown>);
 
-    container.addEventListener("mousedown", (event) => {
+    const selectSource = (event: MouseEvent) => {
       const target = event.target instanceof Element ? event.target : null;
-      if (target?.closest(PREVIEW_INTERACTIVE_SELECTOR)) {
-        event.stopPropagation();
+      const interactiveTarget = target?.closest(PREVIEW_INTERACTIVE_SELECTOR);
+      if (
+        interactiveTarget &&
+        interactiveTarget !== container &&
+        container.contains(interactiveTarget)
+      ) {
         return;
       }
 
-      if (!shouldActivateEditablePreview(event)) {
+      if (
+        event.button !== 0 ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey
+      ) {
         return;
       }
 
       event.preventDefault();
-      view.dispatch({
-        selection: { anchor: this.config.from, head: this.config.to },
-        scrollIntoView: true,
-      });
-      view.focus();
-    });
+      event.stopImmediatePropagation();
+      selectWidgetSource(view, this.config.from, this.config.to);
+    };
+
+    container.addEventListener("pointerdown", selectSource, { capture: true });
+    container.addEventListener("mousedown", selectSource, { capture: true });
+    container.addEventListener("click", selectSource, { capture: true });
 
     return container;
   }
@@ -289,18 +300,23 @@ export class InlineMathWidget extends WidgetType {
     });
     previewWidgetMounts.set(container, component as Record<string, unknown>);
 
-    container.addEventListener("mousedown", (event) => {
+    const selectSource = (event: MouseEvent) => {
       if (!shouldActivateEditablePreview(event)) {
         return;
       }
 
       event.preventDefault();
+      event.stopImmediatePropagation();
       view.dispatch({
         selection: { anchor: this.config.from, head: this.config.to },
         scrollIntoView: true,
       });
       view.focus();
-    });
+    };
+
+    container.addEventListener("pointerdown", selectSource, { capture: true });
+    container.addEventListener("mousedown", selectSource, { capture: true });
+    container.addEventListener("click", selectSource, { capture: true });
 
     return container;
   }

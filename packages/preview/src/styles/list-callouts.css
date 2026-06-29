@@ -1,6 +1,11 @@
 .markdown-rendered li.lc-list-callout,
 .markdown-preview-surface .markdown li.lc-list-callout {
+  padding-block-end: calc(var(--list-spacing) + 0.35rem);
   position: relative;
+}
+
+.markdown-editor-surface .cm-line.lc-list-callout {
+  padding-block-end: 0.35rem;
 }
 
 .markdown-rendered li.lc-list-callout > :not(ul, ol),

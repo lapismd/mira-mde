@@ -75,6 +75,8 @@ Mira keeps source mode, live preview, and reading mode aligned so portable Markd
 
 Inline **bold**, _italic_, ~~strikethrough~~, \`inline code\`, [relative links](notes/markdown.md), [external links](https://example.com), automatic links like https://example.com, [[Daily Note|wikilinks]], embedded notes like ![[Architecture Diagram|architecture diagram]], #tags, and inline math $a^2 + b^2 = c^2$ stay editable in live preview.
 
+---
+
 Raw HTML such as <mark>highlighted text</mark> and <kbd>keyboard keys</kbd> is preserved.
 
 ## Callouts and blockquotes
@@ -109,6 +111,24 @@ Raw HTML such as <mark>highlighted text</mark> and <kbd>keyboard keys</kbd> is p
 2. Ordered item with children
    - Nested unordered item
    - [ ] Nested task item
+
+## Indentation and continuation
+
+- Unordered parent with wrapped continuation text that should align under the content and keep the list marker separate.
+  Continued parent paragraph stays aligned with the parent content.
+  - Nested unordered child with its own continuation text.
+    Continued nested paragraph remains inside the nested level.
+
+1. Ordered parent with wrapped continuation text that keeps the number and paragraph body aligned.
+   Continued ordered paragraph stays aligned with the ordered content.
+2. Ordered parent with a nested task
+   - [ ] Nested task continuation keeps the checkbox and text aligned.
+     Continued task text remains inside the nested task.
+
+> Blockquote parent with continuation text that keeps the quote guide visible.
+> Continued blockquote paragraph stays aligned.
+>
+> > Nested blockquote keeps a second guide and continuation indentation.
 
 ## Images and embeds
 

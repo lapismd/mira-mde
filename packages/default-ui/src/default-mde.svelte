@@ -22,6 +22,9 @@
     placeholder = "Start writing Markdown...",
     lineWrapping = true,
     spellcheck = true,
+    indentGuides = true,
+    indentWithTabs = true,
+    indentWidth = 4,
     theme = "obsidian",
     themeConfig,
     sourcePath,
@@ -40,6 +43,9 @@
     onChange,
     onModeChange,
     onReadonlyChange,
+    onIndentGuidesChange,
+    onIndentWidthChange,
+    onIndentWithTabsChange,
     onFrontmatterChange,
   }: MiraDefaultMdeProps = $props();
 
@@ -76,16 +82,37 @@
     onReadonlyChange?.(nextReadonly);
   }
 
+  function applyIndentGuides(nextEnabled: boolean): void {
+    indentGuides = nextEnabled;
+    onIndentGuidesChange?.(nextEnabled);
+  }
+
+  function applyIndentWidth(nextWidth: number): void {
+    indentWidth = nextWidth;
+    onIndentWidthChange?.(nextWidth);
+  }
+
+  function applyIndentWithTabs(nextEnabled: boolean): void {
+    indentWithTabs = nextEnabled;
+    onIndentWithTabsChange?.(nextEnabled);
+  }
+
   function createToolbarActionContext(): MiraDefaultToolbarActionContext {
     return {
       value,
       mode,
       readonly,
       focus,
+      getIndentGuides: () => indentGuides,
+      getIndentWidth: () => indentWidth,
+      getIndentWithTabs: () => indentWithTabs,
       getMarkdown,
       getMode,
       getSelection,
       insertMarkdown,
+      setIndentGuides: applyIndentGuides,
+      setIndentWidth: applyIndentWidth,
+      setIndentWithTabs: applyIndentWithTabs,
       setMarkdown,
       setMode,
       setReadonly,
@@ -158,6 +185,12 @@
       {toolbarActions}
       {toolbars}
       context={toolbarContext}
+      {indentGuides}
+      {indentWidth}
+      {indentWithTabs}
+      onIndentGuidesChange={applyIndentGuides}
+      onIndentWidthChange={applyIndentWidth}
+      onIndentWithTabsChange={applyIndentWithTabs}
     />
   {/if}
 
@@ -172,6 +205,9 @@
       {placeholder}
       {lineWrapping}
       {spellcheck}
+      {indentGuides}
+      {indentWithTabs}
+      {indentWidth}
       {theme}
       {themeConfig}
       {sourcePath}

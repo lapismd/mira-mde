@@ -74,6 +74,9 @@ preview, and the default editor shell around them.
 - Live preview block widgets must use Lapis-compatible margins and sizing.
   Margin around widget roots can break CodeMirror gutter alignment, so verify
   line numbers after changing widget CSS.
+- In live preview, prefer padding over margins for line-level separation such
+  as list-callout spacing, because margins change CodeMirror line/gutter
+  geometry.
 
 ## Markdown Surfaces
 
@@ -92,15 +95,23 @@ preview, and the default editor shell around them.
   behavior, layout registration, copy actions, and source toggle behavior.
 - Tables should keep Lapis menus, icons, drag/drop behavior, cell backgrounds,
   sizing, source fallback, and row/column chrome.
+- Block and inline rendered widgets should keep source fallback behavior. If a
+  user clicks rendered inline math, links, embeds, or block widgets such as
+  horizontal rules and code fences, the underlying Markdown source must become
+  editable.
 
 ## UI And Interactions
 
 - Use Lucide icons consistently with the Lapis port and existing Mira UI.
 - Icon-only buttons need accessible labels and hover tooltips where the action is
   not obvious from context.
+- Hover-only editor chrome, such as code-copy controls, should remain mounted
+  for keyboard accessibility but hidden visually until hover or focus.
 - Default editor toolbars should stay compact and editor-like. View controls
   belong at the end of the toolbar unless a specific design says otherwise.
 - Prefer declarative toolbar APIs for custom actions and dropdown menu items.
+- Split view should keep editor and preview vertical scroll positions
+  synchronized by ratio rather than by fixed pixel offsets.
 - Avoid adding explanatory text inside the app UI when a standard control,
   icon, tooltip, or menu item is enough.
 

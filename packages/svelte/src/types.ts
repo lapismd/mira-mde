@@ -23,6 +23,9 @@ export type MiraMdeProps = {
   placeholder?: string;
   lineWrapping?: boolean;
   spellcheck?: boolean;
+  indentGuides?: boolean;
+  indentWithTabs?: boolean;
+  indentWidth?: number;
   theme?: MiraTheme;
   themeConfig?: MiraThemeConfig;
   sourcePath?: string;

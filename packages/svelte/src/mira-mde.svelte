@@ -24,6 +24,9 @@
     placeholder = "Start writing Markdown...",
     lineWrapping = true,
     spellcheck = true,
+    indentGuides = true,
+    indentWithTabs = true,
+    indentWidth = 4,
     theme = "obsidian",
     themeConfig,
     sourcePath,
@@ -39,6 +42,7 @@
   }: MiraMdeProps = $props();
 
   let editorHost: HTMLDivElement | null = $state(null);
+  let previewPane: HTMLElement | null = $state(null);
   let rootEl: HTMLDivElement | null = $state(null);
   let controller: MiraEditorController | null = $state(null);
   let cleanupExtensionMounts: Array<() => void> = [];
@@ -60,6 +64,9 @@
       placeholder,
       lineWrapping,
       spellcheck,
+      indentGuides,
+      indentWithTabs,
+      indentWidth,
       sourcePath,
       extensions.map((extension) => extension.name).join(","),
     ].join("|"),
@@ -83,6 +90,8 @@
         placeholder,
         lineWrapping,
         spellcheck,
+        indentWithTabs,
+        indentWidth,
       }),
       createMarkdownCodeMirrorExtensions({
         codeLanguages: resolved.codeLanguages,
@@ -91,6 +100,7 @@
       createTableExtensions(),
       createRichEditorExtensions({
         livePreview: mode === "live-preview",
+        indentGuides,
         extensions,
         sourcePath,
         linkResolver,
@@ -244,6 +254,14 @@
     return () => observer.disconnect();
   });
 
+  $effect(() => {
+    if (mode !== "split" || !controller || !previewPane) {
+      return;
+    }
+
+    return syncSplitScroll(controller.view.scrollDOM, previewPane);
+  });
+
   function themeClassName(
     value: "obsidian" | "system" | "light" | "dark" | "inherit",
   ): string {
@@ -348,6 +366,48 @@
   function isDocument(value: unknown): value is Document {
     return typeof Document !== "undefined" && value instanceof Document;
   }
+
+  function syncSplitScroll(
+    editorScroller: HTMLElement,
+    previewPaneElement: HTMLElement,
+  ): () => void {
+    const previewScroller =
+      previewPaneElement.querySelector<HTMLElement>(".mira-markdown-preview") ??
+      previewPaneElement;
+    let activeSource: HTMLElement | null = null;
+    let releaseFrame = 0;
+
+    const sync = (source: HTMLElement, target: HTMLElement) => {
+      if (activeSource && activeSource !== source) {
+        return;
+      }
+
+      const sourceMax = source.scrollHeight - source.clientHeight;
+      const targetMax = target.scrollHeight - target.clientHeight;
+      if (sourceMax <= 0 || targetMax <= 0) {
+        return;
+      }
+
+      activeSource = source;
+      target.scrollTop = (source.scrollTop / sourceMax) * targetMax;
+      cancelAnimationFrame(releaseFrame);
+      releaseFrame = requestAnimationFrame(() => {
+        activeSource = null;
+      });
+    };
+
+    const syncPreview = () => sync(editorScroller, previewScroller);
+    const syncEditor = () => sync(previewScroller, editorScroller);
+
+    editorScroller.addEventListener("scroll", syncPreview, { passive: true });
+    previewScroller.addEventListener("scroll", syncEditor, { passive: true });
+
+    return () => {
+      cancelAnimationFrame(releaseFrame);
+      editorScroller.removeEventListener("scroll", syncPreview);
+      previewScroller.removeEventListener("scroll", syncEditor);
+    };
+  }
 </script>
 
 <div
@@ -419,7 +479,10 @@
     </section>
 
     {#if showPreview}
-      <section class="mira-mde__pane mira-mde__pane--preview">
+      <section
+        bind:this={previewPane}
+        class="mira-mde__pane mira-mde__pane--preview"
+      >
         <MarkdownPreview
           {...({ frontmatterConfig } as any)}
           class="markdown-reading-view"

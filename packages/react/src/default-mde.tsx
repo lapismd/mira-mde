@@ -44,11 +44,17 @@ export const MiraDefaultMde = forwardRef<
     features = {},
     frontmatterConfig,
     frontmatterOpen = true,
+    indentGuides: indentGuidesProp,
+    indentWithTabs: indentWithTabsProp,
+    indentWidth: indentWidthProp,
     lineWrapping = true,
     linkResolver,
     mode: modeProp,
     onChange,
     onFrontmatterChange,
+    onIndentGuidesChange,
+    onIndentWidthChange,
+    onIndentWithTabsChange,
     onModeChange,
     onReadonlyChange,
     placeholder = "Start writing Markdown...",
@@ -68,9 +74,17 @@ export const MiraDefaultMde = forwardRef<
   const [uncontrolledMode, setUncontrolledMode] = useState(defaultMode);
   const [uncontrolledReadonly, setUncontrolledReadonly] =
     useState(defaultReadonly);
+  const [uncontrolledIndentGuides, setUncontrolledIndentGuides] =
+    useState(true);
+  const [uncontrolledIndentWithTabs, setUncontrolledIndentWithTabs] =
+    useState(true);
+  const [uncontrolledIndentWidth, setUncontrolledIndentWidth] = useState(4);
   const value = valueProp ?? uncontrolledValue;
   const mode = modeProp ?? uncontrolledMode;
   const readonly = readonlyProp ?? uncontrolledReadonly;
+  const indentGuides = indentGuidesProp ?? uncontrolledIndentGuides;
+  const indentWithTabs = indentWithTabsProp ?? uncontrolledIndentWithTabs;
+  const indentWidth = indentWidthProp ?? uncontrolledIndentWidth;
   const resolvedFeatures = useMemo(
     () => resolveMiraDefaultFeatures(features),
     [features],
@@ -124,6 +138,36 @@ export const MiraDefaultMde = forwardRef<
     [onReadonlyChange, readonlyProp],
   );
 
+  const applyIndentGuides = useCallback(
+    (nextEnabled: boolean) => {
+      if (indentGuidesProp === undefined) {
+        setUncontrolledIndentGuides(nextEnabled);
+      }
+      onIndentGuidesChange?.(nextEnabled);
+    },
+    [indentGuidesProp, onIndentGuidesChange],
+  );
+
+  const applyIndentWithTabs = useCallback(
+    (nextEnabled: boolean) => {
+      if (indentWithTabsProp === undefined) {
+        setUncontrolledIndentWithTabs(nextEnabled);
+      }
+      onIndentWithTabsChange?.(nextEnabled);
+    },
+    [indentWithTabsProp, onIndentWithTabsChange],
+  );
+
+  const applyIndentWidth = useCallback(
+    (nextWidth: number) => {
+      if (indentWidthProp === undefined) {
+        setUncontrolledIndentWidth(nextWidth);
+      }
+      onIndentWidthChange?.(nextWidth);
+    },
+    [indentWidthProp, onIndentWidthChange],
+  );
+
   const handleSetMarkdown = useCallback(
     (markdown: string) => {
       if (valueProp === undefined) {
@@ -153,12 +197,18 @@ export const MiraDefaultMde = forwardRef<
   const toolbarContext = useMemo<MiraDefaultToolbarActionContext>(
     () => ({
       focus: () => editorRef.current?.focus(),
+      getIndentGuides: () => indentGuides,
+      getIndentWidth: () => indentWidth,
+      getIndentWithTabs: () => indentWithTabs,
       getMarkdown: () => editorRef.current?.getMarkdown() ?? value,
       getMode: () => editorRef.current?.getMode() ?? mode,
       getSelection: () => editorRef.current?.getSelection() ?? null,
       insertMarkdown: (markdown) => editorRef.current?.insertMarkdown(markdown),
       mode,
       readonly,
+      setIndentGuides: applyIndentGuides,
+      setIndentWidth: applyIndentWidth,
+      setIndentWithTabs: applyIndentWithTabs,
       setMarkdown: handleSetMarkdown,
       setMode: handleSetMode,
       setReadonly: handleSetReadonly,
@@ -169,6 +219,12 @@ export const MiraDefaultMde = forwardRef<
       handleSetMarkdown,
       handleSetMode,
       handleSetReadonly,
+      applyIndentGuides,
+      applyIndentWidth,
+      applyIndentWithTabs,
+      indentGuides,
+      indentWidth,
+      indentWithTabs,
       mode,
       readonly,
       value,
@@ -215,8 +271,14 @@ export const MiraDefaultMde = forwardRef<
           defaultEditMode={resolvedDefaultEditMode}
           featureConfigs={featureConfigs}
           features={features}
+          indentGuides={indentGuides}
+          indentWidth={indentWidth}
+          indentWithTabs={indentWithTabs}
           mode={mode}
           modeOptions={modeOptions}
+          onIndentGuidesChange={applyIndentGuides}
+          onIndentWidthChange={applyIndentWidth}
+          onIndentWithTabsChange={applyIndentWithTabs}
           readonly={readonly}
           toolbarActions={toolbarActions}
           toolbars={toolbars}
@@ -237,6 +299,9 @@ export const MiraDefaultMde = forwardRef<
           frontmatterOpen={
             resolvedFeatures[MiraFeature.Frontmatter] && frontmatterOpen
           }
+          indentGuides={indentGuides}
+          indentWidth={indentWidth}
+          indentWithTabs={indentWithTabs}
           lineWrapping={lineWrapping}
           linkResolver={linkResolver}
           mode={mode}

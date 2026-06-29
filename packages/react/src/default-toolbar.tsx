@@ -96,8 +96,14 @@ export function MiraDefaultToolbar({
   defaultEditMode = defaultMiraEditMode,
   featureConfigs = {},
   features = {},
+  indentGuides = true,
+  indentWithTabs = true,
+  indentWidth = 4,
   mode = "live-preview",
   modeOptions: modeOptionsProp,
+  onIndentGuidesChange,
+  onIndentWidthChange,
+  onIndentWithTabsChange,
   onInsertMarkdown,
   onModeChange,
   readonly = false,
@@ -110,6 +116,10 @@ export function MiraDefaultToolbar({
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const [lastNonSplitMode, setLastNonSplitMode] =
     useState<MiraMode>(defaultEditMode);
+  const [localIndentGuides, setLocalIndentGuides] = useState(indentGuides);
+  const [localIndentWithTabs, setLocalIndentWithTabs] =
+    useState(indentWithTabs);
+  const [localIndentWidth, setLocalIndentWidth] = useState(indentWidth);
   const resolvedFeatures = useMemo(
     () => resolveMiraDefaultFeatures(features),
     [features],
@@ -175,8 +185,10 @@ export function MiraDefaultToolbar({
     modeOptions.includes("preview") &&
     editModeOptions.length > 0;
   const splitModeVisible = modeSwitchVisible && modeOptions.includes("split");
+  const editorSettingsMenuVisible = true;
   const viewModeOverflowVisible =
-    modeSwitchVisible && viewModeMenuItems.length > 0;
+    (modeSwitchVisible && viewModeMenuItems.length > 0) ||
+    editorSettingsMenuVisible;
   const toolbarHasStartContent =
     startToolbars.length > 0 ||
     toolbarItems.length > 0 ||
@@ -185,11 +197,26 @@ export function MiraDefaultToolbar({
   const fallbackContext = useCallback(
     (): MiraDefaultToolbarActionContext => ({
       focus: () => undefined,
+      getIndentGuides: () => localIndentGuides,
+      getIndentWidth: () => localIndentWidth,
+      getIndentWithTabs: () => localIndentWithTabs,
       getMarkdown: () => value,
       getMode: () => mode,
       getSelection: () => null,
       insertMarkdown(markdown) {
         onInsertMarkdown?.(markdown);
+      },
+      setIndentGuides(nextEnabled) {
+        setLocalIndentGuides(nextEnabled);
+        onIndentGuidesChange?.(nextEnabled);
+      },
+      setIndentWidth(nextWidth) {
+        setLocalIndentWidth(nextWidth);
+        onIndentWidthChange?.(nextWidth);
+      },
+      setIndentWithTabs(nextEnabled) {
+        setLocalIndentWithTabs(nextEnabled);
+        onIndentWithTabsChange?.(nextEnabled);
       },
       mode,
       readonly,
@@ -201,7 +228,19 @@ export function MiraDefaultToolbar({
       setSelection: () => undefined,
       value,
     }),
-    [mode, onInsertMarkdown, onModeChange, readonly, value],
+    [
+      localIndentGuides,
+      localIndentWidth,
+      localIndentWithTabs,
+      mode,
+      onIndentGuidesChange,
+      onIndentWidthChange,
+      onIndentWithTabsChange,
+      onInsertMarkdown,
+      onModeChange,
+      readonly,
+      value,
+    ],
   );
 
   const actionContext = useCallback(
@@ -235,6 +274,72 @@ export function MiraDefaultToolbar({
     },
     [context, modeOptions, onModeChange],
   );
+
+  const getIndentGuidesSetting = useCallback(
+    () => actionContext().getIndentGuides?.() ?? localIndentGuides,
+    [actionContext, localIndentGuides],
+  );
+
+  const getIndentWidthSetting = useCallback(
+    () => actionContext().getIndentWidth?.() ?? localIndentWidth,
+    [actionContext, localIndentWidth],
+  );
+
+  const getIndentWithTabsSetting = useCallback(
+    () => actionContext().getIndentWithTabs?.() ?? localIndentWithTabs,
+    [actionContext, localIndentWithTabs],
+  );
+
+  const setIndentGuidesSetting = useCallback(
+    (nextEnabled: boolean) => {
+      const ctx = actionContext();
+      if (ctx.setIndentGuides) {
+        ctx.setIndentGuides(nextEnabled);
+      } else {
+        setLocalIndentGuides(nextEnabled);
+        onIndentGuidesChange?.(nextEnabled);
+      }
+    },
+    [actionContext, onIndentGuidesChange],
+  );
+
+  const setIndentWidthSetting = useCallback(
+    (nextWidth: number) => {
+      const ctx = actionContext();
+      if (ctx.setIndentWidth) {
+        ctx.setIndentWidth(nextWidth);
+      } else {
+        setLocalIndentWidth(nextWidth);
+        onIndentWidthChange?.(nextWidth);
+      }
+    },
+    [actionContext, onIndentWidthChange],
+  );
+
+  const setIndentWithTabsSetting = useCallback(
+    (nextEnabled: boolean) => {
+      const ctx = actionContext();
+      if (ctx.setIndentWithTabs) {
+        ctx.setIndentWithTabs(nextEnabled);
+      } else {
+        setLocalIndentWithTabs(nextEnabled);
+        onIndentWithTabsChange?.(nextEnabled);
+      }
+    },
+    [actionContext, onIndentWithTabsChange],
+  );
+
+  useEffect(() => {
+    setLocalIndentGuides(indentGuides);
+  }, [indentGuides]);
+
+  useEffect(() => {
+    setLocalIndentWithTabs(indentWithTabs);
+  }, [indentWithTabs]);
+
+  useEffect(() => {
+    setLocalIndentWidth(indentWidth);
+  }, [indentWidth]);
 
   const modeAfterSplit = useCallback((): MiraMode => {
     return resolveMiraModeAfterSplit({
@@ -430,9 +535,15 @@ export function MiraDefaultToolbar({
               ) : null}
               {viewModeOverflowVisible ? (
                 <ViewModeDropdown
+                  getIndentGuides={getIndentGuidesSetting}
+                  getIndentWidth={getIndentWidthSetting}
+                  getIndentWithTabs={getIndentWithTabsSetting}
                   items={viewModeMenuItems}
                   isOpen={openMenu === "view-mode"}
                   onApplyMode={applyMode}
+                  onSetIndentGuides={setIndentGuidesSetting}
+                  onSetIndentWidth={setIndentWidthSetting}
+                  onSetIndentWithTabs={setIndentWithTabsSetting}
                   onToggle={() =>
                     setOpenMenu((current) =>
                       current === "view-mode" ? null : "view-mode",
@@ -562,16 +673,30 @@ function ViewModeToggle({
 }
 
 function ViewModeDropdown({
+  getIndentGuides,
+  getIndentWidth,
+  getIndentWithTabs,
   isOpen,
   items,
   onApplyMode,
+  onSetIndentGuides,
+  onSetIndentWidth,
+  onSetIndentWithTabs,
   onToggle,
 }: {
+  getIndentGuides: () => boolean;
+  getIndentWidth: () => number;
+  getIndentWithTabs: () => boolean;
   isOpen: boolean;
   items: ViewModeMenuItem[];
   onApplyMode: (mode: MiraMode) => void;
+  onSetIndentGuides: (enabled: boolean) => void;
+  onSetIndentWidth: (width: number) => void;
+  onSetIndentWithTabs: (enabled: boolean) => void;
   onToggle: () => void;
 }): React.ReactElement {
+  const tabSizeOptions = [2, 4, 8];
+
   return (
     <div className="mira-react-dropdown">
       <button
@@ -616,6 +741,60 @@ function ViewModeDropdown({
               </button>
             );
           })}
+          {items.length > 0 ? (
+            <div data-slot="dropdown-menu-separator" role="separator" />
+          ) : null}
+          <div data-slot="dropdown-menu-label">Editor</div>
+          <button
+            className="mira-react-menu-button"
+            data-slot="dropdown-menu-item"
+            onClick={() => onSetIndentGuides(!getIndentGuides())}
+            role="menuitem"
+            type="button"
+          >
+            {getIndentGuides() ? (
+              <Check
+                aria-hidden="true"
+                className="mira-default-toolbar__menu-icon"
+              />
+            ) : null}
+            <span>Indentation guides</span>
+          </button>
+          <button
+            className="mira-react-menu-button"
+            data-slot="dropdown-menu-item"
+            onClick={() => onSetIndentWithTabs(!getIndentWithTabs())}
+            role="menuitem"
+            type="button"
+          >
+            {getIndentWithTabs() ? (
+              <Check
+                aria-hidden="true"
+                className="mira-default-toolbar__menu-icon"
+              />
+            ) : null}
+            <span>Use tabs for indentation</span>
+          </button>
+          <div data-slot="dropdown-menu-separator" role="separator" />
+          <div data-slot="dropdown-menu-label">Tab size</div>
+          {tabSizeOptions.map((size) => (
+            <button
+              className="mira-react-menu-button"
+              data-slot="dropdown-menu-item"
+              key={size}
+              onClick={() => onSetIndentWidth(size)}
+              role="menuitem"
+              type="button"
+            >
+              {getIndentWidth() === size ? (
+                <Check
+                  aria-hidden="true"
+                  className="mira-default-toolbar__menu-icon"
+                />
+              ) : null}
+              <span>{size} spaces</span>
+            </button>
+          ))}
         </div>
       ) : null}
     </div>

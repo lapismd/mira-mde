@@ -33,6 +33,9 @@ export type MiraDefaultMdeProps = {
   placeholder?: string;
   lineWrapping?: boolean;
   spellcheck?: boolean;
+  indentGuides?: boolean;
+  indentWithTabs?: boolean;
+  indentWidth?: number;
   theme?: MiraTheme;
   themeConfig?: MiraThemeConfig;
   sourcePath?: string;
@@ -51,6 +54,9 @@ export type MiraDefaultMdeProps = {
   onChange?: (value: string) => void;
   onModeChange?: (mode: MiraMode) => void;
   onReadonlyChange?: (readonly: boolean) => void;
+  onIndentGuidesChange?: (enabled: boolean) => void;
+  onIndentWidthChange?: (width: number) => void;
+  onIndentWithTabsChange?: (enabled: boolean) => void;
   onFrontmatterChange?: (nextYaml: string, nextValue: string) => void;
 };
 
@@ -66,9 +72,15 @@ export type MiraDefaultToolbarProps = {
   toolbars?: MiraDefaultToolbarDefinition[];
   modeOptions?: MiraMode[];
   showModeSwitch?: boolean;
+  indentGuides?: boolean;
+  indentWithTabs?: boolean;
+  indentWidth?: number;
   context?: MiraDefaultToolbarActionContext;
   onModeChange?: (mode: MiraMode) => void;
   onInsertMarkdown?: (markdown: string) => void;
+  onIndentGuidesChange?: (enabled: boolean) => void;
+  onIndentWidthChange?: (width: number) => void;
+  onIndentWithTabsChange?: (enabled: boolean) => void;
 };
 
 export type MiraDefaultEditorOptions = Omit<MiraDefaultMdeProps, "class"> & {

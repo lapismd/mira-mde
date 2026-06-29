@@ -1,4 +1,6 @@
 <script lang="ts">
+  import CheckIcon from "@lucide/svelte/icons/check";
+  import CopyIcon from "@lucide/svelte/icons/copy";
   import type { Snippet } from "svelte";
 
   type Props = {
@@ -21,10 +23,6 @@
   const textCodeBlock = $derived(
     /(?:^|\s)language-text(?:\s|$)/u.test(className),
   );
-  const language = $derived.by(() => {
-    const lang = className.split("language-", 2)[1]?.split(/\s+/u)[0] ?? "";
-    return languageMap[lang.toLowerCase().trim()] || lang;
-  });
   let copied = $state(false);
   let copyTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -90,66 +88,6 @@
       copied = false;
     }, 1200);
   }
-
-  const languageMap: Record<string, string> = {
-    js: "JavaScript",
-    javascript: "JavaScript",
-    ts: "TypeScript",
-    typescript: "TypeScript",
-    jsx: "JavaScript (JSX)",
-    tsx: "TypeScript (TSX)",
-    html: "HTML",
-    xml: "XML",
-    css: "CSS",
-    scss: "SCSS",
-    sass: "Sass",
-    less: "Less",
-    json: "JSON",
-    yaml: "YAML",
-    yml: "YAML",
-    toml: "TOML",
-    py: "Python",
-    python: "Python",
-    rb: "Ruby",
-    ruby: "Ruby",
-    php: "PHP",
-    java: "Java",
-    c: "C",
-    cpp: "C++",
-    cxx: "C++",
-    h: "C/C++ Header",
-    cs: "C#",
-    csharp: "C#",
-    go: "Go",
-    rust: "Rust",
-    rs: "Rust",
-    swift: "Swift",
-    kt: "Kotlin",
-    kotlin: "Kotlin",
-    scala: "Scala",
-    sh: "Shell",
-    bash: "Bash",
-    zsh: "Zsh",
-    powershell: "PowerShell",
-    ps1: "PowerShell",
-    dockerfile: "Dockerfile",
-    makefile: "Makefile",
-    gradle: "Gradle",
-    cmake: "CMake",
-    sql: "SQL",
-    mysql: "MySQL",
-    pgsql: "PostgreSQL",
-    postgres: "PostgreSQL",
-    plsql: "PL/SQL",
-    md: "Markdown",
-    markdown: "Markdown",
-    txt: "Plain Text",
-    text: "Plain Text",
-    ini: "INI",
-    cfg: "Config",
-    conf: "Config",
-    log: "Log File",
-  };
 </script>
 
 {#if block}
@@ -157,6 +95,7 @@
     bind:this={ref}
     use:fitTextCodeBlockToLivePreviewViewport={textCodeBlock}
     class={classNames(
+      "mira-code-block",
       "group relative flex rounded-sm px-4 py-4 font-mono whitespace-pre",
       textCodeBlock
         ? "markdown-text-code-block max-w-full items-start overflow-x-auto overflow-y-hidden"
@@ -174,18 +113,18 @@
       {@render children?.()}
     </code>
     {#if content}
-      <div class="absolute end-2 top-2">
+      <div class="mira-code-block__copy absolute end-2 top-2">
         <button
           type="button"
-          class="text-muted-foreground bg-secondary inline-flex h-8 items-center justify-center rounded-sm px-2 font-mono text-xs"
-          aria-label="Copy code"
-          title="Copy code"
+          class="mira-code-block__copy-button text-muted-foreground bg-secondary inline-flex items-center justify-center rounded-sm"
+          aria-label={copied ? "Copied" : "Copy code"}
+          title={copied ? "Copied" : "Copy code"}
           onclick={() => void copyCode()}
         >
           {#if copied}
-            Copied
+            <CheckIcon class="mira-code-block__copy-icon" aria-hidden="true" />
           {:else}
-            {language || "Copy"}
+            <CopyIcon class="mira-code-block__copy-icon" aria-hidden="true" />
           {/if}
         </button>
       </div>

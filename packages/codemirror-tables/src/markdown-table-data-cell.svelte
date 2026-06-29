@@ -90,8 +90,8 @@
   onmouseover={onMouseOver}
   onmousedown={onMouseDown}
   oncontextmenu={onContextMenu}
-  data-x={sourceColIndex}
-  data-y={sourceRowIndex}
+  data-x={colIndex}
+  data-y={rowIndex}
   {colspan}
   {rowspan}
   class={cn(

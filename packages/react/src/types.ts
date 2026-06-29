@@ -46,6 +46,9 @@ export type MiraMdeProps = {
   placeholder?: string;
   lineWrapping?: boolean;
   spellcheck?: boolean;
+  indentGuides?: boolean;
+  indentWithTabs?: boolean;
+  indentWidth?: number;
   theme?: MiraTheme;
   themeConfig?: MiraThemeConfig;
   sourcePath?: string;
@@ -107,10 +110,16 @@ export type MiraDefaultToolbarActionContext = {
   mode: MiraMode;
   readonly: boolean;
   focus: () => void;
+  getIndentGuides?: () => boolean;
+  getIndentWidth?: () => number;
+  getIndentWithTabs?: () => boolean;
   getMarkdown: () => string;
   getMode: () => MiraMode;
   getSelection: () => MiraEditorSelection | null;
   insertMarkdown: (markdown: string) => void;
+  setIndentGuides?: (enabled: boolean) => void;
+  setIndentWidth?: (width: number) => void;
+  setIndentWithTabs?: (enabled: boolean) => void;
   setMarkdown: (markdown: string) => void;
   setMode: (mode: MiraMode) => void;
   setReadonly: (readonly: boolean) => void;
@@ -207,9 +216,15 @@ export type MiraDefaultToolbarProps = {
   toolbars?: MiraDefaultToolbarDefinition[];
   modeOptions?: MiraMode[];
   showModeSwitch?: boolean;
+  indentGuides?: boolean;
+  indentWithTabs?: boolean;
+  indentWidth?: number;
   context?: MiraDefaultToolbarActionContext;
   onModeChange?: (mode: MiraMode) => void;
   onInsertMarkdown?: (markdown: string) => void;
+  onIndentGuidesChange?: (enabled: boolean) => void;
+  onIndentWidthChange?: (width: number) => void;
+  onIndentWithTabsChange?: (enabled: boolean) => void;
 };
 
 export type MiraDefaultMdeProps = Omit<MiraMdeProps, "toolbar"> & {
@@ -219,6 +234,9 @@ export type MiraDefaultMdeProps = Omit<MiraMdeProps, "toolbar"> & {
   featureConfigs?: MiraDefaultFeatureConfigs;
   toolbarActions?: MiraDefaultToolbarAction[];
   toolbars?: MiraDefaultToolbarDefinition[];
+  onIndentGuidesChange?: (enabled: boolean) => void;
+  onIndentWidthChange?: (width: number) => void;
+  onIndentWithTabsChange?: (enabled: boolean) => void;
 };
 
 export type MiraDefaultMdeHandle = MiraMdeHandle;

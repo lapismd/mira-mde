@@ -365,6 +365,14 @@ test("clicking a live-preview block restores editable source", async ({
   await gotoDemo(page);
   await setMode(page, "Live");
 
+  const horizontalRuleWidget = page
+    .locator(".mira-rich-widget--horizontalrule")
+    .first();
+  await expect(horizontalRuleWidget).toBeVisible();
+  await expect(horizontalRuleWidget.locator("hr")).toBeVisible();
+  await horizontalRuleWidget.click();
+  await expect(editorContent(page)).toContainText("---");
+
   const fencedWidget = page
     .locator(".mira-rich-widget--fencedcode")
     .filter({ has: page.locator(".mermaid") })
@@ -407,6 +415,65 @@ test("split view button toggles back to the previous view", async ({
     "preview",
   );
   await expect(splitButton).not.toHaveAttribute("aria-pressed", "true");
+});
+
+test("split view synchronizes vertical scroll between editor and preview", async ({
+  page,
+}) => {
+  await gotoDemo(page);
+  await setMode(page, "Split");
+
+  const editorScroller = page
+    .locator(".mira-mde__editor-host > .cm-editor > .cm-scroller")
+    .first();
+  const previewScroller = page
+    .locator(".mira-mde__pane--preview .mira-markdown-preview")
+    .first();
+  await expect(previewScroller).toBeVisible();
+
+  await editorScroller.evaluate((element) => {
+    element.scrollTop = 1_600;
+    element.dispatchEvent(new Event("scroll"));
+  });
+  await expect
+    .poll(() => previewScroller.evaluate((element) => element.scrollTop))
+    .toBeGreaterThan(0);
+
+  await previewScroller.evaluate((element) => {
+    element.scrollTop = element.scrollHeight;
+    element.dispatchEvent(new Event("scroll"));
+  });
+  await expect
+    .poll(() => editorScroller.evaluate((element) => element.scrollTop))
+    .toBeGreaterThan(1_600);
+});
+
+test("view options expose editor indentation settings", async ({ page }) => {
+  await gotoDemo(page);
+
+  await page
+    .locator(".demo-toolbar")
+    .getByRole("button", { name: "View options" })
+    .click();
+
+  await expect(
+    page.getByRole("menuitem", { name: "Indentation guides", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("menuitem", {
+      name: "Use tabs for indentation",
+      exact: true,
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("menuitem", { name: "2 spaces", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("menuitem", { name: "4 spaces", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("menuitem", { name: "8 spaces", exact: true }),
+  ).toBeVisible();
 });
 
 test("inline fold controls, Source Code Pro, and Obsidian tokens are present", async ({
@@ -452,6 +519,13 @@ test("task lists and live heading gutters match Lapis styling", async ({
     .poll(() =>
       previewTask.evaluate(
         (element) => getComputedStyle(element).listStyleType,
+      ),
+    )
+    .toBe("none");
+  await expect
+    .poll(() =>
+      previewTask.evaluate(
+        (element) => getComputedStyle(element).textDecorationLine,
       ),
     )
     .toBe("none");
@@ -537,6 +611,15 @@ test("task lists and live heading gutters match Lapis styling", async ({
       }),
     )
     .toBe("none");
+  const liveListCallout = page.locator(".cm-line.lc-list-callout").first();
+  await scrollEditorUntilVisible(page, liveListCallout);
+  await expect
+    .poll(() =>
+      liveListCallout.evaluate((element) =>
+        Number.parseFloat(getComputedStyle(element).paddingBottom),
+      ),
+    )
+    .toBeGreaterThan(0);
   await liveTask
     .getByText("Completed task without live-edit strikethrough")
     .click();
@@ -548,14 +631,8 @@ test("task lists and live heading gutters match Lapis styling", async ({
     "[",
     0,
   );
-  for (const top of [720, 800, 880, 960, 1040, 1120]) {
-    await scrollEditor(page, top);
-    await page.waitForTimeout(100);
-    if ((await page.locator('.HyperMD-task-line[data-task="/"]').count()) > 0) {
-      break;
-    }
-  }
   const customTask = page.locator('.HyperMD-task-line[data-task="/"]').first();
+  await scrollEditorUntilVisible(page, customTask, { max: 2_000, step: 100 });
   await expect(customTask).toBeVisible();
   const customTaskCheckbox = customTask.locator(
     '.mira-task-checkbox[data-task="/"]',
@@ -622,6 +699,25 @@ test("live inline markdown is styled and reveals source by token", async ({
     "src",
     "/mira-markdown-demo.svg",
   );
+  const liveEmbedStyle = await inlineImageEmbed.evaluate((element) => {
+    const style = getComputedStyle(element);
+    const caption = element.querySelector("figcaption");
+    const image = element.querySelector("img");
+    return {
+      borderInlineStartWidth: Number.parseFloat(style.borderInlineStartWidth),
+      captionDisplay: caption ? getComputedStyle(caption).display : "",
+      display: style.display,
+      imageMaxHeight: image ? getComputedStyle(image).maxHeight : "",
+      marginBlockStart: Number.parseFloat(style.marginBlockStart),
+      paddingInlineStart: Number.parseFloat(style.paddingInlineStart),
+    };
+  });
+  expect(liveEmbedStyle.display).toBe("block");
+  expect(liveEmbedStyle.borderInlineStartWidth).toBeGreaterThan(0);
+  expect(liveEmbedStyle.captionDisplay).not.toBe("none");
+  expect(liveEmbedStyle.imageMaxHeight).toBe("none");
+  expect(liveEmbedStyle.marginBlockStart).toBeGreaterThan(0);
+  expect(liveEmbedStyle.paddingInlineStart).toBeGreaterThan(0);
   await renderedWikilink.locator("[data-link-preview-trigger]").hover();
   await expect(
     renderedWikilink.locator(
@@ -667,6 +763,11 @@ test("live inline markdown is styled and reveals source by token", async ({
       backgroundImage: expect.stringContaining("svg"),
       paddingInlineEnd: expect.any(Number),
     });
+
+  const inlineMath = page.locator(".mira-inline-math-widget").first();
+  await expect(inlineMath.locator(".katex")).toBeVisible();
+  await inlineMath.click();
+  await expect(editorContent(page)).toContainText("$E = mc^2$");
 
   const strong = page.locator(".cm-strong").filter({ hasText: "bold" }).first();
   await expect(strong).toBeVisible();
@@ -776,6 +877,29 @@ test("preview mode showcases the supported Markdown feature set", async ({
   await expect(
     preview.locator("code").filter({ hasText: "inline code" }),
   ).toBeVisible();
+  await expect(preview.locator("hr").first()).toBeVisible();
+  const codeBlock = preview
+    .locator("pre")
+    .filter({ hasText: "createMiraDefaultEditor" })
+    .first();
+  const copyButton = codeBlock.getByRole("button", { name: "Copy code" });
+  await expect(copyButton).toHaveCount(1);
+  await expect
+    .poll(() =>
+      copyButton.evaluate((element) => ({
+        opacity: getComputedStyle(element.parentElement ?? element).opacity,
+        text: element.textContent?.trim() ?? "",
+      })),
+    )
+    .toEqual({ opacity: "0", text: "" });
+  await codeBlock.hover();
+  await expect
+    .poll(() =>
+      copyButton.evaluate(
+        (element) => getComputedStyle(element.parentElement ?? element).opacity,
+      ),
+    )
+    .toBe("1");
   await expect(
     preview.locator("[data-mira-internal-link]").first(),
   ).toBeVisible();
@@ -814,7 +938,24 @@ test("preview mode showcases the supported Markdown feature set", async ({
     preview.locator('img[alt="Mira Markdown demo asset"]'),
   ).toBeVisible();
   await expect(preview.locator("mark")).toContainText("Raw HTML is preserved");
-  await expect(preview.locator("kbd")).toContainText("keyboard");
+  const kbd = preview.locator("kbd").filter({ hasText: "keyboard" }).first();
+  await expect(kbd).toContainText("keyboard");
+  await expect
+    .poll(() =>
+      kbd.evaluate((element) => {
+        const style = getComputedStyle(element);
+        return {
+          borderBottomWidth: Number.parseFloat(style.borderBottomWidth),
+          display: style.display,
+          fontFamily: style.fontFamily.toLowerCase(),
+        };
+      }),
+    )
+    .toEqual({
+      borderBottomWidth: 2,
+      display: "inline-flex",
+      fontFamily: expect.stringContaining("source code pro"),
+    });
   await expect(
     preview.locator('directive[data-directive="mira"]'),
   ).toContainText("Directive syntax is parsed");
@@ -922,6 +1063,29 @@ test("preview mode showcases the supported Markdown feature set", async ({
   ]) {
     expect(calloutTitles).toContain(title);
   }
+
+  const calloutHeading = preview.getByRole("heading", {
+    name: "Callout variants",
+  });
+  await calloutHeading.scrollIntoViewIfNeeded();
+  await calloutHeading.hover();
+  const headingCollapse = calloutHeading.locator(".heading-collapse-indicator");
+  await expect(headingCollapse).toBeVisible();
+  await expect(headingCollapse).toHaveAttribute(
+    "aria-label",
+    "Collapse section",
+  );
+  await headingCollapse.click();
+  await expect(calloutHeading).toHaveAttribute(
+    "data-heading-collapsed",
+    "true",
+  );
+  await expect(headingCollapse).toHaveAttribute("aria-expanded", "false");
+  await expect
+    .poll(() =>
+      preview.locator('[data-heading-section-collapsed="true"]').count(),
+    )
+    .toBeGreaterThan(0);
 });
 
 test("live preview renders markdown file embeds", async ({ page }) => {

@@ -93,6 +93,72 @@
   margin-block: 1rem;
 }
 
+.markdown-reading-view .markdown :is(h1, h2, h3, h4, h5, h6) {
+  position: relative;
+}
+
+.markdown-reading-view .markdown .heading-collapse-indicator {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: var(--markdown-collapse-icon-color);
+  cursor: pointer;
+  display: inline-flex;
+  height: 1rem;
+  inset-block-start: 50%;
+  inset-inline-start: calc(-1rem - 0.65ch);
+  justify-content: center;
+  opacity: 0;
+  padding: 0;
+  position: absolute;
+  transform: translateY(-50%);
+  transition:
+    opacity 150ms ease,
+    color 150ms ease;
+  width: 1rem;
+}
+
+.markdown-reading-view
+  .markdown
+  :is(h1, h2, h3, h4, h5, h6):hover
+  > .heading-collapse-indicator,
+.markdown-reading-view
+  .markdown
+  :is(h1, h2, h3, h4, h5, h6):focus-within
+  > .heading-collapse-indicator,
+.markdown-reading-view .markdown .heading-collapse-indicator:hover,
+.markdown-reading-view
+  .markdown
+  :is(h1, h2, h3, h4, h5, h6)[data-heading-collapsed="true"]
+  > .heading-collapse-indicator {
+  opacity: 1;
+}
+
+.markdown-reading-view
+  .markdown
+  :is(h1, h2, h3, h4, h5, h6)[data-heading-collapsed="true"]
+  > .heading-collapse-indicator {
+  color: var(--markdown-collapse-icon-color-collapsed);
+}
+
+.markdown-reading-view .markdown .heading-collapse-indicator .svg-icon {
+  height: 12px;
+  stroke-width: 3px;
+  transition: transform 100ms ease-in-out;
+  width: 12px;
+}
+
+.markdown-reading-view
+  .markdown
+  .heading-collapse-indicator[aria-expanded="false"]
+  .svg-icon {
+  transform: rotate(-90deg);
+}
+
+.markdown-reading-view .markdown [data-heading-section-collapsed="true"] {
+  display: none !important;
+}
+
 .markdown-rendered > :first-child,
 .markdown-preview-surface .markdown > :first-child {
   margin-block-start: 0;

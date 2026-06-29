@@ -163,4 +163,42 @@ describe("TableNode", () => {
     ).toBe(2);
     expect(clone.toMarkdown()).toContain("| ^");
   });
+
+  it("selects display rows and columns across MultiMarkdown spans", () => {
+    const node = parseTable(
+      [
+        "| MultiMarkdown | Span | Status |",
+        "| :--- | :--- | ---: |",
+        "| Combined cell | | ready |",
+        "| Persistent row | rendered markdown | ready |",
+        "| ^ | source-compatible spans | ready |",
+      ].join("\n"),
+    );
+
+    expect(node.getCellsInDisplayColumn(0)).toEqual([
+      [0, 0],
+      [1, 0],
+      [2, 0],
+    ]);
+    expect(node.getCellsInDisplayColumn(1)).toEqual([
+      [0, 1],
+      [1, 0],
+      [2, 1],
+      [3, 1],
+    ]);
+    expect(node.getCellsInDisplayRow(1)).toEqual([
+      [1, 0],
+      [1, 2],
+    ]);
+    expect(node.getCellsInDisplayRow(3)).toEqual([
+      [2, 0],
+      [3, 1],
+      [3, 2],
+    ]);
+    expect(node.getCellsInDisplayRange([1, 1], [3, 1])).toEqual([
+      [1, 0],
+      [2, 1],
+      [3, 1],
+    ]);
+  });
 });

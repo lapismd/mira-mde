@@ -40,6 +40,9 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
     fileAdapter,
     frontmatterOpen = true,
     frontmatterConfig,
+    indentGuides = true,
+    indentWithTabs = true,
+    indentWidth = 4,
     lineWrapping = true,
     linkResolver,
     mode: modeProp,
@@ -59,6 +62,7 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
   ref,
 ) {
   const editorHostRef = useRef<HTMLDivElement | null>(null);
+  const previewPaneRef = useRef<HTMLElement | null>(null);
   const rootRef = useRef<HTMLDivElement | null>(null);
   const controllerRef = useRef<MiraEditorController | null>(null);
   const cleanupExtensionMountsRef = useRef<Array<() => void>>([]);
@@ -126,6 +130,8 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
 
     return [
       createBaseCodeMirrorExtensions({
+        indentWithTabs,
+        indentWidth,
         lineWrapping,
         placeholder,
         readonly: readonlyRef.current,
@@ -142,6 +148,7 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
         fileAdapter,
         frontmatterConfig,
         frontmatterOpen,
+        indentGuides,
         linkResolver,
         livePreview: modeRef.current === "live-preview",
         onChange(replacement, from, to, nextValue) {
@@ -170,6 +177,9 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
     fileAdapter,
     frontmatterOpen,
     frontmatterConfig,
+    indentGuides,
+    indentWithTabs,
+    indentWidth,
     lineWrapping,
     linkResolver,
     modeRef,
@@ -299,6 +309,16 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
     theme === "inherit" ? inheritedTheme : theme,
   );
 
+  useEffect(() => {
+    const controller = controllerRef.current;
+    const previewPane = previewPaneRef.current;
+    if (mode !== "split" || !controller || !previewPane) {
+      return;
+    }
+
+    return syncSplitScroll(controller.view.scrollDOM, previewPane);
+  }, [mode, showPreview]);
+
   return (
     <div
       className={cx("mira-mde", themeClass, className)}
@@ -367,7 +387,10 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
         </section>
 
         {showPreview ? (
-          <section className="mira-mde__pane mira-mde__pane--preview">
+          <section
+            className="mira-mde__pane mira-mde__pane--preview"
+            ref={previewPaneRef}
+          >
             <MarkdownPreviewHost
               assetResolver={assetResolver}
               extensions={extensions}
@@ -388,6 +411,48 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
 });
 
 MiraMde.displayName = "MiraMde";
+
+function syncSplitScroll(
+  editorScroller: HTMLElement,
+  previewPane: HTMLElement,
+): () => void {
+  const previewScroller =
+    previewPane.querySelector<HTMLElement>(".mira-markdown-preview") ??
+    previewPane;
+  let activeSource: HTMLElement | null = null;
+  let releaseFrame = 0;
+
+  const sync = (source: HTMLElement, target: HTMLElement) => {
+    if (activeSource && activeSource !== source) {
+      return;
+    }
+
+    const sourceMax = source.scrollHeight - source.clientHeight;
+    const targetMax = target.scrollHeight - target.clientHeight;
+    if (sourceMax <= 0 || targetMax <= 0) {
+      return;
+    }
+
+    activeSource = source;
+    target.scrollTop = (source.scrollTop / sourceMax) * targetMax;
+    cancelAnimationFrame(releaseFrame);
+    releaseFrame = requestAnimationFrame(() => {
+      activeSource = null;
+    });
+  };
+
+  const syncPreview = () => sync(editorScroller, previewScroller);
+  const syncEditor = () => sync(previewScroller, editorScroller);
+
+  editorScroller.addEventListener("scroll", syncPreview, { passive: true });
+  previewScroller.addEventListener("scroll", syncEditor, { passive: true });
+
+  return () => {
+    cancelAnimationFrame(releaseFrame);
+    editorScroller.removeEventListener("scroll", syncPreview);
+    previewScroller.removeEventListener("scroll", syncEditor);
+  };
+}
 
 function themeClassName(theme: MiraTheme): string {
   if (theme === "dark") {

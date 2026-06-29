@@ -55,6 +55,8 @@ This standalone editor is backed by CodeMirror 6, Svelte 5, unified, and the Mir
 
 Inline **bold**, _italic_, ~~strikethrough~~, \`inline code\`, [path links](notes/architecture.md), [external links](https://example.com), automatic links like https://example.com, [[Project Plan|wikilinks]], embedded images like ![[Architecture Diagram|Architecture diagram embed]], tags like #mira/editor, and inline math $E = mc^2$ all render in preview and live preview.
 
+---
+
 > [!note] Portable package boundary
 > The editor, preview renderer, Mermaid support, and UI shell are separate workspace packages.
 
@@ -83,6 +85,25 @@ Inline **bold**, _italic_, ~~strikethrough~~, \`inline code\`, [path links](note
 1. Ordered item
 2. Ordered item with nested tasks
    - [ ] Nested task
+
+## Indentation and continuation
+
+- Unordered parent with a wrapped continuation line that should hang under the text instead of the marker when it wraps across the editor line width.
+  Continued paragraph text stays aligned with the parent item.
+  - Nested unordered child with its own continuation text that demonstrates indentation guides.
+    Continued child paragraph stays inside the nested level.
+- Second unordered parent
+
+1. Ordered parent with wrapped continuation text that keeps the ordered marker separate from the paragraph body.
+   Continued ordered text remains aligned with the ordered content.
+2. Ordered parent with a nested task
+   - [ ] Nested task continuation keeps the checkbox and text aligned.
+     Continued task text remains inside the nested task.
+
+> Blockquote parent with text that can wrap and keep a visible quote guide.
+> Continued blockquote paragraph stays aligned.
+>
+> > Nested blockquote keeps a second guide and continuation indentation.
 
 ## Tables and grid tables
 
@@ -344,6 +365,9 @@ GFM footnotes are supported too.[^feature-footnote]
   let theme = $state<MiraTheme>("system");
   let editorShell = $state<EditorShell>("default");
   let mermaidEnabled = $state(true);
+  let indentGuides = $state(true);
+  let indentWithTabs = $state(true);
+  let indentWidth = $state(4);
   let defaultEditor = $state<MiraDefaultMdeHandle | null>(null);
   let composableEditor = $state<MiraMdeHandle | null>(null);
   const extensions = $derived(mermaidEnabled ? [mermaidExtension()] : []);
@@ -373,6 +397,15 @@ GFM footnotes are supported too.[^feature-footnote]
     getMode() {
       return mode;
     },
+    getIndentGuides() {
+      return indentGuides;
+    },
+    getIndentWidth() {
+      return indentWidth;
+    },
+    getIndentWithTabs() {
+      return indentWithTabs;
+    },
     getSelection() {
       return activeEditor()?.getSelection() ?? null;
     },
@@ -386,6 +419,15 @@ GFM footnotes are supported too.[^feature-footnote]
     setMode(nextMode: MiraMode) {
       mode = nextMode;
       activeEditor()?.setMode(nextMode);
+    },
+    setIndentGuides(nextEnabled: boolean) {
+      indentGuides = nextEnabled;
+    },
+    setIndentWidth(nextWidth: number) {
+      indentWidth = nextWidth;
+    },
+    setIndentWithTabs(nextEnabled: boolean) {
+      indentWithTabs = nextEnabled;
     },
     setReadonly() {
       return undefined;
@@ -539,6 +581,12 @@ GFM footnotes are supported too.[^feature-footnote]
     features={toolbarFeatures}
     toolbars={demoToolbars}
     context={toolbarContext}
+    {indentGuides}
+    {indentWidth}
+    {indentWithTabs}
+    onIndentGuidesChange={(next) => (indentGuides = next)}
+    onIndentWidthChange={(next) => (indentWidth = next)}
+    onIndentWithTabsChange={(next) => (indentWithTabs = next)}
     class="demo-toolbar"
   />
 
@@ -552,6 +600,9 @@ GFM footnotes are supported too.[^feature-footnote]
         themeConfig={{ fallback: "system" }}
         fileAdapter={demoFileAdapter}
         features={editorFeatures}
+        {indentGuides}
+        {indentWithTabs}
+        {indentWidth}
         class="demo-editor"
         sourcePath="demo.md"
       />
@@ -564,6 +615,9 @@ GFM footnotes are supported too.[^feature-footnote]
         themeConfig={{ fallback: "system" }}
         {extensions}
         fileAdapter={demoFileAdapter}
+        {indentGuides}
+        {indentWithTabs}
+        {indentWidth}
         toolbar={false}
         class="demo-editor"
         sourcePath="demo.md"

@@ -479,20 +479,7 @@
     start: [number, number],
     end: [number, number],
   ): [number, number][] {
-    const [row1, col1] = start;
-    const [row2, col2] = end;
-
-    const minRow = Math.min(row1, row2);
-    const maxRow = Math.max(row1, row2);
-    const minCol = Math.min(col1, col2);
-    const maxCol = Math.max(col1, col2);
-
-    const cells: [number, number][] = [];
-    for (let row = minRow; row <= maxRow; row++) {
-      for (let col = minCol; col <= maxCol; col++) {
-        cells.push([row, col]);
-      }
-    }
+    const cells = node.getCellsInDisplayRange(start, end);
     if (cells.length == 1) {
       return [];
     }
@@ -501,19 +488,13 @@
 
   function selectColumn(evt: Event, column: number) {
     setTimeout(() => {
-      selected = Array.from({ length: node.getRowCount() }).map((_, row) => [
-        row,
-        column,
-      ]);
+      selected = node.getCellsInDisplayColumn(column);
     });
   }
 
   function selectRow(evt: Event, row: number) {
     setTimeout(() => {
-      selected = Array.from({ length: node.getColCount() }).map((_, col) => [
-        row,
-        col,
-      ]);
+      selected = node.getCellsInDisplayRow(row);
     });
   }
 
@@ -532,14 +513,8 @@
       emitChange({
         selectedCells:
           type === MARKDOWN_TABLE_COL_TYPE
-            ? Array.from({ length: node.getRowCount() }).map((_, row) => [
-                row,
-                end,
-              ])
-            : Array.from({ length: node.getColCount() }).map((_, col) => [
-                end,
-                col,
-              ]),
+            ? node.getCellsInDisplayColumn(end)
+            : node.getCellsInDisplayRow(end),
       });
     }
   }

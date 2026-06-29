@@ -14,6 +14,8 @@ type CoordinatesSubscription = (
   coords: [colIndex: number, rowIndex: number],
 ) => void;
 
+export type TableCellCoordinates = [rowIndex: number, colIndex: number];
+
 function coordinatesEmitter() {
   let subscription: CoordinatesSubscription = () => {};
   return {
@@ -334,6 +336,78 @@ export class TableNode {
   /** Returns whether the display table contains MultiMarkdown spans. */
   hasSpans(): boolean {
     return this.__hasSpans;
+  }
+
+  /** Returns source-cell coordinates covered by a display row. */
+  getCellsInDisplayRow(rowIndex: number): TableCellCoordinates[] {
+    return this.getCellsInDisplayRange([rowIndex, 0], [
+      rowIndex,
+      this.getColCount() - 1,
+    ]);
+  }
+
+  /** Returns source-cell coordinates covered by a display column. */
+  getCellsInDisplayColumn(colIndex: number): TableCellCoordinates[] {
+    return this.getCellsInDisplayRange([0, colIndex], [
+      this.getRowCount() - 1,
+      colIndex,
+    ]);
+  }
+
+  /** Returns source-cell coordinates covered by a display rectangle. */
+  getCellsInDisplayRange(
+    start: TableCellCoordinates,
+    end: TableCellCoordinates,
+  ): TableCellCoordinates[] {
+    const [row1, col1] = start;
+    const [row2, col2] = end;
+    const minRow = Math.min(row1, row2);
+    const maxRow = Math.max(row1, row2);
+    const minCol = Math.min(col1, col2);
+    const maxCol = Math.max(col1, col2);
+    const cells: TableCellCoordinates[] = [];
+    const seen = new Set<string>();
+
+    this.__displayMdastNode.children.forEach((row, displayRowIndex) => {
+      row.children.forEach((cell, displayCellIndex) => {
+        const hProperties = (cell.data?.hProperties ?? {}) as Record<
+          string,
+          unknown
+        >;
+        const sourceRowIndex = Number(
+          hProperties.sourceRowIndex ?? displayRowIndex,
+        );
+        const sourceColIndex = Number(
+          hProperties.sourceColIndex ?? displayCellIndex,
+        );
+        const displayColIndex = Number(
+          hProperties.displayColIndex ?? displayCellIndex,
+        );
+        const rowSpan = Number(hProperties.rowSpan ?? 1);
+        const colSpan = Number(hProperties.colSpan ?? 1);
+        const cellStartRow = displayRowIndex;
+        const cellEndRow = displayRowIndex + rowSpan - 1;
+        const cellStartCol = displayColIndex;
+        const cellEndCol = displayColIndex + colSpan - 1;
+        const intersects =
+          cellStartRow <= maxRow &&
+          cellEndRow >= minRow &&
+          cellStartCol <= maxCol &&
+          cellEndCol >= minCol;
+
+        if (!intersects) {
+          return;
+        }
+
+        const key = `${sourceRowIndex},${sourceColIndex}`;
+        if (!seen.has(key)) {
+          seen.add(key);
+          cells.push([sourceRowIndex, sourceColIndex]);
+        }
+      });
+    });
+
+    return cells;
   }
 
   /** Returns the number of rows in the table. */

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { tick } from "svelte";
   import rehypeHighlight from "rehype-highlight";
   import rehypeKatex from "rehype-katex";
   import rehypeRaw from "rehype-raw";
@@ -70,6 +71,13 @@
     onFrontmatterChange?: (nextYaml: string, nextValue: string) => void;
   };
 
+  type HeadingElement = HTMLElement & {
+    dataset: HTMLElement["dataset"] & {
+      headingCollapsed?: string;
+      headingLevel?: string;
+    };
+  };
+
   let {
     value,
     sourcePath,
@@ -88,6 +96,9 @@
     onChange,
     onFrontmatterChange,
   }: Props = $props();
+
+  let documentEl: HTMLDivElement | null = $state(null);
+  let cleanupHeadingCollapse: (() => void) | null = null;
 
   const builtInComponents: MiraRendererComponents = {
     callout: Callout,
@@ -235,6 +246,115 @@
       })
       .join("");
   }
+
+  $effect(() => {
+    value;
+    inline;
+    embed;
+    documentEl;
+
+    if (inline || embed || !documentEl) {
+      return;
+    }
+
+    let cancelled = false;
+    void tick().then(() => {
+      if (cancelled || !documentEl) {
+        return;
+      }
+      cleanupHeadingCollapse?.();
+      cleanupHeadingCollapse = installHeadingCollapse(documentEl);
+    });
+
+    return () => {
+      cancelled = true;
+      cleanupHeadingCollapse?.();
+      cleanupHeadingCollapse = null;
+    };
+  });
+
+  function installHeadingCollapse(root: HTMLElement): () => void {
+    const buttons: HTMLButtonElement[] = [];
+    const headings = Array.from(
+      root.querySelectorAll<HeadingElement>("h1,h2,h3,h4,h5,h6"),
+    );
+
+    for (const heading of headings) {
+      if (heading.querySelector(":scope > .heading-collapse-indicator")) {
+        continue;
+      }
+
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "heading-collapse-indicator";
+      button.setAttribute("aria-label", "Collapse section");
+      button.setAttribute("aria-expanded", "true");
+      button.innerHTML = [
+        '<svg class="svg-icon" aria-hidden="true" viewBox="0 0 24 24" ',
+        'fill="none" stroke="currentColor" stroke-width="2" ',
+        'stroke-linecap="round" stroke-linejoin="round">',
+        '<path d="m6 9 6 6 6-6"></path>',
+        "</svg>",
+      ].join("");
+
+      button.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const collapsed = heading.dataset.headingCollapsed !== "true";
+        setHeadingCollapsed(heading, collapsed);
+      });
+
+      heading.insertBefore(button, heading.firstChild);
+      buttons.push(button);
+    }
+
+    return () => {
+      for (const button of buttons) {
+        button.remove();
+      }
+      for (const heading of headings) {
+        delete heading.dataset.headingCollapsed;
+      }
+      for (const element of root.querySelectorAll<HTMLElement>(
+        "[data-heading-section-collapsed]",
+      )) {
+        delete element.dataset.headingSectionCollapsed;
+      }
+    };
+  }
+
+  function setHeadingCollapsed(
+    heading: HeadingElement,
+    collapsed: boolean,
+  ): void {
+    const button = heading.querySelector<HTMLButtonElement>(
+      ":scope > .heading-collapse-indicator",
+    );
+    heading.dataset.headingCollapsed = collapsed ? "true" : "false";
+    button?.setAttribute("aria-expanded", collapsed ? "false" : "true");
+    button?.setAttribute(
+      "aria-label",
+      collapsed ? "Expand section" : "Collapse section",
+    );
+
+    const level = Number.parseInt(heading.tagName.slice(1), 10);
+    let current = heading.nextElementSibling as HTMLElement | null;
+    while (current) {
+      if (
+        /^H[1-6]$/u.test(current.tagName) &&
+        Number.parseInt(current.tagName.slice(1), 10) <= level
+      ) {
+        break;
+      }
+
+      if (collapsed) {
+        current.dataset.headingSectionCollapsed = "true";
+      } else {
+        delete current.dataset.headingSectionCollapsed;
+      }
+      current = current.nextElementSibling as HTMLElement | null;
+    }
+  }
 </script>
 
 {#if inline}
@@ -260,7 +380,7 @@
     data-markdown-embed={embed ? true : undefined}
   >
     <div class="cm-sizer">
-      <div class="markdown-view__document markdown">
+      <div bind:this={documentEl} class="markdown-view__document markdown">
         <Markdown
           {value}
           {sourcePath}

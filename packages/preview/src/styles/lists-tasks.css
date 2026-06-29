@@ -41,7 +41,8 @@
 .markdown-rendered li[data-task="X"],
 .markdown-preview-surface .markdown li[data-task="x"],
 .markdown-preview-surface .markdown li[data-task="X"] {
-  text-decoration: line-through;
+  color: inherit;
+  text-decoration: none;
 }
 
 .markdown-live-preview-mode li[data-task="x"],

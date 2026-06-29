@@ -63,10 +63,16 @@
     toolbars = [],
     modeOptions: modeOptionsProp,
     showModeSwitch = true,
+    indentGuides = true,
+    indentWithTabs = true,
+    indentWidth = 4,
     context,
     class: className = "",
     onModeChange,
     onInsertMarkdown,
+    onIndentGuidesChange,
+    onIndentWidthChange,
+    onIndentWithTabsChange,
   }: MiraDefaultToolbarProps = $props();
 
   const resolvedFeatures = $derived(resolveMiraDefaultFeatures(features));
@@ -145,9 +151,12 @@
   const splitModeVisible = $derived(
     modeSwitchVisible && modeOptions.includes("split"),
   );
+  const editorSettingsMenuVisible = $derived(true);
   const viewModeOverflowVisible = $derived(
-    modeSwitchVisible && viewModeMenuItems.length > 0,
+    (modeSwitchVisible && viewModeMenuItems.length > 0) ||
+      editorSettingsMenuVisible,
   );
+  const tabSizeOptions = [2, 4, 8];
 
   function fallbackContext(): MiraDefaultToolbarActionContext {
     return {
@@ -155,11 +164,26 @@
       mode,
       readonly,
       focus: () => undefined,
+      getIndentGuides: () => indentGuides,
+      getIndentWidth: () => indentWidth,
+      getIndentWithTabs: () => indentWithTabs,
       getMarkdown: () => value,
       getMode: () => mode,
       getSelection: () => null,
       insertMarkdown(markdown) {
         onInsertMarkdown?.(markdown);
+      },
+      setIndentGuides(nextEnabled) {
+        indentGuides = nextEnabled;
+        onIndentGuidesChange?.(nextEnabled);
+      },
+      setIndentWidth(nextWidth) {
+        indentWidth = nextWidth;
+        onIndentWidthChange?.(nextWidth);
+      },
+      setIndentWithTabs(nextEnabled) {
+        indentWithTabs = nextEnabled;
+        onIndentWithTabsChange?.(nextEnabled);
       },
       setMarkdown: () => undefined,
       setMode(nextMode) {
@@ -306,6 +330,48 @@
     mode = typedMode;
     context?.setMode(typedMode);
     onModeChange?.(typedMode);
+  }
+
+  function getIndentGuidesSetting(): boolean {
+    return actionContext().getIndentGuides?.() ?? indentGuides;
+  }
+
+  function getIndentWidthSetting(): number {
+    return actionContext().getIndentWidth?.() ?? indentWidth;
+  }
+
+  function getIndentWithTabsSetting(): boolean {
+    return actionContext().getIndentWithTabs?.() ?? indentWithTabs;
+  }
+
+  function setIndentGuidesSetting(nextEnabled: boolean): void {
+    const ctx = actionContext();
+    if (ctx.setIndentGuides) {
+      ctx.setIndentGuides(nextEnabled);
+    } else {
+      indentGuides = nextEnabled;
+      onIndentGuidesChange?.(nextEnabled);
+    }
+  }
+
+  function setIndentWidthSetting(nextWidth: number): void {
+    const ctx = actionContext();
+    if (ctx.setIndentWidth) {
+      ctx.setIndentWidth(nextWidth);
+    } else {
+      indentWidth = nextWidth;
+      onIndentWidthChange?.(nextWidth);
+    }
+  }
+
+  function setIndentWithTabsSetting(nextEnabled: boolean): void {
+    const ctx = actionContext();
+    if (ctx.setIndentWithTabs) {
+      ctx.setIndentWithTabs(nextEnabled);
+    } else {
+      indentWithTabs = nextEnabled;
+      onIndentWithTabsChange?.(nextEnabled);
+    }
   }
 
   function switchToSplitMode(): void {
@@ -493,20 +559,59 @@
       <Tooltip.Content>{miraViewOptionsLabel}</Tooltip.Content>
     </Tooltip.Root>
     <DropdownMenu.Content align="end">
-      {#each viewModeMenuItems as item (item.mode)}
-        {@const ItemIcon = modeIcons[item.mode]}
-        <DropdownMenu.Item onclick={() => applyMode(item.mode)}>
-          <ItemIcon
+      {#if viewModeMenuItems.length > 0}
+        {#each viewModeMenuItems as item (item.mode)}
+          {@const ItemIcon = modeIcons[item.mode]}
+          <DropdownMenu.Item onclick={() => applyMode(item.mode)}>
+            <ItemIcon
+              class="mira-default-toolbar__menu-icon"
+              aria-hidden="true"
+            />
+            <span>{item.label}</span>
+            {#if item.checked}
+              <CheckIcon
+                class="mira-default-toolbar__menu-check"
+                aria-hidden="true"
+              />
+            {/if}
+          </DropdownMenu.Item>
+        {/each}
+        <DropdownMenu.Separator />
+      {/if}
+      <DropdownMenu.Label>Editor</DropdownMenu.Label>
+      <DropdownMenu.Item
+        onclick={() => setIndentGuidesSetting(!getIndentGuidesSetting())}
+      >
+        {#if getIndentGuidesSetting()}
+          <CheckIcon
             class="mira-default-toolbar__menu-icon"
             aria-hidden="true"
           />
-          <span>{item.label}</span>
-          {#if item.checked}
+        {/if}
+        <span>Indentation guides</span>
+      </DropdownMenu.Item>
+      <DropdownMenu.Item
+        onclick={() => setIndentWithTabsSetting(!getIndentWithTabsSetting())}
+      >
+        {#if getIndentWithTabsSetting()}
+          <CheckIcon
+            class="mira-default-toolbar__menu-icon"
+            aria-hidden="true"
+          />
+        {/if}
+        <span>Use tabs for indentation</span>
+      </DropdownMenu.Item>
+      <DropdownMenu.Separator />
+      <DropdownMenu.Label>Tab size</DropdownMenu.Label>
+      {#each tabSizeOptions as size}
+        <DropdownMenu.Item onclick={() => setIndentWidthSetting(size)}>
+          {#if getIndentWidthSetting() === size}
             <CheckIcon
-              class="mira-default-toolbar__menu-check"
+              class="mira-default-toolbar__menu-icon"
               aria-hidden="true"
             />
           {/if}
+          <span>{size} spaces</span>
         </DropdownMenu.Item>
       {/each}
     </DropdownMenu.Content>
