@@ -1,0 +1,26 @@
+---
+title: Images
+description: Render Markdown images through the asset resolver.
+---
+
+import LiveEditorExample from "../../../components/LiveEditorExample.svelte";
+import { imagesMarkdown } from "../../../data/markdown-examples";
+
+Images render from Markdown image syntax and can be resolved by the host application's asset resolver.
+
+<LiveEditorExample
+  client:only="svelte"
+  title="Images"
+  description="Preview an image with alt text and a title."
+  initialValue={imagesMarkdown}
+  height="30rem"
+  sourcePath="markdown/images.md"
+/>
+
+## Syntax
+
+```md
+![Alt text](/path/to/image.svg "Optional title")
+```
+
+Use alt text for accessible descriptions. The title is optional.

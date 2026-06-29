@@ -1,0 +1,30 @@
+---
+title: Callouts
+description: Render Obsidian-style callouts and collapsible callouts.
+---
+
+import LiveEditorExample from "../../../components/LiveEditorExample.svelte";
+import { calloutsMarkdown } from "../../../data/markdown-examples";
+
+Callouts extend blockquotes with a typed label, icon, title, and optional collapsed state.
+
+<LiveEditorExample
+  client:only="svelte"
+  title="Callouts"
+  description="Preview default and collapsed callouts."
+  initialValue={calloutsMarkdown}
+  height="30rem"
+  sourcePath="markdown/callouts.md"
+/>
+
+## Syntax
+
+```md
+> [!note] Title
+> Callout content.
+
+> [!warning]- Collapsed title
+> Hidden by default.
+```
+
+Use `+` for open-by-default collapsible callouts and `-` for collapsed callouts.

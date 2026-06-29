@@ -1,0 +1,27 @@
+---
+title: Markdown Embeds
+description: Embed notes or assets with Obsidian-style embed syntax.
+---
+
+import LiveEditorExample from "../../../components/LiveEditorExample.svelte";
+import { embedsMarkdown } from "../../../data/markdown-examples";
+
+Markdown embeds use wikilink syntax with a leading `!` to render a referenced note or asset inline.
+
+<LiveEditorExample
+  client:only="svelte"
+  title="Markdown embeds"
+  description="Preview embedded note and asset references."
+  initialValue={embedsMarkdown}
+  height="26rem"
+  sourcePath="markdown/embeds.md"
+/>
+
+## Syntax
+
+```md
+![[Architecture Diagram]]
+![[Architecture Diagram|Architecture diagram]]
+```
+
+Embeds use the configured asset and link resolvers to find display content.

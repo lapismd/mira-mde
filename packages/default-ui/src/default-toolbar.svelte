@@ -94,16 +94,24 @@
   const endToolbars = $derived(
     customToolbars.filter((toolbar) => toolbar.align === "end"),
   );
+  const visibleStartToolbars = $derived(
+    startToolbars.filter(toolbarHasRenderableActions),
+  );
+  const visibleEndToolbars = $derived(
+    endToolbars.filter(toolbarHasRenderableActions),
+  );
+  const toolbarItemsVisible = $derived(toolbarItems.length > 0);
+  const customToolbarActionsVisible = $derived(customToolbarActions.length > 0);
 
   const modeSwitchVisible = $derived(
     showModeSwitch &&
       resolvedFeatures[MiraFeature.ModeSwitch] &&
       modeOptions.length > 1,
   );
-  const toolbarHasStartContent = $derived(
-    startToolbars.length > 0 ||
-      toolbarItems.length > 0 ||
-      customToolbarActions.length > 0,
+  const toolbarHasLeadingContent = $derived(
+    visibleStartToolbars.length > 0 ||
+      toolbarItemsVisible ||
+      customToolbarActionsVisible,
   );
 
   let lastNonSplitMode = $state<MiraMode | null>(null);
@@ -156,7 +164,16 @@
     (modeSwitchVisible && viewModeMenuItems.length > 0) ||
       editorSettingsMenuVisible,
   );
+  const viewControlsVisible = $derived(
+    viewModeToggleVisible || splitModeVisible || viewModeOverflowVisible,
+  );
   const tabSizeOptions = [2, 4, 8];
+
+  function toolbarHasRenderableActions(
+    toolbar: MiraDefaultToolbarDefinition,
+  ): boolean {
+    return toolbar.items.length > 0;
+  }
 
   function fallbackContext(): MiraDefaultToolbarActionContext {
     return {
@@ -628,12 +645,23 @@
       class={`mira-default-toolbar mira-default-ui__toolbar ${className}`.trim()}
       aria-label="Markdown editor toolbar"
     >
-      {#each startToolbars as toolbar (toolbar.id)}
+      {#each visibleStartToolbars as toolbar, index (toolbar.id)}
+        {#if index > 0}
+          <Separator
+            orientation="vertical"
+            class="mira-default-ui__separator"
+          />
+        {/if}
         {@render renderToolbarSection(toolbar)}
-        <Separator orientation="vertical" class="mira-default-ui__separator" />
       {/each}
 
-      {#if toolbarItems.length > 0}
+      {#if toolbarItemsVisible}
+        {#if visibleStartToolbars.length > 0}
+          <Separator
+            orientation="vertical"
+            class="mira-default-ui__separator"
+          />
+        {/if}
         <div
           class="mira-default-ui__toolbar-section"
           role="group"
@@ -664,8 +692,8 @@
         </div>
       {/if}
 
-      {#if customToolbarActions.length > 0}
-        {#if toolbarItems.length > 0}
+      {#if customToolbarActionsVisible}
+        {#if visibleStartToolbars.length > 0 || toolbarItemsVisible}
           <Separator
             orientation="vertical"
             class="mira-default-ui__separator"
@@ -684,13 +712,18 @@
 
       <div class="mira-default-toolbar__spacer"></div>
 
-      {#each endToolbars as toolbar (toolbar.id)}
+      {#each visibleEndToolbars as toolbar, index (toolbar.id)}
+        {#if index > 0}
+          <Separator
+            orientation="vertical"
+            class="mira-default-ui__separator"
+          />
+        {/if}
         {@render renderToolbarSection(toolbar)}
-        <Separator orientation="vertical" class="mira-default-ui__separator" />
       {/each}
 
-      {#if viewModeToggleVisible || splitModeVisible || viewModeOverflowVisible}
-        {#if toolbarHasStartContent || endToolbars.length > 0}
+      {#if viewControlsVisible}
+        {#if toolbarHasLeadingContent || visibleEndToolbars.length > 0}
           <Separator
             orientation="vertical"
             class="mira-default-ui__separator"

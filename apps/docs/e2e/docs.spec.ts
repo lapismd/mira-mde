@@ -36,40 +36,69 @@ test("documents the supported Markdown feature set", async ({ page }) => {
   await page.goto("/markdown/");
 
   await expect(
-    page.getByRole("heading", { name: "Supported Markdown" }),
+    page.getByRole("heading", { name: "Markdown", exact: true }),
   ).toBeVisible();
   await expect(
-    page.getByText("Frontmatter", { exact: true }).first(),
+    page.getByRole("link", { name: "Frontmatter" }).first(),
   ).toBeVisible();
   await expect(
-    page.getByText("Wikilinks", { exact: true }).first(),
+    page.getByRole("link", { name: "Wikilinks" }).first(),
   ).toBeVisible();
   await expect(
-    page.getByText("Markdown embeds", { exact: true }).first(),
+    page.getByRole("link", { name: "Markdown embeds" }).first(),
   ).toBeVisible();
   await expect(
-    page.getByText("Grid tables", { exact: true }).first(),
+    page.getByRole("link", { name: "Grid tables" }).first(),
   ).toBeVisible();
   await expect(
-    page.getByText("Raw HTML", { exact: true }).first(),
+    page.getByRole("link", { name: "Raw HTML" }).first(),
   ).toBeVisible();
   await expect(
-    page.getByText("Directives", { exact: true }).first(),
+    page.getByRole("link", { name: "Directives" }).first(),
   ).toBeVisible();
   await expect(
-    page.getByText("Footnotes", { exact: true }).first(),
+    page.getByRole("link", { name: "Footnotes" }).first(),
   ).toBeVisible();
   await expect(
-    page.getByText("Mermaid", { exact: true }).first(),
+    page.getByRole("link", { name: "Mermaid" }).first(),
   ).toBeVisible();
 });
 
-test("renders table and Mermaid examples", async ({ page }) => {
-  await page.goto("/tables/");
+test("renders focused Markdown feature examples", async ({ page }) => {
+  await page.goto("/markdown/frontmatter/");
   await expect(page.locator(".docs-live-editor")).toBeVisible();
+  await expect(page.locator(".mira-default-ui")).toHaveAttribute(
+    "data-mode",
+    "preview",
+  );
+
+  await page.goto("/markdown/grid-tables/");
+  await expect(page.locator(".docs-live-editor")).toBeVisible();
+  await expect(page.locator(".mira-default-ui")).toHaveAttribute(
+    "data-mode",
+    "preview",
+  );
   await expect(page.locator("table").first()).toBeVisible();
 
-  await page.goto("/mermaid/");
+  await page.goto("/markdown/mermaid/");
   await expect(page.locator(".docs-live-editor")).toBeVisible();
+  await expect(page.locator(".mira-default-ui")).toHaveAttribute(
+    "data-mode",
+    "preview",
+  );
   await expect(page.locator("svg").first()).toBeVisible();
+});
+
+test("redirects old table and Mermaid docs URLs", async ({ page }) => {
+  await page.goto("/tables/");
+  await expect(page).toHaveURL(/\/markdown\/tables\/?$/);
+  await expect(
+    page.getByRole("heading", { name: "Tables", exact: true }),
+  ).toBeVisible();
+
+  await page.goto("/mermaid/");
+  await expect(page).toHaveURL(/\/markdown\/mermaid\/?$/);
+  await expect(
+    page.getByRole("heading", { name: "Mermaid", exact: true }),
+  ).toBeVisible();
 });

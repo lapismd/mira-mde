@@ -1,0 +1,30 @@
+---
+title: Headings
+description: Structure Markdown documents with heading levels.
+---
+
+import LiveEditorExample from "../../../components/LiveEditorExample.svelte";
+import { headingsMarkdown } from "../../../data/markdown-examples";
+
+Headings define document structure and provide stable anchors for navigation, outlines, and reading-mode hierarchy.
+
+<LiveEditorExample
+  client:only="svelte"
+  title="Headings"
+  description="Preview heading levels and their rendered hierarchy."
+  initialValue={headingsMarkdown}
+  height="28rem"
+  sourcePath="markdown/headings.md"
+/>
+
+## Syntax
+
+```md
+# Heading 1
+
+## Heading 2
+
+### Heading 3
+```
+
+Use one to six `#` characters followed by a space.

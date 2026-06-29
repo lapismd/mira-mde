@@ -1,0 +1,30 @@
+---
+title: Lists
+description: Render ordered, unordered, nested, and continued lists.
+---
+
+import LiveEditorExample from "../../../components/LiveEditorExample.svelte";
+import { listsMarkdown } from "../../../data/markdown-examples";
+
+Lists preserve nesting, continuation indentation, and list marker alignment across editor and preview surfaces.
+
+<LiveEditorExample
+  client:only="svelte"
+  title="Lists"
+  description="Preview ordered, unordered, nested, and wrapped list content."
+  initialValue={listsMarkdown}
+  height="32rem"
+  sourcePath="markdown/lists.md"
+/>
+
+## Syntax
+
+```md
+- Unordered item
+  - Nested item
+
+1. Ordered item
+2. Ordered item
+```
+
+Use consistent indentation to keep child items and continued text inside the intended list level.

@@ -1,0 +1,27 @@
+---
+title: Tags
+description: Render inline and nested tags.
+---
+
+import LiveEditorExample from "../../../components/LiveEditorExample.svelte";
+import { tagsMarkdown } from "../../../data/markdown-examples";
+
+Tags represent inline metadata and can appear inside normal paragraph text.
+
+<LiveEditorExample
+  client:only="svelte"
+  title="Tags"
+  description="Preview simple and nested tag syntax."
+  initialValue={tagsMarkdown}
+  height="24rem"
+  sourcePath="markdown/tags.md"
+/>
+
+## Syntax
+
+```md
+#mira
+#mira/docs
+```
+
+Nested tags keep their full path in the rendered tag text.

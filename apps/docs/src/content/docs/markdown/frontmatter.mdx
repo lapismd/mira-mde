@@ -1,0 +1,31 @@
+---
+title: Frontmatter
+description: Use YAML or TOML property blocks at the start of a Markdown document.
+---
+
+import LiveEditorExample from "../../../components/LiveEditorExample.svelte";
+import { frontmatterMarkdown } from "../../../data/markdown-examples";
+
+Frontmatter stores document metadata before the Markdown body. Mira renders it with the same compact property surface across preview and live preview.
+
+<LiveEditorExample
+  client:only="svelte"
+  title="Frontmatter"
+  description="Preview a document with properties, aliases, booleans, dates, and tags."
+  initialValue={frontmatterMarkdown}
+  height="28rem"
+  sourcePath="markdown/frontmatter.md"
+/>
+
+## Syntax
+
+```md
+---
+title: Release notes
+status: draft
+tags:
+  - markdown
+---
+```
+
+Frontmatter must appear at the beginning of the file. The default renderer supports YAML and TOML-style property blocks.

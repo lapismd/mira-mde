@@ -1,0 +1,29 @@
+---
+title: Inline Formatting
+description: Render bold, emphasis, strikethrough, and inline code.
+---
+
+import LiveEditorExample from "../../../components/LiveEditorExample.svelte";
+import { inlineFormattingMarkdown } from "../../../data/markdown-examples";
+
+Inline formatting changes text inside a paragraph without changing the surrounding block structure.
+
+<LiveEditorExample
+  client:only="svelte"
+  title="Inline formatting"
+  description="Preview inline emphasis, strong text, strikethrough, and code spans."
+  initialValue={inlineFormattingMarkdown}
+  height="26rem"
+  sourcePath="markdown/inline-formatting.md"
+/>
+
+## Syntax
+
+```md
+**bold**
+_italic_
+~~strikethrough~~
+`inline code`
+```
+
+Inline formatting remains editable in live preview and renders the same in reading mode.

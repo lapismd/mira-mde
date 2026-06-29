@@ -1,0 +1,30 @@
+---
+title: Code
+description: Render inline code and fenced code blocks.
+---
+
+import LiveEditorExample from "../../../components/LiveEditorExample.svelte";
+import { codeMarkdown } from "../../../data/markdown-examples";
+
+Code spans render inline. Fenced code blocks render as block widgets with syntax highlighting and source fallback.
+
+<LiveEditorExample
+  client:only="svelte"
+  title="Code"
+  description="Preview inline code and a highlighted fenced code block."
+  initialValue={codeMarkdown}
+  height="30rem"
+  sourcePath="markdown/code.md"
+/>
+
+## Syntax
+
+````md
+`inline code`
+
+```ts
+const value = "code";
+```
+````
+
+Use a language after the opening fence to enable language-specific highlighting.
