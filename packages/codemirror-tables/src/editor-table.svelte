@@ -58,7 +58,6 @@
     return node.getDisplayMdastNode();
   });
   let align = $derived(mdastNode.align ?? []);
-  let hasTableSpans = $derived(node.hasSpans());
   let columnCount = $derived.by(() => {
     tableVersion;
     return node.getColCount();
@@ -457,6 +456,11 @@
     if (tableCell === null) {
       return [-1, -1];
     }
+    const x = tableCell.dataset.x;
+    const y = tableCell.dataset.y;
+    if (x && y) {
+      return [+y, +x];
+    }
     const tableRow = tableCell.parentElement!;
     const tableContainer = tableRow.parentElement!;
     const colIndex =
@@ -644,7 +648,7 @@
             <Table.Row
               class="group border-none hover:[&,&>svelte-css-wrapper]:[&>th,td]:bg-transparent"
             >
-              <Table.Head class="border-none p-0">
+              <Table.Head class="h-5 border-none p-0">
                 <div
                   class="markdown-table-chrome absolute top-0 z-10 flex items-center opacity-0 group-hover:opacity-100"
                   data-markdown-table-chrome="delete-table"
@@ -652,7 +656,11 @@
                   <Tooltip.Provider>
                     <Tooltip.Root>
                       <Tooltip.Trigger
-                        class={buttonVariants({ variant: "ghost", size: "sm" })}
+                        class={buttonVariants({
+                          variant: "ghost",
+                          size: "xs",
+                          class: "h-5 w-5 p-0",
+                        })}
                         onclick={(evt) => onDelete(evt)}
                       >
                         <Delete />
@@ -674,7 +682,7 @@
                   {@render columnMenu({ index })}
                 </MarkdownTableColumnHead>
               {/each}
-              <Table.Head class="group w-5 border-none"></Table.Head>
+              <Table.Head class="group h-5 w-5 border-none"></Table.Head>
             </Table.Row>
           </Table.Header>
           <Table.Body>
@@ -690,23 +698,31 @@
                   onDeleteRow={deleteRow}
                 />
                 {#each row.children as col, index}
-                  {@const id = [rowIndex, index].join(",")}
+                  {@const hProperties = col.data?.hProperties ?? {}}
+                  {@const sourceRowIndex =
+                    hProperties.sourceRowIndex ?? rowIndex}
+                  {@const sourceColIndex = hProperties.sourceColIndex ?? index}
+                  {@const displayColIndex =
+                    hProperties.displayColIndex ?? index}
+                  {@const id = [sourceRowIndex, sourceColIndex].join(",")}
                   <MarkdownTableDataCell
                     node={col}
                     {rowIndex}
-                    colIndex={index}
-                    align={align[index]}
+                    colIndex={displayColIndex}
+                    {sourceRowIndex}
+                    {sourceColIndex}
+                    align={align[displayColIndex]}
                     colspan={col.data?.hProperties?.colSpan}
                     rowspan={col.data?.hProperties?.rowSpan}
-                    readonly={hasTableSpans}
                     selectedClass={selectedClasses[id]}
                     {dragSource}
                     {dragOverIndex}
                     onContentChange={(value) =>
-                      onContentChange(value, index, rowIndex)}
+                      onContentChange(value, sourceColIndex, sourceRowIndex)}
                     {onMouseOver}
                     {onMouseDown}
-                    onContextMenu={() => (coords = [rowIndex, index])}
+                    onContextMenu={() =>
+                      (coords = [sourceRowIndex, sourceColIndex])}
                   />
                 {/each}
                 {#if rowIndex === 0}
@@ -800,9 +816,9 @@
     <DropdownMenu.Trigger
       class={buttonVariants({
         variant: "ghost",
-        size: "sm",
+        size: "xs",
         class:
-          "markdown-table-chrome rounded-full opacity-40 group-hover:opacity-100",
+          "markdown-table-chrome h-5 w-5 rounded-full p-0 opacity-40 group-hover:opacity-100",
       })}
     >
       <Elipsis />

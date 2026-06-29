@@ -1,12 +1,11 @@
 <script lang="ts">
   // @ts-nocheck
-  import { EditorView, drawSelection, keymap } from "@codemirror/view";
+  import { EditorView, keymap } from "@codemirror/view";
   import { EditorState } from "@codemirror/state";
-  import { history } from "@codemirror/commands";
-  import { markdown, markdownLanguage } from "@codemirror/lang-markdown";
   import { cn } from "./utils";
   import { tick } from "svelte";
   import { MarkdownPreview } from "@mira-mde/preview";
+  import { createInlineTableMarkdownExtensions } from "./inline-editor-extensions";
 
   let {
     content,
@@ -23,14 +22,7 @@
     doc: "",
     state: EditorState.create({
       extensions: [
-        drawSelection(),
-        EditorView.lineWrapping,
-        history(),
-        EditorView.editable.of(true),
-        EditorView.editorAttributes.of({ class: "mod-inline" }),
-        markdown({
-          base: markdownLanguage,
-        }),
+        createInlineTableMarkdownExtensions(),
         keymap.of([
           {
             key: "Enter",
@@ -102,7 +94,10 @@
   {#if editing}
     <div
       use:codeMirror={content}
-      class="h-full w-full p-2 ring-[var(--background-modifier-border-focus)] focus-within:rounded-sm focus-within:ring-2"
+      class={cn(
+        "h-full w-full p-2 ring-[var(--background-modifier-border-focus)] focus-within:rounded-sm focus-within:ring-2",
+        className,
+      )}
     ></div>
   {:else}
     <button

@@ -1057,6 +1057,22 @@ test("tables and admonition callouts render in preview and live-preview", async 
   expect(tableMetrics.rowHandleBorderLeft).toBe("0px");
   expect(tableMetrics.rowHandle.width).toBeCloseTo(16, 1);
   expect(tableMetrics.rowHandleIcon.width).toBeCloseTo(16, 1);
+  const rightAlignedPipeCell = liveTable
+    .locator("tbody td:not(.markdown-table-chrome)")
+    .filter({ hasText: "ready" })
+    .first();
+  await rightAlignedPipeCell.click();
+  await expect(
+    rightAlignedPipeCell.locator(".cm-editor.mod-inline"),
+  ).toBeVisible();
+  await expect
+    .poll(() =>
+      rightAlignedPipeCell
+        .locator(".cm-content")
+        .first()
+        .evaluate((element) => getComputedStyle(element).textAlign),
+    )
+    .toBe("right");
   await liveTable.hover();
   await expect(
     page
@@ -1193,6 +1209,17 @@ test("tables and admonition callouts render in preview and live-preview", async 
   await expect(liveMultiMarkdownTable.locator("td[rowspan='2']")).toContainText(
     "Persistent row",
   );
+  const multiMarkdownSpanCell = liveMultiMarkdownTable
+    .locator("td[colspan='2']")
+    .filter({ hasText: "Combined cell" })
+    .first();
+  await multiMarkdownSpanCell.click();
+  await expect(
+    multiMarkdownSpanCell.locator(".cm-editor.mod-inline"),
+  ).toBeVisible();
+  await expect(multiMarkdownSpanCell.locator(".cm-content")).toContainText(
+    "Combined cell",
+  );
   const liveGridTable = page
     .locator(".mira-rich-widget--gridtable .cm-table-widget")
     .first();
@@ -1206,6 +1233,29 @@ test("tables and admonition callouts render in preview and live-preview", async 
       )
       .first(),
   ).toBeVisible();
+  const gridRowHandleAlignment = await liveGridTable.evaluate((element) => {
+    const rowGutter = element.querySelector<HTMLElement>(
+      '[data-markdown-table-chrome="row-gutter"]',
+    );
+    const rowHandle = element.querySelector<HTMLElement>(
+      '[data-markdown-table-drag-handle="row"]',
+    );
+    const center = (rect: DOMRect) => ({
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2,
+    });
+    const rowGutterRect = rowGutter!.getBoundingClientRect();
+    const rowHandleCenter = center(rowHandle!.getBoundingClientRect());
+
+    return {
+      rowBorderDelta: Math.abs(rowHandleCenter.x - rowGutterRect.right),
+      rowCenterDelta: Math.abs(
+        rowHandleCenter.y - (rowGutterRect.top + rowGutterRect.height / 2),
+      ),
+    };
+  });
+  expect(gridRowHandleAlignment.rowBorderDelta).toBeLessThan(2);
+  expect(gridRowHandleAlignment.rowCenterDelta).toBeLessThan(2);
   await liveGridTable.locator("thead th").nth(1).hover();
   await expect(
     page
@@ -1254,11 +1304,58 @@ test("tables and admonition callouts render in preview and live-preview", async 
     .first();
   await scrollEditorUntilVisible(page, justifyGridTable, { max: 10_000 });
   await expect(justifyGridTable).toBeVisible();
+  for (const [align, text] of [
+    ["center", "ABC"],
+    ["left", "ABC"],
+    ["right", "ABC"],
+  ] as const) {
+    const alignedGridCell = page
+      .locator(
+        `.mira-rich-widget--gridtable .cm-table-widget td[data-align="${align}"]`,
+      )
+      .filter({ hasText: text })
+      .first();
+    await scrollEditorUntilVisible(page, alignedGridCell, { max: 10_000 });
+    await expect(alignedGridCell).toBeVisible();
+  }
+  const rightAlignedGridCell = page
+    .locator(
+      '.mira-rich-widget--gridtable .cm-table-widget td[data-align="right"]',
+    )
+    .filter({ hasText: "ABC" })
+    .first();
+  await scrollEditorUntilVisible(page, rightAlignedGridCell, { max: 10_000 });
+  await rightAlignedGridCell.click();
   await expect(
-    page
-      .locator(".mira-rich-widget--gridtable .cm-table-widget")
-      .filter({ hasText: "ABC" }),
-  ).toHaveCount(3);
+    rightAlignedGridCell.locator(".cm-editor.mod-inline"),
+  ).toBeVisible();
+  await expect
+    .poll(() =>
+      rightAlignedGridCell
+        .locator(".cm-content")
+        .first()
+        .evaluate((element) => getComputedStyle(element).textAlign),
+    )
+    .toBe("right");
+  const formattedGridTable = page
+    .locator(".mira-rich-widget--gridtable")
+    .filter({ hasText: "formatted" })
+    .first();
+  await scrollEditorUntilVisible(page, formattedGridTable, { max: 10_000 });
+  const formattedGridCell = formattedGridTable
+    .locator("td")
+    .filter({ hasText: "formatted" })
+    .first();
+  await formattedGridCell.click();
+  await expect(
+    formattedGridCell.locator(".cm-editor.mod-inline"),
+  ).toBeVisible();
+  await expect(
+    formattedGridCell.locator(".cm-emphasis").filter({ hasText: "formatted" }),
+  ).toBeVisible();
+  await expect(
+    formattedGridCell.locator(".cm-strong").filter({ hasText: "paragraphs" }),
+  ).toBeVisible();
   const liveCallout = page
     .locator(".mira-rich-widget--blockquote .callout")
     .first();

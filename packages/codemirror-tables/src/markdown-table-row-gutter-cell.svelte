@@ -73,7 +73,7 @@
 <Table.Cell
   bind:ref={cellRef}
   class={cn(
-    "markdown-table-chrome markdown-table-chrome--gutter-cell relative w-10 border-r p-0 opacity-0 group-hover:border-y group-hover:border-l group-hover:opacity-100",
+    "markdown-table-chrome markdown-table-chrome--gutter-cell relative w-[2rem] border-r p-0 opacity-0 group-hover:border-y group-hover:border-l group-hover:opacity-100",
     dropIndicatorClasses(dragSource, dragOverIndex, rowIndex, colIndex),
     dragSource?.type === MARKDOWN_TABLE_ROW_TYPE &&
       dragSource.index === rowIndex &&
@@ -101,8 +101,9 @@
     <DropdownMenu.Trigger
       class={buttonVariants({
         variant: "ghost",
-        size: "sm",
-        class: "markdown-table-chrome opacity-40 group-hover:opacity-100",
+        size: "xs",
+        class:
+          "markdown-table-chrome h-5 w-5 p-0 opacity-40 group-hover:opacity-100",
       })}
     >
       <Elipsis />

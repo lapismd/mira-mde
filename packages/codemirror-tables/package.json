@@ -30,6 +30,8 @@
     "@dnd-kit/svelte": "^0.4.0",
     "@adobe/mdast-util-gridtables": "^4.0.13",
     "@lucide/svelte": "^0.525.0",
+    "@mira-mde/codemirror": "workspace:*",
+    "@mira-mde/codemirror-markdown": "workspace:*",
     "@mira-mde/preview": "workspace:*",
     "@mira-mde/ui": "workspace:*",
     "lodash-es": "^4.17.21",

@@ -16,6 +16,8 @@
     node: Mdast.Nodes;
     rowIndex: number;
     colIndex: number;
+    sourceRowIndex?: number;
+    sourceColIndex?: number;
     align: string | null | undefined;
     colspan?: number;
     rowspan?: number;
@@ -33,6 +35,8 @@
     node,
     rowIndex,
     colIndex,
+    sourceRowIndex = rowIndex,
+    sourceColIndex = colIndex,
     align,
     colspan,
     rowspan,
@@ -86,6 +90,8 @@
   onmouseover={onMouseOver}
   onmousedown={onMouseDown}
   oncontextmenu={onContextMenu}
+  data-x={sourceColIndex}
+  data-y={sourceRowIndex}
   {colspan}
   {rowspan}
   class={cn(

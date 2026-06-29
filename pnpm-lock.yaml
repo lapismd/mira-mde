@@ -263,6 +263,12 @@ importers:
       '@lucide/svelte':
         specifier: ^0.525.0
         version: 0.525.0(svelte@5.56.4(@typescript-eslint/types@8.62.0))
+      '@mira-mde/codemirror':
+        specifier: workspace:*
+        version: link:../codemirror
+      '@mira-mde/codemirror-markdown':
+        specifier: workspace:*
+        version: link:../codemirror-markdown
       '@mira-mde/preview':
         specifier: workspace:*
         version: link:../preview

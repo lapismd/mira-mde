@@ -165,6 +165,13 @@
   width: 2.5rem;
 }
 
+.markdown-preview-surface .w-\[2rem\],
+.markdown-editor-surface .w-\[2rem\],
+.markdown-widget-shell .w-\[2rem\],
+.cm-table-widget .w-\[2rem\] {
+  width: 2rem;
+}
+
 .markdown-preview-surface .w-\[9em\],
 .markdown-editor-surface .w-\[9em\],
 .markdown-widget-shell .w-\[9em\],
@@ -509,6 +516,13 @@
 .markdown-widget-shell .text-center,
 .cm-table-widget .text-center {
   text-align: center;
+}
+
+.markdown-preview-surface .text-justify,
+.markdown-editor-surface .text-justify,
+.markdown-widget-shell .text-justify,
+.cm-table-widget .text-justify {
+  text-align: justify;
 }
 
 .markdown-preview-surface .align-middle,

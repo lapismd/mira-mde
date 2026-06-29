@@ -2,13 +2,12 @@
   // @ts-nocheck
   import type * as Mdast from "mdast";
   import { TableNode } from "./table-node";
-  import { EditorView, drawSelection } from "@codemirror/view";
+  import { EditorView } from "@codemirror/view";
   import { EditorState } from "@codemirror/state";
-  import { history } from "@codemirror/commands";
-  import { markdown, markdownLanguage } from "@codemirror/lang-markdown";
   import { cn } from "./utils";
   import { tick } from "svelte";
   import { toHtml } from "./utils";
+  import { createInlineTableMarkdownExtensions } from "./inline-editor-extensions";
 
   let {
     node,
@@ -28,14 +27,7 @@
     doc: "",
     state: EditorState.create({
       extensions: [
-        drawSelection(),
-        EditorView.lineWrapping,
-        history(),
-        EditorView.editable.of(true),
-        EditorView.editorAttributes.of({ class: "mod-inline" }),
-        markdown({
-          base: markdownLanguage,
-        }),
+        createInlineTableMarkdownExtensions(),
         EditorView.domEventHandlers({
           focus: (event, view) => {},
           blur: (event, view) => {
@@ -111,7 +103,7 @@
       </div>
     </div>
   {:else if editing}
-    <div use:codeMirror={content} class="p-2"></div>
+    <div use:codeMirror={content} class={cn("p-2", className)}></div>
   {:else}
     <button
       onclick={(evt) => enableEdit(evt)}

@@ -84,11 +84,42 @@ describe("TableNode", () => {
     expect(node.hasSpans()).toBe(true);
     expect(displayRows[1]?.children).toHaveLength(2);
     expect(displayRows[1]?.children[0]?.data?.hProperties?.colSpan).toBe(2);
+    expect(displayRows[1]?.children[0]?.data?.hProperties).toMatchObject({
+      sourceRowIndex: 1,
+      sourceColIndex: 0,
+      displayColIndex: 0,
+    });
     expect(displayRows[2]?.children).toHaveLength(3);
     expect(displayRows[2]?.children[0]?.data?.hProperties?.rowSpan).toBe(2);
+    expect(displayRows[2]?.children[0]?.data?.hProperties).toMatchObject({
+      sourceRowIndex: 2,
+      sourceColIndex: 0,
+      displayColIndex: 0,
+    });
     expect(displayRows[3]?.children).toHaveLength(2);
+    expect(displayRows[3]?.children[0]?.data?.hProperties).toMatchObject({
+      sourceRowIndex: 3,
+      sourceColIndex: 1,
+      displayColIndex: 1,
+    });
+    expect(displayRows[3]?.children[1]?.data?.hProperties).toMatchObject({
+      sourceRowIndex: 3,
+      sourceColIndex: 2,
+      displayColIndex: 2,
+    });
     expect(cellText(node, 3, 0)).toBe("^");
     expect(node.toMarkdown()).toContain("| ^");
+
+    const displayCell = displayRows[3]!.children[0]!;
+    const coords = displayCell.data!.hProperties! as {
+      sourceRowIndex: number;
+      sourceColIndex: number;
+    };
+    node.updateCellContents(coords.sourceColIndex, coords.sourceRowIndex, [
+      { type: "text", value: "edited span cell" },
+    ]);
+    expect(cellText(node, 3, 0)).toBe("^");
+    expect(cellText(node, 3, 1)).toBe("edited span cell");
   });
 
   it("keeps trailing empty columns separate from MultiMarkdown colspans", () => {

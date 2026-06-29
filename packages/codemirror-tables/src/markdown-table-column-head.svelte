@@ -69,7 +69,7 @@
   bind:ref={headRef}
   data-markdown-table-col-index={index}
   class={cn(
-    "markdown-table-chrome markdown-table-chrome--cell group relative border-b p-0 opacity-0 group-hover:opacity-100",
+    "markdown-table-chrome markdown-table-chrome--cell group relative h-5 border-b p-0 opacity-0 group-hover:opacity-100",
     className,
     dropIndicatorClasses(dragSource, dragOverIndex, -1, index),
     dragSource?.type === MARKDOWN_TABLE_COL_TYPE &&

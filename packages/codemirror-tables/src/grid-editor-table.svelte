@@ -787,7 +787,7 @@
           <Table.Row
             class="group border-none hover:[&,&>svelte-css-wrapper]:[&>th,td]:bg-transparent"
           >
-            <Table.Head class="border-none p-0">
+            <Table.Head class="h-5 border-none p-0">
               <div
                 class="markdown-table-chrome absolute top-0 z-10 flex items-center opacity-0 group-hover/trigger:opacity-100"
                 data-markdown-table-chrome="delete-table"
@@ -795,7 +795,11 @@
                 <Tooltip.Provider>
                   <Tooltip.Root>
                     <Tooltip.Trigger
-                      class={buttonVariants({ variant: "ghost", size: "sm" })}
+                      class={buttonVariants({
+                        variant: "ghost",
+                        size: "xs",
+                        class: "h-5 w-5 p-0",
+                      })}
                       onclick={(evt: MouseEvent) => onDelete(evt)}
                     >
                       <Delete />
@@ -807,7 +811,7 @@
             </Table.Head>
             {#each { length: columnCount } as _, index}
               <Table.Head
-                class="markdown-table-chrome markdown-table-chrome--cell group relative border-b p-0 opacity-0 group-hover/trigger:opacity-100"
+                class="markdown-table-chrome markdown-table-chrome--cell group relative h-5 border-b p-0 opacity-0 group-hover/trigger:opacity-100"
                 data-markdown-table-chrome="col-header"
                 ondragenter={() => (dragState.end = index)}
               >
@@ -830,7 +834,7 @@
                 </div>
               </Table.Head>
             {/each}
-            <Table.Head class="group w-5 border-none"></Table.Head>
+            <Table.Head class="group h-5 w-5 border-none"></Table.Head>
           </Table.Row>
         </Table.Header>
         <Table.Body>
@@ -891,7 +895,7 @@
   {#each gridRows as row, rowIndex}
     <Table.Row class={cn("group border-none")}>
       <Component
-        class="markdown-table-chrome markdown-table-chrome--gutter-cell w-10 border-r p-0 opacity-0 group-hover:border-y group-hover:border-l group-hover/trigger:opacity-100"
+        class="markdown-table-chrome markdown-table-chrome--gutter-cell relative w-[2rem] border-r p-0 opacity-0 group-hover:border-y group-hover:border-l group-hover/trigger:opacity-100"
         data-markdown-table-chrome="row-gutter"
       >
         <Button
@@ -903,7 +907,7 @@
           data-grab-handle=""
           data-markdown-table-drag-handle="row"
           data-markdown-table-drag-index={rowIndex}
-          class="markdown-table-chrome markdown-table-chrome--drag-handle absolute top-[calc(50%-0.75rem_/_2)] right-[-4px] z-10 hidden cursor-grab group-hover:inline-flex"
+          class="markdown-table-chrome markdown-table-chrome--drag-handle absolute top-1/2 right-[-0.5rem] z-10 cursor-grab opacity-0 group-hover:opacity-100"
           onclick={(evt) => selectRow(evt, rowIndex)}
         >
           <GripVertical />
@@ -912,8 +916,9 @@
           <DropdownMenu.Trigger
             class={buttonVariants({
               variant: "ghost",
-              size: "sm",
-              class: "markdown-table-chrome opacity-40 group-hover:opacity-100",
+              size: "xs",
+              class:
+                "markdown-table-chrome h-5 w-5 p-0 opacity-40 group-hover:opacity-100",
             })}
           >
             <Elipsis />
@@ -997,6 +1002,12 @@
         >
           <ColumnEditor
             content={cell.cell.content}
+            class={cn({
+              "text-left": cell.cell.align === "left",
+              "text-center": cell.cell.align === "center",
+              "text-right": cell.cell.align === "right",
+              "text-justify": cell.cell.align === "justify",
+            })}
             onContentChange={(value) => onContentChange(value, cell.x, cell.y)}
             onEdit={(evt: MouseEvent) => handleEdit(evt, cell)}
           />
@@ -1049,9 +1060,9 @@
     <DropdownMenu.Trigger
       class={buttonVariants({
         variant: "ghost",
-        size: "sm",
+        size: "xs",
         class:
-          "markdown-table-chrome rounded-full opacity-40 group-hover:opacity-100",
+          "markdown-table-chrome h-5 w-5 rounded-full p-0 opacity-40 group-hover:opacity-100",
       })}
     >
       <Elipsis />

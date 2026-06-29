@@ -52,6 +52,14 @@ function processMultiMarkdownSpans(table: Mdast.Table): {
     () => [],
   );
   const cellSpans = new Map<string, { rowspan: number; colspan: number }>();
+  const cellCoordinates = new Map<
+    string,
+    {
+      sourceRowIndex: number;
+      sourceColIndex: number;
+      displayColIndex: number;
+    }
+  >();
   let hasSpans = false;
 
   for (let rowIndex = 0; rowIndex < rows.length; rowIndex += 1) {
@@ -91,6 +99,11 @@ function processMultiMarkdownSpans(table: Mdast.Table): {
 
       grid[rowIndex]![colIndex] = cell;
       cellSpans.set(`${rowIndex},${colIndex}`, { rowspan: 1, colspan });
+      cellCoordinates.set(`${rowIndex},${colIndex}`, {
+        sourceRowIndex: rowIndex,
+        sourceColIndex: cellIndex,
+        displayColIndex: colIndex,
+      });
 
       for (let offset = 1; offset < colspan; offset += 1) {
         grid[rowIndex]![colIndex + offset] = cell;
@@ -120,12 +133,17 @@ function processMultiMarkdownSpans(table: Mdast.Table): {
           }
 
           const spanInfo = cellSpans.get(`${rowIndex},${colIndex}`);
-          if (!spanInfo) {
+          const sourceCoordinates = cellCoordinates.get(
+            `${rowIndex},${colIndex}`,
+          );
+          if (!spanInfo || !sourceCoordinates) {
             continue;
           }
 
           seenCells.add(cell);
-          children.push(withTableSpanProperties(cell, spanInfo));
+          children.push(
+            withTableSpanProperties(cell, spanInfo, sourceCoordinates),
+          );
         }
 
         return { ...row, children };
@@ -160,6 +178,11 @@ function extendRowspan(
 function withTableSpanProperties(
   cell: Mdast.TableCell,
   spanInfo: { rowspan: number; colspan: number },
+  sourceCoordinates: {
+    sourceRowIndex: number;
+    sourceColIndex: number;
+    displayColIndex: number;
+  },
 ): Mdast.TableCell {
   const nextCell: Mdast.TableCell = {
     ...cell,
@@ -168,6 +191,7 @@ function withTableSpanProperties(
       hProperties: {
         ...((cell.data?.hProperties as Record<string, unknown> | undefined) ??
           {}),
+        ...sourceCoordinates,
       },
     },
   };
