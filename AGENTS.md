@@ -118,6 +118,8 @@ preview, and the default editor shell around them.
 ## Development Workflow
 
 - The worktree may contain user changes. Do not revert unrelated edits.
+- If the `jj` binary is available, use the `jj-jujutsu` skill and Jujutsu for
+  version-control inspection, diffs, and commits instead of Git.
 - Use `rg` or `rg --files` for searches.
 - Use `apply_patch` for manual file edits.
 - Keep changes scoped to the package or app needed for the request.
@@ -125,6 +127,9 @@ preview, and the default editor shell around them.
   required to complete the task.
 - For docs/demo assets, keep files in the owning app or package and avoid
   duplicating large assets across packages without a reason.
+- After each verified change, run `jj commit` with a PR-quality message that
+  explains what changed, why it changed, and the validation that passed. Keep the
+  message descriptive enough for review context rather than using a terse label.
 
 ## Verification
 
