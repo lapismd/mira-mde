@@ -128,28 +128,40 @@ preview, and the default editor shell around them.
 
 ## Verification
 
-Run the narrowest meaningful checks for the touched area first. Useful commands:
+Every workspace should expose a `check` script. That script is the local quality
+gate for Prettier formatting, Svelte diagnostics where applicable, and
+TypeScript diagnostics. Svelte diagnostics must fail on warnings.
+
+For package- or app-scoped changes, always run the modified workspace's relevant
+checks and tests before handing work back. Start with:
 
 ```sh
-pnpm check:format
-pnpm check:types
-pnpm check:svelte
+pnpm --filter @mira-mde/preview check
+pnpm --filter @mira-mde/preview test
+```
+
+Also run the package build when the change affects exports, packaging, styles,
+Svelte components, framework wrappers, or build-time behavior:
+
+```sh
+pnpm --filter @mira-mde/preview build
+```
+
+For changes that touch multiple packages/apps or shared repo configuration, run
+full-repo validation instead of only filtered checks:
+
+```sh
+pnpm check
 pnpm lint
 pnpm test
 pnpm build
 pnpm test:e2e
 ```
 
-For package-scoped work, prefer filtered commands before full-repo checks, for
-example:
+`pnpm check:all` runs the standard full-repo non-e2e validation:
 
 ```sh
-pnpm --filter @mira-mde/preview build
-pnpm --filter @mira-mde/codemirror-rich test
-pnpm --filter @mira-mde/default-ui build
-pnpm --filter @mira-mde/react build
-pnpm --filter @mira-mde/docs build
-pnpm --filter @mira-mde/demo build
+pnpm check:all
 ```
 
 For visual markdown or EBR styling changes, also compare Mira against Lapis in

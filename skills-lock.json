@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "jj-jujutsu": {
+      "source": "stevejuma/jj-jujutsu-skill",
+      "sourceType": "github",
+      "skillPath": "skills/jj-jujutsu/SKILL.md",
+      "computedHash": "79b92d190e1fad52dd495b526d2cf6e1c3103d0c243a1782a5e032b366719b2f"
+    }
+  }
+}

@@ -128,17 +128,25 @@ describe("@mira-mde/react", () => {
 
   it("creates the default editor from a DOM root", () => {
     const host = document.createElement("div");
-    const editor = createMiraDefaultEditor({
-      features: {
-        [MiraFeature.Toolbar]: false,
-      },
-      root: host,
-      value: "# Hello",
+    let editor!: ReturnType<typeof createMiraDefaultEditor>;
+
+    act(() => {
+      editor = createMiraDefaultEditor({
+        features: {
+          [MiraFeature.Toolbar]: false,
+        },
+        root: host,
+        value: "# Hello",
+      });
     });
 
     expect(editor.getMarkdown()).toBe("# Hello");
-    editor.setMarkdown("Updated");
+    act(() => {
+      editor.setMarkdown("Updated");
+    });
     expect(editor.getMarkdown()).toBe("Updated");
-    editor.destroy();
+    act(() => {
+      editor.destroy();
+    });
   });
 });

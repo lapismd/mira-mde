@@ -10,7 +10,7 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-/* eslint-disable no-underscore-dangle */
+
 import { fromMarkdown } from "mdast-util-from-markdown";
 import { CONTINUE, visit } from "unist-util-visit";
 import { pick } from "lodash-es";
@@ -30,12 +30,12 @@ function unescapeCode(tree) {
   visit(tree, (node) => {
     if (node.type === "inlineCode" || node.type === "code") {
       // remove escaped pipes and plusses in code
-      // eslint-disable-next-line no-param-reassign
+
       node.value = node.value.replace(/\\([+|])/gm, "$1");
     }
     if (node.type === "code") {
       // remove non-break-here characters
-      // eslint-disable-next-line no-param-reassign
+
       node.value = node.value.replace(/\u0083 ?\n/gmu, "");
     }
 
@@ -332,7 +332,7 @@ function commitRow(info) {
   }
 
   this.exit(rowToken);
-  // eslint-disable-next-line no-param-reassign
+
   info.cells = [];
 }
 

@@ -11,19 +11,19 @@ import {
   defaultMiraFeatures,
   MiraFeature,
   resolveMiraDefaultFeatures,
-  resolveMiraDefaultToolbarItems
+  resolveMiraDefaultToolbarItems,
 } from "@mira-mde/default-ui";
 ```
 
-| Export | Purpose |
-| :--- | :--- |
-| `createMiraDefaultEditor` | Imperatively mount the default editor into a DOM node. |
-| `MiraFeature` | Stable feature flag names. |
-| `defaultMiraFeatures` | Default resolved feature map. |
-| `resolveMiraDefaultFeatures` | Merge caller feature flags with defaults. |
-| `resolveMiraDefaultToolbarItems` | Resolve built-in toolbar item availability. |
-| `resolveMiraDefaultToolbarActions` | Merge custom toolbar actions. |
-| `resolveMiraDefaultToolbarDefinitions` | Merge custom toolbar sections. |
+| Export                                 | Purpose                                                |
+| :------------------------------------- | :----------------------------------------------------- |
+| `createMiraDefaultEditor`              | Imperatively mount the default editor into a DOM node. |
+| `MiraFeature`                          | Stable feature flag names.                             |
+| `defaultMiraFeatures`                  | Default resolved feature map.                          |
+| `resolveMiraDefaultFeatures`           | Merge caller feature flags with defaults.              |
+| `resolveMiraDefaultToolbarItems`       | Resolve built-in toolbar item availability.            |
+| `resolveMiraDefaultToolbarActions`     | Merge custom toolbar actions.                          |
+| `resolveMiraDefaultToolbarDefinitions` | Merge custom toolbar sections.                         |
 
 ## `@mira-mde/default-ui/svelte`
 
@@ -32,7 +32,7 @@ import {
   MiraDefaultMde,
   MiraDefaultToolbar,
   type MiraDefaultMdeHandle,
-  type MiraDefaultToolbarDefinition
+  type MiraDefaultToolbarDefinition,
 } from "@mira-mde/default-ui/svelte";
 ```
 
@@ -43,7 +43,7 @@ import {
   MiraMde,
   MiraDefaultMde,
   MiraDefaultToolbar,
-  createMiraDefaultEditor
+  createMiraDefaultEditor,
 } from "@mira-mde/react";
 import "@mira-mde/react/styles.css";
 ```

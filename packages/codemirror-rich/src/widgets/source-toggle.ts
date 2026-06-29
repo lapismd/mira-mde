@@ -1,6 +1,8 @@
 import { EditorView } from "@codemirror/view";
 
-export function createSourceToggleButton(onClick: () => void): HTMLButtonElement {
+export function createSourceToggleButton(
+  onClick: () => void,
+): HTMLButtonElement {
   const button = document.createElement("button");
   button.type = "button";
   button.className =
@@ -42,7 +44,11 @@ function appendSvgPath(svg: SVGSVGElement, d: string): void {
   svg.append(path);
 }
 
-export function selectWidgetSource(view: EditorView, from: number, to: number): void {
+export function selectWidgetSource(
+  view: EditorView,
+  from: number,
+  to: number,
+): void {
   view.dispatch({
     selection: { anchor: from, head: to },
     scrollIntoView: true,

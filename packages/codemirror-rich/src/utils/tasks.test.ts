@@ -43,11 +43,7 @@ describe("task utilities", () => {
     const taskLine = state.doc.line(1);
     const taskRange = getTaskMarkerRange(taskLine.text, taskLine.from);
     expect(
-      selectionTouchesTaskMarker(
-        state,
-        taskLine.from,
-        taskRange!.markerEnd,
-      ),
+      selectionTouchesTaskMarker(state, taskLine.from, taskRange!.markerEnd),
     ).toBe(false);
   });
 });

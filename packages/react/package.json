@@ -18,6 +18,8 @@
   },
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts --clean && cp src/styles.css dist/styles.css && publint",
+    "check": "pnpm check:format && pnpm check:svelte && pnpm check:types",
+    "check:format": "prettier --ignore-path ../../.prettierignore . --check",
     "check:types": "tsc -p tsconfig.json --noEmit",
     "check:svelte": "echo \"no svelte files\"",
     "lint": "eslint src --ext .ts,.tsx",

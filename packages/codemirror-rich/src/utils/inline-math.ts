@@ -1,5 +1,10 @@
 import type { RangeBoundary } from "./ranges";
-import { findInlineCodeRanges, isEscaped, isPositionInsideRanges, isWhitespace } from "./inline-code";
+import {
+  findInlineCodeRanges,
+  isEscaped,
+  isPositionInsideRanges,
+  isWhitespace,
+} from "./inline-code";
 
 export type InlineMathRange = RangeBoundary & {
   source: string;

@@ -6,8 +6,10 @@
   "type": "module",
   "scripts": {
     "build": "vite build",
+    "check": "pnpm check:format && pnpm check:svelte && pnpm check:types",
+    "check:format": "prettier --ignore-path ../../.prettierignore . --check",
     "check:types": "svelte-kit sync && tsc -p tsconfig.json --noEmit",
-    "check:svelte": "svelte-check --tsconfig tsconfig.json",
+    "check:svelte": "svelte-kit sync && svelte-check --tsconfig tsconfig.json --fail-on-warnings",
     "dev": "vite dev --host 127.0.0.1",
     "lint": "eslint src --ext .ts,.svelte",
     "preview": "vite preview --host 127.0.0.1",

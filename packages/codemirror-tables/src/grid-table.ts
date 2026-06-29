@@ -74,7 +74,7 @@ function arrayMove<T>(
   defaultValue: T,
 ) {
   if (new_index >= arr.length) {
-    var k = new_index - arr.length + 1;
+    let k = new_index - arr.length + 1;
     while (k--) {
       arr.push(structuredClone(defaultValue));
     }
@@ -106,7 +106,7 @@ export type GridType = {
   maxRows: number;
 };
 
-function createVirtualGrid(table: Mdast.GridTable, doc: Text): GridType {
+function createVirtualGrid(table: Mdast.GridTable, _doc: Text): GridType {
   // Collect all rows from all sections
   const allRows: RowType[] = [];
   const rowMap: Map<Mdast.GridTableRow, RowType> = new Map();
@@ -254,7 +254,7 @@ export class GridTableNode {
   static toMarkdown(node: Mdast.Nodes): string {
     return toMarkdown(node, {
       handlers: {
-        text(node, parent, context, safeOptions) {
+        text(node) {
           return node.value;
         },
       },
@@ -265,7 +265,7 @@ export class GridTableNode {
   toMarkdown() {
     return toMarkdown(this.__mdastNode, {
       handlers: {
-        text(node, parent, context, safeOptions) {
+        text(node) {
           return node.value;
         },
       },
@@ -396,7 +396,7 @@ export class GridTableNode {
   }
 
   position(rowIndex: number, colIndex?: number): any {
-    let element = getCellAtPosition(this.__grid, colIndex ?? 0, rowIndex);
+    const element = getCellAtPosition(this.__grid, colIndex ?? 0, rowIndex);
     if (!element) {
       return null;
     }
@@ -411,7 +411,7 @@ export class GridTableNode {
   }
 
   positions(rowIndex: number, colIndex?: number): any[] {
-    let cell = getCellAtPosition(this.__grid, colIndex ?? 0, rowIndex);
+    const cell = getCellAtPosition(this.__grid, colIndex ?? 0, rowIndex);
     if (!cell) {
       return [];
     }
@@ -419,7 +419,7 @@ export class GridTableNode {
   }
 
   coordsAt(position: number) {
-    let cell = getCellAtOffset(this.__grid, position);
+    const cell = getCellAtOffset(this.__grid, position);
     if (!cell) {
       return [-1, -1];
     }

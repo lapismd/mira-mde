@@ -8,6 +8,8 @@ export default tseslint.config(
     ignores: [
       "**/dist/**",
       "**/build/**",
+      "apps/docs/.astro/**",
+      "**/test-results/**",
       "**/.svelte-kit/**",
       "node_modules/**",
     ],
@@ -30,6 +32,12 @@ export default tseslint.config(
           varsIgnorePattern: "^_",
         },
       ],
+    },
+  },
+  {
+    files: ["packages/codemirror-tables/src/**/*.{js,ts}"],
+    rules: {
+      "@typescript-eslint/ban-ts-comment": "off",
     },
   },
   prettier,

@@ -1,5 +1,9 @@
 import { parseDocument, stringify } from "yaml";
-import type { FrontmatterConfig, FrontmatterProperty, FrontmatterPropertyKind } from "./types";
+import type {
+  FrontmatterConfig,
+  FrontmatterProperty,
+  FrontmatterPropertyKind,
+} from "./types";
 import { isRecord, isTextNumberArray } from "./predicates";
 import { resolveFrontmatterWidget, toBuiltinFrontmatterKind } from "./widgets";
 

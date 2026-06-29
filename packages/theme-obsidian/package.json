@@ -14,6 +14,8 @@
   },
   "scripts": {
     "build": "echo \"@mira-mde/theme-obsidian has no build step\"",
+    "check": "pnpm check:format && pnpm check:svelte && pnpm check:types",
+    "check:format": "prettier --ignore-path ../../.prettierignore . --check",
     "check:types": "echo \"@mira-mde/theme-obsidian has no types\"",
     "check:svelte": "echo \"@mira-mde/theme-obsidian has no svelte files\"",
     "lint": "echo \"@mira-mde/theme-obsidian has no lintable files\"",

@@ -20,8 +20,8 @@ export default defineConfig({
         { label: "Tables", slug: "tables" },
         { label: "Mermaid", slug: "mermaid" },
         { label: "Extensions API", slug: "extensions-api" },
-        { label: "API Reference", slug: "api-reference" }
-      ]
-    })
-  ]
+        { label: "API Reference", slug: "api-reference" },
+      ],
+    }),
+  ],
 });

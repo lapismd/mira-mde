@@ -14,7 +14,12 @@ export type HastRaw = {
   value: string;
 };
 export type HastNode =
-  HastRoot | Element | Text | Comment | HastRaw | RootContent;
+  | HastRoot
+  | Element
+  | Text
+  | Comment
+  | HastRaw
+  | RootContent;
 export type HastProperties = Record<string, unknown>;
 export type Parser = (md: string) => HastNode;
 

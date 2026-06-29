@@ -5,7 +5,7 @@ import {
   type Extension,
   type Range,
 } from "@codemirror/state";
-import { EditorView, GutterMarker, gutterLineClass } from "@codemirror/view";
+import { GutterMarker, gutterLineClass } from "@codemirror/view";
 
 class HeadingGutterMarker extends GutterMarker {
   override readonly elementClass: string;

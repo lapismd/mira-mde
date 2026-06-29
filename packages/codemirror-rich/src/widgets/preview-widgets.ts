@@ -1,14 +1,19 @@
 import { EditorView, WidgetType } from "@codemirror/view";
-import { createMarkdownGridTableWidget, createMarkdownTableWidget } from "@mira-mde/codemirror-tables";
+import {
+  createMarkdownGridTableWidget,
+  createMarkdownTableWidget,
+} from "@mira-mde/codemirror-tables";
 import { MarkdownPreview } from "@mira-mde/preview";
 import { mount, unmount } from "svelte";
 import type { MiraRichEditorOptions } from "../types";
-import { shouldActivateEditablePreview, PREVIEW_INTERACTIVE_SELECTOR } from "../utils/activation";
+import {
+  shouldActivateEditablePreview,
+  PREVIEW_INTERACTIVE_SELECTOR,
+} from "../utils/activation";
 import { estimateMarkdownBlockHeight } from "../utils/height-estimates";
 import { createSourceToggleButton, selectWidgetSource } from "./source-toggle";
 
 const previewWidgetMounts = new WeakMap<HTMLElement, Record<string, unknown>>();
-
 
 export class BlockPreviewWidget extends WidgetType {
   constructor(

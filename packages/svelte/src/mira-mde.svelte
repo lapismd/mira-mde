@@ -336,10 +336,9 @@
     }
 
     const configuredRoot = config?.root;
-    const rootElement =
-      isDocument(configuredRoot)
-        ? configuredRoot.documentElement
-        : configuredRoot;
+    const rootElement = isDocument(configuredRoot)
+      ? configuredRoot.documentElement
+      : configuredRoot;
     const targets: HTMLElement[] = [];
     let current: HTMLElement | null =
       rootElement ?? element?.parentElement ?? document.documentElement;
@@ -484,7 +483,7 @@
         class="mira-mde__pane mira-mde__pane--preview"
       >
         <MarkdownPreview
-          {...({ frontmatterConfig } as any)}
+          {...{ frontmatterConfig } as any}
           class="markdown-reading-view"
           {value}
           {sourcePath}

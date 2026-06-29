@@ -5,7 +5,7 @@
     MiraFeature,
     type MiraDefaultFeatureConfigs,
     type MiraDefaultMdeHandle,
-    type MiraFeatureFlags
+    type MiraFeatureFlags,
   } from "@mira-mde/default-ui/svelte";
   import type { MiraMode, MiraTheme } from "@mira-mde/extensions";
   import { docsFileAdapter } from "../lib/file-adapter";
@@ -33,18 +33,23 @@
     readonly = false,
     sourcePath = "docs.md",
     theme = "obsidian",
-    title = "Live example"
+    title = "Live example",
   }: Props = $props();
 
   let editor = $state<MiraDefaultMdeHandle | null>(null);
-  let value = $state(initialValue);
-  let activeMode = $state<MiraMode>(mode);
+  let value = $state("");
+  let activeMode = $state<MiraMode>("live-preview");
+
+  $effect(() => {
+    value = initialValue;
+    activeMode = mode;
+  });
 
   const mergedFeatures = $derived({
     [MiraFeature.Mermaid]: true,
     [MiraFeature.Tables]: true,
     [MiraFeature.GridTables]: true,
-    ...features
+    ...features,
   });
 
   function resetExample(): void {
@@ -66,7 +71,11 @@
         <p class="docs-live-editor__description">{description}</p>
       {/if}
     </div>
-    <button class="docs-live-editor__reset" type="button" onclick={resetExample}>
+    <button
+      class="docs-live-editor__reset"
+      type="button"
+      onclick={resetExample}
+    >
       <RotateCcwIcon class="docs-live-editor__reset-icon" aria-hidden="true" />
       Reset
     </button>

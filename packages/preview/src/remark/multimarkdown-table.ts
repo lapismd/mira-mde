@@ -61,11 +61,9 @@ function processTableSpans(
         continue;
       }
 
-      let { colspan, nextCellIndex } = getColspan(
-        originalCells,
-        cellIndex,
-        options,
-      );
+      const colspanInfo = getColspan(originalCells, cellIndex, options);
+      let { colspan } = colspanInfo;
+      const { nextCellIndex } = colspanInfo;
 
       if (colIndex >= columnCount) {
         cellIndex = nextCellIndex - 1;

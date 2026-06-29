@@ -1,8 +1,16 @@
 @import "@mira-mde/default-ui/styles.css";
 
 :root {
-  --docs-live-editor-border: color-mix(in srgb, var(--sl-color-gray-5), transparent 15%);
-  --docs-live-editor-header: color-mix(in srgb, var(--sl-color-gray-6), transparent 65%);
+  --docs-live-editor-border: color-mix(
+    in srgb,
+    var(--sl-color-gray-5),
+    transparent 15%
+  );
+  --docs-live-editor-header: color-mix(
+    in srgb,
+    var(--sl-color-gray-6),
+    transparent 65%
+  );
 }
 
 .sl-markdown-content .docs-live-editor {

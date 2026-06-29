@@ -20,7 +20,6 @@ import type {
   MiraDefaultEditorEventMap,
   MiraDefaultEditorEventName,
   MiraDefaultEditorOptions,
-  MiraDefaultEditMode,
   MiraDefaultMdeHandle,
 } from "./types";
 

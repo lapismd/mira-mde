@@ -61,7 +61,10 @@ export function hasRenderedInitialFrontmatterCursor(
   return false;
 }
 
-export function rangesOverlap(left: RangeBoundary, right: RangeBoundary): boolean {
+export function rangesOverlap(
+  left: RangeBoundary,
+  right: RangeBoundary,
+): boolean {
   return left.from < right.to && right.from < left.to;
 }
 

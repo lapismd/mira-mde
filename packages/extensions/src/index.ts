@@ -4,7 +4,10 @@ import type { Component } from "svelte";
 import type { Pluggable } from "unified";
 
 export type MiraRendererComponent =
-  Component<any, any, any> | string | null | undefined;
+  | Component<any, any, any>
+  | string
+  | null
+  | undefined;
 
 export type MiraRendererComponents = Record<string, MiraRendererComponent>;
 
@@ -58,9 +61,7 @@ export type MiraFileAdapter = {
     href: string;
     sourcePath?: string;
   }) => MiraFileRef | null | Promise<MiraFileRef | null>;
-  readMarkdown?: (
-    file: MiraFileRef,
-  ) => string | null | Promise<string | null>;
+  readMarkdown?: (file: MiraFileRef) => string | null | Promise<string | null>;
   readAssetUrl?: (file: MiraFileRef) => string | null | Promise<string | null>;
   openFile?: (file: MiraFileRef, event?: MouseEvent) => void | Promise<void>;
   renderEmbed?: (
@@ -73,10 +74,7 @@ export type MiraFileAdapter = {
   ) =>
     | Array<{ id: string; text: string; level: number }>
     | Promise<Array<{ id: string; text: string; level: number }>>;
-  watchFile?: (
-    file: MiraFileRef,
-    callback: () => void,
-  ) => void | (() => void);
+  watchFile?: (file: MiraFileRef, callback: () => void) => void | (() => void);
 };
 
 export type MiraExtensionRuntimeContext = {
@@ -92,7 +90,8 @@ export type MiraExtensionContext = {
 };
 
 export type MiraExtensionContribution =
-  CodeMirrorExtension | CodeMirrorExtension[];
+  | CodeMirrorExtension
+  | CodeMirrorExtension[];
 
 export type MiraExtension = {
   name: string;

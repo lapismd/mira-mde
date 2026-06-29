@@ -8,7 +8,7 @@
     MiraFeature,
     type MiraDefaultMdeHandle,
     type MiraDefaultToolbarActionContext,
-    type MiraDefaultToolbarDefinition
+    type MiraDefaultToolbarDefinition,
   } from "@mira-mde/default-ui/svelte";
   import type { MiraMode } from "@mira-mde/extensions";
   import { toolbarMarkdown } from "../data/examples";
@@ -19,7 +19,7 @@
   let mode = $state<MiraMode>("live-preview");
 
   const features = {
-    [MiraFeature.Mermaid]: true
+    [MiraFeature.Mermaid]: true,
   };
 
   const customToolbars: MiraDefaultToolbarDefinition[] = [
@@ -34,9 +34,9 @@
           icon: SparklesIcon,
           run(context: MiraDefaultToolbarActionContext) {
             context.insertMarkdown(
-              "\n> [!tip] Custom toolbar\n> This callout came from a declarative toolbar button.\n"
+              "\n> [!tip] Custom toolbar\n> This callout came from a declarative toolbar button.\n",
             );
-          }
+          },
         },
         {
           type: "dropdown",
@@ -46,7 +46,7 @@
           items: [
             {
               type: "label",
-              label: "Templates"
+              label: "Templates",
             },
             {
               id: "template-checklist",
@@ -54,9 +54,9 @@
               icon: CheckIcon,
               run(context: MiraDefaultToolbarActionContext) {
                 context.insertMarkdown(
-                  "\n- [ ] First task\n- [ ] Second task\n- [ ] Third task\n"
+                  "\n- [ ] First task\n- [ ] Second task\n- [ ] Third task\n",
                 );
-              }
+              },
             },
             {
               id: "template-section",
@@ -64,14 +64,14 @@
               icon: FileTextIcon,
               run(context: MiraDefaultToolbarActionContext) {
                 context.insertMarkdown(
-                  "\n## New section\n\nAdd details for this section.\n"
+                  "\n## New section\n\nAdd details for this section.\n",
                 );
-              }
-            }
-          ]
-        }
-      ]
-    }
+              },
+            },
+          ],
+        },
+      ],
+    },
   ];
 
   function resetExample(): void {
@@ -82,10 +82,7 @@
   }
 </script>
 
-<section
-  class="docs-live-editor"
-  style="--docs-live-editor-height: 28rem;"
->
+<section class="docs-live-editor" style="--docs-live-editor-height: 28rem;">
   <div class="docs-live-editor__header">
     <div>
       <p class="docs-live-editor__title">Declarative custom toolbar</p>
@@ -94,7 +91,11 @@
         default toolbar.
       </p>
     </div>
-    <button class="docs-live-editor__reset" type="button" onclick={resetExample}>
+    <button
+      class="docs-live-editor__reset"
+      type="button"
+      onclick={resetExample}
+    >
       Reset
     </button>
   </div>
@@ -102,7 +103,7 @@
   <MiraDefaultMde
     bind:this={editor}
     bind:value
-    bind:mode={mode}
+    bind:mode
     {features}
     fileAdapter={docsFileAdapter}
     toolbars={customToolbars}

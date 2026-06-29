@@ -51,8 +51,9 @@ export function tabAction(delta: number) {
     if (!cell) {
       return false;
     }
-    let [row, col] = cell;
-    let index = col + delta;
+    let row = cell[0];
+    const column = cell[1];
+    let index = column + delta;
     if (index >= tableNode.getColCount()) {
       tableNode.insertColumnAt(index);
     }
@@ -62,7 +63,7 @@ export function tabAction(delta: number) {
       index = tableNode.getColCount() - 1;
     }
 
-    let pos = tableNode.rerender().position(row, index);
+    const pos = tableNode.rerender().position(row, index);
     if (pos) {
       const head = coords.from + pos.start.offset!;
       const anchor = coords.from + pos.end.offset!;
@@ -97,9 +98,9 @@ class TableDecoration implements PluginValue {
   }
 
   process(view: EditorView): DecorationSet {
-    let widgets: Range<Decoration>[] = [];
+    const widgets: Range<Decoration>[] = [];
     const cachedTableLines = new Set<number>();
-    for (let { from, to } of view.visibleRanges) {
+    for (const { from, to } of view.visibleRanges) {
       syntaxTree(view.state).iterate({
         from,
         to,
@@ -146,12 +147,12 @@ export function tableExtension({
           return false;
         }
 
-        const [row, col] = cell;
+        const [row] = cell;
         if (row + 1 >= tableNode.getRowCount()) {
           tableNode.insertRowAt(row + 1);
         }
 
-        let pos = tableNode.rerender().position(row + 1, col);
+        const pos = tableNode.rerender().position(row + 1, col);
         if (pos) {
           const head = coords.from + pos.start.offset!;
           const anchor = coords.from + pos.end.offset!;
@@ -177,9 +178,9 @@ export function tableExtension({
           return false;
         }
 
-        const [row, col] = cell;
+        const [row] = cell;
         tableNode.insertRowAt(row + 1);
-        let pos = tableNode.rerender().position(row + 1, 0);
+        const pos = tableNode.rerender().position(row + 1, 0);
         if (pos) {
           const head = coords.from + pos.start.offset! + 1;
           const anchor = head;

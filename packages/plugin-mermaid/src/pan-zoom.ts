@@ -1,7 +1,4 @@
-import type {
-  SvgPanZoomInstance,
-  SvgPanZoomOptions,
-} from "svg-pan-zoom";
+import type { SvgPanZoomInstance, SvgPanZoomOptions } from "svg-pan-zoom";
 
 type PanZoomPoint = {
   x: number;

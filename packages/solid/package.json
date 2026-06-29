@@ -6,6 +6,8 @@
   "type": "module",
   "scripts": {
     "build": "echo \"@mira-mde/solid is planned after the core API stabilizes\"",
+    "check": "pnpm check:format && pnpm check:svelte && pnpm check:types",
+    "check:format": "prettier --ignore-path ../../.prettierignore . --check",
     "check:types": "echo \"@mira-mde/solid is planned\"",
     "check:svelte": "echo \"no svelte files\"",
     "lint": "echo \"@mira-mde/solid is planned\"",

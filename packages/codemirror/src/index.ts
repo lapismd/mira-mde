@@ -49,7 +49,8 @@ export type MiraCodeMirrorOptions = {
   indentWidth?: number;
   lineNumbers?: boolean;
   autocomplete?:
-    Exclude<Parameters<typeof autocompletion>[0], undefined> | false;
+    | Exclude<Parameters<typeof autocompletion>[0], undefined>
+    | false;
 };
 
 export const miraClassHighlighter = tagHighlighter([

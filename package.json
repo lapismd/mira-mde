@@ -10,7 +10,8 @@
   },
   "scripts": {
     "build": "turbo run build",
-    "check:all": "pnpm check:format && pnpm check:types && pnpm check:svelte && pnpm lint && pnpm test && pnpm build",
+    "check": "pnpm check:format && turbo run check",
+    "check:all": "pnpm check && pnpm lint && pnpm test && pnpm build",
     "check:format": "prettier . --check",
     "check:svelte": "turbo run check:svelte",
     "check:types": "turbo run check:types",

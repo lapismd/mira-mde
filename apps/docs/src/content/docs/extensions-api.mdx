@@ -15,8 +15,8 @@ export function myExtension(): MiraExtension {
     name: "my-extension",
     codemirror: [],
     preview: {
-      rehypePlugins: []
-    }
+      rehypePlugins: [],
+    },
   };
 }
 ```
@@ -30,9 +30,9 @@ const linkResolver = {
   resolveLink(href, context) {
     return {
       href,
-      title: context.sourcePath
+      title: context.sourcePath,
     };
-  }
+  },
 };
 ```
 
@@ -42,11 +42,11 @@ const linkResolver = {
 
 ## Public Entry Points
 
-| Entry point | Purpose |
-| :--- | :--- |
-| `MiraMde` | Svelte editor component for custom shells. |
+| Entry point                  | Purpose                                       |
+| :--------------------------- | :-------------------------------------------- |
+| `MiraMde`                    | Svelte editor component for custom shells.    |
 | `createRichEditorExtensions` | CodeMirror rich editor/live-preview behavior. |
-| `createTableExtensions` | Editable table and grid-table behavior. |
-| `mermaidExtension` | Mermaid rendering and live-widget support. |
-| `MarkdownPreview` | Rendered Markdown surface. |
-| `MiraDefaultMde` | Default editor and toolbar package. |
+| `createTableExtensions`      | Editable table and grid-table behavior.       |
+| `mermaidExtension`           | Mermaid rendering and live-widget support.    |
+| `MarkdownPreview`            | Rendered Markdown surface.                    |
+| `MiraDefaultMde`             | Default editor and toolbar package.           |

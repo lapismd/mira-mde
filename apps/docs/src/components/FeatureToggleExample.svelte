@@ -2,7 +2,7 @@
   import {
     MiraDefaultMde,
     MiraFeature,
-    type MiraFeatureFlags
+    type MiraFeatureFlags,
   } from "@mira-mde/default-ui/svelte";
   import type { MiraMode } from "@mira-mde/extensions";
   import { featureToggleMarkdown } from "../data/examples";
@@ -18,14 +18,11 @@
     [MiraFeature.Tables]: tables,
     [MiraFeature.GridTables]: tables,
     [MiraFeature.Mermaid]: mermaid,
-    [MiraFeature.SplitMode]: splitMode
+    [MiraFeature.SplitMode]: splitMode,
   });
 </script>
 
-<section
-  class="docs-live-editor"
-  style="--docs-live-editor-height: 30rem;"
->
+<section class="docs-live-editor" style="--docs-live-editor-height: 30rem;">
   <div class="docs-live-editor__header">
     <div>
       <p class="docs-live-editor__title">Feature toggles</p>
@@ -52,7 +49,7 @@
 
   <MiraDefaultMde
     bind:value
-    bind:mode={mode}
+    bind:mode
     {features}
     fileAdapter={docsFileAdapter}
     class="docs-live-editor__surface"

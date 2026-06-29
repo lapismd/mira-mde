@@ -2,8 +2,10 @@ node_modules
 dist
 build
 .svelte-kit
+apps/docs/.astro
 .turbo
 coverage
+test-results
 pnpm-lock.yaml
 apps/demo/static/mira-markdown-demo.svg
 apps/docs/public/mira-markdown-demo.svg

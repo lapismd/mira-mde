@@ -656,7 +656,9 @@
                   </Toolbar.Button>
                 {/snippet}
               </Tooltip.Trigger>
-              <Tooltip.Content>{miraDefaultToolbarItemLabels[item]}</Tooltip.Content>
+              <Tooltip.Content
+                >{miraDefaultToolbarItemLabels[item]}</Tooltip.Content
+              >
             </Tooltip.Root>
           {/each}
         </div>

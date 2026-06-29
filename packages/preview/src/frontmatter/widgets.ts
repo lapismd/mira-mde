@@ -4,7 +4,10 @@ import type {
   FrontmatterPropertyKind,
   FrontmatterTypeDefinition,
 } from "./types";
-import { frontmatterPropertyKindLabels, frontmatterPropertyKindOptions } from "./types";
+import {
+  frontmatterPropertyKindLabels,
+  frontmatterPropertyKindOptions,
+} from "./types";
 
 export function frontmatterPropertyIcon(
   kind: FrontmatterPropertyKind,

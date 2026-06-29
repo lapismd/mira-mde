@@ -39,7 +39,7 @@ import "@mira-mde/default-ui/styles.css";
 const editor = createMiraDefaultEditor({
   root: document.querySelector("#editor")!,
   value: "# Hello Mira",
-  sourcePath: "note.md"
+  sourcePath: "note.md",
 });
 
 editor.on("change", (markdown) => {
@@ -51,12 +51,12 @@ editor.on("change", (markdown) => {
 
 Import one package stylesheet for the surface you use:
 
-| Surface | Stylesheet |
-| :--- | :--- |
-| Svelte default UI | `@mira-mde/default-ui/styles.css` |
-| React default UI | `@mira-mde/react/styles.css` |
-| Lower-level Svelte editor | `@mira-mde/svelte/styles.css` |
-| Rendered preview only | `@mira-mde/preview/styles.css` |
+| Surface                   | Stylesheet                        |
+| :------------------------ | :-------------------------------- |
+| Svelte default UI         | `@mira-mde/default-ui/styles.css` |
+| React default UI          | `@mira-mde/react/styles.css`      |
+| Lower-level Svelte editor | `@mira-mde/svelte/styles.css`     |
+| Rendered preview only     | `@mira-mde/preview/styles.css`    |
 
 ## Modes
 

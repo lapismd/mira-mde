@@ -35,7 +35,7 @@ function arrayMove<T>(
   defaultValue: T,
 ) {
   if (new_index >= arr.length) {
-    var k = new_index - arr.length + 1;
+    let k = new_index - arr.length + 1;
     while (k--) {
       arr.push(structuredClone(defaultValue));
     }
@@ -87,7 +87,9 @@ function processMultiMarkdownSpans(table: Mdast.Table): {
         continue;
       }
 
-      let { colspan, nextCellIndex } = getColspan(originalCells, cellIndex);
+      const colspanInfo = getColspan(originalCells, cellIndex);
+      let { colspan } = colspanInfo;
+      const { nextCellIndex } = colspanInfo;
 
       if (colIndex >= columnCount) {
         cellIndex = nextCellIndex - 1;
@@ -340,18 +342,18 @@ export class TableNode {
 
   /** Returns source-cell coordinates covered by a display row. */
   getCellsInDisplayRow(rowIndex: number): TableCellCoordinates[] {
-    return this.getCellsInDisplayRange([rowIndex, 0], [
-      rowIndex,
-      this.getColCount() - 1,
-    ]);
+    return this.getCellsInDisplayRange(
+      [rowIndex, 0],
+      [rowIndex, this.getColCount() - 1],
+    );
   }
 
   /** Returns source-cell coordinates covered by a display column. */
   getCellsInDisplayColumn(colIndex: number): TableCellCoordinates[] {
-    return this.getCellsInDisplayRange([0, colIndex], [
-      this.getRowCount() - 1,
-      colIndex,
-    ]);
+    return this.getCellsInDisplayRange(
+      [0, colIndex],
+      [this.getRowCount() - 1, colIndex],
+    );
   }
 
   /** Returns source-cell coordinates covered by a display rectangle. */
@@ -527,7 +529,7 @@ export class TableNode {
     const table = this.__mdastNode;
     for (let rowIndex = 0; rowIndex < table.children.length; rowIndex++) {
       const row = table.children[rowIndex];
-      let [x, y] = [
+      const [x, y] = [
         row.position?.start?.offset ?? -1,
         row.position?.end?.offset ?? -1,
       ];
@@ -535,7 +537,7 @@ export class TableNode {
         const cells = row.children;
         for (let colIndex = 0; colIndex < cells.length; colIndex++) {
           const cell = cells[colIndex];
-          let [x, y] = [
+          const [x, y] = [
             cell.position?.start?.offset ?? -1,
             cell.position?.end?.offset ?? -1,
           ];

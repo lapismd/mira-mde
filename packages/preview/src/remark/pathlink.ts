@@ -1,6 +1,10 @@
 import type { Root } from "mdast";
 import type { Plugin } from "unified";
-import { isImplicitLocalPathDestination, splitTextNodes, type MarkdownInlineNode } from "./utils";
+import {
+  isImplicitLocalPathDestination,
+  splitTextNodes,
+  type MarkdownInlineNode,
+} from "./utils";
 
 export const remarkPathLinks: Plugin<[], Root> = () => {
   return (tree) =>

@@ -9,7 +9,7 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-/* eslint-disable no-use-before-define,no-underscore-dangle,no-param-reassign */
+
 import { codes, types } from "micromark-util-symbol";
 import { markdownLineEnding, markdownSpace } from "micromark-util-character";
 import {
@@ -353,7 +353,6 @@ function parse() {
         if (e === "enter") {
           bodyStart = idx;
         } else {
-          // eslint-disable-next-line prefer-const
           let [hdrIdx, ftrIdx] = fatLines;
           const bdy = node;
           if (hdrIdx > bodyStart + 1) {

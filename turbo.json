@@ -5,6 +5,10 @@
       "dependsOn": ["^build"],
       "outputs": ["dist/**", ".svelte-kit/**", "build/**"]
     },
+    "check": {
+      "dependsOn": ["^build"],
+      "outputs": []
+    },
     "check:types": {
       "dependsOn": ["^build"],
       "outputs": []

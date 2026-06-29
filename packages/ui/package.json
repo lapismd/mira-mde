@@ -79,8 +79,10 @@
   },
   "scripts": {
     "build": "svelte-package --input src --output dist && publint",
+    "check": "pnpm check:format && pnpm check:svelte && pnpm check:types",
+    "check:format": "prettier --ignore-path ../../.prettierignore . --check",
     "check:types": "tsc -p tsconfig.json --noEmit",
-    "check:svelte": "svelte-check --tsconfig tsconfig.json",
+    "check:svelte": "svelte-check --tsconfig tsconfig.json --fail-on-warnings",
     "lint": "eslint src --ext .ts,.svelte",
     "test": "vitest run"
   },

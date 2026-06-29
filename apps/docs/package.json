@@ -6,8 +6,10 @@
   "type": "module",
   "scripts": {
     "build": "astro check && astro build",
-    "check:svelte": "echo \"Astro checks Svelte islands via astro check\"",
-    "check:types": "astro check",
+    "check": "pnpm check:format && pnpm check:svelte && pnpm check:types",
+    "check:format": "prettier --ignore-path ../../.prettierignore . --check",
+    "check:types": "astro check --minimumFailingSeverity warning",
+    "check:svelte": "svelte-check --tsconfig tsconfig.json --fail-on-warnings",
     "dev": "astro dev --host 127.0.0.1",
     "lint": "eslint src/content.config.ts src/data e2e --ext .ts",
     "preview": "astro preview --host 127.0.0.1",

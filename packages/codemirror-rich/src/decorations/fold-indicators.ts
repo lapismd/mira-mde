@@ -1,6 +1,19 @@
-import { foldEffect, foldedRanges, foldable, unfoldEffect } from "@codemirror/language";
+import {
+  foldEffect,
+  foldedRanges,
+  foldable,
+  unfoldEffect,
+} from "@codemirror/language";
 import { RangeSetBuilder, type Extension } from "@codemirror/state";
-import { Decoration, type DecorationSet, EditorView, type PluginValue, ViewPlugin, type ViewUpdate, WidgetType } from "@codemirror/view";
+import {
+  Decoration,
+  type DecorationSet,
+  EditorView,
+  type PluginValue,
+  ViewPlugin,
+  type ViewUpdate,
+  WidgetType,
+} from "@codemirror/view";
 import type { RangeBoundary } from "../utils/ranges";
 
 export function foldIndicatorDecorations(): Extension {

@@ -351,7 +351,10 @@
     0 8px 28px rgb(0 0 0 / 14%),
     0 2px 8px rgb(0 0 0 / 8%);
   color: var(--popover-foreground, var(--mira-foreground));
-  max-height: var(--radix-dropdown-menu-content-available-height, min(70vh, 28rem));
+  max-height: var(
+    --radix-dropdown-menu-content-available-height,
+    min(70vh, 28rem)
+  );
   min-width: 8rem;
   overflow-x: hidden;
   overflow-y: auto;
@@ -361,7 +364,10 @@
 
 [data-slot="context-menu-content"],
 [data-slot="context-menu-sub-content"] {
-  max-height: var(--radix-context-menu-content-available-height, min(70vh, 28rem));
+  max-height: var(
+    --radix-context-menu-content-available-height,
+    min(70vh, 28rem)
+  );
 }
 
 [data-slot="dropdown-menu-content"].flex,
@@ -430,7 +436,10 @@
 [data-slot="context-menu-checkbox-item"][data-highlighted],
 [data-slot="context-menu-radio-item"][data-highlighted],
 [data-slot="context-menu-sub-trigger"][data-highlighted] {
-  background: var(--accent, var(--background-modifier-hover, var(--mira-accent-soft)));
+  background: var(
+    --accent,
+    var(--background-modifier-hover, var(--mira-accent-soft))
+  );
   color: var(--accent-foreground, var(--mira-foreground));
 }
 
@@ -618,7 +627,11 @@
 }
 
 [data-slot="table-row"]:hover > :is(th, td) {
-  background: color-mix(in oklab, var(--muted, var(--mira-muted)) 50%, transparent);
+  background: color-mix(
+    in oklab,
+    var(--muted, var(--mira-muted)) 50%,
+    transparent
+  );
 }
 
 [data-slot="table-row"].border-none,
@@ -667,7 +680,11 @@
 }
 
 [data-slot="table-footer"] {
-  background: color-mix(in oklab, var(--muted, var(--mira-muted)) 50%, transparent);
+  background: color-mix(
+    in oklab,
+    var(--muted, var(--mira-muted)) 50%,
+    transparent
+  );
   border-top: 1px solid var(--border, var(--mira-border));
   font-weight: 500;
 }

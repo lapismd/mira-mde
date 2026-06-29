@@ -1,7 +1,17 @@
-import type { FrontmatterConfig, FrontmatterPathSegment, FrontmatterProperty, FrontmatterPropertyKind } from "./types";
+import type {
+  FrontmatterConfig,
+  FrontmatterPathSegment,
+  FrontmatterProperty,
+  FrontmatterPropertyKind,
+} from "./types";
 import { isRecord, isTextNumberArray } from "./predicates";
 import { defaultFrontmatterValue } from "./defaults";
-import { frontmatterPropertyIcon, resolveConfiguredFrontmatterType, resolveFrontmatterWidget, toBuiltinFrontmatterKind } from "./widgets";
+import {
+  frontmatterPropertyIcon,
+  resolveConfiguredFrontmatterType,
+  resolveFrontmatterWidget,
+  toBuiltinFrontmatterKind,
+} from "./widgets";
 
 export function frontmatterProperties(
   value: Record<string, unknown>,
@@ -320,4 +330,3 @@ function formatPath(path: FrontmatterPathSegment[]): string {
     )
     .join("");
 }
-

@@ -1,15 +1,6 @@
-import {
-  foldEffect,
-  foldedRanges,
-  foldable,
-  ensureSyntaxTree,
-  syntaxTree,
-  unfoldEffect,
-} from "@codemirror/language";
+import { ensureSyntaxTree, syntaxTree } from "@codemirror/language";
 import {
   EditorState,
-  RangeSet,
-  RangeSetBuilder,
   StateField,
   type Extension,
   type Range,
@@ -18,51 +9,28 @@ import {
   Decoration,
   type DecorationSet,
   EditorView,
-  GutterMarker,
-  gutterLineClass,
   type PluginValue,
   ViewPlugin,
   type ViewUpdate,
   WidgetType,
 } from "@codemirror/view";
-import { MarkdownPreview } from "@mira-mde/preview";
-import {
-  createMarkdownGridTableWidget,
-  createMarkdownTableWidget,
-} from "@mira-mde/codemirror-tables";
-import { mount, unmount } from "svelte";
 import { miraRichEditorTheme } from "./theme";
 import type { MiraRichEditorOptions } from "./types";
-import {
-  getFencedCodeLanguage,
-  getFencedCodeWidgetRange,
-} from "./utils/fenced-code";
+import { getFencedCodeLanguage } from "./utils/fenced-code";
 import {
   getAtxHeadingMarkerRange,
   selectionTouchesLine,
 } from "./utils/headings";
 import { getTaskMarkerRange, selectionTouchesTaskMarker } from "./utils/tasks";
-import { estimateMarkdownBlockHeight } from "./utils/height-estimates";
 import {
   findInlineCodeRanges,
   isPositionInsideRanges,
 } from "./utils/inline-code";
-import {
-  findInlineMathRanges,
-  type InlineMathRange,
-} from "./utils/inline-math";
-import {
-  getLineIndentInfo,
-  indentGuideDecorations,
-  normalizeIndentText,
-  selectionTouchesIndent,
-  splitIndentSegments,
-  toMarkdownColumns,
-} from "./utils/indent";
+import { findInlineMathRanges } from "./utils/inline-math";
+import { indentGuideDecorations } from "./utils/indent";
 import {
   getMarkdownLinkTextRange,
   isBareExternalAutolinkUrl,
-  isExternalMarkdownDestination,
   isExternalMarkdownLink,
 } from "./utils/links";
 import { getListCalloutMarkerRange } from "./utils/list-callouts";
@@ -75,15 +43,8 @@ import {
   sortRanges,
   type RangeBoundary,
 } from "./utils/ranges";
-import {
-  foldIndicatorDecorations,
-  getFoldAnchor,
-} from "./decorations/fold-indicators";
+import { foldIndicatorDecorations } from "./decorations/fold-indicators";
 import { headingGutterExtension } from "./decorations/heading-gutter";
-import {
-  PREVIEW_INTERACTIVE_SELECTOR,
-  shouldActivateEditablePreview,
-} from "./utils/activation";
 import {
   BlockPreviewWidget,
   InlineMarkdownWidget,
@@ -376,7 +337,6 @@ function buildInlinePreviewDecorations(
     ranges,
     syntaxHiddenRanges,
     activeInlineSourceRanges,
-    options,
   );
 
   for (const visibleRange of view.visibleRanges) {
@@ -522,7 +482,6 @@ function decorateInlineSyntax(
   ranges: Range<Decoration>[],
   hiddenRanges: RangeBoundary[],
   activeSourceRanges: RangeBoundary[],
-  options: MiraRichEditorOptions,
 ): void {
   const tree =
     ensureSyntaxTree(view.state, view.state.doc.length, 100) ??

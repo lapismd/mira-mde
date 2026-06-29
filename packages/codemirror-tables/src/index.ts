@@ -3,7 +3,12 @@ export * from "./pipe-table";
 export * from "./types";
 export * from "./widgets/grid-table-widget";
 export * from "./widgets/pipe-table-widget";
-export { GridTableNode, type ColType, type GridType, type RowType } from "./grid-table";
+export {
+  GridTableNode,
+  type ColType,
+  type GridType,
+  type RowType,
+} from "./grid-table";
 export { $convertTableElement, TableNode } from "./table-node";
 
 import EditorColumn from "./editor-column.svelte";

@@ -46,7 +46,7 @@ export function isImplicitLocalPathDestination(value: string): boolean {
   if (value.trim() !== value || value.length === 0) {
     return false;
   }
-  if (/[\n\r\t<>\[\]|]/.test(value)) {
+  if (/[\n\r\t<>|]/.test(value) || value.includes("[") || value.includes("]")) {
     return false;
   }
   if (value.includes("#") || value.includes("?")) {
