@@ -42,15 +42,210 @@ function arrayMove<T>(
   return arr;
 }
 
+function processMultiMarkdownSpans(table: Mdast.Table): {
+  table: Mdast.Table;
+  hasSpans: boolean;
+} {
+  const rows = table.children;
+  const columnCount = Math.max(1, rows[0]?.children?.length ?? 1);
+  const grid: Array<Array<Mdast.TableCell | null | undefined>> = rows.map(
+    () => [],
+  );
+  const cellSpans = new Map<string, { rowspan: number; colspan: number }>();
+  let hasSpans = false;
+
+  for (let rowIndex = 0; rowIndex < rows.length; rowIndex += 1) {
+    const originalCells = rows[rowIndex]?.children ?? [];
+    let colIndex = 0;
+
+    for (let cellIndex = 0; cellIndex < originalCells.length; cellIndex += 1) {
+      const cell = originalCells[cellIndex];
+      if (!cell) {
+        continue;
+      }
+
+      while (grid[rowIndex]?.[colIndex] !== undefined) {
+        colIndex += 1;
+      }
+
+      const cellText = tableCellText(cell);
+
+      if (cellText === "^") {
+        hasSpans = true;
+        extendRowspan(grid, cellSpans, rowIndex, colIndex);
+        colIndex += 1;
+        continue;
+      }
+
+      let { colspan, nextCellIndex } = getColspan(originalCells, cellIndex);
+
+      if (colIndex >= columnCount) {
+        cellIndex = nextCellIndex - 1;
+        continue;
+      }
+
+      colspan = Math.min(colspan, columnCount - colIndex);
+      if (colspan > 1) {
+        hasSpans = true;
+      }
+
+      grid[rowIndex]![colIndex] = cell;
+      cellSpans.set(`${rowIndex},${colIndex}`, { rowspan: 1, colspan });
+
+      for (let offset = 1; offset < colspan; offset += 1) {
+        grid[rowIndex]![colIndex + offset] = cell;
+      }
+
+      cellIndex = nextCellIndex - 1;
+      colIndex += colspan;
+    }
+  }
+
+  if (!hasSpans) {
+    return { table, hasSpans: false };
+  }
+
+  return {
+    hasSpans: true,
+    table: {
+      ...table,
+      children: rows.map((row, rowIndex) => {
+        const seenCells = new Set<Mdast.TableCell>();
+        const children: Mdast.TableCell[] = [];
+
+        for (let colIndex = 0; colIndex < columnCount; colIndex += 1) {
+          const cell = grid[rowIndex]?.[colIndex];
+          if (!cell || seenCells.has(cell)) {
+            continue;
+          }
+
+          const spanInfo = cellSpans.get(`${rowIndex},${colIndex}`);
+          if (!spanInfo) {
+            continue;
+          }
+
+          seenCells.add(cell);
+          children.push(withTableSpanProperties(cell, spanInfo));
+        }
+
+        return { ...row, children };
+      }),
+    },
+  };
+}
+
+function extendRowspan(
+  grid: Array<Array<Mdast.TableCell | null | undefined>>,
+  cellSpans: Map<string, { rowspan: number; colspan: number }>,
+  rowIndex: number,
+  colIndex: number,
+): void {
+  for (let checkRow = rowIndex - 1; checkRow >= 0; checkRow -= 1) {
+    const spanningCell = grid[checkRow]?.[colIndex];
+    if (!spanningCell) {
+      continue;
+    }
+
+    const spanInfo = cellSpans.get(`${checkRow},${colIndex}`);
+    if (spanInfo && checkRow + spanInfo.rowspan === rowIndex) {
+      spanInfo.rowspan += 1;
+      grid[rowIndex]![colIndex] = spanningCell;
+      return;
+    }
+  }
+
+  grid[rowIndex]![colIndex] = null;
+}
+
+function withTableSpanProperties(
+  cell: Mdast.TableCell,
+  spanInfo: { rowspan: number; colspan: number },
+): Mdast.TableCell {
+  const nextCell: Mdast.TableCell = {
+    ...cell,
+    data: {
+      ...(cell.data ?? {}),
+      hProperties: {
+        ...((cell.data?.hProperties as Record<string, unknown> | undefined) ??
+          {}),
+      },
+    },
+  };
+
+  if (spanInfo.colspan > 1) {
+    nextCell.data!.hProperties!.colSpan = spanInfo.colspan;
+  }
+  if (spanInfo.rowspan > 1) {
+    nextCell.data!.hProperties!.rowSpan = spanInfo.rowspan;
+  }
+
+  return nextCell;
+}
+
+function tableCellText(cell: Mdast.TableCell): string {
+  return TableNode.toMarkdown(cell).trim();
+}
+
+function getColspan(
+  cells: Mdast.TableCell[],
+  cellIndex: number,
+): { colspan: number; nextCellIndex: number } {
+  let nextCellIndex = cellIndex + 1;
+  let markerCount = 0;
+
+  while (nextCellIndex < cells.length) {
+    const nextCell = cells[nextCellIndex];
+    if (!nextCell || tableCellText(nextCell) !== "") {
+      break;
+    }
+
+    markerCount += 1;
+    nextCellIndex += 1;
+  }
+
+  if (markerCount === 0 || nextCellIndex >= cells.length) {
+    return { colspan: 1, nextCellIndex: cellIndex + 1 };
+  }
+
+  return { colspan: 1 + markerCount, nextCellIndex };
+}
+
+function normalizeGfmTableSeparators(markdown: string): string {
+  const lines = markdown.split("\n");
+  if (lines.length < 2) {
+    return markdown;
+  }
+
+  lines[1] = lines[1].replace(/:?-+:?/g, (marker) => {
+    const leftAligned = marker.startsWith(":");
+    const rightAligned = marker.endsWith(":");
+    const dashCount = marker.replaceAll(":", "").length;
+    if (dashCount >= 3) {
+      return marker;
+    }
+
+    return `${leftAligned ? ":" : ""}---${rightAligned ? ":" : ""}`;
+  });
+
+  return lines.join("\n");
+}
+
 export class TableNode {
   /** @internal */
   __mdastNode: Mdast.Table;
+  /** @internal */
+  __displayMdastNode: Mdast.Table;
+  /** @internal */
+  __hasSpans = false;
   /** @internal */
   focusEmitter = coordinatesEmitter();
 
   /** @internal */
   static clone(node: TableNode): TableNode {
-    return new TableNode(structuredClone(node.__mdastNode));
+    return new TableNode(structuredClone(node.__mdastNode), {
+      table: structuredClone(node.__displayMdastNode),
+      hasSpans: node.__hasSpans,
+    });
   }
 
   static fromMarkdown(doc: string) {
@@ -59,21 +254,31 @@ export class TableNode {
       mdastExtensions: [gfmTableFromMarkdown()],
     });
     if (root.children[0]?.type === "table") {
-      return new TableNode(root.children[0]);
+      return new TableNode(
+        root.children[0],
+        processMultiMarkdownSpans(root.children[0]),
+      );
     }
     return null;
   }
 
   static toMarkdown(node: Mdast.Nodes): string {
-    return toMarkdown(node, { extensions: [gfmTableToMarkdown()] });
+    return normalizeGfmTableSeparators(
+      toMarkdown(node, { extensions: [gfmTableToMarkdown()] }),
+    );
   }
 
   toMarkdown() {
-    return toMarkdown(this.__mdastNode, { extensions: [gfmTableToMarkdown()] });
+    return normalizeGfmTableSeparators(
+      toMarkdown(this.__mdastNode, { extensions: [gfmTableToMarkdown()] }),
+    );
   }
 
   rerender(): this {
-    this.__mdastNode = TableNode.fromMarkdown(this.toMarkdown())!.__mdastNode;
+    const next = TableNode.fromMarkdown(this.toMarkdown())!;
+    this.__mdastNode = next.__mdastNode;
+    this.__displayMdastNode = next.__displayMdastNode;
+    this.__hasSpans = next.__hasSpans;
     return this;
   }
 
@@ -83,13 +288,28 @@ export class TableNode {
    * {@link https://github.com/micromark/micromark-extension-gfm-table | micromark/micromark-extension-gfm-table}
    * for more information on the MDAST table node.
    */
-  constructor(mdastNode?: Mdast.Table) {
+  constructor(
+    mdastNode?: Mdast.Table,
+    displayModel?: { table: Mdast.Table; hasSpans: boolean },
+  ) {
     this.__mdastNode = mdastNode ?? { type: "table", children: [] };
+    this.__displayMdastNode = displayModel?.table ?? this.__mdastNode;
+    this.__hasSpans = displayModel?.hasSpans ?? false;
   }
 
   /** Returns the mdast node that this node is constructed from. */
   getMdastNode(): Mdast.Table {
     return this.__mdastNode;
+  }
+
+  /** Returns the table shape used for display in live-preview widgets. */
+  getDisplayMdastNode(): Mdast.Table {
+    return this.__displayMdastNode;
+  }
+
+  /** Returns whether the display table contains MultiMarkdown spans. */
+  hasSpans(): boolean {
+    return this.__hasSpans;
   }
 
   /** Returns the number of rows in the table. */
@@ -143,7 +363,7 @@ export class TableNode {
     }
 
     if (table.align && table.align.length > 0) {
-      table.align.splice(colIndex, 0, "left");
+      table.align.splice(colIndex, 0, null);
     }
   }
 

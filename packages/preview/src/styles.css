@@ -6,6 +6,7 @@
 @import "./styles/editor-shared.css";
 @import "./styles/headings.css";
 @import "./styles/lists-tasks.css";
+@import "./styles/list-callouts.css";
 @import "./styles/blockquotes-footnotes.css";
 @import "./styles/code-katex.css";
 @import "./styles/links-embeds-tags.css";

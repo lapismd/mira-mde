@@ -1,0 +1,90 @@
+.markdown-rendered li.lc-list-callout,
+.markdown-preview-surface .markdown li.lc-list-callout {
+  position: relative;
+}
+
+.markdown-rendered li.lc-list-callout > :not(ul, ol),
+.markdown-preview-surface .markdown li.lc-list-callout > :not(ul, ol) {
+  position: relative;
+  z-index: 1;
+}
+
+.markdown-rendered li.lc-list-callout::before,
+.markdown-preview-surface .markdown li.lc-list-callout::before {
+  background-color: rgba(
+    var(--lc-callout-color),
+    var(--lc-bg-opacity-light, 0.12)
+  );
+  border-radius: 4px;
+  content: "";
+  inset: calc(-1 * var(--lc-bg-top-reading, 0.15rem))
+    calc(-1 * var(--lc-bg-right-reading, 0.35rem))
+    calc(-1 * var(--lc-bg-bottom-reading, 0.15rem))
+    calc(-1 * var(--lc-bg-left-reading, 0.35rem));
+  pointer-events: none;
+  position: absolute;
+  z-index: 0;
+}
+
+.mira-theme-dark .markdown-rendered li.lc-list-callout::before,
+.mira-theme-dark .markdown-preview-surface .markdown li.lc-list-callout::before,
+.theme-dark .markdown-rendered li.lc-list-callout::before,
+.theme-dark .markdown-preview-surface .markdown li.lc-list-callout::before {
+  background-color: rgba(
+    var(--lc-callout-color),
+    var(--lc-bg-opacity-dark, 0.18)
+  );
+}
+
+.markdown-rendered .lc-list-marker,
+.markdown-preview-surface .markdown .lc-list-marker,
+.markdown-editor-surface .lc-list-marker {
+  color: rgb(var(--lc-callout-color));
+  display: inline-block;
+  font-family: var(--font-monospace, var(--mira-font-mono));
+  font-weight: 700;
+  margin-inline-end: 0.4em;
+  pointer-events: none;
+}
+
+.markdown-rendered .lc-list-marker > svg,
+.markdown-preview-surface .markdown .lc-list-marker > svg,
+.markdown-editor-surface .lc-list-marker > svg {
+  display: inline-block;
+  height: 1em;
+  position: relative;
+  width: 1em;
+}
+
+.markdown-editor-surface .lc-list-bg {
+  background-clip: content-box;
+  display: block;
+  inset: calc(-1 * var(--lc-bg-top, 0.15rem))
+    calc(-1 * var(--lc-bg-right, 0.35rem))
+    calc(-1 * var(--lc-bg-bottom, 0.15rem))
+    calc(-1 * var(--lc-bg-left, 0.35rem));
+  padding: inherit;
+  pointer-events: none;
+  position: absolute;
+  z-index: -1;
+}
+
+.markdown-editor-surface .lc-list-bg::after {
+  background-color: rgba(
+    var(--lc-callout-color),
+    var(--lc-bg-opacity-light, 0.12)
+  );
+  border-radius: 4px;
+  content: "";
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+
+.mira-theme-dark .markdown-editor-surface .lc-list-bg::after,
+.theme-dark .markdown-editor-surface .lc-list-bg::after {
+  background-color: rgba(
+    var(--lc-callout-color),
+    var(--lc-bg-opacity-dark, 0.18)
+  );
+}

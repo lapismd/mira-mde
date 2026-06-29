@@ -41,6 +41,26 @@ export function hasInitialFrontmatterCursor(
   );
 }
 
+export function hasRenderedInitialFrontmatterCursor(
+  state: EditorState,
+): boolean {
+  if (!hasInitialFrontmatterCursor(state, 0) || state.doc.lines < 3) {
+    return false;
+  }
+
+  if (state.doc.line(1).text !== "---") {
+    return false;
+  }
+
+  for (let lineNumber = 2; lineNumber <= state.doc.lines; lineNumber += 1) {
+    if (state.doc.line(lineNumber).text === "---") {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 export function rangesOverlap(left: RangeBoundary, right: RangeBoundary): boolean {
   return left.from < right.to && right.from < left.to;
 }

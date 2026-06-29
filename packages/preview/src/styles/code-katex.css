@@ -41,6 +41,68 @@
   padding: 0;
 }
 
+.markdown-rendered .code-line,
+.markdown-preview-surface .markdown .code-line,
+.markdown-widget-shell .code-line {
+  border-left: 4px solid transparent;
+  display: inline-block;
+  margin-left: -12px;
+  margin-right: -12px;
+  min-width: 100%;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+.markdown-rendered .numbered-code-line,
+.markdown-preview-surface .markdown .numbered-code-line,
+.markdown-widget-shell .numbered-code-line {
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: calc(1ch * var(--numbered-code-line-size));
+}
+
+.markdown-rendered .numbered-code-line::before,
+.markdown-preview-surface .markdown .numbered-code-line::before,
+.markdown-widget-shell .numbered-code-line::before {
+  color: var(--color-text-weak, var(--mira-muted-foreground));
+  content: attr(data-line-number);
+  display: inline-flex;
+  font-family: var(--font-monospace);
+  justify-content: end;
+  margin-right: 1ch;
+  opacity: 0.5;
+  padding: 0 3px 0 5px;
+  text-align: right;
+  width: calc(1ch * var(--numbered-code-line-size));
+}
+
+.markdown-rendered .highlighted-code-line,
+.markdown-preview-surface .markdown .highlighted-code-line,
+.markdown-widget-shell .highlighted-code-line {
+  background-color: var(--code-highlighted-line, rgb(204 238 255 / 0.27));
+  border-left-color: var(
+    --code-highlighted-line-indicator,
+    var(--interactive-accent)
+  );
+}
+
+.markdown-rendered code[data-muted="true"] .code-line,
+.markdown-preview-surface .markdown code[data-muted="true"] .code-line,
+.markdown-widget-shell code[data-muted="true"] .code-line {
+  opacity: 0.3;
+}
+
+.markdown-rendered code[data-muted="true"] .highlighted-code-line,
+.markdown-preview-surface
+  .markdown
+  code[data-muted="true"]
+  .highlighted-code-line,
+.markdown-widget-shell code[data-muted="true"] .highlighted-code-line {
+  background-color: transparent;
+  border-left-color: transparent;
+  opacity: 1;
+}
+
 .mira-inline-math-widget,
 .mira-inline-math-widget p,
 .mira-inline-math-widget .katex,

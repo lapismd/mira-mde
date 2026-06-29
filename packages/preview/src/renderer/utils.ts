@@ -50,6 +50,8 @@ export function normalizeProperties(
       normalizedKey = toKebabAttribute(key);
     } else if (svgCamelCaseAttributes.has(key)) {
       normalizedKey = toKebabAttribute(key);
+    } else if (htmlCamelCaseAttributes[key]) {
+      normalizedKey = htmlCamelCaseAttributes[key];
     }
 
     if (normalizedValue === true && key === "checked") {
@@ -148,6 +150,11 @@ const svgCamelCaseAttributes = new Set([
   "viewBox",
   "xlinkHref",
 ]);
+
+const htmlCamelCaseAttributes: Record<string, string> = {
+  colSpan: "colspan",
+  rowSpan: "rowspan",
+};
 
 function toKebabAttribute(value: string): string {
   return value.replace(/[A-Z]/g, (character) => `-${character.toLowerCase()}`);

@@ -76,11 +76,17 @@ Inline **bold**, _italic_, ~~strikethrough~~, \`inline code\`, [path links](note
 - [?] Question task marker
 - [-] Cancelled task marker
 
+- & Highlighted list callout item
+- ? Question list callout item
+- ! Warning list callout item
+
 1. Ordered item
 2. Ordered item with nested tasks
    - [ ] Nested task
 
 ## Tables and grid tables
+
+### Pipe table
 
 | Package | Role | Status |
 | :--- | :--- | ---: |
@@ -88,15 +94,78 @@ Inline **bold**, _italic_, ~~strikethrough~~, \`inline code\`, [path links](note
 | @mira-mde/preview | rendered markdown | ready |
 | @mira-mde/plugin-mermaid | optional extension | ready |
 
-+----------------------+------------------------+
-| Feature              | Behavior               |
-+======================+========================+
-| Row and column menus | Kebab dropdown actions |
-+----------------------+------------------------+
-| Drag handles         | Reorder rows/columns   |
-+----------------------+------------------------+
-| Source toggle        | Edit raw Markdown      |
-+----------------------+------------------------+
+### MultiMarkdown spans
+
+| MultiMarkdown | Span | Status |
+| :--- | :--- | ---: |
+| Combined cell | | ready |
+| Persistent row | rendered markdown | ready |
+| ^ | source-compatible spans | ready |
+
+### Grid table
+
+#### Overview spans and sections
+
++-------------------+------+
+| Table Headings    | Here |
++--------+----------+------+
+| Sub    | Headings | Too  |
++========+=================+
+| cell   | column spanning |
+| spans  +---------:+------+
+| rows   |   normal | cell |
++---v----+:---------------:+
+|        | cells can be    |
+|        | *formatted*     |
+|        | **paragraphs**  |
+|        | \`\`\`             |
+| multi  | and contain     |
+| line   | blocks          |
+| cells  | \`\`\`             |
++========+=========:+======+
+| footer |    cells |      |
++--------+----------+------+
+
+#### Horizontal alignment
+
++>-----<+
+| A b C |
++-------+
+
++:-----:+
+|  ABC  |
++-------+
+
++:------+
+| ABC   |
++------+
+
++------:+
+|   ABC |
++------+
+
+#### Vertical alignment
+
++---^---+
+| Larum |
+| Ipsum |
+|       |
+|       |
++-------+
+
++---x---+
+|       |
+| Larum |
+| Ipsum |
+|       |
++-------+
+
++---v---+
+|       |
+|       |
+| Larum |
+| Ipsum |
++-------+
 
 ## Media, embeds, and raw HTML
 
@@ -112,6 +181,8 @@ Directive syntax is parsed and surfaced as a portable custom element.
 
 ## Mermaid
 
+### Flowchart
+
 ~~~mermaid
 flowchart LR
   Core["@mira-mde/core"] --> Svelte["@mira-mde/svelte"]
@@ -119,6 +190,8 @@ flowchart LR
   Mermaid["@mira-mde/plugin-mermaid"] --> Preview["@mira-mde/preview"]
   Svelte --> Demo["apps/demo"]
 ~~~
+
+### Rough sequence
 
 ~~~mermaid
 ---
@@ -137,7 +210,7 @@ sequenceDiagram
 
 ## Code, math, and footnotes
 
-~~~ts
+~~~ts {2}
 import { createMiraDefaultEditor } from "@mira-mde/default-ui";
 import "@mira-mde/default-ui/styles.css";
 ~~~

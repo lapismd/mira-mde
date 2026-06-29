@@ -17,6 +17,9 @@
     rowIndex: number;
     colIndex: number;
     align: string | null | undefined;
+    colspan?: number;
+    rowspan?: number;
+    readonly?: boolean;
     selectedClass?: string;
     dragSource: MarkdownTableDragSource | null;
     dragOverIndex: number | null;
@@ -31,6 +34,9 @@
     rowIndex,
     colIndex,
     align,
+    colspan,
+    rowspan,
+    readonly = false,
     selectedClass,
     dragSource,
     dragOverIndex,
@@ -80,6 +86,8 @@
   onmouseover={onMouseOver}
   onmousedown={onMouseDown}
   oncontextmenu={onContextMenu}
+  {colspan}
+  {rowspan}
   class={cn(
     "relative border-r border-b p-0 text-left",
     selectedClass,
@@ -97,6 +105,7 @@
   <ColumnEditor
     {node}
     {onContentChange}
+    {readonly}
     class={cn({
       "text-right": align === "right",
       "text-left": align === "left",

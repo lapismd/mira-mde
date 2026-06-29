@@ -33,15 +33,24 @@ import {
 import { mount, unmount } from "svelte";
 import { miraRichEditorTheme } from "./theme";
 import type { MiraRichEditorOptions } from "./types";
-import { getFencedCodeLanguage, getFencedCodeWidgetRange } from "./utils/fenced-code";
+import {
+  getFencedCodeLanguage,
+  getFencedCodeWidgetRange,
+} from "./utils/fenced-code";
 import {
   getAtxHeadingMarkerRange,
   selectionTouchesLine,
 } from "./utils/headings";
 import { getTaskMarkerRange, selectionTouchesTaskMarker } from "./utils/tasks";
 import { estimateMarkdownBlockHeight } from "./utils/height-estimates";
-import { findInlineCodeRanges, isPositionInsideRanges } from "./utils/inline-code";
-import { findInlineMathRanges, type InlineMathRange } from "./utils/inline-math";
+import {
+  findInlineCodeRanges,
+  isPositionInsideRanges,
+} from "./utils/inline-code";
+import {
+  findInlineMathRanges,
+  type InlineMathRange,
+} from "./utils/inline-math";
 import {
   getLineIndentInfo,
   indentGuideDecorations,
@@ -56,29 +65,53 @@ import {
   isExternalMarkdownDestination,
   isExternalMarkdownLink,
 } from "./utils/links";
+import { getListCalloutMarkerRange } from "./utils/list-callouts";
 import {
   hasInitialFrontmatterCursor,
+  hasRenderedInitialFrontmatterCursor,
   rangeContainsSelectionCursor,
   rangeIntersectsSelection,
   rangesOverlap,
   sortRanges,
   type RangeBoundary,
 } from "./utils/ranges";
-import { foldIndicatorDecorations, getFoldAnchor } from "./decorations/fold-indicators";
+import {
+  foldIndicatorDecorations,
+  getFoldAnchor,
+} from "./decorations/fold-indicators";
 import { headingGutterExtension } from "./decorations/heading-gutter";
-import { PREVIEW_INTERACTIVE_SELECTOR, shouldActivateEditablePreview } from "./utils/activation";
-import { BlockPreviewWidget, InlineMarkdownWidget, InlineMathWidget } from "./widgets/preview-widgets";
+import {
+  PREVIEW_INTERACTIVE_SELECTOR,
+  shouldActivateEditablePreview,
+} from "./utils/activation";
+import {
+  BlockPreviewWidget,
+  InlineMarkdownWidget,
+  InlineMathWidget,
+} from "./widgets/preview-widgets";
 import { TaskCheckboxWidget } from "./widgets/task-checkbox";
 
 export { getFoldAnchor } from "./decorations/fold-indicators";
-export { PREVIEW_INTERACTIVE_SELECTOR, shouldActivateEditablePreview } from "./utils/activation";
+export {
+  PREVIEW_INTERACTIVE_SELECTOR,
+  shouldActivateEditablePreview,
+} from "./utils/activation";
 
 export type { MiraRichEditorOptions } from "./types";
-export { getFencedCodeLanguage, getFencedCodeWidgetRange } from "./utils/fenced-code";
-export { getAtxHeadingMarkerRange, selectionTouchesLine } from "./utils/headings";
+export {
+  getFencedCodeLanguage,
+  getFencedCodeWidgetRange,
+} from "./utils/fenced-code";
+export {
+  getAtxHeadingMarkerRange,
+  selectionTouchesLine,
+} from "./utils/headings";
 export { getTaskMarkerRange, selectionTouchesTaskMarker } from "./utils/tasks";
 export { estimateMarkdownBlockHeight } from "./utils/height-estimates";
-export { findInlineMathRanges, type InlineMathRange } from "./utils/inline-math";
+export {
+  findInlineMathRanges,
+  type InlineMathRange,
+} from "./utils/inline-math";
 export {
   getLineIndentInfo,
   normalizeIndentText,
@@ -164,10 +197,16 @@ export function createRichEditorExtensions(
     livePreview ? inlinePreviewDecorations(options) : [],
     foldIndicatorDecorations(),
     livePreview
-      ? EditorView.editorAttributes.of({
-          class:
+      ? EditorView.editorAttributes.compute(["doc", "selection"], (state) => ({
+          class: [
             "mira-mde-live-preview-mode markdown-live-preview-mode markdown-live-preview-view cm-live-preview",
-        })
+            hasRenderedInitialFrontmatterCursor(state)
+              ? "mira-mde-live-preview-hide-cursor"
+              : "",
+          ]
+            .filter(Boolean)
+            .join(" "),
+        }))
       : [],
   ];
 }
@@ -236,9 +275,9 @@ function buildBlockPreviewDecorations(
       const to = state.doc.lineAt(node.to).to;
       const selectionInside =
         node.name === "Frontmatter"
-          ? rangeIntersectsSelection(state, from, to) &&
+          ? rangeContainsSelectionCursor(state, from, to) &&
             !hasInitialFrontmatterCursor(state, from)
-          : rangeIntersectsSelection(state, from, to);
+          : rangeContainsSelectionCursor(state, from, to);
 
       if (
         selectionInside &&
@@ -296,7 +335,7 @@ function buildBlockPreviewDecorations(
     const from = line.from;
     const to = line.to;
     if (
-      rangeIntersectsSelection(state, from, to) ||
+      rangeContainsSelectionCursor(state, from, to) ||
       replacedRanges.some((range) => rangesOverlap(range, { from, to }))
     ) {
       continue;
@@ -348,6 +387,7 @@ function buildInlinePreviewDecorations(
       }
       decorateHeadingLine(line.text, line.from, ranges);
       decorateFootnotes(line.text, line.from, ranges);
+      decorateListCallouts(line.text, line.from, ranges, view.state);
       decorateTaskCheckboxes(
         line.text,
         line.from,
@@ -396,6 +436,82 @@ function buildInlinePreviewDecorations(
   }
 
   return Decoration.set(sortRanges(ranges), true);
+}
+
+class ListCalloutMarkerWidget extends WidgetType {
+  constructor(private readonly marker: string) {
+    super();
+  }
+
+  override toDOM(): HTMLElement {
+    const span = document.createElement("span");
+    span.className = "lc-list-marker";
+    span.setAttribute("aria-hidden", "true");
+    span.textContent = this.marker;
+    return span;
+  }
+
+  override eq(widget: ListCalloutMarkerWidget): boolean {
+    return widget.marker === this.marker;
+  }
+}
+
+class ListCalloutBackgroundWidget extends WidgetType {
+  override toDOM(): HTMLElement {
+    const span = document.createElement("span");
+    span.className = "lc-list-bg";
+    span.setAttribute("aria-hidden", "true");
+    return span;
+  }
+
+  override eq(): boolean {
+    return true;
+  }
+}
+
+function decorateListCallouts(
+  text: string,
+  lineStart: number,
+  ranges: Range<Decoration>[],
+  state: EditorState,
+): void {
+  const markerRange = getListCalloutMarkerRange(text, lineStart);
+  if (!markerRange) {
+    return;
+  }
+
+  ranges.push(
+    Decoration.line({
+      class: "lc-list-callout",
+      attributes: {
+        "data-callout": markerRange.marker,
+        style: `--lc-callout-color: ${markerRange.color}`,
+      },
+    }).range(lineStart),
+  );
+
+  ranges.push(
+    Decoration.widget({
+      side: -1,
+      widget: new ListCalloutBackgroundWidget(),
+    }).range(lineStart),
+  );
+
+  if (
+    rangeIntersectsSelection(
+      state,
+      markerRange.markerStart,
+      markerRange.markerEnd,
+    )
+  ) {
+    return;
+  }
+
+  ranges.push(
+    Decoration.replace({
+      widget: new ListCalloutMarkerWidget(markerRange.marker),
+    }).range(markerRange.markerStart, markerRange.markerEnd),
+  );
 }
 
 function decorateInlineSyntax(
@@ -469,11 +585,7 @@ function collectActiveTaskMarkerRanges(
       const taskRange = getTaskMarkerRange(line.text, line.from);
       if (
         taskRange &&
-        selectionTouchesTaskMarker(
-          view.state,
-          line.from,
-          taskRange.markerEnd,
-        )
+        selectionTouchesTaskMarker(view.state, line.from, taskRange.markerEnd)
       ) {
         activeSourceRanges.push({
           from: taskRange.markerStart,
@@ -504,11 +616,10 @@ function decorateInlineMarkdownWidgets(
     return widgetRanges;
   }
 
-  for (const match of text.matchAll(/\[\[[^\]\r\n]+\]\]/gu)) {
+  for (const match of text.matchAll(/!?\[\[[^\]\r\n]+\]\]/gu)) {
     const localFrom = match.index ?? 0;
     const localTo = localFrom + match[0].length;
     if (
-      text[localFrom - 1] === "!" ||
       isPositionInsideRanges(localFrom, codeRanges) ||
       isPositionInsideRanges(localTo - 1, codeRanges)
     ) {
@@ -844,7 +955,9 @@ function decorateHeadingFormatting(
   const markerRange = getAtxHeadingMarkerRange(text, lineStart);
   if (
     !markerRange ||
-    options.excludedRanges?.some((range) => rangesOverlap(range, markerRange)) ||
+    options.excludedRanges?.some((range) =>
+      rangesOverlap(range, markerRange),
+    ) ||
     (options.state &&
       selectionTouchesLine(options.state, lineStart, lineStart + text.length))
   ) {

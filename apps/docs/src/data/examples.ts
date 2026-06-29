@@ -96,6 +96,13 @@ Raw HTML such as <mark>highlighted text</mark> and <kbd>keyboard keys</kbd> is p
 - [-] Cancelled task states keep their marker
 - [ ] Publish package docs
 
+## List callouts
+
+- & Highlighted list callout item
+- ? Question list callout item
+- ! Warning list callout item
+- @ Reference list callout item
+
 ## Lists
 
 1. Ordered item
@@ -113,7 +120,7 @@ Directive syntax is parsed and rendered as a portable custom element unless an a
 
 ## Code
 
-~~~ts
+~~~ts {2}
 type EditorMode = "source" | "live-preview" | "preview" | "split";
 
 export function selectMode(mode: EditorMode) {
@@ -228,6 +235,8 @@ export const tableMarkdown = String.raw`# Tables
 
 Pipe tables render as editable table widgets in live preview.
 
+## Pipe table
+
 | Package | Owner | Status | Notes |
 | :--- | :--- | ---: | :--- |
 | @mira-mde/core | editor | 100 | selection and transactions |
@@ -238,22 +247,89 @@ Pipe tables render as editable table widgets in live preview.
 | :--- | :--- | :---: | ---: |
 | Cell content | left | centered | right |
 
+MultiMarkdown table spans render in reading mode and preview surfaces.
+
+## MultiMarkdown spans
+
+| MultiMarkdown | Span | Status |
+| :--- | :--- | ---: |
+| Combined cell | | ready |
+| Persistent row | rendered markdown | ready |
+| ^ | source-compatible spans | ready |
+
 Grid tables are part of the portable Markdown table subsystem.
 
-+----------------------+------------------------+
-| Feature              | Behavior               |
-+======================+========================+
-| Row and column menus | Kebab dropdown actions |
-+----------------------+------------------------+
-| Drag handles         | Reorder rows/columns   |
-+----------------------+------------------------+
-| Source toggle        | Edit raw Markdown      |
-+----------------------+------------------------+
+## Grid table
+
+### Overview spans and sections
+
++-------------------+------+
+| Table Headings    | Here |
++--------+----------+------+
+| Sub    | Headings | Too  |
++========+=================+
+| cell   | column spanning |
+| spans  +---------:+------+
+| rows   |   normal | cell |
++---v----+:---------------:+
+|        | cells can be    |
+|        | *formatted*     |
+|        | **paragraphs**  |
+|        | ${"```"}             |
+| multi  | and contain     |
+| line   | blocks          |
+| cells  | ${"```"}             |
++========+=========:+======+
+| footer |    cells |      |
++--------+----------+------+
+
+### Horizontal alignment
+
++>-----<+
+| A b C |
++-------+
+
++:-----:+
+|  ABC  |
++-------+
+
++:------+
+| ABC   |
++------+
+
++------:+
+|   ABC |
++------+
+
+### Vertical alignment
+
++---^---+
+| Larum |
+| Ipsum |
+|       |
+|       |
++-------+
+
++---x---+
+|       |
+| Larum |
+| Ipsum |
+|       |
++-------+
+
++---v---+
+|       |
+|       |
+| Larum |
+| Ipsum |
++-------+
 `;
 
 export const mermaidMarkdown = String.raw`# Mermaid
 
 Mermaid blocks render with the Lapis-aligned control surface.
+
+## Flowchart
 
 ~~~mermaid
 flowchart TB
@@ -266,6 +342,8 @@ flowchart TB
 
 Mermaid code fences can include YAML frontmatter config that is passed to Mermaid before rendering.
 
+## Rough flowchart
+
 ~~~mermaid
 ---
 look: rough
@@ -276,6 +354,8 @@ flowchart LR
   Config[Config frontmatter] --> Render[Mermaid render]
   Render --> Sketch[Rough sketch output]
 ~~~
+
+## Mind map
 
 ~~~mermaid
 mindmap

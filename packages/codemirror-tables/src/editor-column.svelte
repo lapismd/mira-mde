@@ -14,12 +14,14 @@
     node,
     onContentChange,
     onEdit = () => {},
+    readonly = false,
     class: className,
   }: {
     node: Mdast.Nodes;
     class?: string;
     onContentChange: (value: string) => void;
     onEdit?: (evt: MouseEvent) => void;
+    readonly?: boolean;
   } = $props();
   let content = $derived(TableNode.toMarkdown(node).trim());
   let view: EditorView = new EditorView({
@@ -76,6 +78,9 @@
   };
 
   function enableEdit(evt: MouseEvent) {
+    if (readonly) {
+      return;
+    }
     editing = true;
     onEdit(evt);
     tick().then(() => {
@@ -89,7 +94,23 @@
 </script>
 
 <div class={cn("table-cell-wrapper h-full w-full", className)}>
-  {#if editing}
+  {#if readonly}
+    <div class={cn("h-full w-full p-2", className)}>
+      <div class="cm-editor cm-focused mod-inline">
+        <div class="cm-scroller">
+          <div class="cm-content">
+            {#if content}
+              {#await toHtml(content) then markup}
+                {@html markup}
+              {/await}
+            {:else}
+              &NonBreakingSpace;
+            {/if}
+          </div>
+        </div>
+      </div>
+    </div>
+  {:else if editing}
     <div use:codeMirror={content} class="p-2"></div>
   {:else}
     <button

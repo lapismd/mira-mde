@@ -16,9 +16,9 @@ const BLOCK_MATH_BRACKET = "BlockMathBracket";
 
 const delimiterLength: Record<string, number> = {
   [INLINE_MATH_DOLLAR]: 1,
-  [INLINE_MATH_BRACKET]: 3,
+  [INLINE_MATH_BRACKET]: 2,
   [BLOCK_MATH_DOLLAR]: 2,
-  [BLOCK_MATH_BRACKET]: 3,
+  [BLOCK_MATH_BRACKET]: 2,
 };
 
 export const latexParser = StreamLanguage.define(stexMath).parser;
@@ -75,11 +75,7 @@ export function parseLatex(parser: Parser = latexParser): MarkdownConfig {
         before: "Escape",
         name: INLINE_MATH_BRACKET,
         parse(context: InlineContext, next: number, position: number): number {
-          if (
-            next !== 92 ||
-            context.char(position + 1) !== 92 ||
-            ![40, 41].includes(context.char(position + 2))
-          ) {
+          if (next !== 92 || ![40, 41].includes(context.char(position + 1))) {
             return -1;
           }
 
@@ -87,8 +83,8 @@ export function parseLatex(parser: Parser = latexParser): MarkdownConfig {
             context,
             INLINE_MATH_BRACKET,
             position,
-            context.char(position + 2) === 40,
-            context.char(position + 2) === 41,
+            context.char(position + 1) === 40,
+            context.char(position + 1) === 41,
           );
         },
       },
@@ -96,11 +92,7 @@ export function parseLatex(parser: Parser = latexParser): MarkdownConfig {
         before: "Escape",
         name: BLOCK_MATH_BRACKET,
         parse(context: InlineContext, next: number, position: number): number {
-          if (
-            next !== 92 ||
-            context.char(position + 1) !== 92 ||
-            ![91, 93].includes(context.char(position + 2))
-          ) {
+          if (next !== 92 || ![91, 93].includes(context.char(position + 1))) {
             return -1;
           }
 
@@ -108,8 +100,8 @@ export function parseLatex(parser: Parser = latexParser): MarkdownConfig {
             context,
             BLOCK_MATH_BRACKET,
             position,
-            context.char(position + 2) === 91,
-            context.char(position + 2) === 93,
+            context.char(position + 1) === 91,
+            context.char(position + 1) === 93,
           );
         },
       },

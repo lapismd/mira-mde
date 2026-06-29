@@ -12,6 +12,12 @@
   width: fit-content;
 }
 
+.markdown-preview-surface--reading:not(.markdown-preview-surface--embedded)
+  .markdown
+  table:not(.cm-table-widget) {
+  margin-block: var(--table-preview-spacing, 1rem);
+}
+
 .markdown-rendered :is(th, td),
 .markdown-preview-surface .markdown :is(th, td) {
   border: var(--table-border-width) solid var(--table-border-color);

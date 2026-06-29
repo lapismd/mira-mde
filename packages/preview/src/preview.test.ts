@@ -49,7 +49,9 @@ describe("renderer prop normalization", () => {
           paragraph.properties = {
             className: ["from-plugin"],
             ariaSelected: true,
+            colSpan: 2,
             dataSourceOffset: 4,
+            rowSpan: 3,
           };
         },
       ],
@@ -60,7 +62,11 @@ describe("renderer prop normalization", () => {
 
     expect(paragraph.properties?.class).toBe("from-plugin");
     expect(paragraph.properties?.["aria-selected"]).toBe(true);
+    expect(paragraph.properties?.colspan).toBe(2);
     expect(paragraph.properties?.["data-source-offset"]).toBe(4);
+    expect(paragraph.properties?.rowspan).toBe(3);
     expect(paragraph.properties?.className).toBeUndefined();
+    expect(paragraph.properties?.colSpan).toBeUndefined();
+    expect(paragraph.properties?.rowSpan).toBeUndefined();
   });
 });

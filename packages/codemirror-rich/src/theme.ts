@@ -80,6 +80,9 @@ export const miraRichEditorTheme = EditorView.theme({
     overflow: "hidden",
     width: "0",
   },
+  "&.mira-mde-live-preview-hide-cursor .cm-cursorLayer": {
+    visibility: "hidden",
+  },
   ".mira-rich-widget": {
     background: "var(--mira-widget-background, transparent)",
     boxSizing: "border-box",

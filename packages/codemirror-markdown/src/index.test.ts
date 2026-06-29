@@ -22,4 +22,88 @@ describe("createMarkdownCodeMirrorExtensions", () => {
 
     expect(syntaxTree(state).toString()).toContain("GridTable");
   });
+
+  it.each([
+    ["justify", ["+>-----<+", "| A b C |", "+-------+"]],
+    ["center", ["+:-----:+", "|  ABC  |", "+-------+"]],
+    ["left", ["+:------+", "| ABC   |", "+------+"]],
+    ["right", ["+------:+", "|   ABC |", "+------+"]],
+    [
+      "top",
+      [
+        "+---^---+",
+        "| Larum |",
+        "| Ipsum |",
+        "|       |",
+        "|       |",
+        "+-------+",
+      ],
+    ],
+    [
+      "middle",
+      [
+        "+---x---+",
+        "|       |",
+        "| Larum |",
+        "| Ipsum |",
+        "|       |",
+        "+-------+",
+      ],
+    ],
+    [
+      "bottom",
+      [
+        "+---v---+",
+        "|       |",
+        "|       |",
+        "| Larum |",
+        "| Ipsum |",
+        "+-------+",
+      ],
+    ],
+  ])("parses Adobe %s alignment grid table separators", (_, markdown) => {
+    const state = EditorState.create({
+      doc: markdown.join("\n"),
+      extensions: createMarkdownCodeMirrorExtensions(),
+    });
+
+    expect(syntaxTree(state).toString()).toContain("GridTable");
+  });
+
+  it("parses Lapis wikilink, embed, pathlink, and tag nodes", () => {
+    const state = EditorState.create({
+      doc: [
+        "[[Project Plan#Section|Plan]]",
+        "![[Architecture Diagram#Overview|Diagram]]",
+        "[Project](notes/Project Plan.md)",
+        "#mira/editor",
+      ].join("\n"),
+      extensions: createMarkdownCodeMirrorExtensions(),
+    });
+    const tree = syntaxTree(state).toString();
+
+    expect(tree).toContain("WikiLink");
+    expect(tree).toContain("WikiLinkPath");
+    expect(tree).toContain("WikiLinkAnchor");
+    expect(tree).toContain("WikiLinkText");
+    expect(tree).toContain("EmbedLink");
+    expect(tree).toContain("EmbedLinkPath");
+    expect(tree).toContain("EmbedLinkAnchor");
+    expect(tree).toContain("EmbedLinkText");
+    expect(tree).toContain("PathLink");
+    expect(tree).toContain("PathLinkDestination");
+    expect(tree).toContain("Tag");
+    expect(tree).toContain("TagName");
+  });
+
+  it("parses single-backslash bracket math delimiters", () => {
+    const state = EditorState.create({
+      doc: ["inline \\(x + 1\\)", "\\[", "x + 1", "\\]"].join("\n"),
+      extensions: createMarkdownCodeMirrorExtensions(),
+    });
+    const tree = syntaxTree(state).toString();
+
+    expect(tree).toContain("InlineMathBracket");
+    expect(tree).toContain("BlockMathBracket");
+  });
 });

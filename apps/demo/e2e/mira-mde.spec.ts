@@ -127,6 +127,28 @@ function editorContent(page: Page) {
     .first();
 }
 
+async function tableWidgetShape(widget: Locator) {
+  return widget.evaluate((element) => {
+    const table = element.querySelector<HTMLElement>(".cm-table-widget");
+    return {
+      cols:
+        table?.querySelectorAll('[data-markdown-table-chrome="col-header"]')
+          .length ?? 0,
+      rendered: Boolean(table),
+      rows: table?.querySelectorAll("tbody tr").length ?? 0,
+    };
+  });
+}
+
+async function expectTableWidgetShape(
+  widget: Locator,
+  expected: { cols: number; rows: number },
+) {
+  await expect
+    .poll(() => tableWidgetShape(widget))
+    .toEqual({ rendered: true, ...expected });
+}
+
 async function hiddenFormattingCount(
   page: Page,
   lineSnippet: string,
@@ -179,6 +201,21 @@ test("live preview renders widgets and editable frontmatter updates markdown", a
   await expect(page.locator(".cm-live-preview")).toBeVisible();
   const frontmatterWidget = page.locator(".mira-rich-widget--frontmatter");
   await expect(frontmatterWidget).toBeVisible();
+  await expect(page.locator(".cm-editor").first()).toHaveClass(
+    /mira-mde-live-preview-hide-cursor/,
+  );
+  await expect
+    .poll(() =>
+      page
+        .locator(".cm-editor")
+        .first()
+        .evaluate((element) => {
+          const cursorLayer =
+            element.querySelector<HTMLElement>(".cm-cursorLayer");
+          return cursorLayer ? getComputedStyle(cursorLayer).visibility : "";
+        }),
+    )
+    .toBe("hidden");
   await expect(
     frontmatterWidget.getByRole("button", { name: "Collapse properties" }),
   ).toBeVisible();
@@ -332,7 +369,7 @@ test("clicking a live-preview block restores editable source", async ({
     .locator(".mira-rich-widget--fencedcode")
     .filter({ has: page.locator(".mermaid") })
     .first();
-  await scrollEditor(page, 1500);
+  await scrollEditorUntilVisible(page, fencedWidget, { max: 10_000 });
   await expect(fencedWidget).toBeVisible();
   await fencedWidget.hover();
   await fencedWidget.locator(".mira-rich-widget__source-toggle").click();
@@ -576,9 +613,15 @@ test("live inline markdown is styled and reveals source by token", async ({
   await expect(renderedWikilink).not.toContainText("[[");
   await expect(renderedWikilink).not.toContainText("Project Plan|");
   await expect(renderedWikilink.locator(".mira-link-preview")).toBeVisible();
-  await expect(
-    page.locator(".mira-inline-markdown-widget .mira-embed"),
-  ).toHaveCount(0);
+  const inlineImageEmbed = page
+    .locator(".mira-inline-markdown-widget .mira-embed")
+    .filter({ hasText: "Architecture diagram embed" })
+    .first();
+  await expect(inlineImageEmbed).toBeVisible();
+  await expect(inlineImageEmbed.locator("img")).toHaveAttribute(
+    "src",
+    "/mira-markdown-demo.svg",
+  );
   await renderedWikilink.locator("[data-link-preview-trigger]").hover();
   await expect(
     renderedWikilink.locator(
@@ -1120,6 +1163,36 @@ test("tables and admonition callouts render in preview and live-preview", async 
   await expect(
     columnMenu.locator('[data-slot="dropdown-menu-item"]'),
   ).toHaveCount(6);
+  await page.keyboard.press("Escape");
+  const liveTableWidget = page.locator(".mira-rich-widget--table").first();
+  const tableShapeBeforeActions = await tableWidgetShape(liveTableWidget);
+  await liveTableWidget.locator("tfoot tr").hover();
+  await liveTableWidget
+    .locator('[data-markdown-table-chrome="add-row"] button')
+    .click();
+  await expectTableWidgetShape(liveTableWidget, {
+    cols: tableShapeBeforeActions.cols,
+    rows: tableShapeBeforeActions.rows + 1,
+  });
+  await liveTableWidget.locator("tbody tr").first().hover();
+  await liveTableWidget
+    .locator('[data-markdown-table-chrome="add-col"] button')
+    .click();
+  await expectTableWidgetShape(liveTableWidget, {
+    cols: tableShapeBeforeActions.cols + 1,
+    rows: tableShapeBeforeActions.rows + 1,
+  });
+  const liveMultiMarkdownTable = page
+    .locator(".mira-rich-widget--table")
+    .filter({ hasText: "Combined cell" })
+    .first();
+  await scrollEditorUntilVisible(page, liveMultiMarkdownTable);
+  await expect(liveMultiMarkdownTable.locator("td[colspan='2']")).toContainText(
+    "Combined cell",
+  );
+  await expect(liveMultiMarkdownTable.locator("td[rowspan='2']")).toContainText(
+    "Persistent row",
+  );
   const liveGridTable = page
     .locator(".mira-rich-widget--gridtable .cm-table-widget")
     .first();
@@ -1155,6 +1228,37 @@ test("tables and admonition callouts render in preview and live-preview", async 
       )
       .first(),
   ).toBeVisible();
+  const liveGridTableWidget = page
+    .locator(".mira-rich-widget--gridtable")
+    .first();
+  const gridShapeBeforeActions = await tableWidgetShape(liveGridTableWidget);
+  await liveGridTableWidget.locator("tfoot tr").hover();
+  await liveGridTableWidget
+    .locator('[data-markdown-table-chrome="add-row"] button')
+    .click();
+  await expectTableWidgetShape(liveGridTableWidget, {
+    cols: gridShapeBeforeActions.cols,
+    rows: gridShapeBeforeActions.rows + 1,
+  });
+  await liveGridTableWidget.locator("tbody tr").first().hover();
+  await liveGridTableWidget
+    .locator('[data-markdown-table-chrome="add-col"] button')
+    .click();
+  await expectTableWidgetShape(liveGridTableWidget, {
+    cols: gridShapeBeforeActions.cols + 1,
+    rows: gridShapeBeforeActions.rows + 1,
+  });
+  const justifyGridTable = page
+    .locator(".mira-rich-widget--gridtable .cm-table-widget")
+    .filter({ hasText: "A b C" })
+    .first();
+  await scrollEditorUntilVisible(page, justifyGridTable, { max: 10_000 });
+  await expect(justifyGridTable).toBeVisible();
+  await expect(
+    page
+      .locator(".mira-rich-widget--gridtable .cm-table-widget")
+      .filter({ hasText: "ABC" }),
+  ).toHaveCount(3);
   const liveCallout = page
     .locator(".mira-rich-widget--blockquote .callout")
     .first();

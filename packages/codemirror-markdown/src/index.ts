@@ -14,6 +14,19 @@ import {
 import { Table } from "@lezer/markdown";
 import { GridTable } from "./grid-table";
 import { parseLatex } from "./latex";
+import {
+  EmbedLinkParser,
+  PathLinkParser,
+  TagParser,
+  WikiLinkParser,
+} from "./lapis-inline";
+
+export {
+  EmbedLinkParser,
+  PathLinkParser,
+  TagParser,
+  WikiLinkParser,
+} from "./lapis-inline";
 
 export type MiraMarkdownCodeMirrorOptions = {
   codeLanguages?: LanguageDescription[];
@@ -36,7 +49,15 @@ export function createMarkdownCodeMirrorExtensions(
     yamlFrontmatter({
       content: markdown({
         codeLanguages: [...languages, ...(options.codeLanguages ?? [])],
-        extensions: [Table, GridTable, parseLatex()],
+        extensions: [
+          Table,
+          GridTable,
+          EmbedLinkParser,
+          WikiLinkParser,
+          PathLinkParser,
+          TagParser,
+          parseLatex(),
+        ],
       }),
     }),
     markdownSourceDecorations(),

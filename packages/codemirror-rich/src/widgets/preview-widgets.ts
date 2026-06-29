@@ -144,17 +144,6 @@ export class BlockPreviewWidget extends WidgetType {
     view: EditorView,
     replacement: string,
   ): void {
-    const nextValue = [
-      view.state.doc.sliceString(0, this.config.from),
-      replacement,
-      view.state.doc.sliceString(this.config.to),
-    ].join("");
-    this.config.options.onChange?.(
-      replacement,
-      this.config.from,
-      this.config.to,
-      nextValue,
-    );
     view.dispatch({
       changes: {
         from: this.config.from,
@@ -163,7 +152,6 @@ export class BlockPreviewWidget extends WidgetType {
       },
       selection: {
         anchor: this.config.from,
-        head: this.config.from + replacement.length,
       },
       scrollIntoView: true,
     });

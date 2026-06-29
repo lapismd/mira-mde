@@ -144,16 +144,20 @@ class GridTableParser implements LeafBlockParser {
     if (isHorizontalSeparator(trimmed)) {
       return true;
     }
-    return trimmed.includes("|") && (trimmed.startsWith("|") || /^\s*\|/.test(line));
+    return (
+      trimmed.includes("|") && (trimmed.startsWith("|") || /^\s*\|/.test(line))
+    );
   }
 }
 
+const gridTableSeparatorPattern = /^(\+[:>]?[=-]+[vx^]?[=-]*[:<]?)+\+$/;
+
 function hasGridTableMarker(value: string): boolean {
-  return /^(\+-[:>]?[=-]+[vx^]?[-]*[:<]?)+\+$/.test(value.trim());
+  return gridTableSeparatorPattern.test(value.trim());
 }
 
 function isHorizontalSeparator(line: string): boolean {
-  return /^(\+[:>]?[=-]+[vx^]?[=-]*[:<]?)+\+$/.test(line.trim());
+  return gridTableSeparatorPattern.test(line.trim());
 }
 
 export const GridTable: MarkdownConfig = {

@@ -26,6 +26,9 @@
     remarkDirectivesToHast,
     remarkExternalLinks,
     remarkFrontmatterToHast,
+    remarkHeadings,
+    remarkListCallouts,
+    remarkMultimarkdownTable,
     remarkPathLinks,
     remarkPositionsToData,
     remarkTags,
@@ -42,6 +45,8 @@
   import Link from "./components/link.svelte";
   import Tag from "./components/tag.svelte";
   import rehypeCodeContext from "./rehype-code-context";
+  import { rehypeHighlightLines } from "./rehype-highlight-lines";
+  import { rehypeTableSpans } from "./rehype-table-spans";
   import type { Pluggable } from "unified";
   import type { Options as RemarkRehypeOptions } from "remark-rehype";
   import type { FrontmatterConfig } from "./components/frontmatter-utils";
@@ -110,13 +115,16 @@
     remarkDirective,
     remarkGridTables,
     remarkGfm,
+    remarkMultimarkdownTable,
     remarkCustomChecklists,
+    remarkListCallouts,
     remarkMath,
     remarkCallouts,
     remarkWikiLinks,
     remarkPathLinks,
     remarkExternalLinks,
     remarkTags,
+    remarkHeadings,
     remarkDirectivesToHast,
     remarkFrontmatterToHast,
     remarkPositionsToData,
@@ -125,7 +133,8 @@
 
   const rehypePlugins = $derived<Pluggable[]>([
     rehypeCodeContext,
-    ...(highlight ? [rehypeHighlight] : []),
+    rehypeTableSpans,
+    ...(highlight ? [rehypeHighlight, rehypeHighlightLines] : []),
     rehypeRaw,
     rehypeKatex,
     ...resolvedExtensions.rehypePlugins,
@@ -202,13 +211,10 @@
   function linkNodeProperties(node: any): Record<string, unknown> {
     const data = node.data ?? {};
     const hProperties = data.hProperties ?? {};
-    const id = data.id ?? hProperties.id ?? hProperties.href ?? node.value ?? "";
+    const id =
+      data.id ?? hProperties.id ?? hProperties.href ?? node.value ?? "";
     const text =
-      data.text ??
-      hProperties.text ??
-      hProperties.label ??
-      node.value ??
-      id;
+      data.text ?? hProperties.text ?? hProperties.label ?? node.value ?? id;
 
     return {
       ...hProperties,
