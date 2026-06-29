@@ -1,7 +1,10 @@
 <script lang="ts">
+  import SlidersHorizontalIcon from "@lucide/svelte/icons/sliders-horizontal";
   import {
     MiraDefaultMde,
     MiraFeature,
+    type MiraDefaultToolbarActionContext,
+    type MiraDefaultToolbarDefinition,
     type MiraFeatureFlags,
   } from "@mira-mde/default-ui/svelte";
   import type { MiraMode } from "@mira-mde/extensions";
@@ -9,7 +12,7 @@
   import { docsFileAdapter } from "../lib/file-adapter";
 
   let value = $state(featureToggleMarkdown);
-  let mode = $state<MiraMode>("live-preview");
+  let mode = $state<MiraMode>("preview");
   let tables = $state(true);
   let mermaid = $state(true);
   let splitMode = $state(true);
@@ -20,37 +23,75 @@
     [MiraFeature.Mermaid]: mermaid,
     [MiraFeature.SplitMode]: splitMode,
   });
+
+  const toolbars: MiraDefaultToolbarDefinition[] = [
+    {
+      id: "docs-feature-flags",
+      label: "Feature flags",
+      align: "end",
+      items: [
+        {
+          type: "dropdown",
+          id: "feature-flags",
+          label: "Feature flags",
+          icon: SlidersHorizontalIcon,
+          items: [
+            {
+              type: "label",
+              label: "Feature flags",
+            },
+            {
+              id: "toggle-tables",
+              label: "Tables",
+              checked: () => tables,
+              run() {
+                tables = !tables;
+              },
+            },
+            {
+              id: "toggle-mermaid",
+              label: "Mermaid",
+              checked: () => mermaid,
+              run() {
+                mermaid = !mermaid;
+              },
+            },
+            {
+              id: "toggle-split-mode",
+              label: "Split mode",
+              checked: () => splitMode,
+              run(context: MiraDefaultToolbarActionContext) {
+                splitMode = !splitMode;
+                if (!splitMode && context.getMode() === "split") {
+                  context.setMode("preview");
+                }
+              },
+            },
+          ],
+        },
+      ],
+    },
+  ];
 </script>
 
-<section class="docs-live-editor" style="--docs-live-editor-height: 30rem;">
+<section
+  class="not-content docs-live-editor"
+  style="--docs-live-editor-height: 30rem;"
+>
   <div class="docs-live-editor__header">
     <div>
       <p class="docs-live-editor__title">Feature toggles</p>
       <p class="docs-live-editor__description">
-        Toggle editor features and the toolbar adapts to the active surface.
+        Toggle editor features from the toolbar and the active surface adapts.
       </p>
     </div>
-  </div>
-
-  <div class="docs-live-editor__toggles" aria-label="Feature toggles">
-    <label class="docs-live-editor__toggle">
-      <input type="checkbox" bind:checked={tables} />
-      Tables
-    </label>
-    <label class="docs-live-editor__toggle">
-      <input type="checkbox" bind:checked={mermaid} />
-      Mermaid
-    </label>
-    <label class="docs-live-editor__toggle">
-      <input type="checkbox" bind:checked={splitMode} />
-      Split mode
-    </label>
   </div>
 
   <MiraDefaultMde
     bind:value
     bind:mode
     {features}
+    {toolbars}
     fileAdapter={docsFileAdapter}
     class="docs-live-editor__surface"
     sourcePath="feature-toggles.md"

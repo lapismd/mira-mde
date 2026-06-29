@@ -1,15 +1,19 @@
 import { expect, test } from "@playwright/test";
 
-test("renders the documentation home page with a live editor", async ({
+test("renders the documentation home page with a preview editor", async ({
   page,
 }) => {
   await page.goto("/");
 
   await expect(page.getByRole("heading", { name: "Mira MDE" })).toBeVisible();
-  await expect(page.locator(".docs-live-editor")).toBeVisible();
-  await expect(
-    page.locator(".docs-live-editor").first().locator(".cm-editor").first(),
-  ).toBeVisible();
+  const example = page.locator(".docs-live-editor").first();
+  await expect(example).toBeVisible();
+  await expect(example.locator(".mira-default-ui")).toHaveAttribute(
+    "data-mode",
+    "preview",
+  );
+  await expect(example.locator(".markdown-reading-view").first()).toBeVisible();
+  await expect(example.locator(".docs-live-editor__reset")).toHaveCount(0);
 });
 
 test("renders toolbar docs with custom toolbar actions", async ({ page }) => {
@@ -22,6 +26,10 @@ test("renders toolbar docs with custom toolbar actions", async ({ page }) => {
   await expect(
     page.getByRole("button", { name: "Insert template" }),
   ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Reset example" }),
+  ).toBeVisible();
+  await expect(page.locator(".docs-live-editor__reset")).toHaveCount(0);
 });
 
 test("documents the supported Markdown feature set", async ({ page }) => {

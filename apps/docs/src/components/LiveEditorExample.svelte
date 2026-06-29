@@ -5,6 +5,7 @@
     MiraFeature,
     type MiraDefaultFeatureConfigs,
     type MiraDefaultMdeHandle,
+    type MiraDefaultToolbarDefinition,
     type MiraFeatureFlags,
   } from "@mira-mde/default-ui/svelte";
   import type { MiraMode, MiraTheme } from "@mira-mde/extensions";
@@ -29,7 +30,7 @@
     features = {},
     height = "34rem",
     initialValue,
-    mode = "live-preview",
+    mode = "preview",
     readonly = false,
     sourcePath = "docs.md",
     theme = "obsidian",
@@ -38,7 +39,7 @@
 
   let editor = $state<MiraDefaultMdeHandle | null>(null);
   let value = $state("");
-  let activeMode = $state<MiraMode>("live-preview");
+  let activeMode = $state<MiraMode>("preview");
 
   $effect(() => {
     value = initialValue;
@@ -52,6 +53,22 @@
     ...features,
   });
 
+  const resetToolbars = $derived<MiraDefaultToolbarDefinition[]>([
+    {
+      id: "docs-example-actions",
+      label: "Example actions",
+      align: "end",
+      items: [
+        {
+          id: "reset-example",
+          label: "Reset example",
+          icon: RotateCcwIcon,
+          run: resetExample,
+        },
+      ],
+    },
+  ]);
+
   function resetExample(): void {
     value = initialValue;
     activeMode = mode;
@@ -61,7 +78,7 @@
 </script>
 
 <section
-  class="docs-live-editor"
+  class="not-content docs-live-editor"
   style={`--docs-live-editor-height: ${height};`}
 >
   <div class="docs-live-editor__header">
@@ -71,14 +88,6 @@
         <p class="docs-live-editor__description">{description}</p>
       {/if}
     </div>
-    <button
-      class="docs-live-editor__reset"
-      type="button"
-      onclick={resetExample}
-    >
-      <RotateCcwIcon class="docs-live-editor__reset-icon" aria-hidden="true" />
-      Reset
-    </button>
   </div>
 
   <MiraDefaultMde
@@ -91,6 +100,7 @@
     fileAdapter={docsFileAdapter}
     features={mergedFeatures}
     {featureConfigs}
+    toolbars={resetToolbars}
     class="docs-live-editor__surface"
   />
 </section>

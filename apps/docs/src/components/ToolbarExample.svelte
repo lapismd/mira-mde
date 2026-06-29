@@ -2,6 +2,7 @@
   import CheckIcon from "@lucide/svelte/icons/check";
   import FileTextIcon from "@lucide/svelte/icons/file-text";
   import ListPlusIcon from "@lucide/svelte/icons/list-plus";
+  import RotateCcwIcon from "@lucide/svelte/icons/rotate-ccw";
   import SparklesIcon from "@lucide/svelte/icons/sparkles";
   import {
     MiraDefaultMde,
@@ -72,6 +73,19 @@
         },
       ],
     },
+    {
+      id: "docs-toolbar-example-actions",
+      label: "Example actions",
+      align: "end",
+      items: [
+        {
+          id: "reset-toolbar-example",
+          label: "Reset example",
+          icon: RotateCcwIcon,
+          run: resetExample,
+        },
+      ],
+    },
   ];
 
   function resetExample(): void {
@@ -82,7 +96,10 @@
   }
 </script>
 
-<section class="docs-live-editor" style="--docs-live-editor-height: 28rem;">
+<section
+  class="not-content docs-live-editor"
+  style="--docs-live-editor-height: 28rem;"
+>
   <div class="docs-live-editor__header">
     <div>
       <p class="docs-live-editor__title">Declarative custom toolbar</p>
@@ -91,13 +108,6 @@
         default toolbar.
       </p>
     </div>
-    <button
-      class="docs-live-editor__reset"
-      type="button"
-      onclick={resetExample}
-    >
-      Reset
-    </button>
   </div>
 
   <MiraDefaultMde
