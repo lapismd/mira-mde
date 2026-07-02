@@ -1,107 +1,12 @@
-(node:51152) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
-(Use `node --trace-warnings ...` to show where the warning was created)
-[36m11:51:18 PM [vite-plugin-svelte] no Svelte config found at /Users/stevejuma/code/mira-mde/apps/docs - using default configuration.[39m
+12:23:37 PM [vite-plugin-svelte] no Svelte config found at /Users/stevejuma/code/mira-mde/apps/docs - using default configuration.
 {"message":"connected.","label":"vite","level":"info"}
 {"message":"Generated 0ms","label":"types","level":"info"}
 {"message":"connected.","label":"vite","level":"info"}
 {"message":"Syncing content","label":"content","level":"info"}
+{"message":"Astro config changed","label":"content","level":"info"}
+{"message":"Clearing content store","label":"content","level":"info"}
 {"message":"Synced content","label":"content","level":"info"}
 {"message":"Re-optimizing dependencies because vite config has changed","label":"vite","level":"info"}
-{"message":" astro  v7.0.3 ready in 1966 ms\n┃ Local    http://127.0.0.1:4174/","label":"SKIP_FORMAT","level":"info"}
+{"message":" astro  v7.0.3 ready in 2327 ms\n┃ Local    http://127.0.0.1:4321/","label":"SKIP_FORMAT","level":"info"}
 {"message":"watching for file changes...","label":null,"level":"info"}
 {"message":"[optimizer] bundling dependencies...","label":"vite","level":"info"}
-[36m11:51:44 PM [vite-plugin-svelte] src/components/LiveEditorExample.svelte:40:21 This reference only captures the initial value of `initialValue`. Did you mean to reference it inside a closure instead?
-https://svelte.dev/e/state_referenced_locally[39m
-[36m11:51:44 PM [vite-plugin-svelte] src/components/LiveEditorExample.svelte:41:36 This reference only captures the initial value of `mode`. Did you mean to reference it inside a closure instead?
-https://svelte.dev/e/state_referenced_locally[39m
-{"message":"[200] HEAD / 4189ms","label":null,"level":"info"}
-{"message":"[200] / 11ms","label":null,"level":"info"}
-{"message":"[200] / 7ms","label":null,"level":"info"}
-{"message":"[200] / 7ms","label":null,"level":"info"}
-[36m11:52:05 PM [vite-plugin-svelte] src/components/LiveEditorExample.svelte:40:21 This reference only captures the initial value of `initialValue`. Did you mean to reference it inside a closure instead?
-https://svelte.dev/e/state_referenced_locally[39m
-[36m11:52:05 PM [vite-plugin-svelte] src/components/LiveEditorExample.svelte:41:36 This reference only captures the initial value of `mode`. Did you mean to reference it inside a closure instead?
-https://svelte.dev/e/state_referenced_locally[39m
-{"message":"[200] / 6ms","label":null,"level":"info"}
-{"message":"[optimizer] bundling dependencies...","label":"vite","level":"info"}
-{"message":"✨ new dependencies optimized: svg2roughjs","label":"vite","level":"info"}
-{"message":"✨ optimized dependencies changed. reloading","label":"vite","level":"info"}
-{"message":"[console.error] TypeError: Failed to fetch dynamically imported module: http://127.0.0.1:4174/node_modules/.vite/deps/codemirror-lang-mermaid.js?v=3b73a719","label":"vite","level":"error"}
-{"message":"[Unhandled rejection] TypeError: Failed to fetch dynamically imported module: http://127.0.0.1:4174/node_modules/.vite/deps/codemirror-lang-mermaid.js?v=3b73a719\n","label":"vite","level":"error"}
-{"message":"[200] /toolbar/ 327ms","label":null,"level":"info"}
-{"message":"[200] /markdown/ 41ms","label":null,"level":"info"}
-[36m11:52:09 PM [vite-plugin-svelte] src/components/LiveEditorExample.svelte:40:21 This reference only captures the initial value of `initialValue`. Did you mean to reference it inside a closure instead?
-https://svelte.dev/e/state_referenced_locally[39m
-[36m11:52:09 PM [vite-plugin-svelte] src/components/LiveEditorExample.svelte:41:36 This reference only captures the initial value of `mode`. Did you mean to reference it inside a closure instead?
-https://svelte.dev/e/state_referenced_locally[39m
-{"message":"[200] /tables/ 37ms","label":null,"level":"info"}
-{"message":"[200] /mermaid/ 44ms","label":null,"level":"info"}
-{"message":"/@fs/Users/stevejuma/code/mira-mde/packages/preview/dist/components/frontmatter.svelte","label":"watch","level":"info"}
-{"message":"/@fs/Users/stevejuma/code/mira-mde/packages/preview/dist/components/frontmatter.svelte","label":"watch","level":"info"}
-{"message":"/@fs/Users/stevejuma/code/mira-mde/packages/preview/dist/components/frontmatter.svelte","label":"watch","level":"info"}
-{"message":"/@fs/Users/stevejuma/code/mira-mde/packages/preview/dist/components/frontmatter.svelte","label":"watch","level":"info"}
-{"message":"/@fs/Users/stevejuma/code/mira-mde/packages/preview/dist/components/frontmatter.svelte","label":"watch","level":"info"}
-{"message":"/@fs/Users/stevejuma/code/mira-mde/packages/preview/dist/components/frontmatter.svelte","label":"watch","level":"info"}
-{"message":"/@fs/Users/stevejuma/code/mira-mde/packages/preview/dist/components/frontmatter.svelte","label":"watch","level":"info"}
-{"message":"/@fs/Users/stevejuma/code/mira-mde/packages/preview/dist/components/frontmatter.svelte","label":"watch","level":"info"}
-{"message":"/@fs/Users/stevejuma/code/mira-mde/packages/preview/dist/components/frontmatter.svelte","label":"watch","level":"info"}
-{"message":"/@fs/Users/stevejuma/code/mira-mde/packages/preview/dist/components/frontmatter.svelte","label":"watch","level":"info"}
-{"message":"/@fs/Users/stevejuma/code/mira-mde/packages/svelte/dist/mira-mde.svelte, /@fs/Users/stevejuma/code/mira-mde/packages/codemirror-tables/dist/grid-editor-column.svelte","label":"watch","level":"info"}
-{"message":"/@fs/Users/stevejuma/code/mira-mde/packages/preview/dist/markdown-preview.svelte","label":"watch","level":"info"}
-{"message":"/@fs/Users/stevejuma/code/mira-mde/packages/svelte/dist/mira-mde.svelte, /@fs/Users/stevejuma/code/mira-mde/packages/codemirror-tables/dist/grid-editor-column.svelte, /@fs/Users/stevejuma/code/mira-mde/packages/preview/dist/markdown-preview.svelte","label":"watch","level":"info"}
-{"message":"/@fs/Users/stevejuma/code/mira-mde/packages/svelte/dist/mira-mde.svelte, /@fs/Users/stevejuma/code/mira-mde/packages/codemirror-tables/dist/grid-editor-column.svelte, /@fs/Users/stevejuma/code/mira-mde/packages/preview/dist/markdown-preview.svelte","label":"watch","level":"info"}
-{"message":"/@fs/Users/stevejuma/code/mira-mde/packages/svelte/dist/mira-mde.svelte, /@fs/Users/stevejuma/code/mira-mde/packages/codemirror-tables/dist/grid-editor-column.svelte, /@fs/Users/stevejuma/code/mira-mde/packages/preview/dist/markdown-preview.svelte","label":"watch","level":"info"}
-{"message":"/@fs/Users/stevejuma/code/mira-mde/packages/svelte/dist/mira-mde.svelte, /@fs/Users/stevejuma/code/mira-mde/packages/codemirror-tables/dist/grid-editor-column.svelte, /@fs/Users/stevejuma/code/mira-mde/packages/preview/dist/markdown-preview.svelte","label":"watch","level":"info"}
-{"message":"/@fs/Users/stevejuma/code/mira-mde/packages/preview/dist/renderer/renderer.svelte, /@fs/Users/stevejuma/code/mira-mde/packages/preview/dist/renderer/markdown.svelte, /@fs/Users/stevejuma/code/mira-mde/packages/preview/dist/components/callout.svelte, /@fs/Users/stevejuma/code/mira-mde/packages/preview/dist/components/checkbox.svelte, /@fs/Users/stevejuma/code/mira-mde/packages/preview/dist/components/embed.svelte and 5 more","label":"watch","level":"info"}
-{"message":"/@fs/Users/stevejuma/code/mira-mde/packages/preview/dist/renderer/renderer.svelte, /@fs/Users/stevejuma/code/mira-mde/packages/preview/dist/renderer/markdown.svelte","label":"watch","level":"info"}
-{"message":"/src/styles/global.css","label":"watch","level":"info"}
-{"message":"/@fs/Users/stevejuma/code/mira-mde/packages/svelte/dist/mira-mde.svelte, /@fs/Users/stevejuma/code/mira-mde/packages/codemirror-tables/dist/grid-editor-column.svelte, /@fs/Users/stevejuma/code/mira-mde/packages/preview/dist/markdown-preview.svelte","label":"watch","level":"info"}
-{"message":"/@fs/Users/stevejuma/code/mira-mde/packages/svelte/dist/mira-mde.svelte, /@fs/Users/stevejuma/code/mira-mde/packages/codemirror-tables/dist/grid-editor-column.svelte, /@fs/Users/stevejuma/code/mira-mde/packages/preview/dist/markdown-preview.svelte","label":"watch","level":"info"}
-{"message":"/@fs/Users/stevejuma/code/mira-mde/packages/svelte/dist/mira-mde.svelte, /@fs/Users/stevejuma/code/mira-mde/packages/codemirror-tables/dist/grid-editor-column.svelte, /@fs/Users/stevejuma/code/mira-mde/packages/preview/dist/markdown-preview.svelte","label":"watch","level":"info"}
-{"message":"/@fs/Users/stevejuma/code/mira-mde/packages/svelte/dist/mira-mde.svelte, /@fs/Users/stevejuma/code/mira-mde/packages/codemirror-tables/dist/grid-editor-column.svelte, /@fs/Users/stevejuma/code/mira-mde/packages/preview/dist/markdown-preview.svelte","label":"watch","level":"info"}
-{"message":"/src/styles/global.css","label":"watch","level":"info"}
-{"message":"/src/styles/global.css","label":"watch","level":"info"}
-{"message":"/src/styles/global.css","label":"watch","level":"info"}
-{"message":"/src/styles/global.css","label":"watch","level":"info"}
-{"message":"/src/styles/global.css","label":"watch","level":"info"}
-{"message":"/src/styles/global.css","label":"watch","level":"info"}
-{"message":"/src/styles/global.css","label":"watch","level":"info"}
-{"message":"/src/styles/global.css","label":"watch","level":"info"}
-{"message":"/src/styles/global.css","label":"watch","level":"info"}
-{"message":"/src/styles/global.css","label":"watch","level":"info"}
-{"message":"/src/styles/global.css","label":"watch","level":"info"}
-{"message":"/src/styles/global.css","label":"watch","level":"info"}
-{"message":"/src/styles/global.css","label":"watch","level":"info"}
-{"message":"/src/styles/global.css","label":"watch","level":"info"}
-{"message":"/src/styles/global.css","label":"watch","level":"info"}
-{"message":"/src/styles/global.css","label":"watch","level":"info"}
-{"message":"/src/styles/global.css","label":"watch","level":"info"}
-{"message":"/@fs/Users/stevejuma/code/mira-mde/packages/svelte/dist/mira-mde.svelte, /@fs/Users/stevejuma/code/mira-mde/packages/codemirror-tables/dist/grid-editor-column.svelte, /@fs/Users/stevejuma/code/mira-mde/packages/preview/dist/markdown-preview.svelte","label":"watch","level":"info"}
-{"message":"/@fs/Users/stevejuma/code/mira-mde/packages/svelte/dist/mira-mde.svelte","label":"watch","level":"info"}
-{"message":"/@fs/Users/stevejuma/code/mira-mde/packages/svelte/dist/mira-mde.svelte, /@fs/Users/stevejuma/code/mira-mde/packages/codemirror-tables/dist/grid-editor-table.svelte","label":"watch","level":"info"}
-{"message":"/@fs/Users/stevejuma/code/mira-mde/packages/svelte/dist/mira-mde.svelte, /@fs/Users/stevejuma/code/mira-mde/packages/codemirror-tables/dist/grid-editor-table.svelte","label":"watch","level":"info"}
-{"message":"/@fs/Users/stevejuma/code/mira-mde/packages/svelte/dist/mira-mde.svelte","label":"watch","level":"info"}
-{"message":"/@fs/Users/stevejuma/code/mira-mde/packages/codemirror-tables/dist/editor-table.svelte, /@fs/Users/stevejuma/code/mira-mde/packages/codemirror-tables/dist/markdown-table-column-head.svelte, /@fs/Users/stevejuma/code/mira-mde/packages/codemirror-tables/dist/markdown-table-data-cell.svelte, /@fs/Users/stevejuma/code/mira-mde/packages/codemirror-tables/dist/markdown-table-row-gutter-cell.svelte","label":"watch","level":"info"}
-{"message":"/@fs/Users/stevejuma/code/mira-mde/packages/codemirror-tables/dist/editor-table.svelte, /@fs/Users/stevejuma/code/mira-mde/packages/codemirror-tables/dist/grid-editor-table.svelte, /@fs/Users/stevejuma/code/mira-mde/packages/codemirror-tables/dist/menu-component.svelte","label":"watch","level":"info"}
-{"message":"/@fs/Users/stevejuma/code/mira-mde/packages/svelte/dist/mira-mde.svelte","label":"watch","level":"info"}
-{"message":"/@fs/Users/stevejuma/code/mira-mde/packages/svelte/dist/mira-mde.svelte, /@fs/Users/stevejuma/code/mira-mde/packages/codemirror-tables/dist/grid-editor-table.svelte","label":"watch","level":"info"}
-{"message":"/@fs/Users/stevejuma/code/mira-mde/packages/svelte/dist/mira-mde.svelte, /@fs/Users/stevejuma/code/mira-mde/packages/codemirror-tables/dist/editor-column.svelte, /@fs/Users/stevejuma/code/mira-mde/packages/codemirror-tables/dist/editor-table.svelte","label":"watch","level":"info"}
-{"message":"/@fs/Users/stevejuma/code/mira-mde/packages/svelte/dist/mira-mde.svelte, /@fs/Users/stevejuma/code/mira-mde/packages/codemirror-tables/dist/grid-editor-table.svelte","label":"watch","level":"info"}
-{"message":"/@fs/Users/stevejuma/code/mira-mde/packages/codemirror-tables/dist/grid-editor-column.svelte, /@fs/Users/stevejuma/code/mira-mde/packages/codemirror-tables/dist/editor-column.svelte, /@fs/Users/stevejuma/code/mira-mde/packages/codemirror-tables/dist/editor-table.svelte, /@fs/Users/stevejuma/code/mira-mde/packages/codemirror-tables/dist/grid-editor-table.svelte, /@fs/Users/stevejuma/code/mira-mde/packages/codemirror-tables/dist/markdown-table-column-head.svelte and 2 more","label":"watch","level":"info"}
-{"message":"/@fs/Users/stevejuma/code/mira-mde/packages/svelte/dist/mira-mde.svelte","label":"watch","level":"info"}
-{"message":"/@fs/Users/stevejuma/code/mira-mde/packages/svelte/dist/mira-mde.svelte","label":"watch","level":"info"}
-{"message":"/@fs/Users/stevejuma/code/mira-mde/packages/svelte/dist/mira-mde.svelte","label":"watch","level":"info"}
-{"message":"/@fs/Users/stevejuma/code/mira-mde/packages/svelte/dist/mira-mde.svelte","label":"watch","level":"info"}
-{"message":"/@fs/Users/stevejuma/code/mira-mde/packages/default-ui/dist/default-mde.svelte","label":"watch","level":"info"}
-{"message":"/src/styles/global.css","label":"watch","level":"info"}
-{"message":"/src/components/LiveEditorExample.svelte, /src/components/ToolbarExample.svelte, /@fs/Users/stevejuma/code/mira-mde/packages/default-ui/dist/default-mde.svelte, /@fs/Users/stevejuma/code/mira-mde/packages/default-ui/dist/default-toolbar.svelte","label":"watch","level":"info"}
-{"message":"/src/styles/global.css","label":"watch","level":"info"}
-{"message":"/src/components/LiveEditorExample.svelte, /src/components/ToolbarExample.svelte","label":"watch","level":"info"}
-{"message":"/@fs/Users/stevejuma/code/mira-mde/packages/default-ui/dist/default-toolbar.svelte","label":"watch","level":"info"}
-{"message":"[200] / 1119ms","label":null,"level":"info"}
-{"message":"[200] / 9ms","label":null,"level":"info"}
-{"message":"[200] / 24ms","label":null,"level":"info"}
-{"message":"[200] /toolbar/ 50ms","label":null,"level":"info"}
-{"message":"[200] /markdown/ 31ms","label":null,"level":"info"}
-{"message":"[200] /tables/ 35ms","label":null,"level":"info"}
-{"message":"[200] /mermaid/ 29ms","label":null,"level":"info"}
