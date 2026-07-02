@@ -211,6 +211,8 @@
       {theme}
       {themeConfig}
       {sourcePath}
+      blockControls={resolvedFeatures[MiraFeature.BlockControls] &&
+        featureConfigs[MiraFeature.BlockControls]?.enabled !== false}
       toolbar={false}
       extensions={activeExtensions}
       {linkResolver}

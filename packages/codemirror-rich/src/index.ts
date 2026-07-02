@@ -43,6 +43,7 @@ import {
   sortRanges,
   type RangeBoundary,
 } from "./utils/ranges";
+import { blockControlExtensions } from "./block-controls";
 import { foldIndicatorDecorations } from "./decorations/fold-indicators";
 import { headingGutterExtension } from "./decorations/heading-gutter";
 import {
@@ -86,6 +87,15 @@ export {
   isExternalMarkdownDestination,
   isExternalMarkdownLink,
 } from "./utils/links";
+export {
+  collectMarkdownBlockRanges,
+  deleteMarkdownBlockRange,
+  duplicateMarkdownBlockRange,
+  markdownBlockAt,
+  moveMarkdownBlockRange,
+  replaceMarkdownRange,
+  type MiraMarkdownBlockMoveTarget,
+} from "./block-ranges";
 
 const BLOCK_WIDGET_NODE_NAMES = new Set([
   "Frontmatter",
@@ -160,6 +170,7 @@ export function createRichEditorExtensions(
     livePreview ? blockPreviewDecorations(options) : [],
     livePreview ? inlinePreviewDecorations(options) : [],
     foldIndicatorDecorations(),
+    blockControlExtensions(options),
     livePreview
       ? EditorView.editorAttributes.compute(["doc", "selection"], (state) => ({
           class: [

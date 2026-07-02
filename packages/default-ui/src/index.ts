@@ -185,6 +185,7 @@ export type {
   MiraFrontmatterConfig,
 } from "./types";
 export type {
+  MiraDefaultBlockControlsConfig,
   MiraDefaultFeatureConfigs,
   MiraDefaultMermaidConfig,
   MiraDefaultSlashCommandConfig,

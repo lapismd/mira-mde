@@ -42,6 +42,7 @@ export type MiraMarkdownTemplate = {
 };
 
 export type MiraSlashCommandContext = {
+  view?: unknown;
   query: string;
   range: MiraTextRange;
   getValue: () => string;
@@ -566,6 +567,7 @@ function createSlashCommandContext(
   };
 
   return {
+    view,
     query: match.query,
     range: defaultRange,
     getValue: () => view.state.doc.toString(),

@@ -27,6 +27,7 @@
     placeholder = "Start writing Markdown...",
     lineWrapping = true,
     spellcheck = true,
+    blockControls = false,
     indentGuides = true,
     indentWithTabs = true,
     indentWidth = 4,
@@ -67,6 +68,7 @@
       placeholder,
       lineWrapping,
       spellcheck,
+      blockControls,
       indentGuides,
       indentWithTabs,
       indentWidth,
@@ -117,6 +119,8 @@
       }),
       createTableExtensions(),
       createRichEditorExtensions({
+        blockActions: resolved.blockActions,
+        blockControls: blockControls && mode !== "preview" && !readonly,
         livePreview: mode === "live-preview",
         indentGuides,
         extensions,
@@ -154,6 +158,7 @@
         getValue: () => activeController.getValue(),
         setValue: (next) => activeController.setValue(next),
         focus: () => activeController.focus(),
+        view: activeController.view,
         insertMarkdown,
       });
       if (typeof cleanup === "function") {

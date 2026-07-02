@@ -28,6 +28,7 @@ export const MiraFeature = {
   Wikilinks: "wikilinks",
   Tags: "tags",
   SlashCommands: "slash-commands",
+  BlockControls: "block-controls",
   SourceMode: "source-mode",
   LivePreviewMode: "live-preview-mode",
   PreviewMode: "preview-mode",
@@ -146,6 +147,10 @@ export type MiraDefaultMermaidConfig = {
   enabled?: boolean;
 };
 
+export type MiraDefaultBlockControlsConfig = {
+  enabled?: boolean;
+};
+
 export type MiraDefaultSlashCommandId =
   | "heading1"
   | "heading2"
@@ -169,6 +174,7 @@ export type MiraDefaultSlashCommandConfig = {
 export type MiraDefaultFeatureConfigs = {
   [MiraFeature.Toolbar]?: MiraDefaultToolbarConfig;
   [MiraFeature.Mermaid]?: MiraDefaultMermaidConfig;
+  [MiraFeature.BlockControls]?: MiraDefaultBlockControlsConfig;
   [MiraFeature.SlashCommands]?: MiraDefaultSlashCommandConfig;
 };
 
@@ -192,6 +198,7 @@ export const defaultMiraFeatures: ResolvedMiraDefaultFeatures = {
   [MiraFeature.Wikilinks]: true,
   [MiraFeature.Tags]: true,
   [MiraFeature.SlashCommands]: true,
+  [MiraFeature.BlockControls]: true,
   [MiraFeature.SourceMode]: true,
   [MiraFeature.LivePreviewMode]: true,
   [MiraFeature.PreviewMode]: true,

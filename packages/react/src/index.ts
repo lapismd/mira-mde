@@ -24,6 +24,7 @@ export type {
   MiraDefaultEditorEventName,
   MiraDefaultEditorOptions,
   MiraDefaultEditMode,
+  MiraDefaultBlockControlsConfig,
   MiraDefaultFeatureConfigs,
   MiraDefaultMdeHandle,
   MiraDefaultMdeProps,

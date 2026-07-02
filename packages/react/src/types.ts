@@ -50,6 +50,7 @@ export type MiraMdeProps = {
   placeholder?: string;
   lineWrapping?: boolean;
   spellcheck?: boolean;
+  blockControls?: boolean;
   indentGuides?: boolean;
   indentWithTabs?: boolean;
   indentWidth?: number;
@@ -87,6 +88,7 @@ export type MiraFeatureName =
   | "wikilinks"
   | "tags"
   | "slash-commands"
+  | "block-controls"
   | "source-mode"
   | "live-preview-mode"
   | "preview-mode"
@@ -204,9 +206,14 @@ export type MiraDefaultMermaidConfig = {
   enabled?: boolean;
 };
 
+export type MiraDefaultBlockControlsConfig = {
+  enabled?: boolean;
+};
+
 export type MiraDefaultFeatureConfigs = {
   toolbar?: MiraDefaultToolbarConfig;
   mermaid?: MiraDefaultMermaidConfig;
+  "block-controls"?: MiraDefaultBlockControlsConfig;
   "slash-commands"?: MiraDefaultSlashCommandConfig;
 };
 

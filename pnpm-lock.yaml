@@ -396,6 +396,22 @@ importers:
         specifier: ^11.0.5
         version: 11.0.5
 
+  packages/plugin-ai:
+    dependencies:
+      '@mira-mde/codemirror-rich':
+        specifier: workspace:*
+        version: link:../codemirror-rich
+      '@mira-mde/extensions':
+        specifier: workspace:*
+        version: link:../extensions
+    devDependencies:
+      '@codemirror/state':
+        specifier: ^6.5.2
+        version: 6.7.0
+      '@codemirror/view':
+        specifier: ^6.38.8
+        version: 6.43.3
+
   packages/plugin-mermaid:
     dependencies:
       '@lucide/svelte':

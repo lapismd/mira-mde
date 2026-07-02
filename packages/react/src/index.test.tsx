@@ -8,11 +8,16 @@ import {
   MiraFeature,
   MiraMde,
   createMiraDefaultEditor,
+  resolveMiraDefaultFeatures,
 } from ".";
 
 describe("@mira-mde/react", () => {
   it("exports the editor component", () => {
     expect(MiraMde).toBeTruthy();
+  });
+
+  it("enables block controls in the default feature set", () => {
+    expect(resolveMiraDefaultFeatures()[MiraFeature.BlockControls]).toBe(true);
   });
 
   it("renders the default toolbar with custom React actions", () => {

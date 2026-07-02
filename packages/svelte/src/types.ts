@@ -23,6 +23,7 @@ export type MiraMdeProps = {
   placeholder?: string;
   lineWrapping?: boolean;
   spellcheck?: boolean;
+  blockControls?: boolean;
   indentGuides?: boolean;
   indentWithTabs?: boolean;
   indentWidth?: number;

@@ -25,6 +25,7 @@ describe("default UI feature resolution", () => {
     expect(features[MiraFeature.Toolbar]).toBe(true);
     expect(features[MiraFeature.Mermaid]).toBe(true);
     expect(features[MiraFeature.SlashCommands]).toBe(true);
+    expect(features[MiraFeature.BlockControls]).toBe(true);
     expect(features[MiraFeature.LivePreviewMode]).toBe(true);
   });
 

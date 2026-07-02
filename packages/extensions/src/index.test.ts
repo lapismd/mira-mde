@@ -64,6 +64,42 @@ describe("resolveMiraExtensions", () => {
       "callout",
     ]);
   });
+
+  it("merges block actions in extension order", () => {
+    const resolved = resolveMiraExtensions(
+      [
+        defineMiraExtension({
+          name: "first",
+          blockActions: [
+            {
+              id: "duplicate",
+              label: "Duplicate",
+              run: () => undefined,
+            },
+          ],
+        }),
+        defineMiraExtension({
+          name: "second",
+          blockActions: [
+            {
+              id: "ask-ai",
+              label: "Ask AI",
+              run: () => undefined,
+            },
+          ],
+        }),
+      ],
+      {
+        mode: "source",
+        readonly: false,
+      },
+    );
+
+    expect(resolved.blockActions.map((action) => action.id)).toEqual([
+      "duplicate",
+      "ask-ai",
+    ]);
+  });
 });
 
 describe("slash snippet helpers", () => {

@@ -39,6 +39,29 @@ export type MiraTextRange = {
   to: number;
 };
 
+export type MiraMarkdownBlockKind =
+  | "frontmatter"
+  | "heading"
+  | "paragraph"
+  | "list"
+  | "blockquote"
+  | "code"
+  | "math"
+  | "table"
+  | "grid-table"
+  | "embed"
+  | "html"
+  | "directive"
+  | "thematic-break";
+
+export type MiraMarkdownBlockRange = MiraTextRange & {
+  id: string;
+  kind: MiraMarkdownBlockKind;
+  startLine: number;
+  endLine: number;
+  text: string;
+};
+
 export type MiraTemplateSelection =
   | number
   | {
@@ -119,6 +142,31 @@ export type MiraToolbarItem = {
   command: string;
 };
 
+export type MiraBlockActionContext = MiraExtensionRuntimeContext & {
+  block: MiraMarkdownBlockRange;
+  blocks: MiraMarkdownBlockRange[];
+  selection: MiraTextRange | null;
+  sourcePath?: string;
+  replaceRange: (
+    markdown: string,
+    range: MiraTextRange,
+    selection?: MiraTemplateSelection,
+  ) => void;
+};
+
+type MiraBlockActionDynamicBoolean =
+  | boolean
+  | ((context: MiraBlockActionContext) => boolean);
+
+export type MiraBlockAction = {
+  id: string;
+  label: string;
+  description?: string;
+  destructive?: boolean;
+  disabled?: MiraBlockActionDynamicBoolean;
+  run: (context: MiraBlockActionContext) => void | Promise<void>;
+};
+
 export type MiraLinkResolver = (target: {
   href: string;
   label: string;
@@ -160,6 +208,7 @@ export type MiraFileAdapter = {
 };
 
 export type MiraExtensionRuntimeContext = {
+  view?: unknown;
   getValue: () => string;
   setValue: (value: string) => void;
   focus: () => void;
@@ -187,6 +236,7 @@ export type MiraExtension = {
   components?: MiraRendererComponents;
   commands?: MiraCommand[];
   slashCommands?: MiraSlashCommand[];
+  blockActions?: MiraBlockAction[];
   toolbarItems?: MiraToolbarItem[];
   styles?: string[];
   onMount?: (context: MiraExtensionRuntimeContext) => void | (() => void);
@@ -200,6 +250,7 @@ export type ResolvedMiraExtensions = {
   components: MiraRendererComponents;
   commands: MiraCommand[];
   slashCommands: MiraSlashCommand[];
+  blockActions: MiraBlockAction[];
   toolbarItems: MiraToolbarItem[];
   styles: string[];
   onMount: NonNullable<MiraExtension["onMount"]>[];
@@ -218,6 +269,7 @@ export function emptyResolvedMiraExtensions(): ResolvedMiraExtensions {
     components: {},
     commands: [],
     slashCommands: [],
+    blockActions: [],
     toolbarItems: [],
     styles: [],
     onMount: [],
@@ -242,6 +294,7 @@ export function resolveMiraExtensions(
     Object.assign(resolved.components, extension.components);
     resolved.commands.push(...(extension.commands ?? []));
     resolved.slashCommands.push(...(extension.slashCommands ?? []));
+    resolved.blockActions.push(...(extension.blockActions ?? []));
     resolved.toolbarItems.push(...(extension.toolbarItems ?? []));
     resolved.styles.push(...(extension.styles ?? []));
     if (extension.onMount) {

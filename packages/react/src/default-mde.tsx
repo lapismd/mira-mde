@@ -289,6 +289,10 @@ export const MiraDefaultMde = forwardRef<
       <div className="mira-default-ui__editor">
         <MiraMde
           assetResolver={assetResolver}
+          blockControls={
+            resolvedFeatures[MiraFeature.BlockControls] &&
+            featureConfigs[MiraFeature.BlockControls]?.enabled !== false
+          }
           className={editorClassName}
           defaultMode={defaultMode}
           defaultReadonly={defaultReadonly}

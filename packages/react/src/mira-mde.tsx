@@ -43,6 +43,7 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
     fileAdapter,
     frontmatterOpen = true,
     frontmatterConfig,
+    blockControls = false,
     indentGuides = true,
     indentWithTabs = true,
     indentWidth = 4,
@@ -156,6 +157,11 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
       createTableExtensions(),
       createRichEditorExtensions({
         assetResolver,
+        blockActions: resolved.blockActions,
+        blockControls:
+          blockControls &&
+          modeRef.current !== "preview" &&
+          !readonlyRef.current,
         extensions,
         fileAdapter,
         frontmatterConfig,
@@ -184,6 +190,7 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
     ].flat();
   }, [
     assetResolver,
+    blockControls,
     commitValue,
     extensions,
     fileAdapter,
@@ -215,6 +222,7 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
           getValue: () => activeController.getValue(),
           insertMarkdown: handleInsertMarkdown,
           setValue: (nextValue) => activeController.setValue(nextValue),
+          view: activeController.view,
         });
         if (typeof cleanup === "function") {
           cleanupExtensionMountsRef.current.push(cleanup);

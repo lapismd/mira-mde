@@ -1,0 +1,38 @@
+{
+  "name": "@mira-mde/plugin-ai",
+  "version": "0.0.0",
+  "license": "AGPL-3.0-or-later",
+  "type": "module",
+  "sideEffects": false,
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --clean",
+    "check": "pnpm check:format && pnpm check:svelte && pnpm check:types",
+    "check:format": "prettier --ignore-path ../../.prettierignore . --check",
+    "check:types": "tsc -p tsconfig.json --noEmit",
+    "check:svelte": "echo \"no svelte files\"",
+    "lint": "eslint src --ext .ts",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@mira-mde/codemirror-rich": "workspace:*",
+    "@mira-mde/extensions": "workspace:*"
+  },
+  "peerDependencies": {
+    "@codemirror/state": "^6.5.2",
+    "@codemirror/view": "^6.38.8"
+  },
+  "devDependencies": {
+    "@codemirror/state": "^6.5.2",
+    "@codemirror/view": "^6.38.8"
+  }
+}

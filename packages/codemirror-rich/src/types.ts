@@ -3,11 +3,14 @@ import type {
   MiraExtension,
   MiraFileAdapter,
   MiraLinkResolver,
+  MiraBlockAction,
 } from "@mira-mde/extensions";
 
 export type MiraRichEditorOptions = {
   enabled?: boolean;
   livePreview?: boolean;
+  blockControls?: boolean;
+  blockActions?: MiraBlockAction[];
   indentGuides?: boolean;
   extensions?: MiraExtension[];
   sourcePath?: string;

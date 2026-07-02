@@ -16,6 +16,7 @@ export {
 } from "./features";
 export { MiraDefaultMde, MiraDefaultToolbar };
 export type {
+  MiraDefaultBlockControlsConfig,
   MiraDefaultEditMode,
   MiraDefaultFeatureConfigs,
   MiraDefaultMermaidConfig,
