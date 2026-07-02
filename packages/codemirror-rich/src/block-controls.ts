@@ -50,6 +50,7 @@ const blockStartCache = new WeakMap<
   EditorState,
   Map<number, MiraMarkdownBlockRange>
 >();
+const activeBlockIdsCache = new WeakMap<EditorState, Set<string>>();
 const blockHandleSvg =
   '<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 5h.01M15 5h.01M9 12h.01M15 12h.01M9 19h.01M15 19h.01"/></svg>';
 
@@ -80,10 +81,13 @@ function blockHandleGutter(): Extension {
     initialSpacer: () => blockHandleSpacerMarker,
     lineMarker(view, line) {
       const block = blockForVisualLine(view, line);
-      return block ? new BlockHandleMarker(block) : null;
+      const active = block
+        ? activeBlockIdsForState(view.state).has(block.id)
+        : false;
+      return block ? new BlockHandleMarker(block, active) : null;
     },
     lineMarkerChange(update) {
-      return update.docChanged || update.viewportChanged;
+      return update.docChanged || update.selectionSet || update.viewportChanged;
     },
     renderEmptyElements: true,
   });
@@ -112,10 +116,59 @@ function blockStartsForState(
   return starts;
 }
 
+function activeBlockIdsForState(state: EditorState): Set<string> {
+  const cached = activeBlockIdsCache.get(state);
+  if (cached) {
+    return cached;
+  }
+
+  const blocks = [...blockStartsForState(state).values()].sort(
+    (a, b) => a.from - b.from,
+  );
+  const selection = state.selection.main;
+  const ids = new Set<string>();
+
+  if (selection.empty) {
+    const block = blockAtPosition(state, blocks, selection.head);
+    if (block) {
+      ids.add(block.id);
+    }
+  } else {
+    for (const block of blocks) {
+      if (selection.from <= block.to && selection.to >= block.from) {
+        ids.add(block.id);
+      }
+    }
+  }
+
+  activeBlockIdsCache.set(state, ids);
+  return ids;
+}
+
+function blockAtPosition(
+  state: EditorState,
+  blocks: MiraMarkdownBlockRange[],
+  position: number,
+): MiraMarkdownBlockRange | null {
+  return (
+    blocks.find(
+      (block) =>
+        position >= block.from &&
+        position <= Math.min(block.to + 1, state.doc.length),
+    ) ??
+    blocks.find((block) => position < block.from) ??
+    blocks.at(-1) ??
+    null
+  );
+}
+
 class BlockHandleMarker extends GutterMarker {
   override elementClass = "mira-block-controls-gutter__element";
 
-  constructor(private readonly block: MiraMarkdownBlockRange) {
+  constructor(
+    private readonly block: MiraMarkdownBlockRange,
+    private readonly active: boolean,
+  ) {
     super();
   }
 
@@ -124,14 +177,17 @@ class BlockHandleMarker extends GutterMarker {
       other instanceof BlockHandleMarker &&
       other.block.id === this.block.id &&
       other.block.from === this.block.from &&
-      other.block.to === this.block.to
+      other.block.to === this.block.to &&
+      other.active === this.active
     );
   }
 
   override toDOM(): Node {
     const button = document.createElement("button");
     button.type = "button";
-    button.className = "mira-block-handle";
+    button.className = this.active
+      ? "mira-block-handle mira-block-handle--active"
+      : "mira-block-handle";
     button.dataset.miraBlockId = this.block.id;
     button.setAttribute("aria-label", "Block actions");
     button.setAttribute("title", "Drag to move. Click for block actions.");
@@ -668,17 +724,7 @@ function activeBlock(
   view: EditorView,
   blocks: MiraMarkdownBlockRange[],
 ): MiraMarkdownBlockRange | null {
-  const head = view.state.selection.main.head;
-  return (
-    blocks.find(
-      (block) =>
-        head >= block.from &&
-        head <= Math.min(block.to + 1, view.state.doc.length),
-    ) ??
-    blocks.find((block) => head < block.from) ??
-    blocks.at(-1) ??
-    null
-  );
+  return blockAtPosition(view.state, blocks, view.state.selection.main.head);
 }
 
 function selectedBlocks(
@@ -779,7 +825,7 @@ const blockControlsTheme = EditorView.theme({
     transition: "opacity 120ms ease, color 120ms ease, background 120ms ease",
     width: "1.35rem",
   },
-  ".mira-block-controls-gutter:hover .mira-block-handle, .mira-block-handle:hover, .mira-block-handle:focus-visible":
+  ".mira-block-controls-gutter:hover .mira-block-handle, .mira-block-handle--active, .mira-block-handle:hover, .mira-block-handle:focus-visible":
     {
       opacity: "1",
     },
