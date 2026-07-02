@@ -1,7 +1,10 @@
-import { Prec, type Extension } from "@codemirror/state";
+import { Prec, type EditorState, type Extension } from "@codemirror/state";
 import {
+  GutterMarker,
   EditorView,
+  gutter,
   keymap,
+  type BlockInfo,
   type KeyBinding,
   type PluginValue,
   type ViewUpdate,
@@ -43,6 +46,12 @@ type DropTarget = {
 const dragActivationDistance = 5;
 const autoScrollThreshold = 42;
 const autoScrollStep = 18;
+const blockStartCache = new WeakMap<
+  EditorState,
+  Map<number, MiraMarkdownBlockRange>
+>();
+const blockHandleSvg =
+  '<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 5h.01M15 5h.01M9 12h.01M15 12h.01M9 19h.01M15 19h.01"/></svg>';
 
 export function blockControlExtensions(
   options: MiraRichEditorOptions,
@@ -53,6 +62,7 @@ export function blockControlExtensions(
 
   return [
     blockControlsTheme,
+    blockHandleGutter(),
     Prec.highest(keymap.of(blockControlKeymap())),
     ViewPlugin.fromClass(
       class extends BlockControlsPlugin {
@@ -63,6 +73,86 @@ export function blockControlExtensions(
     ),
   ];
 }
+
+function blockHandleGutter(): Extension {
+  return gutter({
+    class: "mira-block-controls-gutter",
+    initialSpacer: () => blockHandleSpacerMarker,
+    lineMarker(view, line) {
+      const block = blockForVisualLine(view, line);
+      return block ? new BlockHandleMarker(block) : null;
+    },
+    lineMarkerChange(update) {
+      return update.docChanged || update.viewportChanged;
+    },
+    renderEmptyElements: true,
+  });
+}
+
+function blockForVisualLine(
+  view: EditorView,
+  line: BlockInfo,
+): MiraMarkdownBlockRange | null {
+  return blockStartsForState(view.state).get(line.from) ?? null;
+}
+
+function blockStartsForState(
+  state: EditorState,
+): Map<number, MiraMarkdownBlockRange> {
+  const cached = blockStartCache.get(state);
+  if (cached) {
+    return cached;
+  }
+
+  const starts = new Map<number, MiraMarkdownBlockRange>();
+  for (const block of collectMarkdownBlockRanges(state)) {
+    starts.set(block.from, block);
+  }
+  blockStartCache.set(state, starts);
+  return starts;
+}
+
+class BlockHandleMarker extends GutterMarker {
+  override elementClass = "mira-block-controls-gutter__element";
+
+  constructor(private readonly block: MiraMarkdownBlockRange) {
+    super();
+  }
+
+  override eq(other: GutterMarker): boolean {
+    return (
+      other instanceof BlockHandleMarker &&
+      other.block.id === this.block.id &&
+      other.block.from === this.block.from &&
+      other.block.to === this.block.to
+    );
+  }
+
+  override toDOM(): Node {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "mira-block-handle";
+    button.dataset.miraBlockId = this.block.id;
+    button.setAttribute("aria-label", "Block actions");
+    button.setAttribute("title", "Drag to move. Click for block actions.");
+    button.innerHTML = blockHandleSvg;
+    return button;
+  }
+}
+
+const blockHandleSpacerMarker = new (class extends GutterMarker {
+  override elementClass = "mira-block-controls-gutter__element";
+
+  override eq(other: GutterMarker): boolean {
+    return other === this;
+  }
+
+  override toDOM(): Node {
+    const spacer = document.createElement("span");
+    spacer.className = "mira-block-handle-spacer";
+    return spacer;
+  }
+})();
 
 function blockControlKeymap(): KeyBinding[] {
   return [
@@ -133,6 +223,8 @@ class BlockControlsPlugin implements PluginValue {
     this.layer.append(this.dropLine, this.menu);
     this.view.dom.append(this.layer);
 
+    this.view.dom.addEventListener("pointerdown", this.handleHandlePointerDown);
+    this.view.dom.addEventListener("click", this.handleHandleClick);
     this.view.scrollDOM.addEventListener("scroll", this.scheduleRender);
     window.addEventListener("resize", this.scheduleRender);
     document.addEventListener("pointerdown", this.handleDocumentPointerDown, {
@@ -156,6 +248,11 @@ class BlockControlsPlugin implements PluginValue {
   }
 
   destroy(): void {
+    this.view.dom.removeEventListener(
+      "pointerdown",
+      this.handleHandlePointerDown,
+    );
+    this.view.dom.removeEventListener("click", this.handleHandleClick);
     this.view.scrollDOM.removeEventListener("scroll", this.scheduleRender);
     window.removeEventListener("resize", this.scheduleRender);
     document.removeEventListener(
@@ -196,7 +293,6 @@ class BlockControlsPlugin implements PluginValue {
         continue;
       }
       this.blockRects.push({ block, top: rect.top, bottom: rect.bottom });
-      fragment.append(this.createHandle(block, rect.top));
     }
 
     this.layer.replaceChildren(fragment);
@@ -225,32 +321,45 @@ class BlockControlsPlugin implements PluginValue {
     return { top, bottom };
   }
 
-  private createHandle(
-    block: MiraMarkdownBlockRange,
-    top: number,
-  ): HTMLButtonElement {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "mira-block-handle";
-    button.dataset.miraBlockId = block.id;
-    button.setAttribute("aria-label", "Block actions");
-    button.setAttribute("title", "Drag to move. Click for block actions.");
-    button.style.top = `${Math.max(0, top)}px`;
-    button.innerHTML =
-      '<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 5h.01M15 5h.01M9 12h.01M15 12h.01M9 19h.01M15 19h.01"/></svg>';
-    button.addEventListener("pointerdown", (event) =>
-      this.handlePointerDown(event, block),
-    );
-    button.addEventListener("click", (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      if (this.suppressNextClick) {
-        this.suppressNextClick = false;
-        return;
-      }
-      this.openMenu(block, button);
-    });
-    return button;
+  private readonly handleHandlePointerDown = (event: PointerEvent): void => {
+    const handle = closestBlockHandle(event.target);
+    const block = handle ? this.blockForHandle(handle) : null;
+    if (handle && block) {
+      this.handlePointerDown(event, block);
+    }
+  };
+
+  private readonly handleHandleClick = (event: MouseEvent): void => {
+    const handle = closestBlockHandle(event.target);
+    const block = handle ? this.blockForHandle(handle) : null;
+    if (!handle || !block) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+    if (this.suppressNextClick) {
+      this.suppressNextClick = false;
+      return;
+    }
+    this.openMenu(block, handle);
+  };
+
+  private blockForHandle(
+    handle: HTMLButtonElement,
+  ): MiraMarkdownBlockRange | null {
+    const blockId = handle.dataset.miraBlockId;
+    if (!blockId) {
+      return null;
+    }
+
+    const block =
+      this.blocks.find((candidate) => candidate.id === blockId) ??
+      collectMarkdownBlockRanges(this.view.state).find(
+        (candidate) => candidate.id === blockId,
+      );
+
+    return block ?? null;
   }
 
   private handlePointerDown(
@@ -605,6 +714,14 @@ function compositeBlock(
   };
 }
 
+function closestBlockHandle(
+  target: EventTarget | null,
+): HTMLButtonElement | null {
+  return target instanceof Element
+    ? target.closest<HTMLButtonElement>(".mira-block-handle")
+    : null;
+}
+
 function dynamicDisabled(
   action: MiraBlockAction,
   context: MiraBlockActionContext,
@@ -626,6 +743,24 @@ const blockControlsTheme = EditorView.theme({
     position: "absolute",
     zIndex: "30",
   },
+  ".cm-gutter.mira-block-controls-gutter": {
+    background: "transparent",
+    borderInlineEnd: "0",
+    minWidth: "1.75rem",
+    width: "1.75rem",
+  },
+  ".mira-block-controls-gutter .cm-gutterElement": {
+    alignItems: "center",
+    display: "flex",
+    justifyContent: "center",
+    minWidth: "1.75rem",
+    padding: "0 2px",
+  },
+  ".mira-block-handle-spacer": {
+    display: "block",
+    height: "1.35rem",
+    width: "1.35rem",
+  },
   ".mira-block-handle": {
     alignItems: "center",
     background: "var(--mira-popover)",
@@ -637,15 +772,14 @@ const blockControlsTheme = EditorView.theme({
     display: "inline-flex",
     height: "1.35rem",
     justifyContent: "center",
-    insetInlineStart: "0.25rem",
     opacity: "0",
     padding: "0",
     pointerEvents: "auto",
-    position: "absolute",
+    position: "relative",
     transition: "opacity 120ms ease, color 120ms ease, background 120ms ease",
     width: "1.35rem",
   },
-  ".mira-block-handle:hover, .mira-block-handle:focus-visible, &:focus-within .mira-block-handle":
+  ".mira-block-controls-gutter:hover .mira-block-handle, .mira-block-handle:hover, .mira-block-handle:focus-visible":
     {
       opacity: "1",
     },
