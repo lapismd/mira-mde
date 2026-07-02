@@ -1,6 +1,7 @@
 import type { EditorState } from "@codemirror/state";
 import type { EditorView } from "@codemirror/view";
 import type {
+  MiraMarkdownBlockHandle,
   MiraMarkdownBlockKind,
   MiraMarkdownBlockRange,
   MiraTemplateSelection,
@@ -22,6 +23,11 @@ export type MiraMarkdownBlockMoveTarget =
       position: "before" | "after";
     };
 
+export type MiraMarkdownBlockHandleMoveTarget = {
+  handle: MiraMarkdownBlockHandle;
+  position: "before" | "after" | "inside";
+};
+
 export function collectMarkdownBlockRanges(
   state: EditorState,
 ): MiraMarkdownBlockRange[] {
@@ -42,6 +48,44 @@ export function collectMarkdownBlockRanges(
   }
 
   return blocks;
+}
+
+export function collectMarkdownBlockHandles(
+  state: EditorState,
+): MiraMarkdownBlockHandle[] {
+  const lines = collectLines(state);
+  const blocks = collectMarkdownBlockRanges(state);
+  const handles: MiraMarkdownBlockHandle[] = [];
+
+  for (const block of blocks) {
+    if (block.kind === "list") {
+      continue;
+    }
+
+    if (block.kind === "heading") {
+      const headingLevel = headingLevelForBlock(lines, block);
+      handles.push({
+        id: block.id,
+        role: "heading-section",
+        handleRange: block,
+        affectedRange: headingLevel
+          ? headingSectionRange(state, lines, block, headingLevel)
+          : block,
+        headingLevel: headingLevel ?? undefined,
+      });
+      continue;
+    }
+
+    handles.push({
+      id: block.id,
+      role: "block",
+      handleRange: block,
+      affectedRange: block,
+    });
+  }
+
+  handles.push(...collectListItemHandles(state, lines));
+  return handles.sort((a, b) => a.handleRange.from - b.handleRange.from);
 }
 
 export function markdownBlockAt(
@@ -101,6 +145,25 @@ export function moveMarkdownBlockRange(
   return true;
 }
 
+export function moveMarkdownBlockHandle(
+  view: EditorView,
+  source: MiraMarkdownBlockHandle,
+  target: MiraMarkdownBlockHandleMoveTarget,
+): boolean {
+  if (source.role === "list-item") {
+    return moveMarkdownListItemHandle(view, source, target);
+  }
+
+  if (target.position === "inside") {
+    return false;
+  }
+
+  return moveMarkdownBlockRange(view, source.affectedRange, {
+    block: target.handle.affectedRange,
+    position: target.position,
+  });
+}
+
 export function duplicateMarkdownBlockRange(
   view: EditorView,
   block: MiraMarkdownBlockRange,
@@ -109,6 +172,34 @@ export function duplicateMarkdownBlockRange(
   const editRange = editableBlockRange(view.state.doc, block);
   const source = view.state.doc.sliceString(block.from, block.to);
   const insertion = insertMarkdownBlock(markdown, editRange.to, source);
+
+  view.dispatch({
+    changes: { from: 0, to: view.state.doc.length, insert: insertion.markdown },
+    selection: { anchor: insertion.to },
+    scrollIntoView: true,
+    userEvent: "input.duplicate.block",
+  });
+}
+
+export function duplicateMarkdownBlockHandle(
+  view: EditorView,
+  handle: MiraMarkdownBlockHandle,
+): void {
+  if (handle.role !== "list-item") {
+    duplicateMarkdownBlockRange(view, handle.affectedRange);
+    return;
+  }
+
+  const markdown = view.state.doc.toString();
+  const source = view.state.doc.sliceString(
+    handle.affectedRange.from,
+    handle.affectedRange.to,
+  );
+  const insertion = insertMarkdownListSubtree(
+    markdown,
+    handle.affectedRange.to,
+    source,
+  );
 
   view.dispatch({
     changes: { from: 0, to: view.state.doc.length, insert: insertion.markdown },
@@ -129,6 +220,13 @@ export function deleteMarkdownBlockRange(
     scrollIntoView: true,
     userEvent: "delete.block",
   });
+}
+
+export function deleteMarkdownBlockHandle(
+  view: EditorView,
+  handle: MiraMarkdownBlockHandle,
+): void {
+  deleteMarkdownBlockRange(view, handle.affectedRange);
 }
 
 export function replaceMarkdownRange(
@@ -269,6 +367,116 @@ function createBlock(
   };
 }
 
+function collectListItemHandles(
+  state: EditorState,
+  lines: MarkdownLine[],
+): MiraMarkdownBlockHandle[] {
+  const handles: MiraMarkdownBlockHandle[] = [];
+  const stack: Array<{ id: string; indent: number }> = [];
+
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index]!;
+    if (!isListItem(line)) {
+      continue;
+    }
+
+    const indent = listIndent(line);
+    while (stack.length > 0 && stack.at(-1)!.indent >= indent) {
+      stack.pop();
+    }
+
+    const endIndex = consumeListItem(lines, index);
+    const handleRange = createBlock(state, "list", lines, index, index);
+    const affectedRange = createBlock(state, "list", lines, index, endIndex);
+    const id = `list-item-${line.number}`;
+    const parentId = stack.at(-1)?.id;
+    handles.push({
+      id,
+      role: "list-item",
+      handleRange: { ...handleRange, id },
+      affectedRange: { ...affectedRange, id },
+      listIndent: indent,
+      parentId,
+    });
+    stack.push({ id, indent });
+  }
+
+  return handles;
+}
+
+function headingLevelForBlock(
+  lines: MarkdownLine[],
+  block: MiraMarkdownBlockRange,
+): number | null {
+  const start = lines[block.startLine - 1];
+  if (!start) {
+    return null;
+  }
+
+  const atx = atxHeadingLevel(start);
+  if (atx) {
+    return atx;
+  }
+
+  const underline = lines[block.endLine - 1];
+  return underline ? setextHeadingLevel(underline) : null;
+}
+
+function headingSectionRange(
+  state: EditorState,
+  lines: MarkdownLine[],
+  block: MiraMarkdownBlockRange,
+  headingLevel: number,
+): MiraMarkdownBlockRange {
+  let endIndex = lines.length - 1;
+
+  for (let index = block.endLine; index < lines.length; index += 1) {
+    const level = headingLevelAt(lines, index);
+    if (level !== null && level <= headingLevel) {
+      endIndex = Math.max(
+        block.endLine - 1,
+        previousContentIndex(lines, index),
+      );
+      break;
+    }
+  }
+
+  return {
+    ...createBlock(state, "heading", lines, block.startLine - 1, endIndex),
+    id: block.id,
+  };
+}
+
+function previousContentIndex(
+  lines: MarkdownLine[],
+  beforeIndex: number,
+): number {
+  for (let index = beforeIndex - 1; index >= 0; index -= 1) {
+    if (lines[index]!.trimmed) {
+      return index;
+    }
+  }
+  return Math.max(0, beforeIndex - 1);
+}
+
+function headingLevelAt(lines: MarkdownLine[], index: number): number | null {
+  const line = lines[index];
+  if (!line) {
+    return null;
+  }
+
+  const atx = atxHeadingLevel(line);
+  if (atx) {
+    return atx;
+  }
+
+  if (index > 0 && lines[index - 1]?.trimmed) {
+    return setextHeadingLevel(line);
+  }
+
+  return null;
+}
+
 function editableBlockRange(
   doc: EditorState["doc"],
   block: MiraMarkdownBlockRange,
@@ -295,6 +503,128 @@ function editableBlockRange(
   };
 }
 
+function moveMarkdownListItemHandle(
+  view: EditorView,
+  source: MiraMarkdownBlockHandle,
+  target: MiraMarkdownBlockHandleMoveTarget,
+): boolean {
+  const resolvedTarget = target.handle;
+  if (source.id === resolvedTarget.id) {
+    return false;
+  }
+
+  if (target.position === "inside" && resolvedTarget.role !== "list-item") {
+    return false;
+  }
+
+  const doc = view.state.doc;
+  const sourceEdit = editableBlockRange(doc, source.affectedRange);
+  const insertOffset = insertionOffsetForHandleTarget(
+    resolvedTarget,
+    target.position,
+  );
+
+  if (insertOffset > sourceEdit.from && insertOffset < sourceEdit.to) {
+    return false;
+  }
+
+  const markdown = doc.toString();
+  const sourceText = markdown.slice(
+    source.affectedRange.from,
+    source.affectedRange.to,
+  );
+  const targetIndent = targetListIndent(
+    view.state,
+    source,
+    resolvedTarget,
+    target.position,
+  );
+  const movedText = reindentListSubtree(
+    sourceText,
+    source.listIndent ?? 0,
+    targetIndent,
+  );
+  const withoutSource =
+    markdown.slice(0, sourceEdit.from) + markdown.slice(sourceEdit.to);
+  const adjustedInsertOffset =
+    insertOffset > sourceEdit.from
+      ? insertOffset - (sourceEdit.to - sourceEdit.from)
+      : insertOffset;
+  const insertion =
+    resolvedTarget.role === "list-item"
+      ? insertMarkdownListSubtree(
+          withoutSource,
+          adjustedInsertOffset,
+          movedText,
+        )
+      : insertMarkdownBlock(withoutSource, adjustedInsertOffset, movedText);
+
+  view.dispatch({
+    changes: { from: 0, to: doc.length, insert: insertion.markdown },
+    selection: { anchor: insertion.to },
+    scrollIntoView: true,
+    userEvent: "move.block",
+  });
+  return true;
+}
+
+function insertionOffsetForHandleTarget(
+  target: MiraMarkdownBlockHandle,
+  position: MiraMarkdownBlockHandleMoveTarget["position"],
+): number {
+  if (position === "before") {
+    return target.affectedRange.from;
+  }
+  return target.affectedRange.to;
+}
+
+function targetListIndent(
+  state: EditorState,
+  source: MiraMarkdownBlockHandle,
+  target: MiraMarkdownBlockHandle,
+  position: MiraMarkdownBlockHandleMoveTarget["position"],
+): number {
+  if (target.role !== "list-item") {
+    return 0;
+  }
+
+  if (position !== "inside") {
+    return target.listIndent ?? 0;
+  }
+
+  return (target.listIndent ?? 0) + inferListIndentUnit(state, source, target);
+}
+
+function inferListIndentUnit(
+  state: EditorState,
+  source: MiraMarkdownBlockHandle,
+  target: MiraMarkdownBlockHandle,
+): number {
+  const handles = collectMarkdownBlockHandles(state);
+  const child = handles.find(
+    (handle) =>
+      handle.role === "list-item" &&
+      handle.parentId === target.id &&
+      handle.id !== source.id,
+  );
+  if (child?.listIndent !== undefined && target.listIndent !== undefined) {
+    return Math.max(1, child.listIndent - target.listIndent);
+  }
+
+  const sibling = handles.find(
+    (handle) =>
+      handle.role === "list-item" &&
+      handle.parentId === target.parentId &&
+      handle.id !== source.id &&
+      handle.listIndent !== target.listIndent,
+  );
+  if (sibling?.listIndent !== undefined && target.listIndent !== undefined) {
+    return Math.max(1, Math.abs(sibling.listIndent - target.listIndent));
+  }
+
+  return 2;
+}
+
 function insertMarkdownBlock(
   markdown: string,
   offset: number,
@@ -312,6 +642,54 @@ function insertMarkdownBlock(
     from,
     to: from + blockMarkdown.trimEnd().length,
   };
+}
+
+function insertMarkdownListSubtree(
+  markdown: string,
+  offset: number,
+  blockMarkdown: string,
+): { markdown: string; from: number; to: number } {
+  const before = markdown.slice(0, offset);
+  const after = markdown.slice(offset);
+  const prefix = before && !before.endsWith("\n") ? "\n" : "";
+  const suffix = after && !after.startsWith("\n") ? "\n" : "";
+  const insert = `${prefix}${blockMarkdown.trimEnd()}${suffix}`;
+  const from = offset + prefix.length;
+
+  return {
+    markdown: `${before}${insert}${after}`,
+    from,
+    to: from + blockMarkdown.trimEnd().length,
+  };
+}
+
+function reindentListSubtree(
+  markdown: string,
+  sourceIndent: number,
+  targetIndent: number,
+): string {
+  const delta = targetIndent - sourceIndent;
+  if (delta === 0) {
+    return markdown;
+  }
+
+  return markdown
+    .split("\n")
+    .map((line) => reindentLine(line, delta))
+    .join("\n");
+}
+
+function reindentLine(line: string, delta: number): string {
+  if (!line.trim()) {
+    return line;
+  }
+
+  if (delta > 0) {
+    return `${" ".repeat(delta)}${line}`;
+  }
+
+  const removeCount = Math.min(line.match(/^\s*/u)?.[0].length ?? 0, -delta);
+  return line.slice(removeCount);
 }
 
 function normalizeDocumentEnd(markdown: string): string {
@@ -551,6 +929,40 @@ function consumeList(lines: MarkdownLine[], startIndex: number): number {
   return endIndex;
 }
 
+function consumeListItem(lines: MarkdownLine[], startIndex: number): number {
+  const baseIndent = listIndent(lines[startIndex]!);
+  let endIndex = startIndex;
+
+  for (let index = startIndex + 1; index < lines.length; index += 1) {
+    const line = lines[index]!;
+    if (!line.trimmed) {
+      const next = lines[index + 1];
+      if (
+        next &&
+        (listIndent(next) > baseIndent ||
+          (isListItem(next) && listIndent(next) > baseIndent))
+      ) {
+        endIndex = index;
+        continue;
+      }
+      break;
+    }
+
+    if (isListItem(line) && listIndent(line) <= baseIndent) {
+      break;
+    }
+
+    if (listIndent(line) > baseIndent) {
+      endIndex = index;
+      continue;
+    }
+
+    break;
+  }
+
+  return endIndex;
+}
+
 function isStandaloneEmbed(line: MarkdownLine): boolean {
   return /^\s*!\[\[[^\]\r\n]+\]\]\s*$/u.test(line.text);
 }
@@ -559,8 +971,21 @@ function isAtxHeading(line: MarkdownLine): boolean {
   return /^ {0,3}#{1,6}(?:\s|$)/u.test(line.text);
 }
 
+function atxHeadingLevel(line: MarkdownLine): number | null {
+  const match = line.text.match(/^ {0,3}(#{1,6})(?:\s|$)/u);
+  return match?.[1]?.length ?? null;
+}
+
 function isSetextHeadingUnderline(line: MarkdownLine): boolean {
   return /^ {0,3}(?:=+|-+)\s*$/u.test(line.text);
+}
+
+function setextHeadingLevel(line: MarkdownLine): number | null {
+  const match = line.text.match(/^ {0,3}(=+|-+)\s*$/u);
+  if (!match?.[1]) {
+    return null;
+  }
+  return match[1][0] === "=" ? 1 : 2;
 }
 
 function isThematicBreak(line: MarkdownLine): boolean {

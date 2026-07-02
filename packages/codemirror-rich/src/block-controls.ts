@@ -1,5 +1,14 @@
-import { Prec, type EditorState, type Extension } from "@codemirror/state";
 import {
+  Prec,
+  StateEffect,
+  StateField,
+  type EditorState,
+  type Extension,
+  type Range,
+} from "@codemirror/state";
+import {
+  Decoration,
+  type DecorationSet,
   GutterMarker,
   EditorView,
   gutter,
@@ -13,46 +22,102 @@ import {
 import type {
   MiraBlockAction,
   MiraBlockActionContext,
+  MiraMarkdownBlockHandle,
   MiraMarkdownBlockRange,
 } from "@mira-mde/extensions";
 import type { MiraRichEditorOptions } from "./types";
 import {
-  collectMarkdownBlockRanges,
+  collectMarkdownBlockHandles,
+  deleteMarkdownBlockHandle,
   deleteMarkdownBlockRange,
+  duplicateMarkdownBlockHandle,
   duplicateMarkdownBlockRange,
+  moveMarkdownBlockHandle,
   moveMarkdownBlockRange,
   replaceMarkdownRange,
 } from "./block-ranges";
 
 type BlockRect = {
-  block: MiraMarkdownBlockRange;
+  handle: MiraMarkdownBlockHandle;
   top: number;
   bottom: number;
+  affectedTop: number;
+  affectedBottom: number;
 };
 
 type DragState = {
-  blockId: string;
+  handleId: string;
   dragging: boolean;
   startX: number;
   startY: number;
 };
 
 type DropTarget = {
-  block: MiraMarkdownBlockRange;
-  position: "before" | "after";
+  handle: MiraMarkdownBlockHandle;
+  position: "before" | "after" | "inside";
   top: number;
 };
 
+type BlockHighlightState = {
+  handleId: string | null;
+  range: MiraMarkdownBlockRange | null;
+  decorations: DecorationSet;
+};
+
 const dragActivationDistance = 5;
+const listNestActivationDistance = 24;
 const autoScrollThreshold = 42;
 const autoScrollStep = 18;
-const blockStartCache = new WeakMap<
+const handleStartCache = new WeakMap<
   EditorState,
-  Map<number, MiraMarkdownBlockRange>
+  Map<number, MiraMarkdownBlockHandle>
 >();
-const activeBlockIdsCache = new WeakMap<EditorState, Set<string>>();
+const activeHandleIdsCache = new WeakMap<EditorState, Set<string>>();
 const blockHandleSvg =
   '<svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9 5h.01M15 5h.01M9 12h.01M15 12h.01M9 19h.01M15 19h.01"/></svg>';
+
+const setBlockHighlightEffect = StateEffect.define<{
+  handleId: string;
+  range: MiraMarkdownBlockRange;
+} | null>();
+
+const emptyBlockHighlightState: BlockHighlightState = {
+  handleId: null,
+  range: null,
+  decorations: Decoration.none,
+};
+
+const blockHighlightStateField = StateField.define<BlockHighlightState>({
+  create() {
+    return emptyBlockHighlightState;
+  },
+  update(value, transaction) {
+    for (const effect of transaction.effects) {
+      if (effect.is(setBlockHighlightEffect)) {
+        return effect.value
+          ? {
+              handleId: effect.value.handleId,
+              range: effect.value.range,
+              decorations: buildHighlightDecorations(
+                transaction.state,
+                effect.value.range,
+              ),
+            }
+          : emptyBlockHighlightState;
+      }
+    }
+
+    if (transaction.docChanged) {
+      return emptyBlockHighlightState;
+    }
+
+    return value.decorations === Decoration.none
+      ? value
+      : { ...value, decorations: value.decorations.map(transaction.changes) };
+  },
+  provide: (field) =>
+    EditorView.decorations.from(field, (value) => value.decorations),
+});
 
 export function blockControlExtensions(
   options: MiraRichEditorOptions,
@@ -63,6 +128,7 @@ export function blockControlExtensions(
 
   return [
     blockControlsTheme,
+    blockHighlightStateField,
     blockHandleGutter(),
     Prec.highest(keymap.of(blockControlKeymap())),
     ViewPlugin.fromClass(
@@ -80,85 +146,114 @@ function blockHandleGutter(): Extension {
     class: "mira-block-controls-gutter",
     initialSpacer: () => blockHandleSpacerMarker,
     lineMarker(view, line) {
-      const block = blockForVisualLine(view, line);
-      const active = block
-        ? activeBlockIdsForState(view.state).has(block.id)
+      const handle = handleForVisualLine(view, line);
+      const selectedHandleId = blockHighlight(view.state).handleId;
+      const active = handle
+        ? activeHandleIdsForState(view.state).has(handle.id)
         : false;
-      return block ? new BlockHandleMarker(block, active) : null;
+      const selected = handle ? handle.id === selectedHandleId : false;
+      return handle ? new BlockHandleMarker(handle, active, selected) : null;
     },
     lineMarkerChange(update) {
-      return update.docChanged || update.selectionSet || update.viewportChanged;
+      return (
+        update.docChanged ||
+        update.selectionSet ||
+        update.viewportChanged ||
+        update.transactions.some((transaction) =>
+          transaction.effects.some((effect) =>
+            effect.is(setBlockHighlightEffect),
+          ),
+        )
+      );
     },
     renderEmptyElements: true,
   });
 }
 
-function blockForVisualLine(
+function handleForVisualLine(
   view: EditorView,
   line: BlockInfo,
-): MiraMarkdownBlockRange | null {
-  return blockStartsForState(view.state).get(line.from) ?? null;
+): MiraMarkdownBlockHandle | null {
+  return handleStartsForState(view.state).get(line.from) ?? null;
 }
 
-function blockStartsForState(
+function handleStartsForState(
   state: EditorState,
-): Map<number, MiraMarkdownBlockRange> {
-  const cached = blockStartCache.get(state);
+): Map<number, MiraMarkdownBlockHandle> {
+  const cached = handleStartCache.get(state);
   if (cached) {
     return cached;
   }
 
-  const starts = new Map<number, MiraMarkdownBlockRange>();
-  for (const block of collectMarkdownBlockRanges(state)) {
-    starts.set(block.from, block);
+  const starts = new Map<number, MiraMarkdownBlockHandle>();
+  for (const handle of collectMarkdownBlockHandles(state)) {
+    starts.set(handle.handleRange.from, handle);
   }
-  blockStartCache.set(state, starts);
+  handleStartCache.set(state, starts);
   return starts;
 }
 
-function activeBlockIdsForState(state: EditorState): Set<string> {
-  const cached = activeBlockIdsCache.get(state);
+function activeHandleIdsForState(state: EditorState): Set<string> {
+  const cached = activeHandleIdsCache.get(state);
   if (cached) {
     return cached;
   }
 
-  const blocks = [...blockStartsForState(state).values()].sort(
-    (a, b) => a.from - b.from,
+  const handles = [...handleStartsForState(state).values()].sort(
+    (a, b) => a.handleRange.from - b.handleRange.from,
   );
   const selection = state.selection.main;
   const ids = new Set<string>();
 
   if (selection.empty) {
-    const block = blockAtPosition(state, blocks, selection.head);
-    if (block) {
-      ids.add(block.id);
+    const handle = handleAtPosition(state, handles, selection.head);
+    if (handle) {
+      ids.add(handle.id);
     }
   } else {
-    for (const block of blocks) {
-      if (selection.from <= block.to && selection.to >= block.from) {
-        ids.add(block.id);
+    for (const handle of handles) {
+      if (
+        selection.from <= handle.handleRange.to &&
+        selection.to >= handle.handleRange.from
+      ) {
+        ids.add(handle.id);
       }
     }
   }
 
-  activeBlockIdsCache.set(state, ids);
+  activeHandleIdsCache.set(state, ids);
   return ids;
 }
 
-function blockAtPosition(
+function handleAtPosition(
   state: EditorState,
-  blocks: MiraMarkdownBlockRange[],
+  handles: MiraMarkdownBlockHandle[],
   position: number,
-): MiraMarkdownBlockRange | null {
+): MiraMarkdownBlockHandle | null {
+  const containing = handles
+    .filter(
+      (handle) =>
+        position >= handle.affectedRange.from &&
+        position <= Math.min(handle.affectedRange.to + 1, state.doc.length),
+    )
+    .sort(
+      (a, b) =>
+        a.affectedRange.to -
+        a.affectedRange.from -
+        (b.affectedRange.to - b.affectedRange.from),
+    );
+
   return (
-    blocks.find(
-      (block) =>
-        position >= block.from &&
-        position <= Math.min(block.to + 1, state.doc.length),
-    ) ??
-    blocks.find((block) => position < block.from) ??
-    blocks.at(-1) ??
+    containing[0] ??
+    handles.find((handle) => position < handle.handleRange.from) ??
+    handles.at(-1) ??
     null
+  );
+}
+
+function blockHighlight(state: EditorState): BlockHighlightState {
+  return (
+    state.field(blockHighlightStateField, false) ?? emptyBlockHighlightState
   );
 }
 
@@ -166,8 +261,9 @@ class BlockHandleMarker extends GutterMarker {
   override elementClass = "mira-block-controls-gutter__element";
 
   constructor(
-    private readonly block: MiraMarkdownBlockRange,
+    private readonly handle: MiraMarkdownBlockHandle,
     private readonly active: boolean,
+    private readonly selected: boolean,
   ) {
     super();
   }
@@ -175,22 +271,31 @@ class BlockHandleMarker extends GutterMarker {
   override eq(other: GutterMarker): boolean {
     return (
       other instanceof BlockHandleMarker &&
-      other.block.id === this.block.id &&
-      other.block.from === this.block.from &&
-      other.block.to === this.block.to &&
-      other.active === this.active
+      other.handle.id === this.handle.id &&
+      other.handle.handleRange.from === this.handle.handleRange.from &&
+      other.handle.handleRange.to === this.handle.handleRange.to &&
+      other.active === this.active &&
+      other.selected === this.selected
     );
   }
 
   override toDOM(): Node {
     const button = document.createElement("button");
     button.type = "button";
-    button.className = this.active
-      ? "mira-block-handle mira-block-handle--active"
-      : "mira-block-handle";
-    button.dataset.miraBlockId = this.block.id;
-    button.setAttribute("aria-label", "Block actions");
-    button.setAttribute("title", "Drag to move. Click for block actions.");
+    button.className = [
+      "mira-block-handle",
+      this.active ? "mira-block-handle--active" : "",
+      this.selected ? "mira-block-handle--selected" : "",
+    ]
+      .filter(Boolean)
+      .join(" ");
+    button.dataset.miraBlockId = this.handle.id;
+    button.dataset.miraBlockRole = this.handle.role;
+    button.setAttribute("aria-label", "Block drag handle");
+    button.setAttribute(
+      "title",
+      "Drag to move. Click to highlight. Right-click for block actions.",
+    );
     button.innerHTML = blockHandleSvg;
     return button;
   }
@@ -230,37 +335,48 @@ function blockControlKeymap(): KeyBinding[] {
 }
 
 function moveSelectionByKeyboard(view: EditorView, direction: -1 | 1): boolean {
-  const blocks = collectMarkdownBlockRanges(view.state);
-  const active = activeBlock(view, blocks);
+  const handles = collectMarkdownBlockHandles(view.state);
+  const active = activeHandle(view, handles);
   if (!active) {
     return false;
   }
 
-  const selectionBlocks = selectedBlocks(view, blocks, active);
-  const source = compositeBlock(view, selectionBlocks);
-  const firstIndex = blocks.findIndex(
-    (block) => block.id === selectionBlocks[0]?.id,
+  const selectionHandles = selectedHandles(view, handles, active);
+  const firstIndex = handles.findIndex(
+    (handle) => handle.id === selectionHandles[0]?.id,
   );
-  const lastIndex = blocks.findIndex(
-    (block) => block.id === selectionBlocks.at(-1)?.id,
+  const lastIndex = handles.findIndex(
+    (handle) => handle.id === selectionHandles.at(-1)?.id,
   );
-  const target = direction < 0 ? blocks[firstIndex - 1] : blocks[lastIndex + 1];
+  const target =
+    direction < 0 ? handles[firstIndex - 1] : handles[lastIndex + 1];
 
   if (!target) {
     return false;
   }
 
-  return moveMarkdownBlockRange(view, source, {
-    block: target,
-    position: direction < 0 ? "before" : "after",
-  });
+  if (selectionHandles.length === 1) {
+    return moveMarkdownBlockHandle(view, selectionHandles[0]!, {
+      handle: target,
+      position: direction < 0 ? "before" : "after",
+    });
+  }
+
+  return moveMarkdownBlockRange(
+    view,
+    compositeHandleRange(view, selectionHandles),
+    {
+      block: target.affectedRange,
+      position: direction < 0 ? "before" : "after",
+    },
+  );
 }
 
 class BlockControlsPlugin implements PluginValue {
   private readonly layer = document.createElement("div");
   private readonly dropLine = document.createElement("div");
   private readonly menu = document.createElement("div");
-  private blocks: MiraMarkdownBlockRange[] = [];
+  private handles: MiraMarkdownBlockHandle[] = [];
   private blockRects: BlockRect[] = [];
   private dragState: DragState | null = null;
   private dropTarget: DropTarget | null = null;
@@ -281,6 +397,8 @@ class BlockControlsPlugin implements PluginValue {
 
     this.view.dom.addEventListener("pointerdown", this.handleHandlePointerDown);
     this.view.dom.addEventListener("click", this.handleHandleClick);
+    this.view.dom.addEventListener("contextmenu", this.handleHandleContextMenu);
+    this.view.dom.addEventListener("keydown", this.handleHandleKeyDown);
     this.view.scrollDOM.addEventListener("scroll", this.scheduleRender);
     window.addEventListener("resize", this.scheduleRender);
     document.addEventListener("pointerdown", this.handleDocumentPointerDown, {
@@ -292,8 +410,13 @@ class BlockControlsPlugin implements PluginValue {
   }
 
   update(update: ViewUpdate): void {
+    if (update.docChanged) {
+      this.closeMenu();
+      this.scheduleRender();
+      return;
+    }
+
     if (
-      update.docChanged ||
       update.selectionSet ||
       update.viewportChanged ||
       update.geometryChanged
@@ -309,6 +432,11 @@ class BlockControlsPlugin implements PluginValue {
       this.handleHandlePointerDown,
     );
     this.view.dom.removeEventListener("click", this.handleHandleClick);
+    this.view.dom.removeEventListener(
+      "contextmenu",
+      this.handleHandleContextMenu,
+    );
+    this.view.dom.removeEventListener("keydown", this.handleHandleKeyDown);
     this.view.scrollDOM.removeEventListener("scroll", this.scheduleRender);
     window.removeEventListener("resize", this.scheduleRender);
     document.removeEventListener(
@@ -337,18 +465,24 @@ class BlockControlsPlugin implements PluginValue {
   };
 
   private render(): void {
-    this.blocks = collectMarkdownBlockRanges(this.view.state);
+    this.handles = collectMarkdownBlockHandles(this.view.state);
     this.blockRects = [];
     const rootRect = this.view.dom.getBoundingClientRect();
     const fragment = document.createDocumentFragment();
     fragment.append(this.dropLine, this.menu);
 
-    for (const block of this.blocks) {
-      const rect = this.measureBlock(block, rootRect);
+    for (const handle of this.handles) {
+      const rect = this.measureHandle(handle, rootRect);
       if (!rect) {
         continue;
       }
-      this.blockRects.push({ block, top: rect.top, bottom: rect.bottom });
+      this.blockRects.push({
+        handle,
+        top: rect.top,
+        bottom: rect.bottom,
+        affectedTop: rect.affectedTop,
+        affectedBottom: rect.affectedBottom,
+      });
     }
 
     this.layer.replaceChildren(fragment);
@@ -359,12 +493,17 @@ class BlockControlsPlugin implements PluginValue {
     }
   }
 
-  private measureBlock(
-    block: MiraMarkdownBlockRange,
+  private measureHandle(
+    handle: MiraMarkdownBlockHandle,
     rootRect: DOMRect,
-  ): { top: number; bottom: number } | null {
-    const start = this.view.coordsAtPos(block.from);
-    const end = this.view.coordsAtPos(block.to);
+  ): {
+    top: number;
+    bottom: number;
+    affectedTop: number;
+    affectedBottom: number;
+  } | null {
+    const start = this.view.coordsAtPos(handle.handleRange.from);
+    const end = this.view.coordsAtPos(handle.handleRange.to);
     if (!start && !end) {
       return null;
     }
@@ -374,21 +513,31 @@ class BlockControlsPlugin implements PluginValue {
       (end?.bottom ?? start!.bottom) - rootRect.top,
       top + 18,
     );
-    return { top, bottom };
+    const affectedStart =
+      this.view.coordsAtPos(handle.affectedRange.from) ?? start ?? end!;
+    const affectedEnd =
+      this.view.coordsAtPos(handle.affectedRange.to) ?? end ?? start!;
+    const affectedTop = affectedStart.top - rootRect.top;
+    const affectedBottom = Math.max(
+      affectedEnd.bottom - rootRect.top,
+      affectedTop + 18,
+    );
+
+    return { top, bottom, affectedTop, affectedBottom };
   }
 
   private readonly handleHandlePointerDown = (event: PointerEvent): void => {
     const handle = closestBlockHandle(event.target);
-    const block = handle ? this.blockForHandle(handle) : null;
-    if (handle && block) {
-      this.handlePointerDown(event, block);
+    const target = handle ? this.handleForButton(handle) : null;
+    if (handle && target) {
+      this.handlePointerDown(event, target);
     }
   };
 
   private readonly handleHandleClick = (event: MouseEvent): void => {
     const handle = closestBlockHandle(event.target);
-    const block = handle ? this.blockForHandle(handle) : null;
-    if (!handle || !block) {
+    const target = handle ? this.handleForButton(handle) : null;
+    if (!handle || !target) {
       return;
     }
 
@@ -398,29 +547,67 @@ class BlockControlsPlugin implements PluginValue {
       this.suppressNextClick = false;
       return;
     }
-    this.openMenu(block, handle);
+    this.highlightHandle(target);
   };
 
-  private blockForHandle(
-    handle: HTMLButtonElement,
-  ): MiraMarkdownBlockRange | null {
-    const blockId = handle.dataset.miraBlockId;
-    if (!blockId) {
+  private readonly handleHandleContextMenu = (event: MouseEvent): void => {
+    const button = closestBlockHandle(event.target);
+    const handle = button ? this.handleForButton(button) : null;
+    if (!button || !handle) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+    this.highlightHandle(handle);
+    this.openMenu(handle, button);
+  };
+
+  private readonly handleHandleKeyDown = (event: KeyboardEvent): void => {
+    const button = closestBlockHandle(event.target);
+    const handle = button ? this.handleForButton(button) : null;
+    if (!button || !handle) {
+      return;
+    }
+
+    if (
+      event.key === "ContextMenu" ||
+      (event.shiftKey && event.key === "F10")
+    ) {
+      event.preventDefault();
+      event.stopPropagation();
+      this.highlightHandle(handle);
+      this.openMenu(handle, button);
+      return;
+    }
+
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      event.stopPropagation();
+      this.highlightHandle(handle);
+    }
+  };
+
+  private handleForButton(
+    button: HTMLButtonElement,
+  ): MiraMarkdownBlockHandle | null {
+    const handleId = button.dataset.miraBlockId;
+    if (!handleId) {
       return null;
     }
 
-    const block =
-      this.blocks.find((candidate) => candidate.id === blockId) ??
-      collectMarkdownBlockRanges(this.view.state).find(
-        (candidate) => candidate.id === blockId,
+    const handle =
+      this.handles.find((candidate) => candidate.id === handleId) ??
+      collectMarkdownBlockHandles(this.view.state).find(
+        (candidate) => candidate.id === handleId,
       );
 
-    return block ?? null;
+    return handle ?? null;
   }
 
   private handlePointerDown(
     event: PointerEvent,
-    block: MiraMarkdownBlockRange,
+    handle: MiraMarkdownBlockHandle,
   ): void {
     if (event.button !== 0) {
       return;
@@ -429,7 +616,7 @@ class BlockControlsPlugin implements PluginValue {
     event.stopPropagation();
     this.closeMenu();
     this.dragState = {
-      blockId: block.id,
+      handleId: handle.id,
       dragging: false,
       startX: event.clientX,
       startY: event.clientY,
@@ -454,8 +641,9 @@ class BlockControlsPlugin implements PluginValue {
     event.preventDefault();
     this.dragState.dragging = true;
     this.suppressNextClick = true;
+    this.clearHighlight();
     this.view.dom.classList.add("mira-block-controls-dragging");
-    this.dropTarget = this.resolveDropTarget(event.clientY);
+    this.dropTarget = this.resolveDropTarget(event);
     if (this.dropTarget) {
       this.showDropLine(this.dropTarget.top);
     }
@@ -465,19 +653,26 @@ class BlockControlsPlugin implements PluginValue {
   private readonly handlePointerUp = (): void => {
     const dragState = this.dragState;
     const source = dragState
-      ? this.blocks.find((block) => block.id === dragState.blockId)
+      ? this.handles.find((handle) => handle.id === dragState.handleId)
       : undefined;
 
     if (dragState?.dragging && source && this.dropTarget) {
-      const selectionBlocks = selectedBlocks(this.view, this.blocks, source);
-      moveMarkdownBlockRange(
-        this.view,
-        compositeBlock(this.view, selectionBlocks),
-        {
-          block: this.dropTarget.block,
+      const selectionHandles = selectedHandles(this.view, this.handles, source);
+      if (selectionHandles.length === 1) {
+        moveMarkdownBlockHandle(this.view, source, {
+          handle: this.dropTarget.handle,
           position: this.dropTarget.position,
-        },
-      );
+        });
+      } else if (this.dropTarget.position !== "inside") {
+        moveMarkdownBlockRange(
+          this.view,
+          compositeHandleRange(this.view, selectionHandles),
+          {
+            block: this.dropTarget.handle.affectedRange,
+            position: this.dropTarget.position,
+          },
+        );
+      }
     }
 
     this.dragState = null;
@@ -492,20 +687,27 @@ class BlockControlsPlugin implements PluginValue {
     window.removeEventListener("pointermove", this.handlePointerMove);
   }
 
-  private resolveDropTarget(clientY: number): DropTarget | null {
-    const sourceId = this.dragState?.blockId;
+  private resolveDropTarget(event: PointerEvent): DropTarget | null {
+    const source = this.dragState
+      ? this.handles.find((handle) => handle.id === this.dragState?.handleId)
+      : null;
+    const sourceId = source?.id;
     const candidates = this.blockRects.filter(
-      (rect) => rect.block.id !== sourceId,
+      (rect) =>
+        rect.handle.id !== sourceId &&
+        (!source ||
+          rect.handle.affectedRange.from < source.affectedRange.from ||
+          rect.handle.affectedRange.to > source.affectedRange.to),
     );
     if (candidates.length === 0) {
       return null;
     }
 
     const rootTop = this.view.dom.getBoundingClientRect().top;
-    const localY = clientY - rootTop;
+    const localY = event.clientY - rootTop;
     let nearest = candidates[0]!;
     let nearestDistance = Number.POSITIVE_INFINITY;
-    let position: "before" | "after" = "before";
+    let position: "before" | "after" | "inside" = "before";
 
     for (const rect of candidates) {
       const midpoint = (rect.top + rect.bottom) / 2;
@@ -519,10 +721,18 @@ class BlockControlsPlugin implements PluginValue {
       }
     }
 
+    if (
+      source?.role === "list-item" &&
+      nearest.handle.role === "list-item" &&
+      event.clientX - this.dragState!.startX >= listNestActivationDistance
+    ) {
+      position = "inside";
+    }
+
     return {
-      block: nearest.block,
+      handle: nearest.handle,
       position,
-      top: position === "before" ? nearest.top : nearest.bottom,
+      top: position === "before" ? nearest.affectedTop : nearest.affectedBottom,
     };
   }
 
@@ -545,14 +755,14 @@ class BlockControlsPlugin implements PluginValue {
   }
 
   private openMenu(
-    block: MiraMarkdownBlockRange,
-    handle: HTMLButtonElement,
+    handle: MiraMarkdownBlockHandle,
+    button: HTMLButtonElement,
   ): void {
-    const actions = this.actionsFor(block);
-    const rect = handle.getBoundingClientRect();
+    const actions = this.actionsFor(handle);
+    const rect = button.getBoundingClientRect();
     const rootRect = this.view.dom.getBoundingClientRect();
     this.menu.replaceChildren(
-      ...actions.map((action) => this.createMenuItem(action, block)),
+      ...actions.map((action) => this.createMenuItem(action, handle)),
     );
     this.menu.hidden = false;
     this.menu.style.top = `${rect.top - rootRect.top}px`;
@@ -562,9 +772,9 @@ class BlockControlsPlugin implements PluginValue {
 
   private createMenuItem(
     action: MiraBlockAction,
-    block: MiraMarkdownBlockRange,
+    handle: MiraMarkdownBlockHandle,
   ): HTMLButtonElement {
-    const context = this.actionContext(block);
+    const context = this.actionContext(handle);
     const button = document.createElement("button");
     button.type = "button";
     button.className = action.destructive
@@ -581,24 +791,29 @@ class BlockControlsPlugin implements PluginValue {
     return button;
   }
 
-  private actionsFor(block: MiraMarkdownBlockRange): MiraBlockAction[] {
+  private actionsFor(handle: MiraMarkdownBlockHandle): MiraBlockAction[] {
     return [
-      ...builtInBlockActions(this.view, this.blocks, block),
+      ...builtInBlockActions(this.view, this.handles, handle),
       ...(this.options.blockActions ?? []),
     ];
   }
 
-  private actionContext(block: MiraMarkdownBlockRange): MiraBlockActionContext {
+  private actionContext(
+    handle: MiraMarkdownBlockHandle,
+  ): MiraBlockActionContext {
     const selection = this.view.state.selection.main;
     const range = selection.empty
       ? null
       : { from: selection.from, to: selection.to };
-    const blocks = selectedBlocks(this.view, this.blocks, block);
+    const handles = selectedHandles(this.view, this.handles, handle);
+    const blocks = handles.map((target) => target.affectedRange);
 
     return {
       view: this.view,
-      block,
+      block: handle.affectedRange,
       blocks,
+      handle,
+      affectedRange: handle.affectedRange,
       selection: range,
       sourcePath: this.options.sourcePath,
       focus: () => this.view.focus(),
@@ -628,47 +843,86 @@ class BlockControlsPlugin implements PluginValue {
     this.menu.replaceChildren();
   }
 
-  private readonly handleDocumentPointerDown = (event: PointerEvent): void => {
-    const target = event.target instanceof Node ? event.target : null;
-    if (!target || this.menu.hidden || this.layer.contains(target)) {
+  private highlightHandle(handle: MiraMarkdownBlockHandle): void {
+    this.view.dispatch({
+      effects: setBlockHighlightEffect.of({
+        handleId: handle.id,
+        range: handle.affectedRange,
+      }),
+    });
+    this.scheduleRender();
+  }
+
+  private clearHighlight(): void {
+    if (!blockHighlight(this.view.state).handleId) {
       return;
     }
-    this.closeMenu();
+    this.view.dispatch({ effects: setBlockHighlightEffect.of(null) });
+    this.scheduleRender();
+  }
+
+  private readonly handleDocumentPointerDown = (event: PointerEvent): void => {
+    const target = event.target instanceof Node ? event.target : null;
+    if (!target) {
+      return;
+    }
+
+    if (!this.menu.hidden && !this.menu.contains(target)) {
+      this.closeMenu();
+    }
+
+    if (!closestBlockHandle(target) && !this.menu.contains(target)) {
+      this.clearHighlight();
+    }
   };
 
   private readonly handleDocumentKeyDown = (event: KeyboardEvent): void => {
     if (event.key === "Escape") {
       this.closeMenu();
+      this.clearHighlight();
     }
   };
 }
 
 function builtInBlockActions(
   view: EditorView,
-  allBlocks: MiraMarkdownBlockRange[],
-  block: MiraMarkdownBlockRange,
+  allHandles: MiraMarkdownBlockHandle[],
+  handle: MiraMarkdownBlockHandle,
 ): MiraBlockAction[] {
   return [
     {
       id: "mira-block-move-up",
       label: "Move up",
       disabled: ({ blocks }) => {
-        const first = blocks[0] ?? block;
+        const first = blocks[0] ?? handle.affectedRange;
         return (
-          allBlocks.findIndex((candidate) => candidate.id === first.id) <= 0
+          allHandles.findIndex(
+            (candidate) => candidate.affectedRange.id === first.id,
+          ) <= 0
         );
       },
       run: ({ blocks }) => {
-        const sourceBlocks = blocks.length > 0 ? blocks : [block];
-        const firstIndex = allBlocks.findIndex(
-          (candidate) => candidate.id === sourceBlocks[0]!.id,
+        const sourceHandles = handlesForAction(allHandles, blocks, handle);
+        const firstIndex = allHandles.findIndex(
+          (candidate) => candidate.id === sourceHandles[0]!.id,
         );
-        const target = allBlocks[firstIndex - 1];
+        const target = allHandles[firstIndex - 1];
         if (target) {
-          moveMarkdownBlockRange(view, compositeBlock(view, sourceBlocks), {
-            block: target,
-            position: "before",
-          });
+          if (sourceHandles.length === 1) {
+            moveMarkdownBlockHandle(view, sourceHandles[0]!, {
+              handle: target,
+              position: "before",
+            });
+          } else {
+            moveMarkdownBlockRange(
+              view,
+              compositeHandleRange(view, sourceHandles),
+              {
+                block: target.affectedRange,
+                position: "before",
+              },
+            );
+          }
         }
       },
     },
@@ -676,23 +930,36 @@ function builtInBlockActions(
       id: "mira-block-move-down",
       label: "Move down",
       disabled: ({ blocks }) => {
-        const last = blocks.at(-1) ?? block;
+        const last = blocks.at(-1) ?? handle.affectedRange;
         return (
-          allBlocks.findIndex((candidate) => candidate.id === last.id) >=
-          allBlocks.length - 1
+          allHandles.findIndex(
+            (candidate) => candidate.affectedRange.id === last.id,
+          ) >=
+          allHandles.length - 1
         );
       },
       run: ({ blocks }) => {
-        const sourceBlocks = blocks.length > 0 ? blocks : [block];
-        const lastIndex = allBlocks.findIndex(
-          (candidate) => candidate.id === sourceBlocks.at(-1)!.id,
+        const sourceHandles = handlesForAction(allHandles, blocks, handle);
+        const lastIndex = allHandles.findIndex(
+          (candidate) => candidate.id === sourceHandles.at(-1)!.id,
         );
-        const target = allBlocks[lastIndex + 1];
+        const target = allHandles[lastIndex + 1];
         if (target) {
-          moveMarkdownBlockRange(view, compositeBlock(view, sourceBlocks), {
-            block: target,
-            position: "after",
-          });
+          if (sourceHandles.length === 1) {
+            moveMarkdownBlockHandle(view, sourceHandles[0]!, {
+              handle: target,
+              position: "after",
+            });
+          } else {
+            moveMarkdownBlockRange(
+              view,
+              compositeHandleRange(view, sourceHandles),
+              {
+                block: target.affectedRange,
+                position: "after",
+              },
+            );
+          }
         }
       },
     },
@@ -700,10 +967,15 @@ function builtInBlockActions(
       id: "mira-block-duplicate",
       label: "Duplicate",
       run: ({ blocks }) => {
-        duplicateMarkdownBlockRange(
-          view,
-          compositeBlock(view, blocks.length > 0 ? blocks : [block]),
-        );
+        const sourceHandles = handlesForAction(allHandles, blocks, handle);
+        if (sourceHandles.length === 1) {
+          duplicateMarkdownBlockHandle(view, sourceHandles[0]!);
+        } else {
+          duplicateMarkdownBlockRange(
+            view,
+            compositeHandleRange(view, sourceHandles),
+          );
+        }
       },
     },
     {
@@ -711,42 +983,68 @@ function builtInBlockActions(
       label: "Delete",
       destructive: true,
       run: ({ blocks }) => {
-        deleteMarkdownBlockRange(
-          view,
-          compositeBlock(view, blocks.length > 0 ? blocks : [block]),
-        );
+        const sourceHandles = handlesForAction(allHandles, blocks, handle);
+        if (sourceHandles.length === 1) {
+          deleteMarkdownBlockHandle(view, sourceHandles[0]!);
+        } else {
+          deleteMarkdownBlockRange(
+            view,
+            compositeHandleRange(view, sourceHandles),
+          );
+        }
       },
     },
   ];
 }
 
-function activeBlock(
+function activeHandle(
   view: EditorView,
-  blocks: MiraMarkdownBlockRange[],
-): MiraMarkdownBlockRange | null {
-  return blockAtPosition(view.state, blocks, view.state.selection.main.head);
+  handles: MiraMarkdownBlockHandle[],
+): MiraMarkdownBlockHandle | null {
+  return handleAtPosition(view.state, handles, view.state.selection.main.head);
 }
 
-function selectedBlocks(
+function selectedHandles(
   view: EditorView,
-  blocks: MiraMarkdownBlockRange[],
-  fallback: MiraMarkdownBlockRange,
-): MiraMarkdownBlockRange[] {
+  handles: MiraMarkdownBlockHandle[],
+  fallback: MiraMarkdownBlockHandle,
+): MiraMarkdownBlockHandle[] {
   const selection = view.state.selection.main;
   if (selection.empty) {
     return [fallback];
   }
-  const selected = blocks.filter(
-    (block) => selection.from <= block.to && selection.to >= block.from,
+  const selected = handles.filter(
+    (handle) =>
+      selection.from <= handle.handleRange.to &&
+      selection.to >= handle.handleRange.from,
   );
   return selected.length > 0 ? selected : [fallback];
 }
 
-function compositeBlock(
-  view: EditorView,
+function handlesForAction(
+  allHandles: MiraMarkdownBlockHandle[],
   blocks: MiraMarkdownBlockRange[],
+  fallback: MiraMarkdownBlockHandle,
+): MiraMarkdownBlockHandle[] {
+  if (blocks.length === 0) {
+    return [fallback];
+  }
+
+  const handles = blocks
+    .map((block) =>
+      allHandles.find((handle) => handle.affectedRange.id === block.id),
+    )
+    .filter((handle): handle is MiraMarkdownBlockHandle => Boolean(handle));
+  return handles.length > 0 ? handles : [fallback];
+}
+
+function compositeHandleRange(
+  view: EditorView,
+  handles: MiraMarkdownBlockHandle[],
 ): MiraMarkdownBlockRange {
-  const sorted = [...blocks].sort((a, b) => a.from - b.from);
+  const sorted = [...handles]
+    .map((handle) => handle.affectedRange)
+    .sort((a, b) => a.from - b.from);
   const first = sorted[0]!;
   const last = sorted.at(-1)!;
   return {
@@ -776,6 +1074,29 @@ function dynamicDisabled(
     return action.disabled(context);
   }
   return action.disabled ?? false;
+}
+
+function buildHighlightDecorations(
+  state: EditorState,
+  range: MiraMarkdownBlockRange,
+): DecorationSet {
+  const decorations: Array<Range<Decoration>> = [];
+  const fromLine = state.doc.lineAt(range.from);
+  const toLine = state.doc.lineAt(Math.max(range.from, range.to));
+
+  for (
+    let lineNumber = fromLine.number;
+    lineNumber <= toLine.number;
+    lineNumber += 1
+  ) {
+    decorations.push(
+      Decoration.line({ class: "mira-block-affected-line" }).range(
+        state.doc.line(lineNumber).from,
+      ),
+    );
+  }
+
+  return Decoration.set(decorations);
 }
 
 const blockControlsTheme = EditorView.theme({
@@ -825,7 +1146,7 @@ const blockControlsTheme = EditorView.theme({
     transition: "opacity 120ms ease, color 120ms ease, background 120ms ease",
     width: "1.35rem",
   },
-  ".mira-block-controls-gutter:hover .mira-block-handle, .mira-block-handle--active, .mira-block-handle:hover, .mira-block-handle:focus-visible":
+  ".mira-block-controls-gutter:hover .mira-block-handle, .mira-block-handle--active, .mira-block-handle--selected, .mira-block-handle:hover, .mira-block-handle:focus-visible":
     {
       opacity: "1",
     },
@@ -837,6 +1158,11 @@ const blockControlsTheme = EditorView.theme({
     background: "var(--mira-accent-soft)",
     color: "var(--mira-foreground)",
     outline: "none",
+  },
+  ".mira-block-handle--selected": {
+    background: "var(--mira-accent-soft)",
+    borderColor: "var(--mira-accent)",
+    color: "var(--mira-foreground)",
   },
   ".mira-block-handle svg": {
     height: "1rem",
@@ -852,6 +1178,9 @@ const blockControlsTheme = EditorView.theme({
     insetInline: "2.25rem 0.75rem",
     pointerEvents: "none",
     position: "absolute",
+  },
+  ".mira-block-affected-line": {
+    backgroundColor: "color-mix(in srgb, var(--mira-accent) 12%, transparent)",
   },
   ".mira-block-menu": {
     background: "var(--mira-popover)",

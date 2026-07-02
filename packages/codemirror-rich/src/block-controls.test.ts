@@ -92,4 +92,142 @@ describe("block controls", () => {
     view.destroy();
     parent.remove();
   });
+
+  it("renders one handle for each list item", async () => {
+    const parent = document.createElement("div");
+    document.body.append(parent);
+    const view = new EditorView({
+      doc: "- parent\n  - child\n- sibling",
+      extensions: [
+        createRichEditorExtensions({
+          blockControls: true,
+          livePreview: false,
+        }),
+      ],
+      parent,
+    });
+
+    await nextFrame();
+
+    const handles = Array.from(
+      parent.querySelectorAll<HTMLButtonElement>(".mira-block-handle"),
+    ).map((handle) => handle.dataset.miraBlockId);
+
+    expect(handles).toEqual(["list-item-1", "list-item-2", "list-item-3"]);
+    expect(parent.querySelector('[data-mira-block-id="line-1"]')).toBeNull();
+
+    view.destroy();
+    parent.remove();
+  });
+
+  it("left-clicks a handle to highlight the affected range without selecting text", async () => {
+    const parent = document.createElement("div");
+    document.body.append(parent);
+    const view = new EditorView({
+      doc: "# One\n\nBody\n\n# Two",
+      extensions: [
+        createRichEditorExtensions({
+          blockControls: true,
+          livePreview: false,
+        }),
+      ],
+      parent,
+    });
+
+    await nextFrame();
+
+    const handle = parent.querySelector<HTMLButtonElement>(
+      '[data-mira-block-id="line-1"]',
+    )!;
+    handle.dispatchEvent(
+      new MouseEvent("click", { bubbles: true, cancelable: true }),
+    );
+    await nextFrame();
+
+    expect(view.state.selection.main.empty).toBe(true);
+    expect(parent.querySelector(".mira-block-menu[hidden]")).not.toBeNull();
+    expect(parent.querySelectorAll(".mira-block-affected-line")).toHaveLength(
+      3,
+    );
+    expect(
+      parent
+        .querySelector<HTMLButtonElement>('[data-mira-block-id="line-1"]')
+        ?.classList.contains("mira-block-handle--selected"),
+    ).toBe(true);
+
+    view.destroy();
+    parent.remove();
+  });
+
+  it("opens block actions from the handle context menu", async () => {
+    const parent = document.createElement("div");
+    document.body.append(parent);
+    const view = new EditorView({
+      doc: "Alpha\n\nBeta",
+      extensions: [
+        createRichEditorExtensions({
+          blockControls: true,
+          livePreview: false,
+        }),
+      ],
+      parent,
+    });
+
+    await nextFrame();
+
+    const handle = parent.querySelector<HTMLButtonElement>(
+      '[data-mira-block-id="line-1"]',
+    )!;
+    handle.dispatchEvent(
+      new MouseEvent("contextmenu", { bubbles: true, cancelable: true }),
+    );
+    await nextFrame();
+
+    const menu = parent.querySelector(".mira-block-menu");
+    expect(menu?.hasAttribute("hidden")).toBe(false);
+    expect(menu?.textContent).toContain("Duplicate");
+    expect(parent.querySelectorAll(".mira-block-affected-line")).toHaveLength(
+      1,
+    );
+
+    view.destroy();
+    parent.remove();
+  });
+
+  it("opens block actions from the keyboard context-menu shortcut", async () => {
+    const parent = document.createElement("div");
+    document.body.append(parent);
+    const view = new EditorView({
+      doc: "Alpha\n\nBeta",
+      extensions: [
+        createRichEditorExtensions({
+          blockControls: true,
+          livePreview: false,
+        }),
+      ],
+      parent,
+    });
+
+    await nextFrame();
+
+    const handle = parent.querySelector<HTMLButtonElement>(
+      '[data-mira-block-id="line-1"]',
+    )!;
+    handle.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        bubbles: true,
+        cancelable: true,
+        key: "F10",
+        shiftKey: true,
+      }),
+    );
+    await nextFrame();
+
+    const menu = parent.querySelector(".mira-block-menu");
+    expect(menu?.hasAttribute("hidden")).toBe(false);
+    expect(menu?.textContent).toContain("Delete");
+
+    view.destroy();
+    parent.remove();
+  });
 });

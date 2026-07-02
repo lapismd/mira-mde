@@ -62,6 +62,21 @@ export type MiraMarkdownBlockRange = MiraTextRange & {
   text: string;
 };
 
+export type MiraMarkdownBlockHandleRole =
+  | "block"
+  | "heading-section"
+  | "list-item";
+
+export type MiraMarkdownBlockHandle = {
+  id: string;
+  role: MiraMarkdownBlockHandleRole;
+  handleRange: MiraMarkdownBlockRange;
+  affectedRange: MiraMarkdownBlockRange;
+  headingLevel?: number;
+  listIndent?: number;
+  parentId?: string;
+};
+
 export type MiraTemplateSelection =
   | number
   | {
@@ -145,6 +160,8 @@ export type MiraToolbarItem = {
 export type MiraBlockActionContext = MiraExtensionRuntimeContext & {
   block: MiraMarkdownBlockRange;
   blocks: MiraMarkdownBlockRange[];
+  handle?: MiraMarkdownBlockHandle;
+  affectedRange?: MiraMarkdownBlockRange;
   selection: MiraTextRange | null;
   sourcePath?: string;
   replaceRange: (

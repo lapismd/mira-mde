@@ -88,12 +88,17 @@ export {
   isExternalMarkdownLink,
 } from "./utils/links";
 export {
+  collectMarkdownBlockHandles,
   collectMarkdownBlockRanges,
+  deleteMarkdownBlockHandle,
   deleteMarkdownBlockRange,
+  duplicateMarkdownBlockHandle,
   duplicateMarkdownBlockRange,
   markdownBlockAt,
+  moveMarkdownBlockHandle,
   moveMarkdownBlockRange,
   replaceMarkdownRange,
+  type MiraMarkdownBlockHandleMoveTarget,
   type MiraMarkdownBlockMoveTarget,
 } from "./block-ranges";
 

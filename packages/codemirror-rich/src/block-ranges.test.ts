@@ -2,9 +2,11 @@ import { EditorState } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
 import { describe, expect, it } from "vitest";
 import {
+  collectMarkdownBlockHandles,
   collectMarkdownBlockRanges,
   deleteMarkdownBlockRange,
   duplicateMarkdownBlockRange,
+  moveMarkdownBlockHandle,
   moveMarkdownBlockRange,
 } from "./block-ranges";
 
@@ -107,6 +109,83 @@ directive
   });
 });
 
+describe("collectMarkdownBlockHandles", () => {
+  it("expands heading handles to their section subtree", () => {
+    const handles = collectMarkdownBlockHandles(
+      state(`# One
+
+Intro
+
+## Two
+
+Nested
+
+# Three
+
+Tail
+`),
+    );
+
+    const one = handles.find((handle) => handle.id === "line-1")!;
+    const two = handles.find((handle) => handle.id === "line-5")!;
+
+    expect(one.role).toBe("heading-section");
+    expect(one.headingLevel).toBe(1);
+    expect(one.affectedRange.text).toBe("# One\n\nIntro\n\n## Two\n\nNested");
+    expect(two.role).toBe("heading-section");
+    expect(two.headingLevel).toBe(2);
+    expect(two.affectedRange.text).toBe("## Two\n\nNested");
+  });
+
+  it("expands setext heading handles by heading level", () => {
+    const handles = collectMarkdownBlockHandles(
+      state(`Title
+=====
+
+Intro
+
+Next
+----
+
+Nested
+`),
+    );
+
+    const title = handles.find((handle) => handle.id === "line-1")!;
+    const next = handles.find((handle) => handle.id === "line-6")!;
+
+    expect(title.headingLevel).toBe(1);
+    expect(title.affectedRange.text).toBe(
+      "Title\n=====\n\nIntro\n\nNext\n----\n\nNested\n",
+    );
+    expect(next.headingLevel).toBe(2);
+    expect(next.affectedRange.text).toBe("Next\n----\n\nNested\n");
+  });
+
+  it("creates one handle for each list item with nested affected ranges", () => {
+    const handles = collectMarkdownBlockHandles(
+      state(`- parent
+  continuation
+  - child
+    nested
+- sibling
+`),
+    ).filter((handle) => handle.role === "list-item");
+
+    expect(handles.map((handle) => handle.id)).toEqual([
+      "list-item-1",
+      "list-item-3",
+      "list-item-5",
+    ]);
+    expect(handles[0]?.affectedRange.text).toBe(
+      "- parent\n  continuation\n  - child\n    nested",
+    );
+    expect(handles[1]?.parentId).toBe("list-item-1");
+    expect(handles[1]?.affectedRange.text).toBe("  - child\n    nested");
+    expect(handles[2]?.listIndent).toBe(0);
+  });
+});
+
 describe("Markdown block mutations", () => {
   it("moves blocks while preserving blank-line separation", () => {
     const editor = createView("# One\n\nAlpha\n\nBeta\n");
@@ -143,6 +222,110 @@ describe("Markdown block mutations", () => {
     deleteMarkdownBlockRange(editor.view, beta);
 
     expect(editor.view.state.doc.toString()).toBe("Alpha\n\nGamma\n");
+    editor.destroy();
+  });
+
+  it("moves heading handles as whole sections", () => {
+    const editor = createView(`# One
+
+Intro
+
+## Two
+
+Nested
+
+# Three
+`);
+    const handles = collectMarkdownBlockHandles(editor.view.state);
+    const one = handles.find((handle) => handle.id === "line-1")!;
+    const three = handles.find((handle) => handle.id === "line-9")!;
+
+    expect(
+      moveMarkdownBlockHandle(editor.view, one, {
+        handle: three,
+        position: "after",
+      }),
+    ).toBe(true);
+    expect(editor.view.state.doc.toString()).toBe(`# Three
+
+# One
+
+Intro
+
+## Two
+
+Nested
+`);
+    editor.destroy();
+  });
+
+  it("moves list item subtrees before and after siblings without blank separators", () => {
+    const editor = createView("- one\n- two\n  - child\n- three\n");
+    const handles = collectMarkdownBlockHandles(editor.view.state);
+    const two = handles.find((handle) => handle.id === "list-item-2")!;
+    const one = handles.find((handle) => handle.id === "list-item-1")!;
+
+    expect(
+      moveMarkdownBlockHandle(editor.view, two, {
+        handle: one,
+        position: "before",
+      }),
+    ).toBe(true);
+    expect(editor.view.state.doc.toString()).toBe(
+      "- two\n  - child\n- one\n- three\n",
+    );
+    editor.destroy();
+  });
+
+  it("moves list items inside other list items and normalizes indentation", () => {
+    const editor = createView("- parent\n- child\n");
+    const handles = collectMarkdownBlockHandles(editor.view.state);
+    const child = handles.find((handle) => handle.id === "list-item-2")!;
+    const parent = handles.find((handle) => handle.id === "list-item-1")!;
+
+    expect(
+      moveMarkdownBlockHandle(editor.view, child, {
+        handle: parent,
+        position: "inside",
+      }),
+    ).toBe(true);
+    expect(editor.view.state.doc.toString()).toBe("- parent\n  - child\n");
+    editor.destroy();
+  });
+
+  it("normalizes nested list items to top-level when moved outside lists", () => {
+    const editor = createView("Intro\n\n- parent\n  - child\n\nOutro\n");
+    const handles = collectMarkdownBlockHandles(editor.view.state);
+    const child = handles.find((handle) => handle.id === "list-item-4")!;
+    const outro = handles.find((handle) => handle.id === "line-6")!;
+
+    expect(
+      moveMarkdownBlockHandle(editor.view, child, {
+        handle: outro,
+        position: "before",
+      }),
+    ).toBe(true);
+    expect(editor.view.state.doc.toString()).toBe(
+      "Intro\n\n- parent\n\n- child\n\nOutro\n",
+    );
+    editor.destroy();
+  });
+
+  it("rejects moving a handle into its own affected range", () => {
+    const editor = createView("- parent\n  - child\n- sibling\n");
+    const handles = collectMarkdownBlockHandles(editor.view.state);
+    const parent = handles.find((handle) => handle.id === "list-item-1")!;
+    const child = handles.find((handle) => handle.id === "list-item-2")!;
+
+    expect(
+      moveMarkdownBlockHandle(editor.view, parent, {
+        handle: child,
+        position: "inside",
+      }),
+    ).toBe(false);
+    expect(editor.view.state.doc.toString()).toBe(
+      "- parent\n  - child\n- sibling\n",
+    );
     editor.destroy();
   });
 });
