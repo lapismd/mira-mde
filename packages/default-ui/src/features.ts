@@ -1,11 +1,11 @@
 import { mermaidExtension } from "@mira-mde/plugin-mermaid";
 import type { Component } from "svelte";
 import type { MiraEditorSelection } from "@mira-mde/core";
-import type {
-  MiraExtension,
-  MiraMarkdownTemplate,
-  MiraMode,
-  MiraSlashCommand,
+import {
+  createSlashSnippet,
+  type MiraExtension,
+  type MiraMode,
+  type MiraSlashCommand,
 } from "@mira-mde/extensions";
 
 export type MiraDefaultEditMode = Extract<MiraMode, "live-preview" | "source">;
@@ -218,113 +218,111 @@ const defaultToolbarItems: MiraDefaultToolbarItem[] = [
 const defaultSlashCommands: Array<
   MiraSlashCommand & { id: MiraDefaultSlashCommandId }
 > = [
-  {
+  createSlashSnippet({
     id: "heading1",
     label: "Heading 1",
     description: "Large section heading",
     group: "Basic",
     keywords: ["h1", "title"],
-    insert: slashTemplate("# <|>"),
-  },
-  {
+    markdown: "# <|>",
+  }),
+  createSlashSnippet({
     id: "heading2",
     label: "Heading 2",
     description: "Section heading",
     group: "Basic",
     keywords: ["h2"],
-    insert: slashTemplate("## <|>"),
-  },
-  {
+    markdown: "## <|>",
+  }),
+  createSlashSnippet({
     id: "heading3",
     label: "Heading 3",
     description: "Subsection heading",
     group: "Basic",
     keywords: ["h3"],
-    insert: slashTemplate("### <|>"),
-  },
-  {
+    markdown: "### <|>",
+  }),
+  createSlashSnippet({
     id: "numberedList",
     label: "Numbered list",
     description: "Start an ordered list",
     group: "Basic",
     keywords: ["ordered list", "ol"],
-    insert: slashTemplate("1. <|>"),
-  },
-  {
+    markdown: "1. <|>",
+  }),
+  createSlashSnippet({
     id: "bulletList",
     label: "Bullet list",
     description: "Start an unordered list",
     group: "Basic",
     keywords: ["unordered list", "ul"],
-    insert: slashTemplate("- <|>"),
-  },
-  {
+    markdown: "- <|>",
+  }),
+  createSlashSnippet({
     id: "taskList",
     label: "Task list",
     description: "Start a checklist",
     group: "Basic",
     keywords: ["checkbox", "todo"],
-    insert: slashTemplate("- [ ] <|>"),
-  },
-  {
+    markdown: "- [ ] <|>",
+  }),
+  createSlashSnippet({
     id: "quote",
     label: "Blockquote",
     description: "Start a quote block",
     group: "Basic",
     keywords: ["quote"],
-    insert: slashTemplate("> <|>"),
-  },
-  {
+    markdown: "> <|>",
+  }),
+  createSlashSnippet({
     id: "callout",
     label: "Callout",
     description: "Insert an Obsidian-style callout",
     group: "Basic",
     keywords: ["admonition", "note"],
-    insert: slashTemplate("> [!note] <|>\n> "),
-  },
-  {
+    markdown: "> [!note] <|>\n> ",
+  }),
+  createSlashSnippet({
     id: "code",
     label: "Code block",
     description: "Insert a fenced code block",
     group: "Blocks",
     keywords: ["fence", "pre"],
-    insert: slashTemplate("```\n<|>\n```"),
-  },
-  {
+    markdown: "```\n<|>\n```",
+  }),
+  createSlashSnippet({
     id: "math",
     label: "Math block",
     description: "Insert a KaTeX block",
     group: "Blocks",
     keywords: ["katex", "latex", "equation"],
-    insert: slashTemplate("$$\n<|>\n$$"),
-  },
-  {
+    markdown: "$$\n<|>\n$$",
+  }),
+  createSlashSnippet({
     id: "table",
     label: "Table",
     description: "Insert a pipe table",
     group: "Blocks",
     keywords: ["pipe table"],
-    insert: "| Column | Value |\n| --- | --- |\n| Item | Detail |\n",
-  },
-  {
+    markdown: "| Column | Value |\n| --- | --- |\n| Item | Detail |\n",
+  }),
+  createSlashSnippet({
     id: "gridTable",
     label: "Grid table",
     description: "Insert a grid table",
     group: "Blocks",
     keywords: ["rst table"],
-    insert:
+    markdown:
       "+--------+--------+\n| Column | Value  |\n+========+========+\n| Item   | Detail |\n+--------+--------+\n",
-  },
-  {
+  }),
+  createSlashSnippet({
     id: "mermaid",
     label: "Mermaid diagram",
     description: "Insert a Mermaid fenced block",
     group: "Blocks",
     keywords: ["diagram", "flowchart"],
-    insert: slashTemplate(
-      "```mermaid\nflowchart TD\n  <|>A[Start] --> B[Done]\n```\n",
-    ),
-  },
+    markdown: "```mermaid\nflowchart TD\n  <|>A[Start] --> B[Done]\n```\n",
+  }),
 ];
 
 export function resolveMiraDefaultFeatures(
@@ -529,18 +527,4 @@ function isSlashCommandAvailable(
     case "math":
       return features[MiraFeature.Math];
   }
-}
-
-function slashTemplate(markdown: string): MiraMarkdownTemplate {
-  const marker = "<|>";
-  const selection = markdown.indexOf(marker);
-
-  if (selection === -1) {
-    return { markdown };
-  }
-
-  return {
-    markdown: markdown.replace(marker, ""),
-    selection,
-  };
 }

@@ -42,12 +42,17 @@ import { tagHighlighter, tags } from "@lezer/highlight";
 
 export {
   applyMarkdownTemplate,
+  createMarkdownTemplate,
   createSlashCommandCompletionSource,
   createSlashCommandExtensions,
+  createSlashSnippet,
   type MiraMarkdownTemplate,
   type MiraSlashCommand,
   type MiraSlashCommandContext,
   type MiraSlashCommandOptions,
+  type MiraSlashCommandTriggerScope,
+  type MiraSlashCommandUi,
+  type MiraSlashSnippetOptions,
   type MiraTemplateSelection,
   type MiraTextRange,
 } from "./slash-commands";

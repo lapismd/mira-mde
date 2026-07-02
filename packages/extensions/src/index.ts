@@ -72,6 +72,47 @@ export type MiraSlashCommand = {
   run?: (context: MiraSlashCommandContext) => void;
 };
 
+export type MiraSlashSnippetOptions<TId extends string = string> = {
+  id: TId;
+  label: string;
+  description?: string;
+  group?: string;
+  keywords?: string[];
+  boost?: number;
+  markdown: string;
+  marker?: string;
+};
+
+export function createMarkdownTemplate(
+  markdown: string,
+  marker = "<|>",
+): MiraMarkdownTemplate {
+  if (!marker) {
+    return { markdown };
+  }
+
+  const selection = markdown.indexOf(marker);
+  if (selection === -1) {
+    return { markdown };
+  }
+
+  return {
+    markdown: markdown.replace(marker, ""),
+    selection,
+  };
+}
+
+export function createSlashSnippet<TId extends string = string>(
+  options: MiraSlashSnippetOptions<TId>,
+): MiraSlashCommand & { id: TId } {
+  const { markdown, marker, ...command } = options;
+
+  return {
+    ...command,
+    insert: createMarkdownTemplate(markdown, marker),
+  };
+}
+
 export type MiraToolbarItem = {
   id: string;
   label: string;

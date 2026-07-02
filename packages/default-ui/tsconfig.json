@@ -2,6 +2,10 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "allowArbitraryExtensions": true,
+    "baseUrl": ".",
+    "paths": {
+      "@mira-mde/extensions": ["../extensions/src/index.ts"]
+    },
     "types": ["svelte", "vitest/globals"]
   },
   "include": ["src/**/*.ts", "src/**/*.svelte"]

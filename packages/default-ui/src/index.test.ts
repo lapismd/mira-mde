@@ -146,6 +146,17 @@ describe("default UI feature resolution", () => {
     ).not.toContain("table");
   });
 
+  it("uses markdown templates for default slash command cursor placement", () => {
+    expect(
+      resolveMiraDefaultSlashCommands().find(
+        (command) => command.id === "heading1",
+      )?.insert,
+    ).toEqual({
+      markdown: "# ",
+      selection: 2,
+    });
+  });
+
   it("supports custom slash commands", () => {
     expect(
       resolveMiraDefaultSlashCommands({

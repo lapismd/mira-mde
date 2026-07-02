@@ -4,6 +4,8 @@ description: Configure the default editor package with feature flags, callbacks,
 ---
 
 import FeatureToggleExample from "../../components/FeatureToggleExample.svelte";
+import LiveEditorExample from "../../components/LiveEditorExample.svelte";
+import { slashCommandsMarkdown } from "../../data/examples";
 
 The default UI package is the fastest way to embed Mira MDE. It combines the Svelte editor, Lapis-aligned Markdown preview, toolbar, Mermaid support, and mode controls.
 
@@ -131,6 +133,56 @@ Feature flags apply to the toolbar, extension setup, and valid mode list. A disa
 | `MiraFeature.LivePreviewMode` | Live preview mode availability.                |
 | `MiraFeature.PreviewMode`     | Reading/preview mode availability.             |
 | `MiraFeature.SplitMode`       | Split mode availability.                       |
+
+## Slash Commands
+
+The default editor enables a compact slash menu in source and live preview modes. Type `/` on an empty line to insert Markdown snippets for headings, lists, tasks, quotes, callouts, code, math, tables, grid tables, and Mermaid diagrams.
+
+<LiveEditorExample
+  client:only="svelte"
+  title="Slash commands"
+  description="Type slash on an empty line, filter the menu, and press enter to insert a snippet."
+  initialValue={slashCommandsMarkdown}
+  mode="live-preview"
+  height="18rem"
+  sourcePath="slash-commands.md"
+/>
+
+Disable built-in snippets by id, or disable all built-ins when an app provides its own list:
+
+```ts
+import { MiraFeature } from "@mira-mde/default-ui";
+
+const featureConfigs = {
+  [MiraFeature.SlashCommands]: {
+    disableDefaultCommands: ["table", "gridTable"],
+  },
+};
+```
+
+Custom snippets use the shared helper from `@mira-mde/extensions`. The `<|>` marker is removed before insertion and becomes the cursor position.
+
+```ts
+import { createSlashSnippet } from "@mira-mde/extensions";
+import { MiraFeature } from "@mira-mde/default-ui";
+
+const featureConfigs = {
+  [MiraFeature.SlashCommands]: {
+    commands: [
+      createSlashSnippet({
+        id: "decision",
+        label: "Decision",
+        description: "Insert a decision callout",
+        group: "Project",
+        keywords: ["adr", "choice"],
+        markdown: "> [!note] Decision\n> <|>",
+      }),
+    ],
+  },
+};
+```
+
+Commands can still provide a `run(context)` callback for advanced editor-only behavior, but the default UI only ships portable Markdown snippets.
 
 ## Imperative Handle
 

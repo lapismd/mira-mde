@@ -32,6 +32,43 @@ test("renders toolbar docs with custom toolbar actions", async ({ page }) => {
   await expect(page.locator(".docs-live-editor__reset")).toHaveCount(0);
 });
 
+test("renders slash commands from the custom popover", async ({ page }) => {
+  await page.goto("/default-editor/");
+
+  const example = page.locator(".docs-live-editor").last();
+  await expect(example.locator(".mira-default-ui")).toHaveAttribute(
+    "data-mode",
+    "live-preview",
+  );
+
+  await example.locator(".cm-content").click();
+  await page.keyboard.type("/h");
+  await expect(example.locator(".mira-slash-menu")).toBeVisible();
+  await expect(
+    example.locator(".mira-slash-menu__item-title", { hasText: "Heading 1" }),
+  ).toBeVisible();
+
+  await page.keyboard.press("Enter");
+  await page.keyboard.type("Draft title");
+
+  await expect(example.locator(".mira-slash-menu")).toHaveCount(0);
+  await expect(example.locator(".cm-content")).toContainText("# Draft title");
+});
+
+test("does not render slash commands for URLs, paths, or prose", async ({
+  page,
+}) => {
+  for (const text of ["https://", "notes/", "word /"]) {
+    await page.goto("/default-editor/");
+    const example = page.locator(".docs-live-editor").last();
+
+    await example.locator(".cm-content").click();
+    await page.keyboard.type(text);
+
+    await expect(example.locator(".mira-slash-menu")).toHaveCount(0);
+  }
+});
+
 test("documents the supported Markdown feature set", async ({ page }) => {
   await page.goto("/markdown/");
 

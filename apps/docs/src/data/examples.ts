@@ -115,3 +115,5 @@ flowchart LR
   Extensions --> Editor
 ~~~
 `;
+
+export const slashCommandsMarkdown = "";
