@@ -9,11 +9,22 @@ import type {
   MiraAssetResolver,
   MiraExtension,
   MiraFileAdapter,
+  MiraImageConfig,
   MiraLinkResolver,
   MiraMode,
   MiraTheme,
   MiraThemeConfig,
 } from "@mira-mde/extensions";
+export {
+  createImageDropPasteExtension,
+  createImageMarkdown,
+  defaultMiraImageMaxSizeBytes,
+  defaultMiraImageMimeTypes,
+  insertImageFiles,
+  openImageFilePicker,
+  resolveMiraImageConfig,
+} from "./images";
+export type { ResolvedMiraImageConfig } from "./images";
 
 export type MiraEditorPosition = {
   line: number;
@@ -39,6 +50,7 @@ export type MiraEditorOptions = {
   linkResolver?: MiraLinkResolver;
   assetResolver?: MiraAssetResolver;
   fileAdapter?: MiraFileAdapter;
+  imageConfig?: MiraImageConfig;
   frontmatterOpen?: boolean;
   frontmatterConfig?: unknown;
   onChange?: (value: string, change: MiraEditorChange) => void;

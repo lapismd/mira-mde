@@ -8,6 +8,7 @@
   import EllipsisIcon from "@lucide/svelte/icons/ellipsis";
   import FileCodeIcon from "@lucide/svelte/icons/file-code";
   import Heading1Icon from "@lucide/svelte/icons/heading-1";
+  import ImageIcon from "@lucide/svelte/icons/image";
   import ItalicIcon from "@lucide/svelte/icons/italic";
   import LinkIcon from "@lucide/svelte/icons/link";
   import ListIcon from "@lucide/svelte/icons/list";
@@ -70,6 +71,7 @@
     class: className = "",
     onModeChange,
     onInsertMarkdown,
+    onInsertImage,
     onIndentGuidesChange,
     onIndentWidthChange,
     onIndentWithTabsChange,
@@ -131,6 +133,7 @@
     bulletList: ListIcon,
     taskList: ListChecksIcon,
     link: LinkIcon,
+    image: ImageIcon,
     table: Table2Icon,
     gridTable: TableCellsSplitIcon,
     code: CodeIcon,
@@ -189,6 +192,9 @@
       getSelection: () => null,
       insertMarkdown(markdown) {
         onInsertMarkdown?.(markdown);
+      },
+      insertImage() {
+        onInsertImage?.();
       },
       setIndentGuides(nextEnabled) {
         indentGuides = nextEnabled;
@@ -430,6 +436,10 @@
   });
 
   function insertTemplate(item: MiraDefaultToolbarItem): void {
+    if (item === "image" && actionContext().insertImage) {
+      actionContext().insertImage?.();
+      return;
+    }
     const markdown = templateForMiraToolbarItem(item);
     if (markdown) {
       actionContext().insertMarkdown(markdown);
@@ -443,7 +453,7 @@
     <DropdownMenu.Root>
       <Tooltip.Root>
         <Tooltip.Trigger>
-          {#snippet child({ props })}
+          {#snippet child({ props }: { props: Record<string, unknown> })}
             <DropdownMenu.Trigger
               {...props}
               class="mira-toolbar__button"
@@ -486,7 +496,7 @@
   {:else}
     <Tooltip.Root>
       <Tooltip.Trigger>
-        {#snippet child({ props })}
+        {#snippet child({ props }: { props: Record<string, unknown> })}
           {@const triggerProps = withTooltipClickHandler(
             props,
             handleToolbarActionButtonClick,
@@ -523,7 +533,7 @@
   {@const ToggleIcon = viewToggleIcon()}
   <Tooltip.Root>
     <Tooltip.Trigger>
-      {#snippet child({ props })}
+      {#snippet child({ props }: { props: Record<string, unknown> })}
         {@const triggerProps = withTooltipClickHandler(props, () =>
           handleViewToggle(),
         )}
@@ -542,7 +552,7 @@
 {#snippet renderSplitModeButton()}
   <Tooltip.Root>
     <Tooltip.Trigger>
-      {#snippet child({ props })}
+      {#snippet child({ props }: { props: Record<string, unknown> })}
         {@const triggerProps = withTooltipClickHandler(props, () =>
           switchToSplitMode(),
         )}
@@ -563,7 +573,7 @@
   <DropdownMenu.Root>
     <Tooltip.Root>
       <Tooltip.Trigger>
-        {#snippet child({ props })}
+        {#snippet child({ props }: { props: Record<string, unknown> })}
           <DropdownMenu.Trigger
             {...props}
             class="mira-toolbar__button"
@@ -671,7 +681,7 @@
             {@const Icon = toolbarItemIcons[item]}
             <Tooltip.Root>
               <Tooltip.Trigger>
-                {#snippet child({ props })}
+                {#snippet child({ props }: { props: Record<string, unknown> })}
                   {@const triggerProps = withTooltipClickHandler(props, () =>
                     insertTemplate(item),
                   )}

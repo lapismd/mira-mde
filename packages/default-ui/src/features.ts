@@ -47,6 +47,7 @@ export type MiraDefaultToolbarItem =
   | "bulletList"
   | "taskList"
   | "link"
+  | "image"
   | "table"
   | "gridTable"
   | "code"
@@ -65,6 +66,7 @@ export type MiraDefaultToolbarActionContext = {
   getIndentWithTabs?: () => boolean;
   getSelection: () => MiraEditorSelection | null;
   insertMarkdown: (markdown: string) => void;
+  insertImage?: () => void;
   setIndentGuides?: (enabled: boolean) => void;
   setIndentWidth?: (width: number) => void;
   setIndentWithTabs?: (enabled: boolean) => void;
@@ -215,6 +217,7 @@ const defaultToolbarItems: MiraDefaultToolbarItem[] = [
   "bulletList",
   "taskList",
   "link",
+  "image",
   "table",
   "gridTable",
   "code",
@@ -488,6 +491,8 @@ function isToolbarItemAvailable(
       return features[MiraFeature.Lists];
     case "link":
       return features[MiraFeature.Links];
+    case "image":
+      return features[MiraFeature.Images];
     case "table":
       return features[MiraFeature.Tables];
     case "gridTable":

@@ -1,0 +1,31 @@
+.mira-markdown-outline {
+  color: var(--mira-muted-foreground);
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.mira-markdown-outline ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.mira-markdown-outline li {
+  margin: 0;
+  padding: 0 0 0 calc((var(--mira-outline-level, 1) - 1) * 0.875rem);
+}
+
+.mira-markdown-outline a {
+  color: inherit;
+  display: block;
+  overflow: hidden;
+  padding: 0.1875rem 0;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mira-markdown-outline a:hover,
+.mira-markdown-outline a:focus {
+  color: var(--mira-foreground);
+}

@@ -75,6 +75,7 @@ const defaultToolbarItems: MiraDefaultToolbarItem[] = [
   "bulletList",
   "taskList",
   "link",
+  "image",
   "table",
   "gridTable",
   "code",
@@ -233,6 +234,8 @@ function isToolbarItemAvailable(
       return features[MiraFeature.Lists];
     case "link":
       return features[MiraFeature.Links];
+    case "image":
+      return features[MiraFeature.Images];
     case "table":
       return features[MiraFeature.Tables];
     case "gridTable":

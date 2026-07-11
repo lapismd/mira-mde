@@ -8,6 +8,7 @@ import {
   Ellipsis,
   FileCode,
   Heading1,
+  Image,
   Italic,
   Link,
   List,
@@ -83,6 +84,7 @@ const toolbarItemIcons: Record<MiraDefaultToolbarItem, MiraReactIcon> = {
   bulletList: List,
   taskList: ListChecks,
   link: Link,
+  image: Image,
   table: Table2,
   gridTable: TableCellsSplit,
   code: Code,
@@ -105,6 +107,7 @@ export function MiraDefaultToolbar({
   onIndentWidthChange,
   onIndentWithTabsChange,
   onInsertMarkdown,
+  onInsertImage,
   onModeChange,
   readonly = false,
   showModeSwitch = true,
@@ -206,6 +209,9 @@ export function MiraDefaultToolbar({
       insertMarkdown(markdown) {
         onInsertMarkdown?.(markdown);
       },
+      insertImage() {
+        onInsertImage?.();
+      },
       setIndentGuides(nextEnabled) {
         setLocalIndentGuides(nextEnabled);
         onIndentGuidesChange?.(nextEnabled);
@@ -236,6 +242,7 @@ export function MiraDefaultToolbar({
       onIndentGuidesChange,
       onIndentWidthChange,
       onIndentWithTabsChange,
+      onInsertImage,
       onInsertMarkdown,
       onModeChange,
       readonly,
@@ -464,9 +471,11 @@ export function MiraDefaultToolbar({
                   disabled={readonly}
                   key={item}
                   onClick={() =>
-                    actionContext().insertMarkdown(
-                      templateForMiraToolbarItem(item),
-                    )
+                    item === "image" && actionContext().insertImage
+                      ? actionContext().insertImage()
+                      : actionContext().insertMarkdown(
+                          templateForMiraToolbarItem(item),
+                        )
                   }
                   title={miraDefaultToolbarItemLabels[item]}
                   type="button"

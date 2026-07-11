@@ -105,6 +105,9 @@ export function createMiraDefaultEditor(
     insertMarkdown(markdown) {
       component.insertMarkdown(markdown);
     },
+    insertImage() {
+      component.insertImage();
+    },
     on(event, handler) {
       listeners[event].add(handler as never);
       return () => {

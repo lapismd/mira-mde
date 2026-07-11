@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { MiraFileRef } from "@mira-mde/extensions";
   import { useMarkdownContext } from "../renderer/context.svelte";
+  import { isImageDataUri } from "../remark";
 
   type Props = {
     src?: string;
@@ -14,12 +15,13 @@
   let adapterSrc = $state<string | null>(null);
   const resolvedSrc = $derived(
     adapterSrc ??
-      markdown.assetResolver?.({
-        src,
-        alt,
-        sourcePath: markdown.sourcePath,
-      }) ??
-      src,
+      (isImageDataUri(src)
+        ? src
+        : (markdown.assetResolver?.({
+            src,
+            alt,
+            sourcePath: markdown.sourcePath,
+          }) ?? src)),
   );
 
   $effect(() => {

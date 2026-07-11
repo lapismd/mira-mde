@@ -3,6 +3,7 @@
   import rehypeHighlight from "rehype-highlight";
   import rehypeKatex from "rehype-katex";
   import rehypeRaw from "rehype-raw";
+  import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
   import remarkGridTables from "@adobe/remark-gridtables";
   import {
     TYPE_TABLE,
@@ -12,6 +13,7 @@
   import remarkFrontmatter from "remark-frontmatter";
   import remarkGfm from "remark-gfm";
   import remarkMath from "remark-math";
+  import remarkEmoji from "remark-emoji";
   import type {
     MiraAssetResolver,
     MiraExtension,
@@ -66,6 +68,10 @@
     fileAdapter?: MiraFileAdapter;
     frontmatterOpen?: boolean;
     frontmatterConfig?: FrontmatterConfig;
+    headingIds?: boolean;
+    headingIdPrefix?: string;
+    htmlPolicy?: "trusted" | "safe";
+    emoji?: boolean;
     dialog?: boolean;
     onChange?: (replacement: string, from: number, to: number) => void;
     onFrontmatterChange?: (nextYaml: string, nextValue: string) => void;
@@ -92,6 +98,10 @@
     fileAdapter,
     frontmatterOpen = true,
     frontmatterConfig,
+    headingIds = false,
+    headingIdPrefix = "",
+    htmlPolicy = "trusted",
+    emoji = false,
     dialog = false,
     onChange,
     onFrontmatterChange,
@@ -126,6 +136,7 @@
     remarkDirective,
     remarkGridTables,
     remarkGfm,
+    ...(emoji ? [remarkEmoji] : []),
     remarkMultimarkdownTable,
     remarkCustomChecklists,
     remarkListCallouts,
@@ -135,18 +146,48 @@
     remarkPathLinks,
     remarkExternalLinks,
     remarkTags,
-    remarkHeadings,
+    [remarkHeadings, { ids: headingIds, prefix: headingIdPrefix }],
     remarkDirectivesToHast,
     remarkFrontmatterToHast,
     remarkPositionsToData,
     ...resolvedExtensions.remarkPlugins,
   ]);
 
+  const miraSanitizeSchema = {
+    ...defaultSchema,
+    attributes: {
+      ...defaultSchema.attributes,
+      "*": [
+        ...(defaultSchema.attributes?.["*"] ?? []),
+        "class",
+        "data-heading",
+        "data-line",
+        "data-sourcepos",
+      ],
+      img: [...(defaultSchema.attributes?.img ?? []), "src", "alt", "title"],
+      a: [
+        ...(defaultSchema.attributes?.a ?? []),
+        "href",
+        "title",
+        "target",
+        "rel",
+      ],
+    },
+    protocols: {
+      ...defaultSchema.protocols,
+      href: ["http", "https", "mailto", "tel"],
+      src: ["http", "https", "data"],
+    },
+  };
+
   const rehypePlugins = $derived<Pluggable[]>([
     rehypeCodeContext,
     rehypeTableSpans,
     ...(highlight ? [rehypeHighlight, rehypeHighlightLines] : []),
     rehypeRaw,
+    ...(htmlPolicy === "safe"
+      ? ([[rehypeSanitize, miraSanitizeSchema]] as Pluggable[])
+      : []),
     rehypeKatex,
     ...resolvedExtensions.rehypePlugins,
   ]);

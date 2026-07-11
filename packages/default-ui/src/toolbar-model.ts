@@ -25,6 +25,7 @@ export const miraDefaultToolbarItemLabels: Record<
   bulletList: "Bullet list",
   taskList: "Task list",
   link: "Link",
+  image: "Image",
   table: "Table",
   gridTable: "Grid table",
   code: "Code block",
@@ -163,6 +164,8 @@ export function templateForMiraToolbarItem(
       return "- [ ] Task";
     case "link":
       return "[label](https://example.com)";
+    case "image":
+      return "![alt](https://example.com/image.png)";
     case "table":
       return "\n| Column | Value |\n| --- | --- |\n| Item | Detail |\n";
     case "gridTable":

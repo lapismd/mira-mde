@@ -38,8 +38,14 @@
     linkResolver,
     assetResolver,
     fileAdapter,
+    imageConfig,
     frontmatterOpen = true,
     frontmatterConfig,
+    headingIds = false,
+    headingIdPrefix = "",
+    htmlPolicy = "trusted",
+    emoji = false,
+    outline = false,
     onChange,
     onModeChange,
     onReadonlyChange,
@@ -109,6 +115,7 @@
       getMarkdown,
       getMode,
       getSelection,
+      insertImage,
       insertMarkdown,
       setIndentGuides: applyIndentGuides,
       setIndentWidth: applyIndentWidth,
@@ -160,6 +167,10 @@
 
   export function insertMarkdown(markdown: string): void {
     editor?.insertMarkdown(markdown);
+  }
+
+  export function insertImage(): void {
+    editor?.insertImage();
   }
 
   $effect(() => {
@@ -218,8 +229,14 @@
       {linkResolver}
       {assetResolver}
       {fileAdapter}
+      {imageConfig}
       frontmatterOpen={resolvedFeatures[MiraFeature.Frontmatter] &&
         frontmatterOpen}
+      {headingIds}
+      {headingIdPrefix}
+      {htmlPolicy}
+      {emoji}
+      {outline}
       onChange={handleChange}
       {onFrontmatterChange}
     />

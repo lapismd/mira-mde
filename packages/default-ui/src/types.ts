@@ -3,6 +3,7 @@ import type {
   MiraAssetResolver,
   MiraExtension,
   MiraFileAdapter,
+  MiraImageConfig,
   MiraLinkResolver,
   MiraMode,
   MiraTheme,
@@ -49,8 +50,14 @@ export type MiraDefaultMdeProps = {
   linkResolver?: MiraLinkResolver;
   assetResolver?: MiraAssetResolver;
   fileAdapter?: MiraFileAdapter;
+  imageConfig?: MiraImageConfig;
   frontmatterOpen?: boolean;
   frontmatterConfig?: MiraFrontmatterConfig;
+  headingIds?: boolean;
+  headingIdPrefix?: string;
+  htmlPolicy?: "trusted" | "safe";
+  emoji?: boolean;
+  outline?: boolean;
   onChange?: (value: string) => void;
   onModeChange?: (mode: MiraMode) => void;
   onReadonlyChange?: (readonly: boolean) => void;
@@ -78,6 +85,7 @@ export type MiraDefaultToolbarProps = {
   context?: MiraDefaultToolbarActionContext;
   onModeChange?: (mode: MiraMode) => void;
   onInsertMarkdown?: (markdown: string) => void;
+  onInsertImage?: () => void;
   onIndentGuidesChange?: (enabled: boolean) => void;
   onIndentWidthChange?: (width: number) => void;
   onIndentWithTabsChange?: (enabled: boolean) => void;
@@ -106,6 +114,7 @@ export type MiraDefaultEditor = {
   getMarkdown: () => string;
   getMode: () => MiraMode;
   getSelection: () => MiraEditorSelection | null;
+  insertImage: () => void;
   insertMarkdown: (markdown: string) => void;
   on: <EventName extends MiraDefaultEditorEventName>(
     event: EventName,

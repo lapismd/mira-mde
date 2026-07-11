@@ -11,6 +11,7 @@ const noInsertItems: MiraFeatureFlags = {
   [MiraFeature.Headings]: false,
   [MiraFeature.Lists]: false,
   [MiraFeature.Links]: false,
+  [MiraFeature.Images]: false,
   [MiraFeature.Tables]: false,
   [MiraFeature.GridTables]: false,
   [MiraFeature.Code]: false,

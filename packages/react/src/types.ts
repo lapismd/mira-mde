@@ -3,6 +3,7 @@ import type {
   MiraAssetResolver,
   MiraExtension,
   MiraFileAdapter,
+  MiraImageConfig,
   MiraLinkResolver,
   MiraMode,
   MiraTheme,
@@ -32,6 +33,7 @@ export type MiraMdeHandle = {
   getMarkdown: () => string;
   getMode: () => MiraMode;
   getSelection: () => MiraEditorSelection | null;
+  insertImage: () => void;
   insertMarkdown: (markdown: string) => void;
   setMarkdown: (markdown: string) => void;
   setMode: (mode: MiraMode) => void;
@@ -62,8 +64,14 @@ export type MiraMdeProps = {
   linkResolver?: MiraLinkResolver;
   assetResolver?: MiraAssetResolver;
   fileAdapter?: MiraFileAdapter;
+  imageConfig?: MiraImageConfig;
   frontmatterOpen?: boolean;
   frontmatterConfig?: MiraFrontmatterConfig;
+  headingIds?: boolean;
+  headingIdPrefix?: string;
+  htmlPolicy?: "trusted" | "safe";
+  emoji?: boolean;
+  outline?: boolean;
   onChange?: (value: string) => void;
   onModeChange?: (mode: MiraMode) => void;
   onReadonlyChange?: (readonly: boolean) => void;
@@ -106,6 +114,7 @@ export type MiraDefaultToolbarItem =
   | "bulletList"
   | "taskList"
   | "link"
+  | "image"
   | "table"
   | "gridTable"
   | "code"
@@ -123,6 +132,7 @@ export type MiraDefaultToolbarActionContext = {
   getMarkdown: () => string;
   getMode: () => MiraMode;
   getSelection: () => MiraEditorSelection | null;
+  insertImage: () => void;
   insertMarkdown: (markdown: string) => void;
   setIndentGuides?: (enabled: boolean) => void;
   setIndentWidth?: (width: number) => void;
@@ -237,6 +247,7 @@ export type MiraDefaultToolbarProps = {
   context?: MiraDefaultToolbarActionContext;
   onModeChange?: (mode: MiraMode) => void;
   onInsertMarkdown?: (markdown: string) => void;
+  onInsertImage?: () => void;
   onIndentGuidesChange?: (enabled: boolean) => void;
   onIndentWidthChange?: (width: number) => void;
   onIndentWithTabsChange?: (enabled: boolean) => void;

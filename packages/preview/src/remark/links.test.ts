@@ -60,6 +60,8 @@ describe("link parity plugins", () => {
   it("classifies external and local path destinations like Lapis", () => {
     expect(isExternalMarkdownDestination("https://example.com")).toBe(true);
     expect(isExternalMarkdownDestination("//example.com")).toBe(true);
+    expect(isExternalMarkdownDestination("mailto:test@example.com")).toBe(true);
+    expect(isExternalMarkdownDestination("tel:+15555551212")).toBe(true);
     expect(isExternalMarkdownDestination("Project Plan.md")).toBe(false);
     expect(isLocalPathDestination("Project Plan.md")).toBe(true);
     expect(isLocalPathDestination("Project.md")).toBe(false);

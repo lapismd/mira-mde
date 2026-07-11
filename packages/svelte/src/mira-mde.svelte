@@ -9,11 +9,13 @@
   import { createRichEditorExtensions } from "@mira-mde/codemirror-rich";
   import { createTableExtensions } from "@mira-mde/codemirror-tables";
   import {
+    createImageDropPasteExtension,
     createMiraEditorController,
+    openImageFilePicker,
     type MiraEditorController,
   } from "@mira-mde/core";
   import { resolveMiraExtensions, type MiraMode } from "@mira-mde/extensions";
-  import { MarkdownPreview } from "@mira-mde/preview";
+  import { MarkdownOutline, MarkdownPreview } from "@mira-mde/preview";
   import { Button } from "@mira-mde/ui/button";
   import { Separator } from "@mira-mde/ui/separator";
   import * as ToggleGroup from "@mira-mde/ui/toggle-group";
@@ -39,8 +41,14 @@
     linkResolver,
     assetResolver,
     fileAdapter,
+    imageConfig,
     frontmatterOpen = true,
     frontmatterConfig,
+    headingIds = false,
+    headingIdPrefix = "",
+    htmlPolicy = "trusted",
+    emoji = false,
+    outline = false,
     onChange,
     onFrontmatterChange,
   }: MiraMdeProps = $props();
@@ -73,6 +81,11 @@
       indentWithTabs,
       indentWidth,
       sourcePath,
+      JSON.stringify({
+        max: imageConfig?.imageMaxSizeBytes,
+        mime: imageConfig?.imageMimeTypes,
+        syntax: imageConfig?.imageSyntax,
+      }),
       extensions.map((extension) => extension.name).join(","),
       resolvedExtensions.slashCommands
         .map((command) =>
@@ -118,6 +131,7 @@
         sourceMode: mode === "source",
       }),
       createTableExtensions(),
+      createImageDropPasteExtension(imageConfig),
       createRichEditorExtensions({
         blockActions: resolved.blockActions,
         blockControls: blockControls && mode !== "preview" && !readonly,
@@ -160,6 +174,7 @@
         focus: () => activeController.focus(),
         view: activeController.view,
         insertMarkdown,
+        insertImage,
       });
       if (typeof cleanup === "function") {
         cleanupExtensionMounts.push(cleanup);
@@ -207,6 +222,12 @@
   export function insertMarkdown(markdown: string): void {
     controller?.replaceSelection(markdown);
     controller?.focus();
+  }
+
+  export function insertImage(): void {
+    if (controller) {
+      openImageFilePicker(controller.view, imageConfig);
+    }
   }
 
   onMount(() => {
@@ -476,6 +497,9 @@
         >
           Link
         </Button>
+        <Button variant="ghost" size="sm" onclick={() => insertImage()}>
+          Image
+        </Button>
         <Button
           variant="ghost"
           size="sm"
@@ -516,6 +540,10 @@
           {assetResolver}
           {fileAdapter}
           {frontmatterOpen}
+          headingIds={headingIds || outline}
+          {headingIdPrefix}
+          {htmlPolicy}
+          {emoji}
           onChange={(replacement, from, to) => {
             const nextValue = `${value.slice(0, from)}${replacement}${value.slice(to)}`;
             value = nextValue;
@@ -523,6 +551,9 @@
           }}
           {onFrontmatterChange}
         />
+        {#if outline}
+          <MarkdownOutline {value} {headingIdPrefix} />
+        {/if}
       </section>
     {/if}
   </div>

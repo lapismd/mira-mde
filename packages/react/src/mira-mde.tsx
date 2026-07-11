@@ -7,7 +7,9 @@ import { createMarkdownCodeMirrorExtensions } from "@mira-mde/codemirror-markdow
 import { createRichEditorExtensions } from "@mira-mde/codemirror-rich";
 import { createTableExtensions } from "@mira-mde/codemirror-tables";
 import {
+  createImageDropPasteExtension,
   createMiraEditorController,
+  openImageFilePicker,
   type MiraEditorController,
 } from "@mira-mde/core";
 import {
@@ -41,8 +43,14 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
     defaultValue = "",
     extensions = [],
     fileAdapter,
+    imageConfig,
     frontmatterOpen = true,
     frontmatterConfig,
+    headingIds = false,
+    headingIdPrefix = "",
+    htmlPolicy = "trusted",
+    emoji = false,
+    outline = false,
     blockControls = false,
     indentGuides = true,
     indentWithTabs = true,
@@ -131,6 +139,13 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
     controller?.focus();
   }, []);
 
+  const handleInsertImage = useCallback(() => {
+    const controller = controllerRef.current;
+    if (controller) {
+      openImageFilePicker(controller.view, imageConfig);
+    }
+  }, [imageConfig]);
+
   const buildCodeMirrorExtensions = useCallback((): Extension[] => {
     const resolved = resolveMiraExtensions(extensions, {
       mode: modeRef.current,
@@ -155,6 +170,7 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
         sourceMode: modeRef.current === "source",
       }),
       createTableExtensions(),
+      createImageDropPasteExtension(imageConfig),
       createRichEditorExtensions({
         assetResolver,
         blockActions: resolved.blockActions,
@@ -199,6 +215,7 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
     indentGuides,
     indentWithTabs,
     indentWidth,
+    imageConfig,
     lineWrapping,
     linkResolver,
     modeRef,
@@ -221,6 +238,7 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
           focus: () => activeController.focus(),
           getValue: () => activeController.getValue(),
           insertMarkdown: handleInsertMarkdown,
+          insertImage: handleInsertImage,
           setValue: (nextValue) => activeController.setValue(nextValue),
           view: activeController.view,
         });
@@ -229,7 +247,7 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
         }
       }
     },
-    [handleInsertMarkdown, resolvedExtensions.onMount],
+    [handleInsertImage, handleInsertMarkdown, resolvedExtensions.onMount],
   );
 
   useEffect(() => {
@@ -302,6 +320,7 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
         return controllerRef.current?.getSelection() ?? null;
       },
       insertMarkdown: handleInsertMarkdown,
+      insertImage: handleInsertImage,
       setMarkdown(markdown) {
         if (valueProp === undefined) {
           setUncontrolledValue(markdown);
@@ -314,7 +333,15 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
         controllerRef.current?.setSelection(selection);
       },
     }),
-    [handleInsertMarkdown, modeRef, setMode, setReadonly, valueProp, valueRef],
+    [
+      handleInsertImage,
+      handleInsertMarkdown,
+      modeRef,
+      setMode,
+      setReadonly,
+      valueProp,
+      valueRef,
+    ],
   );
 
   const showEditor = mode !== "preview";
@@ -383,6 +410,13 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
             >
               Link
             </button>
+            <button
+              className="mira-ui-button mira-ui-button--ghost mira-ui-button--sm"
+              onClick={handleInsertImage}
+              type="button"
+            >
+              Image
+            </button>
           </div>
         </div>
       ) : null}
@@ -412,6 +446,11 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
               fileAdapter={fileAdapter}
               frontmatterConfig={frontmatterConfig}
               frontmatterOpen={frontmatterOpen}
+              headingIds={headingIds || outline}
+              headingIdPrefix={headingIdPrefix}
+              htmlPolicy={htmlPolicy}
+              emoji={emoji}
+              outline={outline}
               linkResolver={linkResolver}
               onChange={handlePreviewChange}
               onFrontmatterChange={onFrontmatterChange}

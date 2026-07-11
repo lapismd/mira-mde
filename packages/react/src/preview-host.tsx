@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { mount, unmount } from "svelte";
-import { MarkdownPreview } from "@mira-mde/preview";
+import { MarkdownOutline, MarkdownPreview } from "@mira-mde/preview";
 import type {
   MiraAssetResolver,
   MiraExtension,
@@ -18,6 +18,11 @@ export type MarkdownPreviewHostProps = {
   fileAdapter?: MiraFileAdapter;
   frontmatterOpen?: boolean;
   frontmatterConfig?: MiraFrontmatterConfig;
+  headingIds?: boolean;
+  headingIdPrefix?: string;
+  htmlPolicy?: "trusted" | "safe";
+  emoji?: boolean;
+  outline?: boolean;
   onChange?: (replacement: string, from: number, to: number) => void;
   onFrontmatterChange?: (nextYaml: string, nextValue: string) => void;
 };
@@ -28,6 +33,11 @@ export function MarkdownPreviewHost({
   fileAdapter,
   frontmatterConfig,
   frontmatterOpen = true,
+  headingIds = false,
+  headingIdPrefix = "",
+  htmlPolicy = "trusted",
+  emoji = false,
+  outline = false,
   linkResolver,
   onChange,
   onFrontmatterChange,
@@ -35,6 +45,7 @@ export function MarkdownPreviewHost({
   value,
 }: MarkdownPreviewHostProps): React.ReactElement {
   const hostRef = useRef<HTMLDivElement | null>(null);
+  const outlineRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!hostRef.current) {
@@ -50,6 +61,10 @@ export function MarkdownPreviewHost({
         fileAdapter,
         frontmatterConfig,
         frontmatterOpen,
+        headingIds,
+        headingIdPrefix,
+        htmlPolicy,
+        emoji,
         linkResolver,
         onChange,
         onFrontmatterChange,
@@ -67,6 +82,10 @@ export function MarkdownPreviewHost({
     fileAdapter,
     frontmatterConfig,
     frontmatterOpen,
+    headingIds,
+    headingIdPrefix,
+    htmlPolicy,
+    emoji,
     linkResolver,
     onChange,
     onFrontmatterChange,
@@ -74,5 +93,28 @@ export function MarkdownPreviewHost({
     value,
   ]);
 
-  return <div className="mira-react-preview-host" ref={hostRef} />;
+  useEffect(() => {
+    if (!outline || !outlineRef.current) {
+      return;
+    }
+
+    const component = mount(MarkdownOutline, {
+      target: outlineRef.current,
+      props: {
+        headingIdPrefix,
+        value,
+      },
+    });
+
+    return () => {
+      unmount(component as never);
+    };
+  }, [headingIdPrefix, outline, value]);
+
+  return (
+    <div className="mira-react-preview-host">
+      <div ref={hostRef} />
+      {outline ? <div ref={outlineRef} /> : null}
+    </div>
+  );
 }

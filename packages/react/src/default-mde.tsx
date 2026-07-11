@@ -40,10 +40,16 @@ export const MiraDefaultMde = forwardRef<
     editorClassName,
     extensions = [],
     fileAdapter,
+    imageConfig,
     featureConfigs = {},
     features = {},
     frontmatterConfig,
     frontmatterOpen = true,
+    headingIds = false,
+    headingIdPrefix = "",
+    htmlPolicy = "trusted",
+    emoji = false,
+    outline = false,
     indentGuides: indentGuidesProp,
     indentWithTabs: indentWithTabsProp,
     indentWidth: indentWidthProp,
@@ -203,6 +209,7 @@ export const MiraDefaultMde = forwardRef<
       getMarkdown: () => editorRef.current?.getMarkdown() ?? value,
       getMode: () => editorRef.current?.getMode() ?? mode,
       getSelection: () => editorRef.current?.getSelection() ?? null,
+      insertImage: () => editorRef.current?.insertImage(),
       insertMarkdown: (markdown) => editorRef.current?.insertMarkdown(markdown),
       mode,
       readonly,
@@ -248,6 +255,9 @@ export const MiraDefaultMde = forwardRef<
       },
       insertMarkdown(markdown) {
         editorRef.current?.insertMarkdown(markdown);
+      },
+      insertImage() {
+        editorRef.current?.insertImage();
       },
       setMarkdown: handleSetMarkdown,
       setMode: handleSetMode,
@@ -299,10 +309,16 @@ export const MiraDefaultMde = forwardRef<
           defaultValue={defaultValue}
           extensions={activeExtensions}
           fileAdapter={fileAdapter}
+          imageConfig={imageConfig}
           frontmatterConfig={frontmatterConfig}
           frontmatterOpen={
             resolvedFeatures[MiraFeature.Frontmatter] && frontmatterOpen
           }
+          headingIds={headingIds}
+          headingIdPrefix={headingIdPrefix}
+          htmlPolicy={htmlPolicy}
+          emoji={emoji}
+          outline={outline}
           indentGuides={indentGuides}
           indentWidth={indentWidth}
           indentWithTabs={indentWithTabs}

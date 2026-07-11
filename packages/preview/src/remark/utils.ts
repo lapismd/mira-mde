@@ -22,7 +22,15 @@ export function isExternalMarkdownDestination(value: string): boolean {
 
   return (
     /^((https?|ftps?|ssh):)?\/\//i.test(text) ||
-    /^<((https?|ftps?|ssh):)?\/\//i.test(text)
+    /^<((https?|ftps?|ssh):)?\/\//i.test(text) ||
+    /^(mailto|tel):/i.test(text) ||
+    /^<(mailto|tel):/i.test(text)
+  );
+}
+
+export function isImageDataUri(value: string): boolean {
+  return /^data:image\/(?:png|jpe?g|gif|webp|avif);base64,[a-z0-9+/=\s]+$/i.test(
+    value.trim(),
   );
 }
 

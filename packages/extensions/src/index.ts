@@ -23,6 +23,20 @@ export type MiraThemeConfig = {
   fallback?: Exclude<MiraTheme, "inherit">;
 };
 
+export type MiraImageSyntax = "reference" | "inline";
+
+export type MiraImageUploadErrorHandler = (error: unknown, file: File) => void;
+
+export type MiraImageUpload = (file: File) => Promise<string>;
+
+export type MiraImageConfig = {
+  imageUpload?: MiraImageUpload;
+  imageMaxSizeBytes?: number;
+  imageMimeTypes?: string[];
+  imageSyntax?: MiraImageSyntax;
+  onImageUploadError?: MiraImageUploadErrorHandler;
+};
+
 export type MiraMode = "source" | "live-preview" | "preview" | "split";
 
 export type MiraCommand = {
@@ -230,6 +244,7 @@ export type MiraExtensionRuntimeContext = {
   setValue: (value: string) => void;
   focus: () => void;
   insertMarkdown: (markdown: string, selection?: MiraTemplateSelection) => void;
+  insertImage?: () => void;
 };
 
 export type MiraExtensionContext = {

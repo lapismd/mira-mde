@@ -2,6 +2,7 @@ import type {
   MiraAssetResolver,
   MiraExtension,
   MiraFileAdapter,
+  MiraImageConfig,
   MiraLinkResolver,
   MiraMode,
   MiraTheme,
@@ -35,8 +36,14 @@ export type MiraMdeProps = {
   linkResolver?: MiraLinkResolver;
   assetResolver?: MiraAssetResolver;
   fileAdapter?: MiraFileAdapter;
+  imageConfig?: MiraImageConfig;
   frontmatterOpen?: boolean;
   frontmatterConfig?: MiraFrontmatterConfig;
+  headingIds?: boolean;
+  headingIdPrefix?: string;
+  htmlPolicy?: "trusted" | "safe";
+  emoji?: boolean;
+  outline?: boolean;
   onChange?: (value: string) => void;
   onFrontmatterChange?: (nextYaml: string, nextValue: string) => void;
 };
@@ -46,6 +53,7 @@ export type MiraMdeHandle = {
   getMarkdown: () => string;
   getMode: () => MiraMode;
   getSelection: () => MiraEditorSelection | null;
+  insertImage: () => void;
   insertMarkdown: (markdown: string) => void;
   setMarkdown: (markdown: string) => void;
   setMode: (mode: MiraMode) => void;
