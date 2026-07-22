@@ -19,7 +19,7 @@ const meta = {
         component: "Inline and block KaTeX math rendering.",
       },
       source: {
-        language: "svelte",
+        language: "html",
         type: "code",
         code: markdownPreviewDocsSource("mathMarkdown"),
       },
@@ -44,7 +44,7 @@ export const LivePreview: Story = {
   parameters: {
     docs: {
       source: {
-        language: "svelte",
+        language: "html",
         type: "code",
         code: markdownEditorDocsSource("mathMarkdown", "live-preview"),
       },
@@ -64,7 +64,7 @@ export const SourceMode: Story = {
   parameters: {
     docs: {
       source: {
-        language: "svelte",
+        language: "html",
         type: "code",
         code: markdownEditorDocsSource("mathMarkdown", "source"),
       },

@@ -20,7 +20,7 @@ const meta = {
           "Pipe tables support alignment markers and shared preview styling.",
       },
       source: {
-        language: "svelte",
+        language: "html",
         type: "code",
         code: markdownPreviewDocsSource("tablesMarkdown"),
       },
@@ -45,7 +45,7 @@ export const LivePreview: Story = {
   parameters: {
     docs: {
       source: {
-        language: "svelte",
+        language: "html",
         type: "code",
         code: markdownEditorDocsSource("tablesMarkdown", "live-preview"),
       },
@@ -65,7 +65,7 @@ export const SourceMode: Story = {
   parameters: {
     docs: {
       source: {
-        language: "svelte",
+        language: "html",
         type: "code",
         code: markdownEditorDocsSource("tablesMarkdown", "source"),
       },

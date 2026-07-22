@@ -20,7 +20,7 @@ const meta = {
           "Relative, external, and automatic links resolve through the configured adapter.",
       },
       source: {
-        language: "svelte",
+        language: "html",
         type: "code",
         code: markdownPreviewDocsSource("linksMarkdown"),
       },
@@ -45,7 +45,7 @@ export const LivePreview: Story = {
   parameters: {
     docs: {
       source: {
-        language: "svelte",
+        language: "html",
         type: "code",
         code: markdownEditorDocsSource("linksMarkdown", "live-preview"),
       },
@@ -65,7 +65,7 @@ export const SourceMode: Story = {
   parameters: {
     docs: {
       source: {
-        language: "svelte",
+        language: "html",
         type: "code",
         code: markdownEditorDocsSource("linksMarkdown", "source"),
       },

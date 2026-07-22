@@ -20,7 +20,7 @@ const meta = {
           "Mermaid diagrams render inline with Lapis-compatible controls.",
       },
       source: {
-        language: "svelte",
+        language: "html",
         type: "code",
         code: markdownPreviewDocsSource("mermaidMarkdownFeature"),
       },
@@ -45,7 +45,7 @@ export const LivePreview: Story = {
   parameters: {
     docs: {
       source: {
-        language: "svelte",
+        language: "html",
         type: "code",
         code: markdownEditorDocsSource(
           "mermaidMarkdownFeature",
@@ -68,7 +68,7 @@ export const SourceMode: Story = {
   parameters: {
     docs: {
       source: {
-        language: "svelte",
+        language: "html",
         type: "code",
         code: markdownEditorDocsSource("mermaidMarkdownFeature", "source"),
       },

@@ -54,7 +54,7 @@ export const defaultEditorDocsSource = `<script lang="ts">
 export const defaultEditorDocsParameters = {
   docs: {
     source: {
-      language: "svelte",
+      language: "html",
       type: "code" as const,
       code: defaultEditorDocsSource,
     },

@@ -20,7 +20,7 @@ const meta = {
           "Obsidian-style callouts with labels, icons, and collapsible state.",
       },
       source: {
-        language: "svelte",
+        language: "html",
         type: "code",
         code: markdownPreviewDocsSource("calloutsMarkdown"),
       },
@@ -45,7 +45,7 @@ export const LivePreview: Story = {
   parameters: {
     docs: {
       source: {
-        language: "svelte",
+        language: "html",
         type: "code",
         code: markdownEditorDocsSource("calloutsMarkdown", "live-preview"),
       },
@@ -65,7 +65,7 @@ export const SourceMode: Story = {
   parameters: {
     docs: {
       source: {
-        language: "svelte",
+        language: "html",
         type: "code",
         code: markdownEditorDocsSource("calloutsMarkdown", "source"),
       },

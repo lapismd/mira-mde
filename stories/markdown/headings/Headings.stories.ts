@@ -20,7 +20,7 @@ const meta = {
           "Headings create the document outline used by reading and editor surfaces.",
       },
       source: {
-        language: "svelte",
+        language: "html",
         type: "code",
         code: markdownPreviewDocsSource("headingsMarkdown"),
       },
@@ -45,7 +45,7 @@ export const LivePreview: Story = {
   parameters: {
     docs: {
       source: {
-        language: "svelte",
+        language: "html",
         type: "code",
         code: markdownEditorDocsSource("headingsMarkdown", "live-preview"),
       },
@@ -65,7 +65,7 @@ export const SourceMode: Story = {
   parameters: {
     docs: {
       source: {
-        language: "svelte",
+        language: "html",
         type: "code",
         code: markdownEditorDocsSource("headingsMarkdown", "source"),
       },

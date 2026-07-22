@@ -19,7 +19,7 @@ const meta = {
         component: "Inline and nested tags render as navigable metadata.",
       },
       source: {
-        language: "svelte",
+        language: "html",
         type: "code",
         code: markdownPreviewDocsSource("tagsMarkdown"),
       },
@@ -44,7 +44,7 @@ export const LivePreview: Story = {
   parameters: {
     docs: {
       source: {
-        language: "svelte",
+        language: "html",
         type: "code",
         code: markdownEditorDocsSource("tagsMarkdown", "live-preview"),
       },
@@ -64,7 +64,7 @@ export const SourceMode: Story = {
   parameters: {
     docs: {
       source: {
-        language: "svelte",
+        language: "html",
         type: "code",
         code: markdownEditorDocsSource("tagsMarkdown", "source"),
       },

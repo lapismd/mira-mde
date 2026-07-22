@@ -20,7 +20,7 @@ const meta = {
           "Footnotes keep supporting details next to related paragraphs.",
       },
       source: {
-        language: "svelte",
+        language: "html",
         type: "code",
         code: markdownPreviewDocsSource("footnotesMarkdown"),
       },
@@ -45,7 +45,7 @@ export const LivePreview: Story = {
   parameters: {
     docs: {
       source: {
-        language: "svelte",
+        language: "html",
         type: "code",
         code: markdownEditorDocsSource("footnotesMarkdown", "live-preview"),
       },
@@ -65,7 +65,7 @@ export const SourceMode: Story = {
   parameters: {
     docs: {
       source: {
-        language: "svelte",
+        language: "html",
         type: "code",
         code: markdownEditorDocsSource("footnotesMarkdown", "source"),
       },

@@ -19,7 +19,7 @@ const meta = {
         component: "Blockquotes preserve quoted prose and nesting.",
       },
       source: {
-        language: "svelte",
+        language: "html",
         type: "code",
         code: markdownPreviewDocsSource("blockquotesMarkdown"),
       },
@@ -44,7 +44,7 @@ export const LivePreview: Story = {
   parameters: {
     docs: {
       source: {
-        language: "svelte",
+        language: "html",
         type: "code",
         code: markdownEditorDocsSource("blockquotesMarkdown", "live-preview"),
       },
@@ -64,7 +64,7 @@ export const SourceMode: Story = {
   parameters: {
     docs: {
       source: {
-        language: "svelte",
+        language: "html",
         type: "code",
         code: markdownEditorDocsSource("blockquotesMarkdown", "source"),
       },

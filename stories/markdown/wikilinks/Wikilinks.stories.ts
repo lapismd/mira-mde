@@ -19,7 +19,7 @@ const meta = {
         component: "Obsidian-style note references stay portable across apps.",
       },
       source: {
-        language: "svelte",
+        language: "html",
         type: "code",
         code: markdownPreviewDocsSource("wikilinksMarkdown"),
       },
@@ -44,7 +44,7 @@ export const LivePreview: Story = {
   parameters: {
     docs: {
       source: {
-        language: "svelte",
+        language: "html",
         type: "code",
         code: markdownEditorDocsSource("wikilinksMarkdown", "live-preview"),
       },
@@ -64,7 +64,7 @@ export const SourceMode: Story = {
   parameters: {
     docs: {
       source: {
-        language: "svelte",
+        language: "html",
         type: "code",
         code: markdownEditorDocsSource("wikilinksMarkdown", "source"),
       },

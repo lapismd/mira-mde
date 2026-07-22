@@ -19,7 +19,7 @@ const meta = {
         component: "Directive syntax renders as portable custom elements.",
       },
       source: {
-        language: "svelte",
+        language: "html",
         type: "code",
         code: markdownPreviewDocsSource("directivesMarkdown"),
       },
@@ -44,7 +44,7 @@ export const LivePreview: Story = {
   parameters: {
     docs: {
       source: {
-        language: "svelte",
+        language: "html",
         type: "code",
         code: markdownEditorDocsSource("directivesMarkdown", "live-preview"),
       },
@@ -64,7 +64,7 @@ export const SourceMode: Story = {
   parameters: {
     docs: {
       source: {
-        language: "svelte",
+        language: "html",
         type: "code",
         code: markdownEditorDocsSource("directivesMarkdown", "source"),
       },

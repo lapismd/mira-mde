@@ -14,15 +14,37 @@
   height: var(--mira-story-editor-height, 34rem);
   max-width: none;
   padding: 0;
+  /* Only CodeMirror / preview panes inside should scroll. */
+  overflow: hidden;
 }
 
 .mira-story-surface--editor :global(.mira-default-mde),
+.mira-story-surface--editor :global(.mira-default-ui),
 .mira-story-surface--editor :global(.mira-mde) {
   height: 100%;
+  max-height: 100%;
+  overflow: hidden;
 }
 
 .mira-story-surface--toolbar {
   padding: 1rem;
+}
+
+/*
+ * Storybook docs/canvas wrappers default to overflow:auto, which stacks a
+ * second scrollbar beside the editor scroller. Keep scrolling inside Mira.
+ */
+.docs-story:has(.mira-story-surface--editor),
+.sb-story:has(.mira-story-surface--editor),
+#storybook-root:has(.mira-story-surface--editor) {
+  overflow: hidden !important;
+}
+
+.docs-story:has(.mira-story-surface--editor) > div,
+.sbdocs-preview:has(.mira-story-surface--editor) .docs-story,
+.innerZoomElementWrapper:has(.mira-story-surface--editor) {
+  overflow: hidden !important;
+  height: auto;
 }
 
 html.dark .mira-story-surface,

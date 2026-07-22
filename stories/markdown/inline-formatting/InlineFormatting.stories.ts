@@ -20,7 +20,7 @@ const meta = {
           "Bold, italic, strikethrough, and inline code compose inside paragraphs.",
       },
       source: {
-        language: "svelte",
+        language: "html",
         type: "code",
         code: markdownPreviewDocsSource("inlineFormattingMarkdown"),
       },
@@ -45,7 +45,7 @@ export const LivePreview: Story = {
   parameters: {
     docs: {
       source: {
-        language: "svelte",
+        language: "html",
         type: "code",
         code: markdownEditorDocsSource(
           "inlineFormattingMarkdown",
@@ -68,7 +68,7 @@ export const SourceMode: Story = {
   parameters: {
     docs: {
       source: {
-        language: "svelte",
+        language: "html",
         type: "code",
         code: markdownEditorDocsSource("inlineFormattingMarkdown", "source"),
       },
