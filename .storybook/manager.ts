@@ -6,12 +6,18 @@ import {
   type TagBadgeParameters,
 } from "storybook-addon-tag-badges/manager-helpers";
 import type { CSSObject } from "storybook/theming";
+import { stackedRenderLabel } from "./manager-stacked-badges.js";
 
 const SMALL_CAPS: CSSObject = {
   fontVariant: "all-small-caps",
   letterSpacing: "0.04em",
 };
 
+/**
+ * Solid fills with white glyphs/text. Each fill clears WCAG AA (≥4.5:1)
+ * against `#ffffff` so icons and labels stay readable, and chips stay
+ * distinct on Storybook’s light chrome.
+ */
 const PRESET_COLORS = {
   green: {
     backgroundColor: "#15843e",
@@ -48,6 +54,16 @@ const PRESET_COLORS = {
     borderColor: "#734603",
     color: "#ffffff",
   },
+  pink: {
+    backgroundColor: "#c32273",
+    borderColor: "#8a1450",
+    color: "#ffffff",
+  },
+  turquoise: {
+    backgroundColor: "#12826c",
+    borderColor: "#0a5344",
+    color: "#ffffff",
+  },
 } as const satisfies Record<string, CSSObject>;
 
 type StylePreset = keyof typeof PRESET_COLORS;
@@ -66,18 +82,27 @@ const SIDEBAR_ICON_STYLE: CSSObject = {
   fontVariant: "normal",
   letterSpacing: 0,
   fontWeight: 700,
+  // Keep white icon even if a caller spreads other styles later.
   color: "#ffffff",
 };
 
+/** Sidebar glyph + full toolbar label for each configured tag. */
 const TAG_ICONS: Record<string, string> = {
   "skip-visual": "⊘",
   "skip-test": "∅",
+  "visual-state": "◉",
   "visual-pending": "⏱",
   "visual-approved": "⛨",
   "visual-failed": "✕",
   new: "✦",
+  alpha: "α",
   beta: "β",
+  rc: "R",
+  experimental: "Δ",
   deprecated: "↓",
+  outdated: "⌛",
+  danger: "!",
+  "code-only": "{}",
 };
 
 function resolvePresetColors(style: Badge["style"]): CSSObject {
@@ -92,6 +117,8 @@ function resolvePresetColors(style: Badge["style"]): CSSObject {
 
 function sidebarIconFor(tag: string, text: string): string {
   if (TAG_ICONS[tag]) return TAG_ICONS[tag];
+  if (tag.startsWith("v:") || tag.startsWith("version:")) return "v";
+  // First character of the label as a last resort.
   return text.trim().charAt(0) || "?";
 }
 
@@ -109,9 +136,11 @@ function withContextBadge(badge: BadgeOrBadgeFn): BadgeOrBadgeFn {
           ...colors,
           ...SIDEBAR_ICON_STYLE,
         },
+        // Addon disables sidebar tooltips; omit so we don't imply they work.
       };
     }
 
+    // Toolbar / MDX: glyph before the label (e.g. "⛨ Approved").
     const label = resolved.text.trim();
     const text =
       icon && label && !label.startsWith(icon)
@@ -136,7 +165,23 @@ function withContextBadges(configs: TagBadgeParameters): TagBadgeParameters {
   }));
 }
 
+/**
+ * Review status on component/group (high-level scan) and on leaves.
+ * `skipInherited: false` so a parent ⛨ does not hide Approved on stories.
+ */
+const REVIEW_SIDEBAR_DISPLAY = [
+  { type: "story" as const, skipInherited: false },
+  { type: "docs" as const, skipInherited: false },
+  { type: "component" as const, skipInherited: false },
+  { type: "group" as const, skipInherited: false },
+];
+
 addons.setConfig({
+  // Custom renderLabel stacks every matching tag like an avatar group.
+  sidebar: {
+    ...addons.getConfig()?.sidebar,
+    renderLabel: stackedRenderLabel,
+  },
   tagBadges: withContextBadges([
     {
       tags: "skip-visual",
@@ -161,6 +206,7 @@ addons.setConfig({
         style: "red",
         tooltip: "Baseline review failed or rejected",
       },
+      display: { sidebar: REVIEW_SIDEBAR_DISPLAY, toolbar: ["docs", "story"] },
     },
     {
       tags: "visual-pending",
@@ -169,6 +215,7 @@ addons.setConfig({
         style: "orange",
         tooltip: "Baseline exists; awaiting human approval",
       },
+      display: { sidebar: REVIEW_SIDEBAR_DISPLAY, toolbar: ["docs", "story"] },
     },
     {
       tags: "visual-approved",
@@ -177,7 +224,17 @@ addons.setConfig({
         style: "green",
         tooltip: "Baseline reviewed and accepted",
       },
+      display: { sidebar: REVIEW_SIDEBAR_DISPLAY, toolbar: ["docs", "story"] },
     },
+    {
+      tags: "visual-state",
+      badge: {
+        text: "Visual",
+        style: "turquoise",
+        tooltip: "Explicit visual-state story",
+      },
+    },
+    // Defaults after custom matchers so repo tags win priority.
     ...defaultConfig,
   ]) satisfies TagBadgeParameters,
 });
