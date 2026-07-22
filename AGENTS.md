@@ -130,6 +130,11 @@ preview, and the default editor shell around them.
 - After each verified change, run `jj commit` with a PR-quality message that
   explains what changed, why it changed, and the validation that passed. Keep the
   message descriptive enough for review context rather than using a terse label.
+- Root Storybook catalog: `pnpm storybook` on port **7007** (override with
+  `STORYBOOK_PORT`). Use `pnpm storybook:restart` to kill stale listeners and
+  start fresh. Manager / Visual Delta source edits need a process restart
+  (`scripts/storybook-run.mjs` watches those paths). Visual gate:
+  `pnpm storybook:check` (`build-storybook` + `test:visual`).
 
 ## Verification
 

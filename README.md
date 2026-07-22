@@ -29,3 +29,20 @@ pnpm install
 pnpm dev
 pnpm check:all
 ```
+
+### Storybook
+
+Catalog lives at the repo root (port **7007**). Visual Delta manager edits
+trigger a full restart via the run wrapper (manager is a one-shot esbuild
+bundle).
+
+```sh
+pnpm storybook              # http://localhost:7007; restarts on Visual Delta / manager edits
+pnpm storybook:restart      # kill listeners on 7007 (+ legacy 9009) and start fresh
+pnpm build-storybook        # static build → storybook-static/
+pnpm test:visual            # Playwright baselines against storybook-static
+pnpm test:visual:update     # gated baseline create/update (VISUAL_UPDATE_APPROVED=1)
+pnpm storybook:check        # build-storybook + test:visual
+```
+
+Override the port with `STORYBOOK_PORT` when needed.
