@@ -1,10 +1,14 @@
 import type { Preview } from "@storybook/svelte-vite";
 import "@mira-mde/default-ui/styles.css";
 import "../stories/markdown/_shared/storybook.css";
+import { installFocusPrototypeGuard } from "./focus-prototype-guard";
 import {
   baselineUrlForStory,
   visualBaselineVisualDeltaParameter,
 } from "./visual-baseline-design";
+
+// Guard Storybook 10.5 focus instrumentation before Docs/react-aria wraps it.
+installFocusPrototypeGuard();
 
 const preview: Preview = {
   tags: ["autodocs", "test"],
@@ -25,6 +29,8 @@ const preview: Preview = {
   },
   decorators: [
     (story, context) => {
+      // Re-apply if Storybook installed its accessor after the first attempt.
+      installFocusPrototypeGuard();
       if (typeof document !== "undefined") {
         const theme = context.globals.theme === "dark" ? "dark" : "light";
         document.documentElement.dataset.theme = theme;
