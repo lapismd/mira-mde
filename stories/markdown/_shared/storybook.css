@@ -1,3 +1,17 @@
+/*
+ * Inset the story canvas so component borders (e.g. MiraDefaultMde) aren't
+ * clipped against the preview pane edge.
+ */
+#storybook-root {
+  box-sizing: border-box;
+  padding: 1rem;
+}
+
+.docs-story {
+  box-sizing: border-box;
+  padding: 1rem;
+}
+
 .mira-story-surface {
   box-sizing: border-box;
   min-height: 100%;
