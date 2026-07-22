@@ -35,6 +35,32 @@ export const defaultEditorArgs: DefaultEditorStoryProps = {
   height: "34rem",
 };
 
+/** Full public API snippet shown in docs instead of `<DefaultEditorStory />`. */
+export const defaultEditorDocsSource = `<script lang="ts">
+  import { MiraDefaultMde } from "@mira-mde/default-ui/svelte";
+  import type { MiraMode } from "@mira-mde/extensions";
+
+  let value = $state("# Hello Mira");
+  let mode = $state<MiraMode>("live-preview");
+</script>
+
+<MiraDefaultMde
+  bind:value
+  bind:mode
+  theme="light"
+  indentGuides
+/>`;
+
+export const defaultEditorDocsParameters = {
+  docs: {
+    source: {
+      language: "svelte",
+      type: "code" as const,
+      code: defaultEditorDocsSource,
+    },
+  },
+};
+
 /** Controls surface matching MiraDefaultMde public configuration props. */
 export const defaultEditorArgTypes = {
   value: {

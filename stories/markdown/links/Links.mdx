@@ -1,4 +1,10 @@
-import { Meta, Canvas, Primary, Controls } from "@storybook/addon-docs/blocks";
+import {
+  Meta,
+  Canvas,
+  Primary,
+  Controls,
+  Source,
+} from "@storybook/addon-docs/blocks";
 import * as LinksStories from "./Links.stories";
 
 <Meta of={LinksStories} />
@@ -6,6 +12,12 @@ import * as LinksStories from "./Links.stories";
 # Links
 
 Relative, external, and automatic links resolve through the configured adapter.
+
+## Usage
+
+Docs source shows the public Mira APIs (not story wrapper components).
+
+<Source of={LinksStories.Preview} />
 
 ## Surfaces
 
@@ -19,9 +31,13 @@ Each markdown feature is shown in reading preview (`MarkdownPreview`), live prev
 
 <Canvas of={LinksStories.LivePreview} meta={LinksStories} />
 
+<Source of={LinksStories.LivePreview} />
+
 ## Source Mode
 
 <Canvas of={LinksStories.SourceMode} meta={LinksStories} />
+
+<Source of={LinksStories.SourceMode} />
 
 ## Syntax
 

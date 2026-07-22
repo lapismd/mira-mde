@@ -1,7 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/svelte-vite";
 import { MiraFeature } from "@mira-mde/default-ui/svelte";
 import DefaultEditorStory from "../_shared/DefaultEditorStory.svelte";
-import { defaultEditorArgs, defaultEditorArgTypes } from "../_shared/argTypes";
+import {
+  defaultEditorArgs,
+  defaultEditorArgTypes,
+  defaultEditorDocsParameters,
+} from "../_shared/argTypes";
 
 const meta = {
   title: "Default UI/Features",
@@ -9,7 +13,9 @@ const meta = {
   args: defaultEditorArgs,
   argTypes: defaultEditorArgTypes,
   parameters: {
+    ...defaultEditorDocsParameters,
     docs: {
+      ...defaultEditorDocsParameters.docs,
       description: {
         component:
           "Feature flags and featureConfigs control toolbar items, mode availability, Mermaid/tables, and slash commands.",

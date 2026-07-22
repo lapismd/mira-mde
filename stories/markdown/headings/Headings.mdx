@@ -1,4 +1,10 @@
-import { Meta, Canvas, Primary, Controls } from "@storybook/addon-docs/blocks";
+import {
+  Meta,
+  Canvas,
+  Primary,
+  Controls,
+  Source,
+} from "@storybook/addon-docs/blocks";
 import * as HeadingsStories from "./Headings.stories";
 
 <Meta of={HeadingsStories} />
@@ -6,6 +12,12 @@ import * as HeadingsStories from "./Headings.stories";
 # Headings
 
 Headings create the document outline used by reading and editor surfaces.
+
+## Usage
+
+Docs source shows the public Mira APIs (not story wrapper components).
+
+<Source of={HeadingsStories.Preview} />
 
 ## Surfaces
 
@@ -19,9 +31,13 @@ Each markdown feature is shown in reading preview (`MarkdownPreview`), live prev
 
 <Canvas of={HeadingsStories.LivePreview} meta={HeadingsStories} />
 
+<Source of={HeadingsStories.LivePreview} />
+
 ## Source Mode
 
 <Canvas of={HeadingsStories.SourceMode} meta={HeadingsStories} />
+
+<Source of={HeadingsStories.SourceMode} />
 
 ## Syntax
 

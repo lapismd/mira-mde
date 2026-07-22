@@ -1,20 +1,32 @@
 import type { Meta, StoryObj } from "@storybook/svelte-vite";
-import InlineFormattingLive from "./InlineFormattingLive.svelte";
-import InlineFormattingPreview from "./InlineFormattingPreview.svelte";
-import InlineFormattingSource from "./InlineFormattingSource.svelte";
+import EditorModeStory from "../_shared/EditorModeStory.svelte";
+import MarkdownPreviewStory from "../_shared/MarkdownPreviewStory.svelte";
+import {
+  markdownEditorDocsSource,
+  markdownPreviewDocsSource,
+} from "../_shared/docs-source";
+import { inlineFormattingMarkdown } from "../fixtures";
 
 const meta = {
   title: "Markdown/Inline Formatting",
-  component: InlineFormattingPreview,
+  component: MarkdownPreviewStory,
+  args: {
+    value: inlineFormattingMarkdown,
+  },
   parameters: {
     docs: {
       description: {
         component:
           "Bold, italic, strikethrough, and inline code compose inside paragraphs.",
       },
+      source: {
+        language: "svelte",
+        type: "code",
+        code: markdownPreviewDocsSource("inlineFormattingMarkdown"),
+      },
     },
   },
-} satisfies Meta<typeof InlineFormattingPreview>;
+} satisfies Meta<typeof MarkdownPreviewStory>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -23,14 +35,43 @@ export const Preview: Story = {};
 
 export const LivePreview: Story = {
   name: "Live Preview",
-  render: () => ({
-    Component: InlineFormattingLive,
+  render: (args) => ({
+    Component: EditorModeStory,
+    props: {
+      ...args,
+      mode: "live-preview",
+    },
   }),
+  parameters: {
+    docs: {
+      source: {
+        language: "svelte",
+        type: "code",
+        code: markdownEditorDocsSource(
+          "inlineFormattingMarkdown",
+          "live-preview",
+        ),
+      },
+    },
+  },
 };
 
 export const SourceMode: Story = {
   name: "Source Mode",
-  render: () => ({
-    Component: InlineFormattingSource,
+  render: (args) => ({
+    Component: EditorModeStory,
+    props: {
+      ...args,
+      mode: "source",
+    },
   }),
+  parameters: {
+    docs: {
+      source: {
+        language: "svelte",
+        type: "code",
+        code: markdownEditorDocsSource("inlineFormattingMarkdown", "source"),
+      },
+    },
+  },
 };

@@ -1,6 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/svelte-vite";
 import DefaultEditorStory from "./_shared/DefaultEditorStory.svelte";
-import { defaultEditorArgs, defaultEditorArgTypes } from "./_shared/argTypes";
+import {
+  defaultEditorArgs,
+  defaultEditorArgTypes,
+  defaultEditorDocsParameters,
+} from "./_shared/argTypes";
 
 const meta = {
   title: "Default UI/MiraDefaultMde",
@@ -8,7 +12,9 @@ const meta = {
   args: defaultEditorArgs,
   argTypes: defaultEditorArgTypes,
   parameters: {
+    ...defaultEditorDocsParameters,
     docs: {
+      ...defaultEditorDocsParameters.docs,
       description: {
         component:
           "Default Mira editor shell (`MiraDefaultMde`) with toolbar, modes, themes, and feature configuration.",

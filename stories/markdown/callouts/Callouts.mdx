@@ -1,4 +1,10 @@
-import { Meta, Canvas, Primary, Controls } from "@storybook/addon-docs/blocks";
+import {
+  Meta,
+  Canvas,
+  Primary,
+  Controls,
+  Source,
+} from "@storybook/addon-docs/blocks";
 import * as CalloutsStories from "./Callouts.stories";
 
 <Meta of={CalloutsStories} />
@@ -6,6 +12,12 @@ import * as CalloutsStories from "./Callouts.stories";
 # Callouts
 
 Obsidian-style callouts with labels, icons, and collapsible state.
+
+## Usage
+
+Docs source shows the public Mira APIs (not story wrapper components).
+
+<Source of={CalloutsStories.Preview} />
 
 ## Surfaces
 
@@ -19,9 +31,13 @@ Each markdown feature is shown in reading preview (`MarkdownPreview`), live prev
 
 <Canvas of={CalloutsStories.LivePreview} meta={CalloutsStories} />
 
+<Source of={CalloutsStories.LivePreview} />
+
 ## Source Mode
 
 <Canvas of={CalloutsStories.SourceMode} meta={CalloutsStories} />
+
+<Source of={CalloutsStories.SourceMode} />
 
 ## Syntax
 

@@ -1,4 +1,10 @@
-import { Meta, Canvas, Primary, Controls } from "@storybook/addon-docs/blocks";
+import {
+  Meta,
+  Canvas,
+  Primary,
+  Controls,
+  Source,
+} from "@storybook/addon-docs/blocks";
 import * as FrontmatterStories from "./Frontmatter.stories";
 
 <Meta of={FrontmatterStories} />
@@ -6,6 +12,12 @@ import * as FrontmatterStories from "./Frontmatter.stories";
 # Frontmatter
 
 Frontmatter stores document properties before the Markdown body.
+
+## Usage
+
+Docs source shows the public Mira APIs (not story wrapper components).
+
+<Source of={FrontmatterStories.Preview} />
 
 ## Surfaces
 
@@ -19,9 +31,13 @@ Each markdown feature is shown in reading preview (`MarkdownPreview`), live prev
 
 <Canvas of={FrontmatterStories.LivePreview} meta={FrontmatterStories} />
 
+<Source of={FrontmatterStories.LivePreview} />
+
 ## Source Mode
 
 <Canvas of={FrontmatterStories.SourceMode} meta={FrontmatterStories} />
+
+<Source of={FrontmatterStories.SourceMode} />
 
 ## Syntax
 

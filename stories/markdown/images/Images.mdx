@@ -1,4 +1,10 @@
-import { Meta, Canvas, Primary, Controls } from "@storybook/addon-docs/blocks";
+import {
+  Meta,
+  Canvas,
+  Primary,
+  Controls,
+  Source,
+} from "@storybook/addon-docs/blocks";
 import * as ImagesStories from "./Images.stories";
 
 <Meta of={ImagesStories} />
@@ -6,6 +12,12 @@ import * as ImagesStories from "./Images.stories";
 # Images
 
 Images resolve through the configured asset resolver. Data-URI (`base64`) images render without a resolver.
+
+## Usage
+
+Docs source shows the public Mira APIs (not story wrapper components).
+
+<Source of={ImagesStories.Preview} />
 
 ## Surfaces
 
@@ -19,9 +31,13 @@ Each markdown feature is shown in reading preview (`MarkdownPreview`), live prev
 
 <Canvas of={ImagesStories.LivePreview} meta={ImagesStories} />
 
+<Source of={ImagesStories.LivePreview} />
+
 ## Source Mode
 
 <Canvas of={ImagesStories.SourceMode} meta={ImagesStories} />
+
+<Source of={ImagesStories.SourceMode} />
 
 ## Syntax
 

@@ -9,7 +9,11 @@ import { aiExtension, createMiraAiToolbarAction } from "@mira-mde/plugin-ai";
 import ListPlusIcon from "@lucide/svelte/icons/list-plus";
 import SparklesIcon from "@lucide/svelte/icons/sparkles";
 import DefaultEditorStory from "../_shared/DefaultEditorStory.svelte";
-import { defaultEditorArgs, defaultEditorArgTypes } from "../_shared/argTypes";
+import {
+  defaultEditorArgs,
+  defaultEditorArgTypes,
+  defaultEditorDocsParameters,
+} from "../_shared/argTypes";
 import {
   blockControlsMarkdown,
   imageAttachmentsMarkdown,
@@ -120,7 +124,9 @@ const meta = {
   },
   argTypes: defaultEditorArgTypes,
   parameters: {
+    ...defaultEditorDocsParameters,
     docs: {
+      ...defaultEditorDocsParameters.docs,
       description: {
         component:
           "Editor chrome plugins: slash commands, block controls, fold/inline headings, image attachments, autocomplete UI, custom toolbars, and @mira-mde/plugin-ai.",

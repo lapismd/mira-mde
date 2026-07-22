@@ -1,4 +1,10 @@
-import { Meta, Canvas, Primary, Controls } from "@storybook/addon-docs/blocks";
+import {
+  Meta,
+  Canvas,
+  Primary,
+  Controls,
+  Source,
+} from "@storybook/addon-docs/blocks";
 import * as GridTablesStories from "./GridTables.stories";
 
 <Meta of={GridTablesStories} />
@@ -6,6 +12,12 @@ import * as GridTablesStories from "./GridTables.stories";
 # Grid Tables
 
 Grid tables use explicit boundaries for spans, sections, and alignment.
+
+## Usage
+
+Docs source shows the public Mira APIs (not story wrapper components).
+
+<Source of={GridTablesStories.Preview} />
 
 ## Surfaces
 
@@ -19,9 +31,13 @@ Each markdown feature is shown in reading preview (`MarkdownPreview`), live prev
 
 <Canvas of={GridTablesStories.LivePreview} meta={GridTablesStories} />
 
+<Source of={GridTablesStories.LivePreview} />
+
 ## Source Mode
 
 <Canvas of={GridTablesStories.SourceMode} meta={GridTablesStories} />
+
+<Source of={GridTablesStories.SourceMode} />
 
 ## Syntax
 

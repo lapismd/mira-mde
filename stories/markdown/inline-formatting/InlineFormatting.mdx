@@ -1,4 +1,10 @@
-import { Meta, Canvas, Primary, Controls } from "@storybook/addon-docs/blocks";
+import {
+  Meta,
+  Canvas,
+  Primary,
+  Controls,
+  Source,
+} from "@storybook/addon-docs/blocks";
 import * as InlineFormattingStories from "./InlineFormatting.stories";
 
 <Meta of={InlineFormattingStories} />
@@ -6,6 +12,12 @@ import * as InlineFormattingStories from "./InlineFormatting.stories";
 # Inline Formatting
 
 Bold, italic, strikethrough, and inline code compose inside paragraphs.
+
+## Usage
+
+Docs source shows the public Mira APIs (not story wrapper components).
+
+<Source of={InlineFormattingStories.Preview} />
 
 ## Surfaces
 

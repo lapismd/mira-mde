@@ -1,20 +1,32 @@
 import type { Meta, StoryObj } from "@storybook/svelte-vite";
-import GridTablesLive from "./GridTablesLive.svelte";
-import GridTablesPreview from "./GridTablesPreview.svelte";
-import GridTablesSource from "./GridTablesSource.svelte";
+import EditorModeStory from "../_shared/EditorModeStory.svelte";
+import MarkdownPreviewStory from "../_shared/MarkdownPreviewStory.svelte";
+import {
+  markdownEditorDocsSource,
+  markdownPreviewDocsSource,
+} from "../_shared/docs-source";
+import { gridTablesMarkdown } from "../fixtures";
 
 const meta = {
   title: "Markdown/Grid Tables",
-  component: GridTablesPreview,
+  component: MarkdownPreviewStory,
+  args: {
+    value: gridTablesMarkdown,
+  },
   parameters: {
     docs: {
       description: {
         component:
           "Grid tables use explicit boundaries for spans, sections, and alignment.",
       },
+      source: {
+        language: "svelte",
+        type: "code",
+        code: markdownPreviewDocsSource("gridTablesMarkdown"),
+      },
     },
   },
-} satisfies Meta<typeof GridTablesPreview>;
+} satisfies Meta<typeof MarkdownPreviewStory>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -23,14 +35,40 @@ export const Preview: Story = {};
 
 export const LivePreview: Story = {
   name: "Live Preview",
-  render: () => ({
-    Component: GridTablesLive,
+  render: (args) => ({
+    Component: EditorModeStory,
+    props: {
+      ...args,
+      mode: "live-preview",
+    },
   }),
+  parameters: {
+    docs: {
+      source: {
+        language: "svelte",
+        type: "code",
+        code: markdownEditorDocsSource("gridTablesMarkdown", "live-preview"),
+      },
+    },
+  },
 };
 
 export const SourceMode: Story = {
   name: "Source Mode",
-  render: () => ({
-    Component: GridTablesSource,
+  render: (args) => ({
+    Component: EditorModeStory,
+    props: {
+      ...args,
+      mode: "source",
+    },
   }),
+  parameters: {
+    docs: {
+      source: {
+        language: "svelte",
+        type: "code",
+        code: markdownEditorDocsSource("gridTablesMarkdown", "source"),
+      },
+    },
+  },
 };

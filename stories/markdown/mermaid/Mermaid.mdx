@@ -1,4 +1,10 @@
-import { Meta, Canvas, Primary, Controls } from "@storybook/addon-docs/blocks";
+import {
+  Meta,
+  Canvas,
+  Primary,
+  Controls,
+  Source,
+} from "@storybook/addon-docs/blocks";
 import * as MermaidStories from "./Mermaid.stories";
 
 <Meta of={MermaidStories} />
@@ -6,6 +12,12 @@ import * as MermaidStories from "./Mermaid.stories";
 # Mermaid
 
 Mermaid diagrams render inline with Lapis-compatible controls.
+
+## Usage
+
+Docs source shows the public Mira APIs (not story wrapper components).
+
+<Source of={MermaidStories.Preview} />
 
 ## Surfaces
 
@@ -19,15 +31,23 @@ Each markdown feature is shown in reading preview (`MarkdownPreview`), live prev
 
 <Canvas of={MermaidStories.LivePreview} meta={MermaidStories} />
 
+<Source of={MermaidStories.LivePreview} />
+
 ## Source Mode
 
 <Canvas of={MermaidStories.SourceMode} meta={MermaidStories} />
 
+<Source of={MermaidStories.SourceMode} />
+
 ## Syntax
 
-```md
+````md
 ```mermaid
 flowchart TB
   A --> B
 ```
+````
+
+```
+
 ```

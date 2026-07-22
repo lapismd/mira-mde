@@ -1,20 +1,32 @@
 import type { Meta, StoryObj } from "@storybook/svelte-vite";
-import TaskStatesLive from "./TaskStatesLive.svelte";
-import TaskStatesPreview from "./TaskStatesPreview.svelte";
-import TaskStatesSource from "./TaskStatesSource.svelte";
+import EditorModeStory from "../_shared/EditorModeStory.svelte";
+import MarkdownPreviewStory from "../_shared/MarkdownPreviewStory.svelte";
+import {
+  markdownEditorDocsSource,
+  markdownPreviewDocsSource,
+} from "../_shared/docs-source";
+import { taskStatesMarkdown } from "../fixtures";
 
 const meta = {
   title: "Markdown/Task States",
-  component: TaskStatesPreview,
+  component: MarkdownPreviewStory,
+  args: {
+    value: taskStatesMarkdown,
+  },
   parameters: {
     docs: {
       description: {
         component:
           "Custom checklist markers cover draft, done, in-progress, and more.",
       },
+      source: {
+        language: "svelte",
+        type: "code",
+        code: markdownPreviewDocsSource("taskStatesMarkdown"),
+      },
     },
   },
-} satisfies Meta<typeof TaskStatesPreview>;
+} satisfies Meta<typeof MarkdownPreviewStory>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -23,14 +35,40 @@ export const Preview: Story = {};
 
 export const LivePreview: Story = {
   name: "Live Preview",
-  render: () => ({
-    Component: TaskStatesLive,
+  render: (args) => ({
+    Component: EditorModeStory,
+    props: {
+      ...args,
+      mode: "live-preview",
+    },
   }),
+  parameters: {
+    docs: {
+      source: {
+        language: "svelte",
+        type: "code",
+        code: markdownEditorDocsSource("taskStatesMarkdown", "live-preview"),
+      },
+    },
+  },
 };
 
 export const SourceMode: Story = {
   name: "Source Mode",
-  render: () => ({
-    Component: TaskStatesSource,
+  render: (args) => ({
+    Component: EditorModeStory,
+    props: {
+      ...args,
+      mode: "source",
+    },
   }),
+  parameters: {
+    docs: {
+      source: {
+        language: "svelte",
+        type: "code",
+        code: markdownEditorDocsSource("taskStatesMarkdown", "source"),
+      },
+    },
+  },
 };

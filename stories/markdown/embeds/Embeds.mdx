@@ -1,4 +1,10 @@
-import { Meta, Canvas, Primary, Controls } from "@storybook/addon-docs/blocks";
+import {
+  Meta,
+  Canvas,
+  Primary,
+  Controls,
+  Source,
+} from "@storybook/addon-docs/blocks";
 import * as EmbedsStories from "./Embeds.stories";
 
 <Meta of={EmbedsStories} />
@@ -6,6 +12,12 @@ import * as EmbedsStories from "./Embeds.stories";
 # Embeds
 
 Embed another note or asset with Obsidian-style embed syntax. Both image assets and Markdown notes resolve through `MiraFileAdapter`.
+
+## Usage
+
+Docs source shows the public Mira APIs (not story wrapper components).
+
+<Source of={EmbedsStories.Preview} />
 
 ## Surfaces
 
@@ -19,9 +31,13 @@ Each markdown feature is shown in reading preview (`MarkdownPreview`), live prev
 
 <Canvas of={EmbedsStories.LivePreview} meta={EmbedsStories} />
 
+<Source of={EmbedsStories.LivePreview} />
+
 ## Source Mode
 
 <Canvas of={EmbedsStories.SourceMode} meta={EmbedsStories} />
+
+<Source of={EmbedsStories.SourceMode} />
 
 ## Syntax
 

@@ -1,20 +1,32 @@
 import type { Meta, StoryObj } from "@storybook/svelte-vite";
-import HeadingsLive from "./HeadingsLive.svelte";
-import HeadingsPreview from "./HeadingsPreview.svelte";
-import HeadingsSource from "./HeadingsSource.svelte";
+import EditorModeStory from "../_shared/EditorModeStory.svelte";
+import MarkdownPreviewStory from "../_shared/MarkdownPreviewStory.svelte";
+import {
+  markdownEditorDocsSource,
+  markdownPreviewDocsSource,
+} from "../_shared/docs-source";
+import { headingsMarkdown } from "../fixtures";
 
 const meta = {
   title: "Markdown/Headings",
-  component: HeadingsPreview,
+  component: MarkdownPreviewStory,
+  args: {
+    value: headingsMarkdown,
+  },
   parameters: {
     docs: {
       description: {
         component:
           "Headings create the document outline used by reading and editor surfaces.",
       },
+      source: {
+        language: "svelte",
+        type: "code",
+        code: markdownPreviewDocsSource("headingsMarkdown"),
+      },
     },
   },
-} satisfies Meta<typeof HeadingsPreview>;
+} satisfies Meta<typeof MarkdownPreviewStory>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -23,14 +35,40 @@ export const Preview: Story = {};
 
 export const LivePreview: Story = {
   name: "Live Preview",
-  render: () => ({
-    Component: HeadingsLive,
+  render: (args) => ({
+    Component: EditorModeStory,
+    props: {
+      ...args,
+      mode: "live-preview",
+    },
   }),
+  parameters: {
+    docs: {
+      source: {
+        language: "svelte",
+        type: "code",
+        code: markdownEditorDocsSource("headingsMarkdown", "live-preview"),
+      },
+    },
+  },
 };
 
 export const SourceMode: Story = {
   name: "Source Mode",
-  render: () => ({
-    Component: HeadingsSource,
+  render: (args) => ({
+    Component: EditorModeStory,
+    props: {
+      ...args,
+      mode: "source",
+    },
   }),
+  parameters: {
+    docs: {
+      source: {
+        language: "svelte",
+        type: "code",
+        code: markdownEditorDocsSource("headingsMarkdown", "source"),
+      },
+    },
+  },
 };

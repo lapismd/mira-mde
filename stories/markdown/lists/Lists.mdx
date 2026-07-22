@@ -1,4 +1,10 @@
-import { Meta, Canvas, Primary, Controls } from "@storybook/addon-docs/blocks";
+import {
+  Meta,
+  Canvas,
+  Primary,
+  Controls,
+  Source,
+} from "@storybook/addon-docs/blocks";
 import * as ListsStories from "./Lists.stories";
 
 <Meta of={ListsStories} />
@@ -6,6 +12,12 @@ import * as ListsStories from "./Lists.stories";
 # Lists
 
 Ordered and unordered lists keep nested alignment and wrapping.
+
+## Usage
+
+Docs source shows the public Mira APIs (not story wrapper components).
+
+<Source of={ListsStories.Preview} />
 
 ## Surfaces
 
@@ -19,9 +31,13 @@ Each markdown feature is shown in reading preview (`MarkdownPreview`), live prev
 
 <Canvas of={ListsStories.LivePreview} meta={ListsStories} />
 
+<Source of={ListsStories.LivePreview} />
+
 ## Source Mode
 
 <Canvas of={ListsStories.SourceMode} meta={ListsStories} />
+
+<Source of={ListsStories.SourceMode} />
 
 ## Syntax
 

@@ -1,20 +1,32 @@
 import type { Meta, StoryObj } from "@storybook/svelte-vite";
-import ListsLive from "./ListsLive.svelte";
-import ListsPreview from "./ListsPreview.svelte";
-import ListsSource from "./ListsSource.svelte";
+import EditorModeStory from "../_shared/EditorModeStory.svelte";
+import MarkdownPreviewStory from "../_shared/MarkdownPreviewStory.svelte";
+import {
+  markdownEditorDocsSource,
+  markdownPreviewDocsSource,
+} from "../_shared/docs-source";
+import { listsMarkdown } from "../fixtures";
 
 const meta = {
   title: "Markdown/Lists",
-  component: ListsPreview,
+  component: MarkdownPreviewStory,
+  args: {
+    value: listsMarkdown,
+  },
   parameters: {
     docs: {
       description: {
         component:
           "Ordered and unordered lists keep nested alignment and wrapping.",
       },
+      source: {
+        language: "svelte",
+        type: "code",
+        code: markdownPreviewDocsSource("listsMarkdown"),
+      },
     },
   },
-} satisfies Meta<typeof ListsPreview>;
+} satisfies Meta<typeof MarkdownPreviewStory>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -23,14 +35,40 @@ export const Preview: Story = {};
 
 export const LivePreview: Story = {
   name: "Live Preview",
-  render: () => ({
-    Component: ListsLive,
+  render: (args) => ({
+    Component: EditorModeStory,
+    props: {
+      ...args,
+      mode: "live-preview",
+    },
   }),
+  parameters: {
+    docs: {
+      source: {
+        language: "svelte",
+        type: "code",
+        code: markdownEditorDocsSource("listsMarkdown", "live-preview"),
+      },
+    },
+  },
 };
 
 export const SourceMode: Story = {
   name: "Source Mode",
-  render: () => ({
-    Component: ListsSource,
+  render: (args) => ({
+    Component: EditorModeStory,
+    props: {
+      ...args,
+      mode: "source",
+    },
   }),
+  parameters: {
+    docs: {
+      source: {
+        language: "svelte",
+        type: "code",
+        code: markdownEditorDocsSource("listsMarkdown", "source"),
+      },
+    },
+  },
 };

@@ -1,19 +1,31 @@
 import type { Meta, StoryObj } from "@storybook/svelte-vite";
-import BlockquotesLive from "./BlockquotesLive.svelte";
-import BlockquotesPreview from "./BlockquotesPreview.svelte";
-import BlockquotesSource from "./BlockquotesSource.svelte";
+import EditorModeStory from "../_shared/EditorModeStory.svelte";
+import MarkdownPreviewStory from "../_shared/MarkdownPreviewStory.svelte";
+import {
+  markdownEditorDocsSource,
+  markdownPreviewDocsSource,
+} from "../_shared/docs-source";
+import { blockquotesMarkdown } from "../fixtures";
 
 const meta = {
   title: "Markdown/Blockquotes",
-  component: BlockquotesPreview,
+  component: MarkdownPreviewStory,
+  args: {
+    value: blockquotesMarkdown,
+  },
   parameters: {
     docs: {
       description: {
         component: "Blockquotes preserve quoted prose and nesting.",
       },
+      source: {
+        language: "svelte",
+        type: "code",
+        code: markdownPreviewDocsSource("blockquotesMarkdown"),
+      },
     },
   },
-} satisfies Meta<typeof BlockquotesPreview>;
+} satisfies Meta<typeof MarkdownPreviewStory>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -22,14 +34,40 @@ export const Preview: Story = {};
 
 export const LivePreview: Story = {
   name: "Live Preview",
-  render: () => ({
-    Component: BlockquotesLive,
+  render: (args) => ({
+    Component: EditorModeStory,
+    props: {
+      ...args,
+      mode: "live-preview",
+    },
   }),
+  parameters: {
+    docs: {
+      source: {
+        language: "svelte",
+        type: "code",
+        code: markdownEditorDocsSource("blockquotesMarkdown", "live-preview"),
+      },
+    },
+  },
 };
 
 export const SourceMode: Story = {
   name: "Source Mode",
-  render: () => ({
-    Component: BlockquotesSource,
+  render: (args) => ({
+    Component: EditorModeStory,
+    props: {
+      ...args,
+      mode: "source",
+    },
   }),
+  parameters: {
+    docs: {
+      source: {
+        language: "svelte",
+        type: "code",
+        code: markdownEditorDocsSource("blockquotesMarkdown", "source"),
+      },
+    },
+  },
 };

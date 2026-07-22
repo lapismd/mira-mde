@@ -1,4 +1,10 @@
-import { Meta, Canvas, Primary, Controls } from "@storybook/addon-docs/blocks";
+import {
+  Meta,
+  Canvas,
+  Primary,
+  Controls,
+  Source,
+} from "@storybook/addon-docs/blocks";
 import * as RawHtmlStories from "./RawHtml.stories";
 
 <Meta of={RawHtmlStories} />
@@ -6,6 +12,12 @@ import * as RawHtmlStories from "./RawHtml.stories";
 # Raw HTML
 
 Trusted raw HTML is preserved in preview surfaces.
+
+## Usage
+
+Docs source shows the public Mira APIs (not story wrapper components).
+
+<Source of={RawHtmlStories.Preview} />
 
 ## Surfaces
 
@@ -19,9 +31,13 @@ Each markdown feature is shown in reading preview (`MarkdownPreview`), live prev
 
 <Canvas of={RawHtmlStories.LivePreview} meta={RawHtmlStories} />
 
+<Source of={RawHtmlStories.LivePreview} />
+
 ## Source Mode
 
 <Canvas of={RawHtmlStories.SourceMode} meta={RawHtmlStories} />
+
+<Source of={RawHtmlStories.SourceMode} />
 
 ## Syntax
 

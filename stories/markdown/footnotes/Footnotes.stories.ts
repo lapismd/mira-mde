@@ -1,20 +1,32 @@
 import type { Meta, StoryObj } from "@storybook/svelte-vite";
-import FootnotesLive from "./FootnotesLive.svelte";
-import FootnotesPreview from "./FootnotesPreview.svelte";
-import FootnotesSource from "./FootnotesSource.svelte";
+import EditorModeStory from "../_shared/EditorModeStory.svelte";
+import MarkdownPreviewStory from "../_shared/MarkdownPreviewStory.svelte";
+import {
+  markdownEditorDocsSource,
+  markdownPreviewDocsSource,
+} from "../_shared/docs-source";
+import { footnotesMarkdown } from "../fixtures";
 
 const meta = {
   title: "Markdown/Footnotes",
-  component: FootnotesPreview,
+  component: MarkdownPreviewStory,
+  args: {
+    value: footnotesMarkdown,
+  },
   parameters: {
     docs: {
       description: {
         component:
           "Footnotes keep supporting details next to related paragraphs.",
       },
+      source: {
+        language: "svelte",
+        type: "code",
+        code: markdownPreviewDocsSource("footnotesMarkdown"),
+      },
     },
   },
-} satisfies Meta<typeof FootnotesPreview>;
+} satisfies Meta<typeof MarkdownPreviewStory>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -23,14 +35,40 @@ export const Preview: Story = {};
 
 export const LivePreview: Story = {
   name: "Live Preview",
-  render: () => ({
-    Component: FootnotesLive,
+  render: (args) => ({
+    Component: EditorModeStory,
+    props: {
+      ...args,
+      mode: "live-preview",
+    },
   }),
+  parameters: {
+    docs: {
+      source: {
+        language: "svelte",
+        type: "code",
+        code: markdownEditorDocsSource("footnotesMarkdown", "live-preview"),
+      },
+    },
+  },
 };
 
 export const SourceMode: Story = {
   name: "Source Mode",
-  render: () => ({
-    Component: FootnotesSource,
+  render: (args) => ({
+    Component: EditorModeStory,
+    props: {
+      ...args,
+      mode: "source",
+    },
   }),
+  parameters: {
+    docs: {
+      source: {
+        language: "svelte",
+        type: "code",
+        code: markdownEditorDocsSource("footnotesMarkdown", "source"),
+      },
+    },
+  },
 };

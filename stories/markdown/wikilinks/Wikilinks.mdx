@@ -1,4 +1,10 @@
-import { Meta, Canvas, Primary, Controls } from "@storybook/addon-docs/blocks";
+import {
+  Meta,
+  Canvas,
+  Primary,
+  Controls,
+  Source,
+} from "@storybook/addon-docs/blocks";
 import * as WikilinksStories from "./Wikilinks.stories";
 
 <Meta of={WikilinksStories} />
@@ -6,6 +12,12 @@ import * as WikilinksStories from "./Wikilinks.stories";
 # Wikilinks
 
 Obsidian-style note references stay portable across apps.
+
+## Usage
+
+Docs source shows the public Mira APIs (not story wrapper components).
+
+<Source of={WikilinksStories.Preview} />
 
 ## Surfaces
 
@@ -19,9 +31,13 @@ Each markdown feature is shown in reading preview (`MarkdownPreview`), live prev
 
 <Canvas of={WikilinksStories.LivePreview} meta={WikilinksStories} />
 
+<Source of={WikilinksStories.LivePreview} />
+
 ## Source Mode
 
 <Canvas of={WikilinksStories.SourceMode} meta={WikilinksStories} />
+
+<Source of={WikilinksStories.SourceMode} />
 
 ## Syntax
 

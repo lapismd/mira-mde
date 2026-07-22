@@ -1,6 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/svelte-vite";
 import DefaultEditorStory from "../_shared/DefaultEditorStory.svelte";
-import { defaultEditorArgs, defaultEditorArgTypes } from "../_shared/argTypes";
+import {
+  defaultEditorArgs,
+  defaultEditorArgTypes,
+  defaultEditorDocsParameters,
+} from "../_shared/argTypes";
 
 const meta = {
   title: "Default UI/Themes",
@@ -8,7 +12,9 @@ const meta = {
   args: defaultEditorArgs,
   argTypes: defaultEditorArgTypes,
   parameters: {
+    ...defaultEditorDocsParameters,
     docs: {
+      ...defaultEditorDocsParameters.docs,
       description: {
         component:
           "Theme tokens for MiraDefaultMde via the theme prop (light, dark, obsidian, system, inherit).",

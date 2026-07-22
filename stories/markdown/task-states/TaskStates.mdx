@@ -1,4 +1,10 @@
-import { Meta, Canvas, Primary, Controls } from "@storybook/addon-docs/blocks";
+import {
+  Meta,
+  Canvas,
+  Primary,
+  Controls,
+  Source,
+} from "@storybook/addon-docs/blocks";
 import * as TaskStatesStories from "./TaskStates.stories";
 
 <Meta of={TaskStatesStories} />
@@ -6,6 +12,12 @@ import * as TaskStatesStories from "./TaskStates.stories";
 # Task States
 
 Custom checklist markers cover draft, done, in-progress, and more.
+
+## Usage
+
+Docs source shows the public Mira APIs (not story wrapper components).
+
+<Source of={TaskStatesStories.Preview} />
 
 ## Surfaces
 
@@ -19,9 +31,13 @@ Each markdown feature is shown in reading preview (`MarkdownPreview`), live prev
 
 <Canvas of={TaskStatesStories.LivePreview} meta={TaskStatesStories} />
 
+<Source of={TaskStatesStories.LivePreview} />
+
 ## Source Mode
 
 <Canvas of={TaskStatesStories.SourceMode} meta={TaskStatesStories} />
+
+<Source of={TaskStatesStories.SourceMode} />
 
 ## Syntax
 

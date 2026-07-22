@@ -1,4 +1,10 @@
-import { Meta, Canvas, Primary, Controls } from "@storybook/addon-docs/blocks";
+import {
+  Meta,
+  Canvas,
+  Primary,
+  Controls,
+  Source,
+} from "@storybook/addon-docs/blocks";
 import * as TagsStories from "./Tags.stories";
 
 <Meta of={TagsStories} />
@@ -6,6 +12,12 @@ import * as TagsStories from "./Tags.stories";
 # Tags
 
 Inline and nested tags render as navigable metadata.
+
+## Usage
+
+Docs source shows the public Mira APIs (not story wrapper components).
+
+<Source of={TagsStories.Preview} />
 
 ## Surfaces
 
@@ -19,9 +31,13 @@ Each markdown feature is shown in reading preview (`MarkdownPreview`), live prev
 
 <Canvas of={TagsStories.LivePreview} meta={TagsStories} />
 
+<Source of={TagsStories.LivePreview} />
+
 ## Source Mode
 
 <Canvas of={TagsStories.SourceMode} meta={TagsStories} />
+
+<Source of={TagsStories.SourceMode} />
 
 ## Syntax
 

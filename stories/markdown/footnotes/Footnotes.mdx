@@ -1,4 +1,10 @@
-import { Meta, Canvas, Primary, Controls } from "@storybook/addon-docs/blocks";
+import {
+  Meta,
+  Canvas,
+  Primary,
+  Controls,
+  Source,
+} from "@storybook/addon-docs/blocks";
 import * as FootnotesStories from "./Footnotes.stories";
 
 <Meta of={FootnotesStories} />
@@ -6,6 +12,12 @@ import * as FootnotesStories from "./Footnotes.stories";
 # Footnotes
 
 Footnotes keep supporting details next to related paragraphs.
+
+## Usage
+
+Docs source shows the public Mira APIs (not story wrapper components).
+
+<Source of={FootnotesStories.Preview} />
 
 ## Surfaces
 
@@ -19,9 +31,13 @@ Each markdown feature is shown in reading preview (`MarkdownPreview`), live prev
 
 <Canvas of={FootnotesStories.LivePreview} meta={FootnotesStories} />
 
+<Source of={FootnotesStories.LivePreview} />
+
 ## Source Mode
 
 <Canvas of={FootnotesStories.SourceMode} meta={FootnotesStories} />
+
+<Source of={FootnotesStories.SourceMode} />
 
 ## Syntax
 
