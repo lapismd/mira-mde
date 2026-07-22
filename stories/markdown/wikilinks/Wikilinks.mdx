@@ -1,0 +1,30 @@
+import { Meta, Canvas, Primary, Controls } from "@storybook/addon-docs/blocks";
+import * as WikilinksStories from "./Wikilinks.stories";
+
+<Meta of={WikilinksStories} />
+
+# Wikilinks
+
+Obsidian-style note references stay portable across apps.
+
+## Surfaces
+
+Each markdown feature is shown in reading preview (`MarkdownPreview`), live preview, and source mode (`MiraDefaultMde`).
+
+<Primary />
+
+<Controls />
+
+## Live Preview
+
+<Canvas of={WikilinksStories.LivePreview} meta={WikilinksStories} />
+
+## Source Mode
+
+<Canvas of={WikilinksStories.SourceMode} meta={WikilinksStories} />
+
+## Syntax
+
+```md
+[[Daily Note]]
+```

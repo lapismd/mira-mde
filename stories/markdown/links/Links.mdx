@@ -1,0 +1,30 @@
+import { Meta, Canvas, Primary, Controls } from "@storybook/addon-docs/blocks";
+import * as LinksStories from "./Links.stories";
+
+<Meta of={LinksStories} />
+
+# Links
+
+Relative, external, and automatic links resolve through the configured adapter.
+
+## Surfaces
+
+Each markdown feature is shown in reading preview (`MarkdownPreview`), live preview, and source mode (`MiraDefaultMde`).
+
+<Primary />
+
+<Controls />
+
+## Live Preview
+
+<Canvas of={LinksStories.LivePreview} meta={LinksStories} />
+
+## Source Mode
+
+<Canvas of={LinksStories.SourceMode} meta={LinksStories} />
+
+## Syntax
+
+```md
+[relative](notes/markdown.md)
+```

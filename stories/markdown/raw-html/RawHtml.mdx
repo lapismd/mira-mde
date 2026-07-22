@@ -1,0 +1,30 @@
+import { Meta, Canvas, Primary, Controls } from "@storybook/addon-docs/blocks";
+import * as RawHtmlStories from "./RawHtml.stories";
+
+<Meta of={RawHtmlStories} />
+
+# Raw HTML
+
+Trusted raw HTML is preserved in preview surfaces.
+
+## Surfaces
+
+Each markdown feature is shown in reading preview (`MarkdownPreview`), live preview, and source mode (`MiraDefaultMde`).
+
+<Primary />
+
+<Controls />
+
+## Live Preview
+
+<Canvas of={RawHtmlStories.LivePreview} meta={RawHtmlStories} />
+
+## Source Mode
+
+<Canvas of={RawHtmlStories.SourceMode} meta={RawHtmlStories} />
+
+## Syntax
+
+```md
+<mark>highlighted</mark>
+```

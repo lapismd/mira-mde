@@ -1,0 +1,31 @@
+.mira-story-surface {
+  box-sizing: border-box;
+  min-height: 100%;
+  padding: 1.25rem 1.5rem;
+  background: var(--mira-background, var(--background-primary, #fff));
+  color: var(--mira-foreground, var(--text-normal, #111));
+}
+
+.mira-story-surface--preview {
+  max-width: 52rem;
+}
+
+.mira-story-surface--editor {
+  height: var(--mira-story-editor-height, 34rem);
+  max-width: none;
+  padding: 0;
+}
+
+.mira-story-surface--editor :global(.mira-default-mde),
+.mira-story-surface--editor :global(.mira-mde) {
+  height: 100%;
+}
+
+.mira-story-surface--toolbar {
+  padding: 1rem;
+}
+
+html.dark .mira-story-surface,
+html.mira-theme-dark .mira-story-surface {
+  color-scheme: dark;
+}

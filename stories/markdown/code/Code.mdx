@@ -1,0 +1,30 @@
+import { Meta, Canvas, Primary, Controls } from "@storybook/addon-docs/blocks";
+import * as CodeStories from "./Code.stories";
+
+<Meta of={CodeStories} />
+
+# Code
+
+Inline code and fenced blocks with optional line highlights.
+
+## Surfaces
+
+Each markdown feature is shown in reading preview (`MarkdownPreview`), live preview, and source mode (`MiraDefaultMde`).
+
+<Primary />
+
+<Controls />
+
+## Live Preview
+
+<Canvas of={CodeStories.LivePreview} meta={CodeStories} />
+
+## Source Mode
+
+<Canvas of={CodeStories.SourceMode} meta={CodeStories} />
+
+## Syntax
+
+```md
+Inline `code`
+```

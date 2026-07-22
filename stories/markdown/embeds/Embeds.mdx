@@ -1,0 +1,30 @@
+import { Meta, Canvas, Primary, Controls } from "@storybook/addon-docs/blocks";
+import * as EmbedsStories from "./Embeds.stories";
+
+<Meta of={EmbedsStories} />
+
+# Embeds
+
+Embed another note or asset with Obsidian-style embed syntax.
+
+## Surfaces
+
+Each markdown feature is shown in reading preview (`MarkdownPreview`), live preview, and source mode (`MiraDefaultMde`).
+
+<Primary />
+
+<Controls />
+
+## Live Preview
+
+<Canvas of={EmbedsStories.LivePreview} meta={EmbedsStories} />
+
+## Source Mode
+
+<Canvas of={EmbedsStories.SourceMode} meta={EmbedsStories} />
+
+## Syntax
+
+```md
+![[Architecture Diagram]]
+```

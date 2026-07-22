@@ -1,3 +1,5 @@
+/** Keep in sync with `stories/markdown/fixtures.ts` (Storybook catalog source of truth). */
+
 export const frontmatterMarkdown = String.raw`---
 title: Release notes
 status: draft
@@ -7,7 +9,7 @@ tags:
   - markdown
   - properties
 aliases:
-  - Markdown metadata
+    - Markdown metadata
 ---
 
 # Frontmatter

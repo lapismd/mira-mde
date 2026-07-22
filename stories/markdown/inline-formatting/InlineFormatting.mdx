@@ -1,0 +1,36 @@
+import { Meta, Canvas, Primary, Controls } from "@storybook/addon-docs/blocks";
+import * as InlineFormattingStories from "./InlineFormatting.stories";
+
+<Meta of={InlineFormattingStories} />
+
+# Inline Formatting
+
+Bold, italic, strikethrough, and inline code compose inside paragraphs.
+
+## Surfaces
+
+Each markdown feature is shown in reading preview (`MarkdownPreview`), live preview, and source mode (`MiraDefaultMde`).
+
+<Primary />
+
+<Controls />
+
+## Live Preview
+
+<Canvas
+  of={InlineFormattingStories.LivePreview}
+  meta={InlineFormattingStories}
+/>
+
+## Source Mode
+
+<Canvas
+  of={InlineFormattingStories.SourceMode}
+  meta={InlineFormattingStories}
+/>
+
+## Syntax
+
+```md
+Use **bold**, _italic_, and `code`.
+```

@@ -1,0 +1,61 @@
+import {
+  Meta,
+  Canvas,
+  Controls,
+  Primary,
+  Source,
+} from "@storybook/addon-docs/blocks";
+import * as MiraDefaultMdeStories from "./MiraDefaultMde.stories";
+import * as ModesStories from "./modes/Modes.stories";
+import * as ThemesStories from "./themes/Themes.stories";
+import * as ConfigurationStories from "./configuration/Configuration.stories";
+import * as FeaturesStories from "./features/Features.stories";
+
+<Meta of={MiraDefaultMdeStories} />
+
+# MiraDefaultMde
+
+Default Mira editor shell from `@mira-mde/default-ui/svelte`. Compose modes, themes, feature flags, and editor settings through props.
+
+## Usage
+
+<Source
+  language="html"
+  code={`<script lang="ts">
+  import { MiraDefaultMde } from "@mira-mde/default-ui/svelte";
+  import "@mira-mde/default-ui/styles.css";
+</script>
+
+<MiraDefaultMde
+  bind:value
+  mode="live-preview"
+  theme="light"
+  features={{ mermaid: true, tables: true }}
+/>`}
+/>
+
+<Primary />
+
+## Properties
+
+Use the Controls panel to explore public configuration props (mode, theme, indentation, reading options, and feature maps).
+
+<Controls />
+
+## Examples
+
+### Modes
+
+<Canvas of={ModesStories.LivePreview} meta={ModesStories} />
+
+### Themes
+
+<Canvas of={ThemesStories.Light} meta={ThemesStories} />
+
+### Configuration
+
+<Canvas of={ConfigurationStories.Defaults} meta={ConfigurationStories} />
+
+### Features
+
+<Canvas of={FeaturesStories.Defaults} meta={FeaturesStories} />

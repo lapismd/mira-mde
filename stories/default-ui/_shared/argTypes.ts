@@ -1,0 +1,130 @@
+import type { ArgTypes } from "@storybook/svelte-vite";
+import { defaultUiSampleMarkdown } from "../fixtures";
+
+export type DefaultEditorStoryProps = {
+  value?: string;
+  mode?: "source" | "live-preview" | "preview" | "split";
+  theme?: "obsidian" | "system" | "light" | "dark" | "inherit";
+  readonly?: boolean;
+  lineWrapping?: boolean;
+  spellcheck?: boolean;
+  indentGuides?: boolean;
+  indentWithTabs?: boolean;
+  indentWidth?: number;
+  outline?: boolean;
+  emoji?: boolean;
+  frontmatterOpen?: boolean;
+  htmlPolicy?: "trusted" | "safe";
+  height?: string;
+};
+
+export const defaultEditorArgs: DefaultEditorStoryProps = {
+  value: defaultUiSampleMarkdown,
+  mode: "live-preview",
+  theme: "light",
+  readonly: false,
+  lineWrapping: true,
+  spellcheck: true,
+  indentGuides: true,
+  indentWithTabs: false,
+  indentWidth: 2,
+  outline: false,
+  emoji: false,
+  frontmatterOpen: true,
+  htmlPolicy: "trusted",
+  height: "34rem",
+};
+
+/** Controls surface matching MiraDefaultMde public configuration props. */
+export const defaultEditorArgTypes = {
+  value: {
+    control: "text",
+    description: "Markdown document content.",
+    table: { category: "Content" },
+  },
+  mode: {
+    control: "select",
+    options: ["source", "live-preview", "preview", "split"],
+    description: "Active editor surface.",
+    table: { category: "Mode", type: { summary: "MiraMode" } },
+  },
+  theme: {
+    control: "select",
+    options: ["light", "dark", "obsidian", "system", "inherit"],
+    description: "Theme tokens applied to the editor shell.",
+    table: { category: "Appearance", type: { summary: "MiraTheme" } },
+  },
+  height: {
+    control: "text",
+    description: "CSS height for the story chrome around the editor.",
+    table: { category: "Appearance" },
+  },
+  readonly: {
+    control: "boolean",
+    description: "Disable editing while keeping the current mode.",
+    table: { category: "Editing" },
+  },
+  lineWrapping: {
+    control: "boolean",
+    description: "Wrap long source lines.",
+    table: { category: "Editing" },
+  },
+  spellcheck: {
+    control: "boolean",
+    description: "Enable browser spellcheck in source surfaces.",
+    table: { category: "Editing" },
+  },
+  indentGuides: {
+    control: "boolean",
+    description: "Show indent guides in the source editor.",
+    table: { category: "Indentation" },
+  },
+  indentWithTabs: {
+    control: "boolean",
+    description: "Prefer tabs over spaces when indenting.",
+    table: { category: "Indentation" },
+  },
+  indentWidth: {
+    control: { type: "number", min: 1, max: 8, step: 1 },
+    description: "Indent size in columns.",
+    table: { category: "Indentation" },
+  },
+  outline: {
+    control: "boolean",
+    description: "Show the document outline beside the editor.",
+    table: { category: "Reading" },
+  },
+  emoji: {
+    control: "boolean",
+    description: "Enable emoji shortcode rendering.",
+    table: { category: "Reading" },
+  },
+  frontmatterOpen: {
+    control: "boolean",
+    description: "Initial expanded state for frontmatter.",
+    table: { category: "Reading" },
+  },
+  htmlPolicy: {
+    control: "select",
+    options: ["trusted", "safe"],
+    description: "Raw HTML sanitization policy.",
+    table: { category: "Reading", type: { summary: '"trusted" | "safe"' } },
+  },
+  features: {
+    control: "object",
+    description:
+      "Partial MiraFeatureFlags map enabling/disabling packaged capabilities.",
+    table: { category: "Features", type: { summary: "MiraFeatureFlags" } },
+  },
+  featureConfigs: {
+    control: "object",
+    description:
+      "Feature-specific configuration such as toolbar items and Mermaid options.",
+    table: {
+      category: "Features",
+      type: { summary: "MiraDefaultFeatureConfigs" },
+    },
+  },
+} satisfies Partial<
+  ArgTypes<DefaultEditorStoryProps & Record<string, unknown>>
+>;

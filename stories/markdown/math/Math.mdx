@@ -1,0 +1,30 @@
+import { Meta, Canvas, Primary, Controls } from "@storybook/addon-docs/blocks";
+import * as MathStories from "./Math.stories";
+
+<Meta of={MathStories} />
+
+# Math
+
+Inline and block KaTeX math rendering.
+
+## Surfaces
+
+Each markdown feature is shown in reading preview (`MarkdownPreview`), live preview, and source mode (`MiraDefaultMde`).
+
+<Primary />
+
+<Controls />
+
+## Live Preview
+
+<Canvas of={MathStories.LivePreview} meta={MathStories} />
+
+## Source Mode
+
+<Canvas of={MathStories.SourceMode} meta={MathStories} />
+
+## Syntax
+
+```md
+$a^2 + b^2 = c^2$
+```

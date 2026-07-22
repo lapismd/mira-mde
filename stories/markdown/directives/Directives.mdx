@@ -1,0 +1,32 @@
+import { Meta, Canvas, Primary, Controls } from "@storybook/addon-docs/blocks";
+import * as DirectivesStories from "./Directives.stories";
+
+<Meta of={DirectivesStories} />
+
+# Directives
+
+Directive syntax renders as portable custom elements.
+
+## Surfaces
+
+Each markdown feature is shown in reading preview (`MarkdownPreview`), live preview, and source mode (`MiraDefaultMde`).
+
+<Primary />
+
+<Controls />
+
+## Live Preview
+
+<Canvas of={DirectivesStories.LivePreview} meta={DirectivesStories} />
+
+## Source Mode
+
+<Canvas of={DirectivesStories.SourceMode} meta={DirectivesStories} />
+
+## Syntax
+
+```md
+:::mira{title="Example"}
+Content
+:::
+```

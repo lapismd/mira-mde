@@ -1,0 +1,30 @@
+import { Meta, Canvas, Primary, Controls } from "@storybook/addon-docs/blocks";
+import * as ImagesStories from "./Images.stories";
+
+<Meta of={ImagesStories} />
+
+# Images
+
+Images resolve through the configured asset resolver.
+
+## Surfaces
+
+Each markdown feature is shown in reading preview (`MarkdownPreview`), live preview, and source mode (`MiraDefaultMde`).
+
+<Primary />
+
+<Controls />
+
+## Live Preview
+
+<Canvas of={ImagesStories.LivePreview} meta={ImagesStories} />
+
+## Source Mode
+
+<Canvas of={ImagesStories.SourceMode} meta={ImagesStories} />
+
+## Syntax
+
+```md
+![Alt](/mira-markdown-demo.svg)
+```

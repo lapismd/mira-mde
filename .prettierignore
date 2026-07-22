@@ -10,3 +10,6 @@ test-results
 pnpm-lock.yaml
 apps/demo/static/mira-markdown-demo.svg
 apps/docs/public/mira-markdown-demo.svg
+storybook-static
+tests/visual/storybook.spec.ts-snapshots/**/*.png
+

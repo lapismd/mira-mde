@@ -1,0 +1,31 @@
+import { Meta, Canvas, Primary, Controls } from "@storybook/addon-docs/blocks";
+import * as TablesStories from "./Tables.stories";
+
+<Meta of={TablesStories} />
+
+# Tables
+
+Pipe tables support alignment markers and shared preview styling.
+
+## Surfaces
+
+Each markdown feature is shown in reading preview (`MarkdownPreview`), live preview, and source mode (`MiraDefaultMde`).
+
+<Primary />
+
+<Controls />
+
+## Live Preview
+
+<Canvas of={TablesStories.LivePreview} meta={TablesStories} />
+
+## Source Mode
+
+<Canvas of={TablesStories.SourceMode} meta={TablesStories} />
+
+## Syntax
+
+```md
+| A   | B   |
+| --- | --- |
+```

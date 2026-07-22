@@ -8,3 +8,8 @@ playwright-report
 test-results
 *.tsbuildinfo
 .DS_Store
+storybook-static
+storybook-static-check
+tests/visual/storybook.spec.ts-snapshots/**/*.json
+tests/visual/storybook.spec.ts-snapshots/**/*.actual.png
+tests/visual/storybook.spec.ts-snapshots/**/*.diff.png

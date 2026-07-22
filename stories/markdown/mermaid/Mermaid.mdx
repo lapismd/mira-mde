@@ -1,0 +1,33 @@
+import { Meta, Canvas, Primary, Controls } from "@storybook/addon-docs/blocks";
+import * as MermaidStories from "./Mermaid.stories";
+
+<Meta of={MermaidStories} />
+
+# Mermaid
+
+Mermaid diagrams render inline with Lapis-compatible controls.
+
+## Surfaces
+
+Each markdown feature is shown in reading preview (`MarkdownPreview`), live preview, and source mode (`MiraDefaultMde`).
+
+<Primary />
+
+<Controls />
+
+## Live Preview
+
+<Canvas of={MermaidStories.LivePreview} meta={MermaidStories} />
+
+## Source Mode
+
+<Canvas of={MermaidStories.SourceMode} meta={MermaidStories} />
+
+## Syntax
+
+```md
+```mermaid
+flowchart TB
+  A --> B
+```
+```

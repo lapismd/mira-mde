@@ -1,0 +1,30 @@
+import { Meta, Canvas, Primary, Controls } from "@storybook/addon-docs/blocks";
+import * as BlockquotesStories from "./Blockquotes.stories";
+
+<Meta of={BlockquotesStories} />
+
+# Blockquotes
+
+Blockquotes preserve quoted prose and nesting.
+
+## Surfaces
+
+Each markdown feature is shown in reading preview (`MarkdownPreview`), live preview, and source mode (`MiraDefaultMde`).
+
+<Primary />
+
+<Controls />
+
+## Live Preview
+
+<Canvas of={BlockquotesStories.LivePreview} meta={BlockquotesStories} />
+
+## Source Mode
+
+<Canvas of={BlockquotesStories.SourceMode} meta={BlockquotesStories} />
+
+## Syntax
+
+```md
+> Quoted prose
+```
