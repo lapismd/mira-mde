@@ -45,6 +45,16 @@ const storyFiles = new Map<string, StoryFile>([
       path: "Architecture Diagram",
     },
   ],
+  [
+    "Embedded Note",
+    {
+      kind: "markdown",
+      markdown:
+        "# Embedded Note\n\nThis note is rendered inline through `![[Embedded Note]]` and the Storybook `MiraFileAdapter`.",
+      name: "Embedded Note",
+      path: "Embedded Note",
+    },
+  ],
 ]);
 
 export const storyFileAdapter: MiraFileAdapter = {

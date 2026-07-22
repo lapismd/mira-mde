@@ -5,7 +5,7 @@ import * as EmbedsStories from "./Embeds.stories";
 
 # Embeds
 
-Embed another note or asset with Obsidian-style embed syntax.
+Embed another note or asset with Obsidian-style embed syntax. Both image assets and Markdown notes resolve through `MiraFileAdapter`.
 
 ## Surfaces
 
@@ -25,6 +25,15 @@ Each markdown feature is shown in reading preview (`MarkdownPreview`), live prev
 
 ## Syntax
 
+Image asset embed:
+
 ```md
 ![[Architecture Diagram]]
+![[Architecture Diagram|Architecture diagram]]
+```
+
+Markdown note embed:
+
+```md
+![[Embedded Note]]
 ```

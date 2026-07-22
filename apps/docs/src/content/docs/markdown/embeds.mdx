@@ -22,6 +22,7 @@ Markdown embeds use wikilink syntax with a leading `!` to render a referenced no
 ```md
 ![[Architecture Diagram]]
 ![[Architecture Diagram|Architecture diagram]]
+![[Embedded Note]]
 ```
 
-Embeds use the configured asset and link resolvers to find display content.
+Embeds use the configured file adapter (or asset/link resolvers) to find display content for both image assets and Markdown notes.

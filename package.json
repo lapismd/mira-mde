@@ -28,13 +28,16 @@
     "test:visual:report": "playwright show-report"
   },
   "dependencies": {
+    "@mira-mde/codemirror": "workspace:*",
     "@mira-mde/default-ui": "workspace:*",
     "@mira-mde/extensions": "workspace:*",
+    "@mira-mde/plugin-ai": "workspace:*",
     "@mira-mde/plugin-mermaid": "workspace:*",
     "@mira-mde/preview": "workspace:*"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
+    "@lucide/svelte": "^0.525.0",
     "@playwright/test": "^1.61.1",
     "@storybook/addon-a11y": "^10.5.2",
     "@storybook/addon-docs": "^10.5.2",

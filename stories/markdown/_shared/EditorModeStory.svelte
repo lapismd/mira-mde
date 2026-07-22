@@ -4,9 +4,15 @@
     MiraFeature,
     type MiraDefaultFeatureConfigs,
     type MiraDefaultMdeProps,
+    type MiraDefaultToolbarDefinition,
     type MiraFeatureFlags,
   } from "@mira-mde/default-ui/svelte";
-  import type { MiraMode, MiraTheme } from "@mira-mde/extensions";
+  import type {
+    MiraExtension,
+    MiraImageConfig,
+    MiraMode,
+    MiraTheme,
+  } from "@mira-mde/extensions";
   import { storyFileAdapter } from "./file-adapter";
 
   type Props = {
@@ -26,6 +32,9 @@
     htmlPolicy?: MiraDefaultMdeProps["htmlPolicy"];
     features?: MiraFeatureFlags;
     featureConfigs?: MiraDefaultFeatureConfigs;
+    extensions?: MiraExtension[];
+    imageConfig?: MiraImageConfig;
+    toolbars?: MiraDefaultToolbarDefinition[];
     height?: string;
   };
 
@@ -46,6 +55,9 @@
     htmlPolicy = "trusted",
     features = {},
     featureConfigs = {},
+    extensions = [],
+    imageConfig,
+    toolbars = [],
     height = "34rem",
   }: Props = $props();
 
@@ -79,6 +91,9 @@
     fileAdapter={storyFileAdapter}
     features={mergedFeatures}
     {featureConfigs}
+    {extensions}
+    {imageConfig}
+    {toolbars}
     class="mira-story-editor"
   />
 </div>

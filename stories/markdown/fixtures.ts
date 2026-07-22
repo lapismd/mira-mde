@@ -54,6 +54,10 @@ export const embedsMarkdown = String.raw`# Markdown embeds
 Embed another note or asset with ![[Architecture Diagram]].
 
 Add display text with ![[Architecture Diagram|Architecture diagram]].
+
+Markdown notes embed through the same adapter:
+
+![[Embedded Note]]
 `;
 
 export const tagsMarkdown = String.raw`# Tags
@@ -159,11 +163,27 @@ $$
 $$
 `;
 
-export const imagesMarkdown = String.raw`# Images
+/** Tiny PNG used for base64 image rendering demos (5x5 red pixel). */
+export const base64DemoPng =
+  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==";
+
+export const imagesMarkdown = `# Images
+
+Resolved path image:
 
 ![Mira Markdown demo asset](/mira-markdown-demo.svg "Mira demo asset")
 
-Images can be resolved through the configured asset resolver.
+Inline base64 image:
+
+![Inline base64](${base64DemoPng})
+
+Reference-style base64 image:
+
+![Reference base64][base64-red]
+
+Images can be resolved through the configured asset resolver. Data-URI images render without a resolver.
+
+[base64-red]: ${base64DemoPng}
 `;
 
 export const rawHtmlMarkdown = String.raw`# Raw HTML

@@ -5,7 +5,7 @@ import * as ImagesStories from "./Images.stories";
 
 # Images
 
-Images resolve through the configured asset resolver.
+Images resolve through the configured asset resolver. Data-URI (`base64`) images render without a resolver.
 
 ## Surfaces
 
@@ -25,6 +25,24 @@ Each markdown feature is shown in reading preview (`MarkdownPreview`), live prev
 
 ## Syntax
 
+Path image (resolved by `assetResolver` / `fileAdapter`):
+
 ```md
-![Alt](/mira-markdown-demo.svg)
+![Alt](/mira-markdown-demo.svg "Optional title")
 ```
+
+Inline base64:
+
+```md
+![Alt](data:image/png;base64,...)
+```
+
+Reference-style base64 (default when pasting or inserting via the toolbar):
+
+```md
+![Alt][label]
+
+[label]: data:image/png;base64,...
+```
+
+Paste, drop, and the toolbar image action use `imageConfig` on the editor. See **Default UI → Editor Plugins → Image Attachments**.

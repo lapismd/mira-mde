@@ -125,6 +125,32 @@ export const defaultEditorArgTypes = {
       type: { summary: "MiraDefaultFeatureConfigs" },
     },
   },
+  extensions: {
+    control: false,
+    description: "Portable Mira extensions (slash, AI, custom CodeMirror).",
+    table: {
+      category: "Extensions",
+      type: { summary: "MiraExtension[]" },
+    },
+  },
+  imageConfig: {
+    control: "object",
+    description:
+      "Image paste/drop/picker config (upload, MIME types, reference vs inline syntax).",
+    table: {
+      category: "Extensions",
+      type: { summary: "MiraImageConfig" },
+    },
+  },
+  toolbars: {
+    control: false,
+    description:
+      "Extra declarative toolbar sections appended to the default toolbar.",
+    table: {
+      category: "Features",
+      type: { summary: "MiraDefaultToolbarDefinition[]" },
+    },
+  },
 } satisfies Partial<
   ArgTypes<DefaultEditorStoryProps & Record<string, unknown>>
 >;

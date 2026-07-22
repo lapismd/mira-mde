@@ -21,6 +21,10 @@ Images render from Markdown image syntax and can be resolved by the host applica
 
 ```md
 ![Alt text](/path/to/image.svg "Optional title")
+![Inline](data:image/png;base64,...)
+![Reference][label]
+
+[label]: data:image/png;base64,...
 ```
 
-Use alt text for accessible descriptions. The title is optional.
+Use alt text for accessible descriptions. The title is optional. Data-URI images render without an asset resolver. Paste, drop, and toolbar insert use `imageConfig` on the editor (default upload encodes as a data URL).

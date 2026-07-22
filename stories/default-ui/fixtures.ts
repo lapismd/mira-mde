@@ -45,3 +45,44 @@ flowchart LR
   Preview --> Split
 ~~~
 `;
+
+/** Empty doc so slash menus open on `/` without competing body text. */
+export const slashCommandsMarkdown = "";
+
+/** Multi-block sample for gutter block controls and section folding. */
+export const blockControlsMarkdown = String.raw`# Block controls
+
+Hover the left gutter to move, duplicate, or delete blocks.
+
+## Nested section
+
+Paragraph under a heading. Use the fold indicator to collapse this section.
+
+- List item one
+- List item two
+
+> [!tip] Callout
+> Callouts and lists also participate in block ranges.
+`;
+
+/** Headings + body for inline marker hiding and fold indicators. */
+export const inlineHeadingsMarkdown = String.raw`# Inline headings
+
+Move the caret onto this heading to reveal the ATX \`#\` markers. Off-line markers stay hidden in live preview.
+
+## Foldable section
+
+Content under this heading can fold from the gutter indicator.
+
+### Nested heading
+
+More body text for fold nesting.
+`;
+
+/** Image attachment demo copy; paste/drop still works in the live canvas. */
+export const imageAttachmentsMarkdown = String.raw`# Image attachments
+
+Use the toolbar image action, or paste / drop an image into the editor.
+
+By default Mira uploads with \`FileReader.readAsDataURL\` and inserts reference-style Markdown. Override \`imageConfig.imageUpload\` to send files to your storage and return a URL.
+`;

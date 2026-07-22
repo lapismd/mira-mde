@@ -45,6 +45,16 @@ const docsFiles = new Map<string, DocsFile>([
       path: "Architecture Diagram",
     },
   ],
+  [
+    "Embedded Note",
+    {
+      kind: "markdown",
+      markdown:
+        "# Embedded Note\n\nThis note is rendered inline through `![[Embedded Note]]` and the docs `MiraFileAdapter`.",
+      name: "Embedded Note",
+      path: "Embedded Note",
+    },
+  ],
 ]);
 
 export const docsFileAdapter: MiraFileAdapter = {

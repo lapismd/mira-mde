@@ -3,9 +3,15 @@
   import type {
     MiraDefaultFeatureConfigs,
     MiraDefaultMdeProps,
+    MiraDefaultToolbarDefinition,
     MiraFeatureFlags,
   } from "@mira-mde/default-ui/svelte";
-  import type { MiraMode, MiraTheme } from "@mira-mde/extensions";
+  import type {
+    MiraExtension,
+    MiraImageConfig,
+    MiraMode,
+    MiraTheme,
+  } from "@mira-mde/extensions";
   import { defaultUiSampleMarkdown } from "../fixtures";
 
   type Props = {
@@ -39,6 +45,12 @@
     features?: MiraFeatureFlags;
     /** Feature-specific configuration (toolbar items, Mermaid, …). */
     featureConfigs?: MiraDefaultFeatureConfigs;
+    /** Portable Mira extensions (slash, AI, custom CodeMirror). */
+    extensions?: MiraExtension[];
+    /** Image paste/drop/picker upload configuration. */
+    imageConfig?: MiraImageConfig;
+    /** Extra declarative toolbar sections. */
+    toolbars?: MiraDefaultToolbarDefinition[];
     /** CSS height for the story chrome around the editor. */
     height?: string;
   };
@@ -59,6 +71,9 @@
     htmlPolicy = "trusted",
     features = {},
     featureConfigs = {},
+    extensions = [],
+    imageConfig,
+    toolbars = [],
     height = "34rem",
   }: Props = $props();
 </script>
@@ -79,5 +94,8 @@
   {htmlPolicy}
   {features}
   {featureConfigs}
+  {extensions}
+  {imageConfig}
+  {toolbars}
   {height}
 />
