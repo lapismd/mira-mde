@@ -163,9 +163,9 @@ $$
 $$
 `;
 
-/** Tiny PNG used for base64 image rendering demos (5x5 red pixel). */
+/** Visible PNG used for base64 image rendering demos (120x72 checkerboard). */
 export const base64DemoPng =
-  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==";
+  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAABICAYAAAA9HjF/AAAA4klEQVR42u3dMQ2AMBRF0TpgrAKW2kJohSABDxQFEAYg4eUMf73DO1tDQplqGy73ihEAuxTgedlOr6/7rbtq6H3TAwzYgICBANYDrAdY7zFgQ2f0AAM2IGAggPUA6wHWA6wHGDDgfGBDe4s2IGAggPUA6wHWAwwYMGADAgbimyw9b9F6gPUA6wEGbEDAQADrAdYDrOebLD1v0YABAzYgYCCA9QDrAdYDDBiwb7IM7S0aCGA9wHqA9QDrAQZsQMBAAAPxTZaet2g9wHqAAQMGbEDAQADrAdZ7EdiF/+LdAXY/uwPLpGopJ9GX1QAAAABJRU5ErkJggg==";
 
 export const imagesMarkdown = `# Images
 
@@ -173,7 +173,7 @@ Resolved path image:
 
 ![Mira Markdown demo asset](/mira-markdown-demo.svg "Mira demo asset")
 
-Inline base64 image:
+Inline base64 image (120×72 PNG data URI):
 
 ![Inline base64](${base64DemoPng})
 
