@@ -5,6 +5,7 @@
   background: var(--mira-background);
   border: 1px solid var(--mira-border);
   border-radius: var(--mira-radius);
+  box-sizing: border-box;
   color: var(--mira-foreground);
   display: flex;
   flex-direction: column;

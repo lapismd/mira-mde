@@ -32,9 +32,10 @@
   overflow: hidden;
 }
 
-.mira-story-surface--editor :global(.mira-default-mde),
-.mira-story-surface--editor :global(.mira-default-ui),
-.mira-story-surface--editor :global(.mira-mde) {
+.mira-story-surface--editor .mira-default-mde,
+.mira-story-surface--editor .mira-default-ui,
+.mira-story-surface--editor .mira-mde {
+  box-sizing: border-box;
   height: 100%;
   max-height: 100%;
   overflow: hidden;
