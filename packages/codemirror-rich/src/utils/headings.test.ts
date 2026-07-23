@@ -3,12 +3,17 @@ import { describe, expect, it } from "vitest";
 import { getAtxHeadingMarkerRange, selectionTouchesLine } from "./headings";
 
 describe("heading utilities", () => {
-  it("resolves ATX heading marker ranges", () => {
+  it("resolves ATX heading marker ranges including trailing marker space", () => {
     expect(getAtxHeadingMarkerRange("### Heading", 5)).toEqual({
       from: 5,
-      to: 8,
+      to: 9,
+    });
+    expect(getAtxHeadingMarkerRange("#  Spaced", 0)).toEqual({
+      from: 0,
+      to: 3,
     });
     expect(getAtxHeadingMarkerRange("Not a heading", 0)).toBeNull();
+    expect(getAtxHeadingMarkerRange("###NoSpace", 0)).toBeNull();
   });
 
   it("treats the whole heading line as active for syntax reveal", () => {

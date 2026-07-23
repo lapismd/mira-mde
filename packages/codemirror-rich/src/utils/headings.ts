@@ -5,14 +5,16 @@ export function getAtxHeadingMarkerRange(
   text: string,
   lineStart: number,
 ): RangeBoundary | null {
-  const match = text.match(/^(#{1,6})(?=\s)/u);
-  if (!match?.[1]) {
+  // Include the required whitespace after `#` markers so live preview does not
+  // leave a visible indent once the hashes themselves are hidden.
+  const match = text.match(/^(#{1,6})(?:[ \t]+)/u);
+  if (!match?.[0]) {
     return null;
   }
 
   return {
     from: lineStart,
-    to: lineStart + match[1].length,
+    to: lineStart + match[0].length,
   };
 }
 
