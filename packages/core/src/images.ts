@@ -13,6 +13,9 @@ export const defaultMiraImageMimeTypes = [
   "image/avif",
 ];
 
+/** URL scheme used in temporary uploading placeholders (not a real asset). */
+export const miraUploadingImageScheme = "mira-uploading:";
+
 export type ResolvedMiraImageConfig = {
   imageUpload: (file: File) => Promise<string>;
   imageMaxSizeBytes: number;
@@ -73,33 +76,28 @@ export async function insertImageFiles(
   const resolved = isResolvedMiraImageConfig(config)
     ? config
     : resolveMiraImageConfig(config);
-  const markdown: string[] = [];
 
+  const pending: { file: File; placeholder: string }[] = [];
   for (const file of files) {
     try {
       validateImageFile(file, resolved);
-      const src = await resolved.imageUpload(file);
-      markdown.push(
-        createImageMarkdown({
-          alt: imageAltFromFile(file),
-          src,
-          syntax: resolved.imageSyntax,
-          doc: view.state.doc.toString(),
-        }),
-      );
+      pending.push({
+        file,
+        placeholder: createUploadingImageMarkdown(file),
+      });
     } catch (error) {
       resolved.onImageUploadError?.(error, file);
     }
   }
 
-  if (markdown.length === 0) {
+  if (pending.length === 0) {
     return;
   }
 
   const selection = view.state.selection.main;
   const from = position ?? selection.from;
   const to = position ?? selection.to;
-  const insert = markdown.join("\n\n");
+  const insert = pending.map((item) => item.placeholder).join("\n\n");
 
   view.dispatch({
     changes: { from, to, insert },
@@ -108,6 +106,24 @@ export async function insertImageFiles(
     userEvent: "input.image",
   });
   view.focus();
+
+  await Promise.all(
+    pending.map(async ({ file, placeholder }) => {
+      try {
+        const src = await resolved.imageUpload(file);
+        const finalMarkdown = createImageMarkdown({
+          alt: imageAltFromFile(file),
+          src,
+          syntax: resolved.imageSyntax,
+          doc: view.state.doc.toString(),
+        });
+        replaceImagePlaceholder(view, placeholder, finalMarkdown);
+      } catch (error) {
+        replaceImagePlaceholder(view, placeholder, "");
+        resolved.onImageUploadError?.(error, file);
+      }
+    }),
+  );
 }
 
 function isResolvedMiraImageConfig(
@@ -175,6 +191,19 @@ function imageFilesFromItems(
     .filter((file): file is File => Boolean(file));
 }
 
+/**
+ * GitHub-style uploading placeholder. Uses a unique `mira-uploading:` URL so
+ * concurrent pastes can be replaced reliably after upload finishes.
+ */
+export function createUploadingImageMarkdown(
+  file: File,
+  id: string = createUploadingId(),
+): string {
+  const name = file.name.trim() || "image";
+  const escapedName = name.replace(/[[\]\\]/g, "\\$&");
+  return `![Uploading ${escapedName}…](${miraUploadingImageScheme}${id})`;
+}
+
 export function createImageMarkdown({
   alt,
   doc,
@@ -193,6 +222,39 @@ export function createImageMarkdown({
 
   const label = uniqueImageLabel(alt, doc);
   return `![${escapedAlt}][${label}]\n\n[${label}]: ${src}`;
+}
+
+function replaceImagePlaceholder(
+  view: EditorView,
+  placeholder: string,
+  replacement: string,
+): void {
+  const doc = view.state.doc.toString();
+  const index = doc.indexOf(placeholder);
+  if (index === -1) {
+    return;
+  }
+
+  let from = index;
+  let to = index + placeholder.length;
+
+  // Trim surrounding blank lines when removing a failed upload placeholder.
+  if (replacement === "") {
+    if (from >= 2 && doc.slice(from - 2, from) === "\n\n") {
+      from -= 2;
+    } else if (to + 2 <= doc.length && doc.slice(to, to + 2) === "\n\n") {
+      to += 2;
+    } else if (from >= 1 && doc[from - 1] === "\n") {
+      from -= 1;
+    } else if (to < doc.length && doc[to] === "\n") {
+      to += 1;
+    }
+  }
+
+  view.dispatch({
+    changes: { from, to, insert: replacement },
+    userEvent: "input.image",
+  });
 }
 
 function uniqueImageLabel(alt: string, doc: string): string {
@@ -219,6 +281,13 @@ function slug(value: string): string {
 
 function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function createUploadingId(): string {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return crypto.randomUUID();
+  }
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
 function readFileAsDataUrl(file: File): Promise<string> {

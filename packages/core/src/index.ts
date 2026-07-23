@@ -18,9 +18,11 @@ import type {
 export {
   createImageDropPasteExtension,
   createImageMarkdown,
+  createUploadingImageMarkdown,
   defaultMiraImageMaxSizeBytes,
   defaultMiraImageMimeTypes,
   insertImageFiles,
+  miraUploadingImageScheme,
   openImageFilePicker,
   resolveMiraImageConfig,
 } from "./images";

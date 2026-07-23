@@ -87,5 +87,5 @@ export const imageAttachmentsMarkdown = String.raw`# Image attachments
 
 Use the toolbar image action, or paste / drop an image into the editor.
 
-By default Mira uploads with ${tick}FileReader.readAsDataURL${tick} and inserts reference-style Markdown. Override ${tick}imageConfig.imageUpload${tick} to send files to your storage and return a URL.
+Paste or drop shows ${tick}![Uploading name…](mira-uploading:…)${tick} until upload finishes, then replaces it with the final Markdown. Default upload uses ${tick}FileReader.readAsDataURL${tick}; override ${tick}imageConfig.imageUpload${tick} for your storage.
 `;

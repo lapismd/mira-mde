@@ -82,7 +82,7 @@ ATX `#` markers hide off-caret (`cm-formatting-hidden`). Fold indicators in the 
 
 ## Image Attachments
 
-Paste, drop, or use the toolbar image action. Default upload encodes files as data URLs and inserts Markdown (reference syntax by default). Configure with `imageConfig`:
+Paste, drop, or use the toolbar image action. While uploading, Mira inserts a GitHub-style placeholder (`![Uploading name…](mira-uploading:…)`) and replaces it with the final Markdown when ready. Default upload encodes files as data URLs (reference syntax by default). Configure with `imageConfig`:
 
 - `imageUpload` — async `(file) => url`
 - `imageSyntax` — `"reference"` | `"inline"`
