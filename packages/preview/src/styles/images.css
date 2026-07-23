@@ -1,0 +1,114 @@
+/* Constrain large pasted/inline markdown images so they never blow up the
+   reading column, while preserving aspect ratio. Applies to both the
+   dedicated image component and any raw <img> rendered through markdown
+   (e.g. via rehype-raw HTML). Link-preview card thumbnails opt out since
+   they already have their own, smaller sizing tuned for hover tooltips. */
+:is(
+    .markdown-rendered,
+    .markdown-preview-surface .markdown,
+    .markdown-widget-shell
+  )
+  img:not(.mira-link-preview__asset),
+.mira-markdown-image {
+  display: block;
+  height: auto;
+  max-height: min(28rem, 50vh);
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.mira-markdown-image-root {
+  display: inline-block;
+  max-width: 100%;
+}
+
+.mira-markdown-image__trigger {
+  background: none;
+  border: 0;
+  cursor: zoom-in;
+  display: inline-block;
+  margin: 0;
+  max-width: 100%;
+  padding: 0;
+}
+
+.mira-markdown-image__trigger:focus-visible {
+  border-radius: var(--radius-s, 4px);
+  outline: 2px solid var(--mira-accent);
+  outline-offset: 2px;
+}
+
+.mira-markdown-image__dialog {
+  background: var(--mira-widget-background, var(--mira-background));
+  border: 1px solid var(--mira-border);
+  border-radius: var(--mira-radius, 8px);
+  box-shadow: var(--mira-widget-shadow, 0 12px 36px rgb(0 0 0 / 24%));
+  color: var(--mira-foreground);
+  max-height: 90vh;
+  max-width: 90vw;
+  padding: 0;
+}
+
+.mira-markdown-image__dialog::backdrop {
+  background: rgb(0 0 0 / 55%);
+}
+
+.mira-markdown-image__dialog-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+}
+
+.mira-markdown-image__dialog-header {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.mira-markdown-image__dialog-close {
+  align-items: center;
+  background: var(--mira-muted);
+  border: 1px solid var(--mira-border);
+  border-radius: 999px;
+  color: var(--mira-muted-foreground);
+  cursor: pointer;
+  display: inline-flex;
+  height: 2rem;
+  justify-content: center;
+  padding: 0;
+  width: 2rem;
+}
+
+.mira-markdown-image__dialog-close:hover,
+.mira-markdown-image__dialog-close:focus-visible {
+  color: var(--mira-foreground);
+  outline: none;
+}
+
+.mira-markdown-image__dialog-close-icon {
+  height: 1rem;
+  width: 1rem;
+}
+
+.mira-markdown-image__dialog-figure {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0;
+  min-height: 0;
+}
+
+.mira-markdown-image__dialog-img {
+  border-radius: var(--radius-s, 4px);
+  display: block;
+  max-height: calc(90vh - 5rem);
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.mira-markdown-image__dialog-caption {
+  color: var(--mira-muted-foreground);
+  font-size: var(--font-smaller, 0.875em);
+  text-align: center;
+}
