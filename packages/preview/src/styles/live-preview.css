@@ -4,7 +4,10 @@
   overflow-x: hidden;
 }
 
-.markdown-live-preview-mode .cm-formatting-hidden {
+/* Hide formatting marks in live preview and source (inline marks run in both). */
+.markdown-live-preview-mode .cm-formatting-hidden,
+.markdown-source-mode .cm-formatting-hidden,
+.markdown-source-view .cm-formatting-hidden {
   display: none;
 }
 

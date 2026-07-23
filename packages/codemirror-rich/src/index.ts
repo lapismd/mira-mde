@@ -173,7 +173,9 @@ export function createRichEditorExtensions(
       ? indentGuideDecorations()
       : [],
     livePreview ? blockPreviewDecorations(options) : [],
-    livePreview ? inlinePreviewDecorations(options) : [],
+    // Inline marks (code/strong/emphasis + hide ticks) run in source and live
+    // preview; replace widgets stay live-preview-only.
+    inlinePreviewDecorations({ ...options, livePreview }),
     foldIndicatorDecorations(),
     blockControlExtensions(options),
     livePreview
@@ -344,10 +346,13 @@ function buildInlinePreviewDecorations(
   options: MiraRichEditorOptions,
 ): DecorationSet {
   const ranges: Range<Decoration>[] = [];
+  const replaceWidgets = options.livePreview ?? true;
   const fencedCodeLineClasses = getFencedCodeLineClasses(view.state);
   const syntaxHiddenRanges: RangeBoundary[] = [];
   const activeInlineSourceRanges: RangeBoundary[] = [];
-  collectActiveTaskMarkerRanges(view, activeInlineSourceRanges);
+  if (replaceWidgets) {
+    collectActiveTaskMarkerRanges(view, activeInlineSourceRanges);
+  }
   decorateInlineSyntax(
     view,
     ranges,
@@ -366,15 +371,17 @@ function buildInlinePreviewDecorations(
       }
       decorateHeadingLine(line.text, line.from, ranges);
       decorateFootnotes(line.text, line.from, ranges);
-      decorateListCallouts(line.text, line.from, ranges, view.state);
-      decorateTaskCheckboxes(
-        line.text,
-        line.from,
-        ranges,
-        options,
-        view.state,
-        activeInlineSourceRanges,
-      );
+      if (replaceWidgets) {
+        decorateListCallouts(line.text, line.from, ranges, view.state);
+        decorateTaskCheckboxes(
+          line.text,
+          line.from,
+          ranges,
+          options,
+          view.state,
+          activeInlineSourceRanges,
+        );
+      }
       decorateStrikethroughRanges(
         line.text,
         line.from,
@@ -383,18 +390,26 @@ function buildInlinePreviewDecorations(
         activeInlineSourceRanges,
         view.state,
       );
-      const inlineMathRanges = !fencedCodeLineClass
-        ? decorateInlineMath(line.text, line.from, ranges, options, view.state)
-        : [];
-      const inlineMarkdownWidgetRanges = !fencedCodeLineClass
-        ? decorateInlineMarkdownWidgets(
-            line.text,
-            line.from,
-            ranges,
-            options,
-            view.state,
-          )
-        : [];
+      const inlineMathRanges =
+        replaceWidgets && !fencedCodeLineClass
+          ? decorateInlineMath(
+              line.text,
+              line.from,
+              ranges,
+              options,
+              view.state,
+            )
+          : [];
+      const inlineMarkdownWidgetRanges =
+        replaceWidgets && !fencedCodeLineClass
+          ? decorateInlineMarkdownWidgets(
+              line.text,
+              line.from,
+              ranges,
+              options,
+              view.state,
+            )
+          : [];
       if (!fencedCodeLineClass) {
         decorateHiddenFormatting(line.text, line.from, ranges, {
           excludedRanges: [

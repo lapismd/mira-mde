@@ -502,6 +502,31 @@ test("inline fold controls, Source Code Pro, and Obsidian tokens are present", a
       getComputedStyle(element).getPropertyValue("--mira-font-mono"),
     );
   expect(monoToken).toContain("Source Code Pro");
+
+  const inlineCode = page
+    .locator(".cm-inline-code")
+    .filter({ hasText: "inline code" })
+    .first();
+  await expect(inlineCode).toBeVisible();
+  const inlineCodeStyle = await inlineCode.evaluate((element) => {
+    const probe = document.createElement("span");
+    probe.style.backgroundColor = "var(--markdown-code-background)";
+    element.append(probe);
+    const expectedBackground = getComputedStyle(probe).backgroundColor;
+    probe.remove();
+    const style = getComputedStyle(element);
+    return {
+      actualBackground: style.backgroundColor,
+      expectedBackground,
+      paddingInlineStart: Number.parseFloat(style.paddingInlineStart),
+    };
+  });
+  expect(inlineCodeStyle.actualBackground).toBe(
+    inlineCodeStyle.expectedBackground,
+  );
+  expect(inlineCodeStyle.paddingInlineStart).toBeGreaterThan(0);
+  await inlineCode.click();
+  await expect(page.locator(".cm-content")).toContainText("`inline code`");
 });
 
 test("task lists and live heading gutters match Lapis styling", async ({
@@ -817,34 +842,52 @@ test("live inline markdown is styled and reveals source by token", async ({
       inlineCode.evaluate((element) => {
         const probe = document.createElement("span");
         probe.style.color = "var(--markdown-code-normal, var(--code-normal))";
+        probe.style.backgroundColor = "var(--markdown-code-background)";
         element.append(probe);
         const expectedColor = getComputedStyle(probe).color;
+        const expectedBackground = getComputedStyle(probe).backgroundColor;
         probe.remove();
         const style = getComputedStyle(element);
         return {
+          backgroundColor: style.backgroundColor,
           color: style.color,
+          expectedBackground,
           expectedColor,
           fontFamily: style.fontFamily.toLowerCase(),
+          paddingInlineStart: Number.parseFloat(style.paddingInlineStart),
         };
       }),
     )
     .toEqual({
+      backgroundColor: expect.any(String),
       color: expect.any(String),
+      expectedBackground: expect.any(String),
       expectedColor: expect.any(String),
       fontFamily: expect.stringContaining("source code pro"),
+      paddingInlineStart: expect.any(Number),
     });
-  const inlineCodeColor = await inlineCode.evaluate((element) => {
+  const inlineCodeStyle = await inlineCode.evaluate((element) => {
     const probe = document.createElement("span");
     probe.style.color = "var(--markdown-code-normal, var(--code-normal))";
+    probe.style.backgroundColor = "var(--markdown-code-background)";
     element.append(probe);
     const expectedColor = getComputedStyle(probe).color;
+    const expectedBackground = getComputedStyle(probe).backgroundColor;
     probe.remove();
+    const style = getComputedStyle(element);
     return {
-      actual: getComputedStyle(element).color,
-      expected: expectedColor,
+      actualBackground: style.backgroundColor,
+      actualColor: style.color,
+      expectedBackground,
+      expectedColor,
+      paddingInlineStart: Number.parseFloat(style.paddingInlineStart),
     };
   });
-  expect(inlineCodeColor.actual).toBe(inlineCodeColor.expected);
+  expect(inlineCodeStyle.actualColor).toBe(inlineCodeStyle.expectedColor);
+  expect(inlineCodeStyle.actualBackground).toBe(
+    inlineCodeStyle.expectedBackground,
+  );
+  expect(inlineCodeStyle.paddingInlineStart).toBeGreaterThan(0);
   await inlineCode.click();
   await expectHiddenFormattingCount(page, lineSnippet, "`", 0);
 

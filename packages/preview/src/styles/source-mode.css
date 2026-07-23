@@ -39,6 +39,16 @@
   color: var(--markdown-code-normal, var(--code-normal));
 }
 
+/* Match reading-mode <code> chips (code-katex.css) in source + live preview. */
+.markdown-editor-surface .cm-inline-code {
+  background-color: var(--markdown-code-background);
+  border: var(--markdown-code-border-width) solid
+    var(--markdown-code-border-color);
+  border-radius: var(--markdown-code-radius);
+  font-size: var(--markdown-code-size);
+  padding: 0.15em 0.3em;
+}
+
 .markdown-editor-surface .cm-formatting-code,
 .markdown-editor-surface .cm-editor .cm-activeLine.cm-line.cm-formatting-code {
   background-color: var(--markdown-code-background);
