@@ -10,6 +10,8 @@
   )
   img:not(.mira-link-preview__asset),
 .mira-markdown-image {
+  border: 1px solid var(--mira-border);
+  border-radius: var(--radius-s, 4px);
   display: block;
   height: auto;
   max-height: min(28rem, 50vh);

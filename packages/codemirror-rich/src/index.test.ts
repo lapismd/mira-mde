@@ -14,7 +14,7 @@ describe("createRichEditorExtensions", () => {
         if (Array.isArray(extension)) {
           return extension.length > 0;
         }
-        return extension != null && extension !== false;
+        return extension != null;
       });
 
     const livePreview = nonempty(

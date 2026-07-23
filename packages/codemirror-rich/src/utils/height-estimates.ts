@@ -36,6 +36,10 @@ export function estimateMarkdownBlockHeight(markdown: string): number {
     );
   }
 
+  if (/^\s*!\[[^\]]*\]\([^)]+\)\s*$/u.test(markdown)) {
+    return Math.max(160, RICH_BLOCK_LINE_HEIGHT_ESTIMATE_PX * 4);
+  }
+
   return Math.max(
     RICH_BLOCK_LINE_HEIGHT_ESTIMATE_PX,
     lineCount * RICH_BLOCK_LINE_HEIGHT_ESTIMATE_PX +

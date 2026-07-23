@@ -23,6 +23,11 @@ import {
 } from "./utils/headings";
 import { getTaskMarkerRange, selectionTouchesTaskMarker } from "./utils/tasks";
 import {
+  findMarkdownImageRanges,
+  isStandaloneMarkdownImageLine,
+  resolveMarkdownImageWidgetSource,
+} from "./utils/images";
+import {
   findInlineCodeRanges,
   isPositionInsideRanges,
 } from "./utils/inline-code";
@@ -310,7 +315,9 @@ function buildBlockPreviewDecorations(
 
   for (let lineNumber = 1; lineNumber <= state.doc.lines; lineNumber += 1) {
     const line = state.doc.line(lineNumber);
-    if (!isStandaloneEmbedLine(line.text)) {
+    const standaloneEmbed = isStandaloneEmbedLine(line.text);
+    const standaloneImage = isStandaloneMarkdownImageLine(line.text);
+    if (!standaloneEmbed && !standaloneImage) {
       continue;
     }
 
@@ -323,14 +330,21 @@ function buildBlockPreviewDecorations(
       continue;
     }
 
+    const markdown = standaloneEmbed
+      ? line.text.trim()
+      : resolveMarkdownImageWidgetSource(line.text, state.doc.toString());
+    if (!markdown) {
+      continue;
+    }
+
     ranges.push(
       Decoration.replace({
         block: true,
         widget: new BlockPreviewWidget({
           from,
           to,
-          markdown: line.text,
-          nodeName: "EmbedLink",
+          markdown,
+          nodeName: standaloneEmbed ? "EmbedLink" : "Image",
           options,
         }),
       }).range(from, to),
@@ -604,7 +618,7 @@ function decorateInlineMarkdownWidgets(
   const widgetRanges: RangeBoundary[] = [];
   const codeRanges = findInlineCodeRanges(text);
 
-  if (isStandaloneEmbedLine(text)) {
+  if (isStandaloneEmbedLine(text) || isStandaloneMarkdownImageLine(text)) {
     widgetRanges.push({ from: lineStart, to: lineStart + text.length });
     return widgetRanges;
   }
@@ -632,6 +646,29 @@ function decorateInlineMarkdownWidgets(
           from,
           to,
           markdown: match[0],
+          options,
+        }),
+      }).range(from, to),
+    );
+  }
+
+  for (const image of findMarkdownImageRanges(text, state.doc.toString())) {
+    const from = lineStart + image.from;
+    const to = lineStart + image.to;
+    if (
+      rangeContainsSelectionCursor(state, from, to) ||
+      widgetRanges.some((range) => rangesOverlap(range, { from, to }))
+    ) {
+      continue;
+    }
+
+    widgetRanges.push({ from, to });
+    ranges.push(
+      Decoration.replace({
+        widget: new InlineMarkdownWidget({
+          from,
+          to,
+          markdown: image.source,
           options,
         }),
       }).range(from, to),
