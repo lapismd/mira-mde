@@ -1,7 +1,15 @@
 /*
  * Inset the story canvas so component borders (e.g. MiraDefaultMde) aren't
  * clipped against the preview pane edge.
+ *
+ * Portaled overlays (dropdown/context menus, tooltips) mount on body, so keep
+ * the preview document on the Mira UI font stack.
  */
+body {
+  font-family: var(--mira-font-sans);
+  font-size: var(--mira-font-size, 14px);
+}
+
 #storybook-root {
   box-sizing: border-box;
   padding: 1rem;
