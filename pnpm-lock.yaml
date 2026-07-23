@@ -124,8 +124,8 @@ importers:
         specifier: ^3.1.0
         version: 3.1.0(storybook@10.5.3(@types/react@19.2.17)(prettier@3.8.5)(react@19.2.7))
       storybook-addon-visual-delta:
-        specifier: file:../../ui/packages/storybook-addon-visual-delta
-        version: file:../../ui/packages/storybook-addon-visual-delta(react@19.2.7)(storybook@10.5.3(@types/react@19.2.17)(prettier@3.8.5)(react@19.2.7))
+        specifier: link:../../ui/packages/storybook-addon-visual-delta
+        version: link:../../ui/packages/storybook-addon-visual-delta
       svelte:
         specifier: ^5.46.1
         version: 5.56.4(@typescript-eslint/types@8.62.0)
@@ -3972,9 +3972,6 @@ packages:
   html-escaper@3.0.3:
     resolution: {integrity: sha512-RuMffC89BOWQoY0WKGpIhn5gX3iI54O6nRA0yC124NYVtzjmFWBIiFd8M0x+ZdX0P9R4lADg1mgP8C7PxGOWuQ==}
 
-  html-to-image@1.11.13:
-    resolution: {integrity: sha512-cuOPoI7WApyhBElTTb9oqsawRvZ0rHhaHwghRLlTuffoD1B2aDemlCruLeZrUIIdvG7gs9xeELEPm6PhuASqrg==}
-
   html-void-elements@3.0.0:
     resolution: {integrity: sha512-bEqo66MRXsUGxWHV5IP0PUiAWwoEjba4VCzg0LjFJBpchPaTfyfCKTG6bc5F8ucKec3q5y6qOdGyYTSBEvhCrg==}
 
@@ -5063,12 +5060,6 @@ packages:
     engines: {node: '>=20'}
     peerDependencies:
       storybook: ^10.0.0
-
-  storybook-addon-visual-delta@file:../../ui/packages/storybook-addon-visual-delta:
-    resolution: {directory: ../../ui/packages/storybook-addon-visual-delta, type: directory}
-    peerDependencies:
-      react: '*'
-      storybook: '*'
 
   storybook@10.5.3:
     resolution: {integrity: sha512-c8Wumu5qz0N2fnzWBxcPzUsY+8BpKBKChNyl4BEh9qhMV6KW587gL8il8emRB+4Hay+zMjDHA7cIeTkl4FKYuw==}
@@ -9445,8 +9436,6 @@ snapshots:
 
   html-escaper@3.0.3: {}
 
-  html-to-image@1.11.13: {}
-
   html-void-elements@3.0.0: {}
 
   html-whitespace-sensitive-tag-names@3.0.1: {}
@@ -10998,14 +10987,6 @@ snapshots:
   storybook-addon-tag-badges@3.1.0(storybook@10.5.3(@types/react@19.2.17)(prettier@3.8.5)(react@19.2.7)):
     dependencies:
       memoizerific: 1.11.3
-      storybook: 10.5.3(@types/react@19.2.17)(prettier@3.8.5)(react@19.2.7)
-
-  storybook-addon-visual-delta@file:../../ui/packages/storybook-addon-visual-delta(react@19.2.7)(storybook@10.5.3(@types/react@19.2.17)(prettier@3.8.5)(react@19.2.7)):
-    dependencies:
-      '@storybook/icons': 2.1.0(react@19.2.7)
-      html-to-image: 1.11.13
-      pixelmatch: 7.2.0
-      react: 19.2.7
       storybook: 10.5.3(@types/react@19.2.17)(prettier@3.8.5)(react@19.2.7)
 
   storybook@10.5.3(@types/react@19.2.17)(prettier@3.8.5)(react@19.2.7):

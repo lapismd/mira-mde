@@ -69,7 +69,7 @@
     "react-dom": "^19.1.0",
     "storybook": "^10.5.2",
     "storybook-addon-tag-badges": "^3.1.0",
-    "storybook-addon-visual-delta": "file:../../ui/packages/storybook-addon-visual-delta",
+    "storybook-addon-visual-delta": "link:../../ui/packages/storybook-addon-visual-delta",
     "svelte": "^5.46.1",
     "svelte-check": "^4.3.4",
     "tsup": "^8.5.1",
