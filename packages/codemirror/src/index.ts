@@ -222,10 +222,122 @@ export const miraEditorTheme = EditorView.theme({
     backgroundColor: "var(--mira-syntax-invalid-background)",
     color: "var(--mira-syntax-invalid)",
   },
+  /* shadcn-like popover chrome for CM tooltips / autocomplete */
   ".cm-tooltip": {
-    border: "1px solid var(--mira-border)",
-    backgroundColor: "var(--mira-popover)",
-    color: "var(--mira-popover-foreground)",
+    backgroundColor:
+      "var(--popover, var(--mira-popover, var(--mira-widget-background)))",
+    border: "1px solid var(--border, var(--mira-border))",
+    borderRadius: "var(--radius-m, var(--mira-radius))",
+    boxShadow: "var(--mira-widget-shadow)",
+    color:
+      "var(--popover-foreground, var(--mira-popover-foreground, var(--mira-foreground)))",
+    fontFamily: "var(--font-sans, var(--mira-font-sans))",
+    fontSize: "var(--mira-font-size, 0.875rem)",
+    lineHeight: "1.4",
+    zIndex: "1100",
+  },
+  ".cm-tooltip.cm-tooltip-autocomplete > ul": {
+    fontFamily: "inherit",
+    maxHeight: "min(18rem, 50vh)",
+    maxWidth: "min(28rem, 95vw)",
+    minWidth: "12rem",
+    padding: "0.25rem",
+  },
+  ".cm-tooltip.cm-tooltip-autocomplete > ul > li": {
+    borderRadius: "var(--radius-s, 4px)",
+    lineHeight: "1.4",
+    padding: "0.375rem 0.5rem",
+  },
+  ".cm-tooltip.cm-tooltip-autocomplete > ul > completion-section": {
+    borderBottom: "1px solid var(--border, var(--mira-border))",
+    color: "var(--muted-foreground, var(--mira-muted-foreground))",
+    fontSize: "0.75rem",
+    fontWeight: "600",
+    letterSpacing: "0.02em",
+    opacity: "1",
+    padding: "0.375rem 0.5rem",
+    textTransform: "uppercase",
+  },
+  ".cm-tooltip-autocomplete ul li[aria-selected]": {
+    backgroundColor:
+      "var(--accent, var(--background-modifier-hover, var(--mira-accent-soft)))",
+    color: "var(--accent-foreground, var(--mira-foreground))",
+  },
+  ".cm-tooltip-autocomplete-disabled ul li[aria-selected]": {
+    backgroundColor: "var(--muted, var(--mira-muted))",
+    color: "var(--muted-foreground, var(--mira-muted-foreground))",
+  },
+  ".cm-completionLabel": {
+    color: "inherit",
+  },
+  ".cm-completionDetail": {
+    color: "var(--muted-foreground, var(--mira-muted-foreground))",
+    fontSize: "0.75rem",
+    fontStyle: "normal",
+    marginLeft: "0.5rem",
+  },
+  ".cm-completionMatchedText": {
+    color: "var(--mira-accent)",
+    fontWeight: "600",
+    textDecoration: "none",
+  },
+  ".cm-tooltip.cm-completionInfo": {
+    backgroundColor:
+      "var(--popover, var(--mira-popover, var(--mira-widget-background)))",
+    border: "1px solid var(--border, var(--mira-border))",
+    borderRadius: "var(--radius-m, var(--mira-radius))",
+    boxShadow: "var(--mira-widget-shadow)",
+    color:
+      "var(--popover-foreground, var(--mira-popover-foreground, var(--mira-foreground)))",
+    fontFamily: "var(--font-sans, var(--mira-font-sans))",
+    fontSize: "0.8125rem",
+    padding: "0.5rem 0.75rem",
+  },
+  ".cm-tooltip .cm-tooltip-arrow:after": {
+    borderBottomColor:
+      "var(--popover, var(--mira-popover, var(--mira-widget-background)))",
+    borderTopColor:
+      "var(--popover, var(--mira-popover, var(--mira-widget-background)))",
+  },
+  ".cm-tooltip .cm-tooltip-arrow:before": {
+    borderBottomColor: "var(--border, var(--mira-border))",
+    borderTopColor: "var(--border, var(--mira-border))",
+  },
+});
+
+/** Overrides CM baseTheme light/dark completion selection colors. */
+const miraAutocompleteBaseTheme = EditorView.baseTheme({
+  "&light .cm-tooltip": {
+    backgroundColor:
+      "var(--popover, var(--mira-popover, var(--mira-widget-background)))",
+    border: "1px solid var(--border, var(--mira-border))",
+    color:
+      "var(--popover-foreground, var(--mira-popover-foreground, var(--mira-foreground)))",
+  },
+  "&dark .cm-tooltip": {
+    backgroundColor:
+      "var(--popover, var(--mira-popover, var(--mira-widget-background)))",
+    border: "1px solid var(--border, var(--mira-border))",
+    color:
+      "var(--popover-foreground, var(--mira-popover-foreground, var(--mira-foreground)))",
+  },
+  "&light .cm-tooltip-autocomplete ul li[aria-selected]": {
+    backgroundColor:
+      "var(--accent, var(--background-modifier-hover, var(--mira-accent-soft)))",
+    color: "var(--accent-foreground, var(--mira-foreground))",
+  },
+  "&dark .cm-tooltip-autocomplete ul li[aria-selected]": {
+    backgroundColor:
+      "var(--accent, var(--background-modifier-hover, var(--mira-accent-soft)))",
+    color: "var(--accent-foreground, var(--mira-foreground))",
+  },
+  "&light .cm-tooltip-autocomplete-disabled ul li[aria-selected]": {
+    backgroundColor: "var(--muted, var(--mira-muted))",
+    color: "var(--muted-foreground, var(--mira-muted-foreground))",
+  },
+  "&dark .cm-tooltip-autocomplete-disabled ul li[aria-selected]": {
+    backgroundColor: "var(--muted, var(--mira-muted))",
+    color: "var(--muted-foreground, var(--mira-muted-foreground))",
   },
 });
 
@@ -407,6 +519,7 @@ export function createBaseCodeMirrorExtensions(
 
   return [
     miraEditorTheme,
+    miraAutocompleteBaseTheme,
     gutterLineStyleSyncExtension(),
     ...((options.lineNumbers ?? true) ? [lineNumbers()] : []),
     highlightActiveLineGutter(),
@@ -429,6 +542,7 @@ export function createBaseCodeMirrorExtensions(
       : [
           autocompletion({
             icons: false,
+            tooltipClass: () => "mira-cm-autocomplete",
             ...(autocompleteConfig ?? {}),
           }),
         ]),
