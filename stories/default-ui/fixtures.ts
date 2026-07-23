@@ -1,3 +1,6 @@
+/** Backtick for interpolation inside String.raw (where \` is literal). */
+const tick = "`";
+
 /** Shared sample document for Default UI catalog stories. */
 export const defaultUiSampleMarkdown = String.raw`---
 title: Default UI sample
@@ -24,9 +27,9 @@ The default editor composes toolbar, mode switching, live widgets, and preview r
 
 | Setting | Prop | Default |
 | :--- | :--- | :--- |
-| Mode | \`mode\` | live-preview |
-| Theme | \`theme\` | light |
-| Line wrap | \`lineWrapping\` | true |
+| Mode | ${tick}mode${tick} | live-preview |
+| Theme | ${tick}theme${tick} | light |
+| Line wrap | ${tick}lineWrapping${tick} | true |
 
 ## Math and code
 
@@ -68,7 +71,7 @@ Paragraph under a heading. Use the fold indicator to collapse this section.
 /** Headings + body for inline marker hiding and fold indicators. */
 export const inlineHeadingsMarkdown = String.raw`# Inline headings
 
-Move the caret onto this heading to reveal the ATX \`#\` markers. Off-line markers stay hidden in live preview.
+Move the caret onto this heading to reveal the ATX ${tick}#${tick} markers. Off-line markers stay hidden in live preview.
 
 ## Foldable section
 
@@ -84,5 +87,5 @@ export const imageAttachmentsMarkdown = String.raw`# Image attachments
 
 Use the toolbar image action, or paste / drop an image into the editor.
 
-By default Mira uploads with \`FileReader.readAsDataURL\` and inserts reference-style Markdown. Override \`imageConfig.imageUpload\` to send files to your storage and return a URL.
+By default Mira uploads with ${tick}FileReader.readAsDataURL${tick} and inserts reference-style Markdown. Override ${tick}imageConfig.imageUpload${tick} to send files to your storage and return a URL.
 `;

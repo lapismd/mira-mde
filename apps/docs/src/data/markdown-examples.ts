@@ -1,5 +1,8 @@
 /** Keep in sync with `stories/markdown/fixtures.ts` (Storybook catalog source of truth). */
 
+/** Backtick for interpolation inside String.raw (where \` is literal). */
+const tick = "`";
+
 export const frontmatterMarkdown = String.raw`---
 title: Release notes
 status: draft
@@ -30,7 +33,7 @@ Headings create the document outline used by reading and editor surfaces.
 
 export const inlineFormattingMarkdown = String.raw`# Inline formatting
 
-Use **bold**, _italic_, ~~strikethrough~~, and \`inline code\` inside paragraphs.
+Use **bold**, _italic_, ~~strikethrough~~, and ${tick}inline code${tick} inside paragraphs.
 
 Inline formatting can combine, so **bold text can include _emphasis_**.
 `;
@@ -143,7 +146,7 @@ Grid tables use explicit row and column boundaries for spans, sections, and alig
 
 export const codeMarkdown = String.raw`# Code
 
-Inline \`code\` stays inside the paragraph.
+Inline ${tick}code${tick} stays inside the paragraph.
 
 ~~~ts {2}
 type EditorMode = "source" | "live-preview" | "preview" | "split";
