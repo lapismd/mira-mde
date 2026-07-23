@@ -56,6 +56,12 @@ export {
   type MiraTemplateSelection,
   type MiraTextRange,
 } from "./slash-commands";
+export {
+  createMiraSearchExtension,
+  search,
+  type MiraSearchConfig,
+} from "./search";
+import { createMiraSearchExtension, type MiraSearchConfig } from "./search";
 
 export type MiraCodeMirrorOptions = {
   readonly?: boolean;
@@ -68,6 +74,7 @@ export type MiraCodeMirrorOptions = {
   autocomplete?:
     | Exclude<Parameters<typeof autocompletion>[0], undefined>
     | false;
+  search?: Partial<MiraSearchConfig>;
 };
 
 export const miraClassHighlighter = tagHighlighter([
@@ -550,6 +557,7 @@ export function createBaseCodeMirrorExtensions(
     crosshairCursor(),
     highlightActiveLine(),
     highlightSelectionMatches(),
+    createMiraSearchExtension(options.search),
     codeFolding(),
     indentUnit.of(
       options.indentWithTabs === false ? " ".repeat(indentWidth) : "\t",

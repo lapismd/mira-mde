@@ -238,6 +238,10 @@ importers:
         version: 1.61.1
 
   packages/codemirror:
+    dependencies:
+      '@lucide/svelte':
+        specifier: ^0.525.0
+        version: 0.525.0(svelte@5.56.4(@typescript-eslint/types@8.62.0))
     devDependencies:
       '@codemirror/autocomplete':
         specifier: ^6.18.7
@@ -263,6 +267,9 @@ importers:
       '@lezer/highlight':
         specifier: ^1.2.3
         version: 1.2.3
+      svelte:
+        specifier: ^5.46.1
+        version: 5.56.4(@typescript-eslint/types@8.62.0)
 
   packages/codemirror-markdown:
     devDependencies:
