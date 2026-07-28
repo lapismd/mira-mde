@@ -11,7 +11,7 @@ import * as EditorPluginsStories from "./EditorPlugins.stories";
 
 # Editor Plugins
 
-Live-preview chrome and portable extensions beyond per-feature Markdown pages: slash menus, block gutter controls, fold / inline headings, image attachments, CodeMirror autocomplete slash UI, custom toolbars, and `@mira-mde/plugin-ai`.
+Live-preview chrome and portable extensions beyond per-feature Markdown pages: slash menus, block gutter controls, fold / inline headings, image attachments, CodeMirror autocomplete slash UI, extension commands/styles, custom toolbars, and `@mira-mde/plugin-ai`.
 
 ## Usage
 
@@ -102,6 +102,40 @@ Rendered base64 examples live under **Markdown → Images**.
 Declarative `toolbars` / `toolbarActions` add buttons and dropdowns beside the default controls.
 
 <Canvas of={EditorPluginsStories.CustomToolbar} meta={EditorPluginsStories} />
+
+## Extension Commands, Toolbar Items, And Styles
+
+An extension can declare commands once and expose them through keyboard shortcuts, the imperative editor handle, and framework-neutral toolbar items. `styles` accepts stylesheet URLs or explicit `{ cssText }` descriptors; Mira mounts them once per document and removes them after the final editor using them unmounts.
+
+<Source
+  language="ts"
+  code={`const decisionExtension = defineMiraExtension({
+  name: "decisions",
+  commands: [{
+    id: "insert-decision",
+    label: "Insert decision",
+    keybindings: ["Mod-Shift-d"],
+    enabled: (context) => !context.readonly,
+    run: (context) => context.insertMarkdown("\\n> [!note] Decision\\n> "),
+  }],
+  toolbarItems: [{
+    id: "insert-decision",
+    label: "Insert decision",
+    command: "insert-decision",
+    icon: "wand-sparkles",
+    group: "Extensions",
+  }],
+  styles: [{
+    id: "decisions",
+    cssText: ".decision-marker { color: var(--interactive-accent); }",
+  }],
+});`}
+/>
+
+<Canvas
+  of={EditorPluginsStories.ExtensionContributions}
+  meta={EditorPluginsStories}
+/>
 
 ## AI Plugin
 

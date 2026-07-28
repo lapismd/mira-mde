@@ -14,7 +14,17 @@
     openImageFilePicker,
     type MiraEditorController,
   } from "@mira-mde/core";
-  import { resolveMiraExtensions, type MiraMode } from "@mira-mde/extensions";
+  import {
+    createMiraCommandKeymap,
+    executeMiraCommand,
+    isMiraCommandEnabled,
+    mountMiraExtensionStyles,
+    resolveMiraExtensions,
+    type MiraCommand,
+    type MiraExtensionRuntimeContext,
+    type MiraMode,
+    type MiraTemplateSelection,
+  } from "@mira-mde/extensions";
   import { MarkdownOutline, MarkdownPreview } from "@mira-mde/preview";
   import { Button } from "@mira-mde/ui/button";
   import { Separator } from "@mira-mde/ui/separator";
@@ -126,6 +136,9 @@
       createSlashCommandExtensions({
         commands: resolved.slashCommands,
       }),
+      createMiraCommandKeymap(resolved.commands, (view) =>
+        createExtensionRuntimeContext(controller, view),
+      ),
       createMarkdownCodeMirrorExtensions({
         codeLanguages: resolved.codeLanguages,
         sourceMode: mode === "source",
@@ -168,14 +181,9 @@
     cleanupExtensionMounts = [];
 
     for (const mountExtension of resolvedExtensions.onMount) {
-      const cleanup = mountExtension({
-        getValue: () => activeController.getValue(),
-        setValue: (next) => activeController.setValue(next),
-        focus: () => activeController.focus(),
-        view: activeController.view,
-        insertMarkdown,
-        insertImage,
-      });
+      const cleanup = mountExtension(
+        createExtensionRuntimeContext(activeController, activeController.view),
+      );
       if (typeof cleanup === "function") {
         cleanupExtensionMounts.push(cleanup);
       }
@@ -199,6 +207,26 @@
     return mode;
   }
 
+  export function getCommands(): readonly MiraCommand[] {
+    return resolvedExtensions.commands;
+  }
+
+  export function isCommandEnabled(commandId: string): boolean {
+    const command = findCommand(commandId);
+    return Boolean(
+      command &&
+      isMiraCommandEnabled(command, createExtensionRuntimeContext(controller)),
+    );
+  }
+
+  export function executeCommand(commandId: string): boolean {
+    return executeMiraCommand(
+      resolvedExtensions.commands,
+      commandId,
+      createExtensionRuntimeContext(controller),
+    );
+  }
+
   export function setMode(nextMode: MiraMode): void {
     mode = nextMode;
   }
@@ -219,8 +247,11 @@
     controller?.setSelection(selection);
   }
 
-  export function insertMarkdown(markdown: string): void {
-    controller?.replaceSelection(markdown);
+  export function insertMarkdown(
+    markdown: string,
+    selection?: MiraTemplateSelection,
+  ): void {
+    controller?.replaceSelection(markdown, selection);
     controller?.focus();
   }
 
@@ -263,6 +294,11 @@
   });
 
   $effect(() => {
+    return mountMiraExtensionStyles(resolvedExtensions.styles);
+  });
+
+  $effect(() => {
+    resolvedExtensions;
     extensionSignature;
     if (controller) {
       controller.update({
@@ -451,6 +487,40 @@
       editorScroller.removeEventListener("scroll", syncPreview);
       previewScroller.removeEventListener("scroll", syncEditor);
     };
+  }
+
+  function createExtensionRuntimeContext(
+    activeController: MiraEditorController | null,
+    view: unknown = activeController?.view,
+  ): MiraExtensionRuntimeContext {
+    return {
+      view,
+      mode,
+      readonly,
+      sourcePath,
+      getValue: () => activeController?.getValue() ?? value,
+      setValue(nextValue) {
+        value = nextValue;
+        activeController?.setValue(nextValue);
+      },
+      focus: () => activeController?.focus(),
+      insertMarkdown,
+      insertImage,
+    };
+  }
+
+  function findCommand(commandId: string): MiraCommand | undefined {
+    for (
+      let index = resolvedExtensions.commands.length - 1;
+      index >= 0;
+      index -= 1
+    ) {
+      const command = resolvedExtensions.commands[index];
+      if (command?.id === commandId) {
+        return command;
+      }
+    }
+    return undefined;
   }
 </script>
 

@@ -13,8 +13,15 @@ import {
   type MiraEditorController,
 } from "@mira-mde/core";
 import {
+  createMiraCommandKeymap,
+  executeMiraCommand,
+  isMiraCommandEnabled,
+  mountMiraExtensionStyles,
   resolveMiraExtensions,
+  type MiraCommand,
+  type MiraExtensionRuntimeContext,
   type MiraMode,
+  type MiraTemplateSelection,
   type MiraTheme,
   type MiraThemeConfig,
 } from "@mira-mde/extensions";
@@ -133,11 +140,14 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
     [onReadonlyChangeRef, readonlyProp],
   );
 
-  const handleInsertMarkdown = useCallback((markdown: string) => {
-    const controller = controllerRef.current;
-    controller?.replaceSelection(markdown);
-    controller?.focus();
-  }, []);
+  const handleInsertMarkdown = useCallback(
+    (markdown: string, selection?: MiraTemplateSelection) => {
+      const controller = controllerRef.current;
+      controller?.replaceSelection(markdown, selection);
+      controller?.focus();
+    },
+    [],
+  );
 
   const handleInsertImage = useCallback(() => {
     const controller = controllerRef.current;
@@ -145,6 +155,37 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
       openImageFilePicker(controller.view, imageConfig);
     }
   }, [imageConfig]);
+
+  const createExtensionRuntimeContext = useCallback(
+    (
+      activeController: MiraEditorController | null = controllerRef.current,
+      view: unknown = activeController?.view,
+    ): MiraExtensionRuntimeContext => ({
+      view,
+      mode: modeRef.current,
+      readonly: readonlyRef.current,
+      sourcePath,
+      focus: () => activeController?.focus(),
+      getValue: () => activeController?.getValue() ?? valueRef.current,
+      insertImage: handleInsertImage,
+      insertMarkdown: handleInsertMarkdown,
+      setValue(nextValue) {
+        if (valueProp === undefined) {
+          setUncontrolledValue(nextValue);
+        }
+        activeController?.setValue(nextValue);
+      },
+    }),
+    [
+      handleInsertImage,
+      handleInsertMarkdown,
+      modeRef,
+      readonlyRef,
+      sourcePath,
+      valueProp,
+      valueRef,
+    ],
+  );
 
   const buildCodeMirrorExtensions = useCallback((): Extension[] => {
     const resolved = resolveMiraExtensions(extensions, {
@@ -165,6 +206,9 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
       createSlashCommandExtensions({
         commands: resolved.slashCommands,
       }),
+      createMiraCommandKeymap(resolved.commands, (view) =>
+        createExtensionRuntimeContext(controllerRef.current, view),
+      ),
       createMarkdownCodeMirrorExtensions({
         codeLanguages: resolved.codeLanguages,
         sourceMode: modeRef.current === "source",
@@ -208,6 +252,7 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
     assetResolver,
     blockControls,
     commitValue,
+    createExtensionRuntimeContext,
     extensions,
     fileAdapter,
     frontmatterOpen,
@@ -234,20 +279,56 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
       cleanupExtensionMountsRef.current = [];
 
       for (const mountExtension of resolvedExtensions.onMount) {
-        const cleanup = mountExtension({
-          focus: () => activeController.focus(),
-          getValue: () => activeController.getValue(),
-          insertMarkdown: handleInsertMarkdown,
-          insertImage: handleInsertImage,
-          setValue: (nextValue) => activeController.setValue(nextValue),
-          view: activeController.view,
-        });
+        const cleanup = mountExtension(
+          createExtensionRuntimeContext(
+            activeController,
+            activeController.view,
+          ),
+        );
         if (typeof cleanup === "function") {
           cleanupExtensionMountsRef.current.push(cleanup);
         }
       }
     },
-    [handleInsertImage, handleInsertMarkdown, resolvedExtensions.onMount],
+    [createExtensionRuntimeContext, resolvedExtensions.onMount],
+  );
+
+  const findCommand = useCallback(
+    (commandId: string): MiraCommand | undefined => {
+      for (
+        let index = resolvedExtensions.commands.length - 1;
+        index >= 0;
+        index -= 1
+      ) {
+        const command = resolvedExtensions.commands[index];
+        if (command?.id === commandId) {
+          return command;
+        }
+      }
+      return undefined;
+    },
+    [resolvedExtensions.commands],
+  );
+
+  const isCommandEnabled = useCallback(
+    (commandId: string): boolean => {
+      const command = findCommand(commandId);
+      return Boolean(
+        command &&
+        isMiraCommandEnabled(command, createExtensionRuntimeContext()),
+      );
+    },
+    [createExtensionRuntimeContext, findCommand],
+  );
+
+  const executeCommand = useCallback(
+    (commandId: string): boolean =>
+      executeMiraCommand(
+        resolvedExtensions.commands,
+        commandId,
+        createExtensionRuntimeContext(),
+      ),
+    [createExtensionRuntimeContext, resolvedExtensions.commands],
   );
 
   useEffect(() => {
@@ -284,6 +365,11 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
     }
   }, [value]);
 
+  useEffect(
+    () => mountMiraExtensionStyles(resolvedExtensions.styles),
+    [resolvedExtensions.styles],
+  );
+
   useEffect(() => {
     const controller = controllerRef.current;
     if (!controller) {
@@ -307,11 +393,15 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
   useImperativeHandle(
     ref,
     () => ({
+      executeCommand,
       focus() {
         controllerRef.current?.focus();
       },
       getMarkdown() {
         return controllerRef.current?.getValue() ?? valueRef.current;
+      },
+      getCommands() {
+        return resolvedExtensions.commands;
       },
       getMode() {
         return modeRef.current;
@@ -321,6 +411,7 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
       },
       insertMarkdown: handleInsertMarkdown,
       insertImage: handleInsertImage,
+      isCommandEnabled,
       setMarkdown(markdown) {
         if (valueProp === undefined) {
           setUncontrolledValue(markdown);
@@ -336,7 +427,10 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
     [
       handleInsertImage,
       handleInsertMarkdown,
+      executeCommand,
+      isCommandEnabled,
       modeRef,
+      resolvedExtensions.commands,
       setMode,
       setReadonly,
       valueProp,

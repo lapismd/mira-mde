@@ -1,7 +1,24 @@
 <script lang="ts">
+  import CheckIcon from "@lucide/svelte/icons/check";
+  import CodeIcon from "@lucide/svelte/icons/code";
+  import CommandIcon from "@lucide/svelte/icons/command";
+  import ImageIcon from "@lucide/svelte/icons/image";
+  import LinkIcon from "@lucide/svelte/icons/link";
+  import PlayIcon from "@lucide/svelte/icons/play";
+  import RotateCcwIcon from "@lucide/svelte/icons/rotate-ccw";
+  import SaveIcon from "@lucide/svelte/icons/save";
+  import SparklesIcon from "@lucide/svelte/icons/sparkles";
+  import TableIcon from "@lucide/svelte/icons/table-2";
+  import WandSparklesIcon from "@lucide/svelte/icons/wand-sparkles";
   import { MiraMde, type MiraMdeHandle } from "@mira-mde/svelte";
   import type { MiraEditorSelection } from "@mira-mde/core";
-  import type { MiraMode } from "@mira-mde/extensions";
+  import {
+    resolveMiraExtensions,
+    type MiraMode,
+    type MiraTemplateSelection,
+    type MiraToolbarIconName,
+  } from "@mira-mde/extensions";
+  import type { Component } from "svelte";
   import MiraDefaultToolbar from "./default-toolbar.svelte";
   import {
     createMiraDefaultExtensions,
@@ -11,6 +28,7 @@
     resolveMiraDefaultEditMode,
     resolveMiraDefaultModes,
     type MiraDefaultToolbarActionContext,
+    type MiraDefaultToolbarDefinition,
   } from "./features";
   import type { MiraDefaultMdeProps } from "./types";
 
@@ -66,6 +84,15 @@
     ...createMiraDefaultExtensions({ features, featureConfigs }),
     ...extensions,
   ]);
+  const resolvedExtensionContributions = $derived(
+    resolveMiraExtensions(activeExtensions, {
+      mode,
+      readonly,
+      sourcePath,
+    }),
+  );
+  const extensionToolbars = $derived.by(createExtensionToolbars);
+  const activeToolbars = $derived([...extensionToolbars, ...toolbars]);
 
   const toolbarVisible = $derived(resolvedFeatures[MiraFeature.Toolbar]);
   const toolbarContext = $derived(createToolbarActionContext());
@@ -131,6 +158,18 @@
     editor?.focus();
   }
 
+  export function executeCommand(commandId: string): boolean {
+    return editor?.executeCommand(commandId) ?? false;
+  }
+
+  export function getCommands(): ReturnType<MiraMdeHandle["getCommands"]> {
+    return editor?.getCommands() ?? resolvedExtensionContributions.commands;
+  }
+
+  export function isCommandEnabled(commandId: string): boolean {
+    return editor?.isCommandEnabled(commandId) ?? false;
+  }
+
   export function getMarkdown(): string {
     return editor?.getMarkdown() ?? value;
   }
@@ -165,13 +204,81 @@
     editor?.setSelection(selection);
   }
 
-  export function insertMarkdown(markdown: string): void {
-    editor?.insertMarkdown(markdown);
+  export function insertMarkdown(
+    markdown: string,
+    selection?: MiraTemplateSelection,
+  ): void {
+    editor?.insertMarkdown(markdown, selection);
   }
 
   export function insertImage(): void {
     editor?.insertImage();
   }
+
+  function createExtensionToolbars(): MiraDefaultToolbarDefinition[] {
+    const groups = new Map<string, MiraDefaultToolbarDefinition>();
+
+    for (const item of resolvedExtensionContributions.toolbarItems) {
+      const align = item.align ?? "start";
+      const label = item.group ?? "Extensions";
+      const key = `${align}:${label}`;
+      let group = groups.get(key);
+      if (!group) {
+        group = {
+          id: `extension-${slugify(label)}-${align}`,
+          label,
+          align,
+          items: [],
+        };
+        groups.set(key, group);
+      }
+
+      group.items.push({
+        id: `extension-${item.id}`,
+        label: item.label,
+        tooltip: item.tooltip,
+        icon: extensionToolbarIcon(item.icon),
+        disabled: () => (editor ? !isCommandEnabled(item.command) : false),
+        run: () => {
+          executeCommand(item.command);
+        },
+      });
+    }
+
+    return [...groups.values()];
+  }
+
+  function extensionToolbarIcon(
+    icon: MiraToolbarIconName | undefined,
+  ): Component<Record<string, unknown>> {
+    return extensionToolbarIcons[icon ?? "command"] ?? CommandIcon;
+  }
+
+  function slugify(value: string): string {
+    return (
+      value
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/(^-|-$)/g, "") || "extensions"
+    );
+  }
+
+  const extensionToolbarIcons: Record<
+    MiraToolbarIconName,
+    Component<Record<string, unknown>>
+  > = {
+    check: CheckIcon,
+    code: CodeIcon,
+    command: CommandIcon,
+    image: ImageIcon,
+    link: LinkIcon,
+    play: PlayIcon,
+    "rotate-ccw": RotateCcwIcon,
+    save: SaveIcon,
+    sparkles: SparklesIcon,
+    table: TableIcon,
+    "wand-sparkles": WandSparklesIcon,
+  };
 
   $effect(() => {
     if (!modeOptions.includes(mode) && modeOptions[0]) {
@@ -194,7 +301,7 @@
       {featureConfigs}
       defaultEditMode={resolvedDefaultEditMode}
       {toolbarActions}
-      {toolbars}
+      toolbars={activeToolbars}
       context={toolbarContext}
       {indentGuides}
       {indentWidth}

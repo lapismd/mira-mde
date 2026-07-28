@@ -72,6 +72,41 @@ const aiDemoExtension = aiExtension({
     "Storybook AI demo: wire `aiExtension({ run })` to your model provider.",
 });
 
+const commandContributionExtension = defineMiraExtension({
+  name: "storybook-command-contributions",
+  commands: [
+    {
+      id: "insert-decision",
+      label: "Insert decision",
+      description: "Insert a decision callout",
+      keybindings: ["Mod-Shift-d"],
+      enabled: (context) => !context.readonly,
+      run(context) {
+        context.insertMarkdown(
+          "\n> [!note] Decision\n> Describe the decision here.\n",
+        );
+      },
+    },
+  ],
+  toolbarItems: [
+    {
+      id: "insert-decision",
+      label: "Insert decision",
+      tooltip: "Insert a decision callout (Mod+Shift+D)",
+      command: "insert-decision",
+      icon: "wand-sparkles",
+      group: "Extension commands",
+    },
+  ],
+  styles: [
+    {
+      id: "storybook-command-contributions",
+      cssText:
+        '.mira-default-ui__toolbar-section[aria-label="Extension commands"] { border-radius: 0.375rem; background: color-mix(in srgb, var(--interactive-accent) 10%, transparent); }',
+    },
+  ],
+});
+
 const customToolbars: MiraDefaultToolbarDefinition[] = [
   {
     id: "story-custom",
@@ -217,6 +252,16 @@ export const CustomToolbar: Story = {
     value: blockControlsMarkdown,
     toolbars: customToolbars,
     extensions: [aiDemoExtension],
+  },
+};
+
+export const ExtensionContributions: Story = {
+  name: "Extension Commands, Toolbar, And Styles",
+  tags: ["visual-pending"],
+  args: {
+    value:
+      "# Extension contributions\n\nUse the extension toolbar button or press Mod+Shift+D.",
+    extensions: [commandContributionExtension],
   },
 };
 

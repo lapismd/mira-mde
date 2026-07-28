@@ -1,6 +1,7 @@
 import type { MiraEditorSelection } from "@mira-mde/core";
 import type {
   MiraAssetResolver,
+  MiraCommand,
   MiraExtension,
   MiraFileAdapter,
   MiraImageConfig,
@@ -8,6 +9,7 @@ import type {
   MiraMode,
   MiraTheme,
   MiraThemeConfig,
+  MiraTemplateSelection,
 } from "@mira-mde/extensions";
 import type {
   MiraDefaultFeatureConfigs,
@@ -110,12 +112,15 @@ export type MiraDefaultEditorEventHandler<
 
 export type MiraDefaultEditor = {
   destroy: () => void;
+  executeCommand: (commandId: string) => boolean;
   focus: () => void;
+  getCommands: () => readonly MiraCommand[];
   getMarkdown: () => string;
   getMode: () => MiraMode;
   getSelection: () => MiraEditorSelection | null;
   insertImage: () => void;
-  insertMarkdown: (markdown: string) => void;
+  insertMarkdown: (markdown: string, selection?: MiraTemplateSelection) => void;
+  isCommandEnabled: (commandId: string) => boolean;
   on: <EventName extends MiraDefaultEditorEventName>(
     event: EventName,
     handler: MiraDefaultEditorEventHandler<EventName>,

@@ -1,5 +1,6 @@
 import type { LanguageDescription } from "@codemirror/language";
 import type { Extension as CodeMirrorExtension } from "@codemirror/state";
+import { keymap, type EditorView, type KeyBinding } from "@codemirror/view";
 import type { Component } from "svelte";
 import type { Pluggable } from "unified";
 
@@ -45,8 +46,22 @@ export type MiraCommand = {
   description?: string;
   group?: string;
   keywords?: string[];
-  run: (context: MiraExtensionRuntimeContext) => void;
+  keybindings?: MiraCommandKeybinding[];
+  enabled?: boolean | ((context: MiraExtensionRuntimeContext) => boolean);
+  run: (context: MiraExtensionRuntimeContext) => void | Promise<void>;
 };
+
+export type MiraCommandKeybinding =
+  | string
+  | {
+      key: string;
+      mac?: string;
+      win?: string;
+      linux?: string;
+      scope?: string;
+      preventDefault?: boolean;
+      stopPropagation?: boolean;
+    };
 
 export type MiraTextRange = {
   from: number;
@@ -169,7 +184,39 @@ export type MiraToolbarItem = {
   id: string;
   label: string;
   command: string;
+  tooltip?: string;
+  icon?: MiraToolbarIconName;
+  group?: string;
+  align?: "start" | "end";
 };
+
+export type MiraToolbarIconName =
+  | "check"
+  | "code"
+  | "command"
+  | "image"
+  | "link"
+  | "play"
+  | "rotate-ccw"
+  | "save"
+  | "sparkles"
+  | "table"
+  | "wand-sparkles";
+
+export type MiraExtensionStyle =
+  | string
+  | {
+      id?: string;
+      href: string;
+      media?: string;
+      integrity?: string;
+      crossOrigin?: "anonymous" | "use-credentials";
+    }
+  | {
+      id?: string;
+      cssText: string;
+      media?: string;
+    };
 
 export type MiraBlockActionContext = MiraExtensionRuntimeContext & {
   block: MiraMarkdownBlockRange;
@@ -240,6 +287,9 @@ export type MiraFileAdapter = {
 
 export type MiraExtensionRuntimeContext = {
   view?: unknown;
+  mode?: MiraMode;
+  readonly?: boolean;
+  sourcePath?: string;
   getValue: () => string;
   setValue: (value: string) => void;
   focus: () => void;
@@ -270,7 +320,7 @@ export type MiraExtension = {
   slashCommands?: MiraSlashCommand[];
   blockActions?: MiraBlockAction[];
   toolbarItems?: MiraToolbarItem[];
-  styles?: string[];
+  styles?: MiraExtensionStyle[];
   onMount?: (context: MiraExtensionRuntimeContext) => void | (() => void);
 };
 
@@ -284,7 +334,7 @@ export type ResolvedMiraExtensions = {
   slashCommands: MiraSlashCommand[];
   blockActions: MiraBlockAction[];
   toolbarItems: MiraToolbarItem[];
-  styles: string[];
+  styles: MiraExtensionStyle[];
   onMount: NonNullable<MiraExtension["onMount"]>[];
 };
 
@@ -335,4 +385,216 @@ export function resolveMiraExtensions(
   }
 
   return resolved;
+}
+
+export function isMiraCommandEnabled(
+  command: MiraCommand,
+  context: MiraExtensionRuntimeContext,
+): boolean {
+  if (typeof command.enabled === "function") {
+    return command.enabled(context);
+  }
+  return command.enabled ?? true;
+}
+
+export function executeMiraCommand(
+  commands: readonly MiraCommand[],
+  commandId: string,
+  context: MiraExtensionRuntimeContext,
+): boolean {
+  const command = findMiraCommand(commands, commandId);
+  if (!command || !isMiraCommandEnabled(command, context)) {
+    return false;
+  }
+
+  void command.run(context);
+  return true;
+}
+
+export function createMiraCommandKeymap(
+  commands: readonly MiraCommand[],
+  contextForView: (view: EditorView) => MiraExtensionRuntimeContext,
+): CodeMirrorExtension {
+  const bindings: KeyBinding[] = [];
+
+  for (const command of commands) {
+    for (const binding of command.keybindings ?? []) {
+      const definition =
+        typeof binding === "string" ? { key: binding } : binding;
+      bindings.push({
+        ...definition,
+        run(view) {
+          return executeMiraCommand(commands, command.id, contextForView(view));
+        },
+      });
+    }
+  }
+
+  return keymap.of(bindings);
+}
+
+type MountedStyle = {
+  count: number;
+  element: HTMLLinkElement | HTMLStyleElement;
+};
+
+const mountedStyleTargets = new WeakMap<
+  ParentNode,
+  Map<string, MountedStyle>
+>();
+
+export function mountMiraExtensionStyles(
+  styles: readonly MiraExtensionStyle[],
+  target?: ParentNode,
+): () => void {
+  const activeTarget =
+    target ?? (typeof document === "undefined" ? undefined : document.head);
+  if (!activeTarget || styles.length === 0) {
+    return () => undefined;
+  }
+
+  let mounted = mountedStyleTargets.get(activeTarget);
+  if (!mounted) {
+    mounted = new Map();
+    mountedStyleTargets.set(activeTarget, mounted);
+  }
+
+  const keys: string[] = [];
+  for (const style of styles) {
+    const normalized = normalizeMiraExtensionStyle(style);
+    const key = normalized.key;
+    const existing = mounted.get(key);
+    if (existing) {
+      existing.count += 1;
+      keys.push(key);
+      continue;
+    }
+
+    const element =
+      normalized.kind === "href"
+        ? createStylesheetLink(activeTarget, normalized)
+        : createInlineStyle(activeTarget, normalized);
+    activeTarget.appendChild(element);
+    mounted.set(key, { count: 1, element });
+    keys.push(key);
+  }
+
+  return () => {
+    const current = mountedStyleTargets.get(activeTarget);
+    if (!current) {
+      return;
+    }
+
+    for (const key of keys) {
+      const entry = current.get(key);
+      if (!entry) {
+        continue;
+      }
+      entry.count -= 1;
+      if (entry.count === 0) {
+        entry.element.remove();
+        current.delete(key);
+      }
+    }
+
+    if (current.size === 0) {
+      mountedStyleTargets.delete(activeTarget);
+    }
+  };
+}
+
+function findMiraCommand(
+  commands: readonly MiraCommand[],
+  commandId: string,
+): MiraCommand | undefined {
+  for (let index = commands.length - 1; index >= 0; index -= 1) {
+    const command = commands[index];
+    if (command?.id === commandId) {
+      return command;
+    }
+  }
+  return undefined;
+}
+
+type NormalizedExtensionStyle =
+  | {
+      kind: "href";
+      key: string;
+      href: string;
+      media?: string;
+      integrity?: string;
+      crossOrigin?: "anonymous" | "use-credentials";
+    }
+  | {
+      kind: "cssText";
+      key: string;
+      cssText: string;
+      media?: string;
+    };
+
+function normalizeMiraExtensionStyle(
+  style: MiraExtensionStyle,
+): NormalizedExtensionStyle {
+  if (typeof style === "string") {
+    return {
+      kind: "href",
+      key: `href:${style}`,
+      href: style,
+    };
+  }
+  if ("href" in style) {
+    return {
+      ...style,
+      kind: "href",
+      key: style.id ? `id:${style.id}` : `href:${style.href}`,
+    };
+  }
+  return {
+    ...style,
+    kind: "cssText",
+    key: style.id ? `id:${style.id}` : `cssText:${style.cssText}`,
+  };
+}
+
+function ownerDocument(target: ParentNode): Document {
+  if (target instanceof Document) {
+    return target;
+  }
+  if (target.ownerDocument) {
+    return target.ownerDocument;
+  }
+  throw new Error("Mira extension styles require a document-backed target");
+}
+
+function createStylesheetLink(
+  target: ParentNode,
+  style: Extract<NormalizedExtensionStyle, { kind: "href" }>,
+): HTMLLinkElement {
+  const element = ownerDocument(target).createElement("link");
+  element.rel = "stylesheet";
+  element.href = style.href;
+  element.dataset.miraExtensionStyle = style.key;
+  if (style.media) {
+    element.media = style.media;
+  }
+  if (style.integrity) {
+    element.integrity = style.integrity;
+  }
+  if (style.crossOrigin) {
+    element.crossOrigin = style.crossOrigin;
+  }
+  return element;
+}
+
+function createInlineStyle(
+  target: ParentNode,
+  style: Extract<NormalizedExtensionStyle, { kind: "cssText" }>,
+): HTMLStyleElement {
+  const element = ownerDocument(target).createElement("style");
+  element.textContent = style.cssText;
+  element.dataset.miraExtensionStyle = style.key;
+  if (style.media) {
+    element.media = style.media;
+  }
+  return element;
 }

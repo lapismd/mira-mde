@@ -1,5 +1,6 @@
 import type {
   MiraAssetResolver,
+  MiraCommand,
   MiraExtension,
   MiraFileAdapter,
   MiraImageConfig,
@@ -7,6 +8,7 @@ import type {
   MiraMode,
   MiraTheme,
   MiraThemeConfig,
+  MiraTemplateSelection,
 } from "@mira-mde/extensions";
 import type { MiraEditorSelection } from "@mira-mde/core";
 
@@ -49,12 +51,15 @@ export type MiraMdeProps = {
 };
 
 export type MiraMdeHandle = {
+  executeCommand: (commandId: string) => boolean;
   focus: () => void;
+  getCommands: () => readonly MiraCommand[];
   getMarkdown: () => string;
   getMode: () => MiraMode;
   getSelection: () => MiraEditorSelection | null;
   insertImage: () => void;
-  insertMarkdown: (markdown: string) => void;
+  insertMarkdown: (markdown: string, selection?: MiraTemplateSelection) => void;
+  isCommandEnabled: (commandId: string) => boolean;
   setMarkdown: (markdown: string) => void;
   setMode: (mode: MiraMode) => void;
   setReadonly: (readonly: boolean) => void;

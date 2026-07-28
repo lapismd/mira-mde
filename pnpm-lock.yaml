@@ -475,6 +475,9 @@ importers:
       '@codemirror/state':
         specifier: ^6.5.2
         version: 6.7.0
+      '@codemirror/view':
+        specifier: ^6.38.8
+        version: 6.43.3
       svelte:
         specifier: ^5.46.1
         version: 5.56.4(@typescript-eslint/types@8.62.0)

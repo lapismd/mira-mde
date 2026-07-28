@@ -6,8 +6,25 @@ import {
   useRef,
   useState,
 } from "react";
+import {
+  Check,
+  Code,
+  Command,
+  Image,
+  Link,
+  Play,
+  RotateCcw,
+  Save,
+  Sparkles,
+  Table2,
+  WandSparkles,
+} from "lucide-react";
 import type { MiraEditorSelection } from "@mira-mde/core";
-import type { MiraMode } from "@mira-mde/extensions";
+import {
+  resolveMiraExtensions,
+  type MiraMode,
+  type MiraToolbarIconName,
+} from "@mira-mde/extensions";
 import { MiraDefaultToolbar } from "./default-toolbar";
 import {
   createMiraDefaultExtensions,
@@ -23,8 +40,24 @@ import type {
   MiraDefaultMdeHandle,
   MiraDefaultMdeProps,
   MiraDefaultToolbarActionContext,
+  MiraDefaultToolbarDefinition,
   MiraMdeHandle,
+  MiraReactIcon,
 } from "./types";
+
+const extensionToolbarIcons: Record<MiraToolbarIconName, MiraReactIcon> = {
+  check: Check,
+  code: Code,
+  command: Command,
+  image: Image,
+  link: Link,
+  play: Play,
+  "rotate-ccw": RotateCcw,
+  save: Save,
+  sparkles: Sparkles,
+  table: Table2,
+  "wand-sparkles": WandSparkles,
+};
 
 export const MiraDefaultMde = forwardRef<
   MiraDefaultMdeHandle,
@@ -110,6 +143,51 @@ export const MiraDefaultMde = forwardRef<
     ],
     [extensions, featureConfigs, features],
   );
+  const resolvedExtensionContributions = useMemo(
+    () =>
+      resolveMiraExtensions(activeExtensions, {
+        mode,
+        readonly,
+        sourcePath,
+      }),
+    [activeExtensions, mode, readonly, sourcePath],
+  );
+  const extensionToolbars = useMemo(() => {
+    const groups = new Map<string, MiraDefaultToolbarDefinition>();
+
+    for (const item of resolvedExtensionContributions.toolbarItems) {
+      const align = item.align ?? "start";
+      const label = item.group ?? "Extensions";
+      const key = `${align}:${label}`;
+      let group = groups.get(key);
+      if (!group) {
+        group = {
+          id: `extension-${slugify(label)}-${align}`,
+          label,
+          align,
+          items: [],
+        };
+        groups.set(key, group);
+      }
+
+      const Icon = extensionToolbarIcons[item.icon ?? "command"] ?? Command;
+      group.items.push({
+        id: `extension-${item.id}`,
+        label: item.label,
+        tooltip: item.tooltip,
+        icon: Icon,
+        disabled: () =>
+          editorRef.current
+            ? !editorRef.current.isCommandEnabled(item.command)
+            : false,
+        run: () => {
+          editorRef.current?.executeCommand(item.command);
+        },
+      });
+    }
+
+    return [...groups.values()];
+  }, [resolvedExtensionContributions.toolbarItems]);
 
   const handleChange = useCallback(
     (nextValue: string) => {
@@ -241,11 +319,20 @@ export const MiraDefaultMde = forwardRef<
   useImperativeHandle(
     ref,
     () => ({
+      executeCommand(commandId) {
+        return editorRef.current?.executeCommand(commandId) ?? false;
+      },
       focus() {
         editorRef.current?.focus();
       },
       getMarkdown() {
         return editorRef.current?.getMarkdown() ?? value;
+      },
+      getCommands() {
+        return (
+          editorRef.current?.getCommands() ??
+          resolvedExtensionContributions.commands
+        );
       },
       getMode() {
         return editorRef.current?.getMode() ?? mode;
@@ -259,6 +346,9 @@ export const MiraDefaultMde = forwardRef<
       insertImage() {
         editorRef.current?.insertImage();
       },
+      isCommandEnabled(commandId) {
+        return editorRef.current?.isCommandEnabled(commandId) ?? false;
+      },
       setMarkdown: handleSetMarkdown,
       setMode: handleSetMode,
       setReadonly: handleSetReadonly,
@@ -266,7 +356,14 @@ export const MiraDefaultMde = forwardRef<
         editorRef.current?.setSelection(selection);
       },
     }),
-    [handleSetMarkdown, handleSetMode, handleSetReadonly, mode, value],
+    [
+      handleSetMarkdown,
+      handleSetMode,
+      handleSetReadonly,
+      mode,
+      resolvedExtensionContributions.commands,
+      value,
+    ],
   );
 
   return (
@@ -291,7 +388,7 @@ export const MiraDefaultMde = forwardRef<
           onIndentWithTabsChange={applyIndentWithTabs}
           readonly={readonly}
           toolbarActions={toolbarActions}
-          toolbars={toolbars}
+          toolbars={[...extensionToolbars, ...toolbars]}
           value={value}
         />
       ) : null}
@@ -345,3 +442,12 @@ export const MiraDefaultMde = forwardRef<
 });
 
 MiraDefaultMde.displayName = "MiraDefaultMde";
+
+function slugify(value: string): string {
+  return (
+    value
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "") || "extensions"
+  );
+}

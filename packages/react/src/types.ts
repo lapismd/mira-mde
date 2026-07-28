@@ -1,6 +1,7 @@
 import type { MiraEditorSelection } from "@mira-mde/core";
 import type {
   MiraAssetResolver,
+  MiraCommand,
   MiraExtension,
   MiraFileAdapter,
   MiraImageConfig,
@@ -8,6 +9,7 @@ import type {
   MiraMode,
   MiraTheme,
   MiraThemeConfig,
+  MiraTemplateSelection,
 } from "@mira-mde/extensions";
 import type {
   MiraDefaultSlashCommandConfig,
@@ -29,12 +31,15 @@ export type MiraReactIcon = ComponentType<{
 export type MiraDefaultEditMode = Extract<MiraMode, "live-preview" | "source">;
 
 export type MiraMdeHandle = {
+  executeCommand: (commandId: string) => boolean;
   focus: () => void;
+  getCommands: () => readonly MiraCommand[];
   getMarkdown: () => string;
   getMode: () => MiraMode;
   getSelection: () => MiraEditorSelection | null;
   insertImage: () => void;
-  insertMarkdown: (markdown: string) => void;
+  insertMarkdown: (markdown: string, selection?: MiraTemplateSelection) => void;
+  isCommandEnabled: (commandId: string) => boolean;
   setMarkdown: (markdown: string) => void;
   setMode: (mode: MiraMode) => void;
   setReadonly: (readonly: boolean) => void;

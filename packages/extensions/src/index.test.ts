@@ -1,8 +1,14 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+import { EditorState } from "@codemirror/state";
+import { EditorView } from "@codemirror/view";
 import {
+  createMiraCommandKeymap,
   createMarkdownTemplate,
   createSlashSnippet,
   defineMiraExtension,
+  executeMiraCommand,
+  isMiraCommandEnabled,
+  mountMiraExtensionStyles,
   resolveMiraExtensions,
 } from ".";
 
@@ -99,6 +105,103 @@ describe("resolveMiraExtensions", () => {
       "duplicate",
       "ask-ai",
     ]);
+  });
+});
+
+describe("extension runtime contributions", () => {
+  const context = {
+    focus: () => undefined,
+    getValue: () => "",
+    insertMarkdown: () => undefined,
+    setValue: () => undefined,
+  };
+
+  it("executes the last enabled command with a matching id", () => {
+    const first = vi.fn();
+    const second = vi.fn();
+    const commands = [
+      { id: "save", label: "Save first", run: first },
+      { id: "save", label: "Save second", run: second },
+    ];
+
+    expect(executeMiraCommand(commands, "save", context)).toBe(true);
+    expect(first).not.toHaveBeenCalled();
+    expect(second).toHaveBeenCalledWith(context);
+  });
+
+  it("does not execute disabled or unknown commands", () => {
+    const run = vi.fn();
+    const command = {
+      id: "publish",
+      label: "Publish",
+      enabled: false,
+      run,
+    };
+
+    expect(isMiraCommandEnabled(command, context)).toBe(false);
+    expect(executeMiraCommand([command], "publish", context)).toBe(false);
+    expect(executeMiraCommand([command], "missing", context)).toBe(false);
+    expect(run).not.toHaveBeenCalled();
+  });
+
+  it("executes command shortcuts through a CodeMirror keymap", () => {
+    const run = vi.fn();
+    const extension = createMiraCommandKeymap(
+      [
+        {
+          id: "save",
+          label: "Save",
+          keybindings: ["Ctrl-s"],
+          run,
+        },
+      ],
+      () => context,
+    );
+    const view = new EditorView({
+      state: EditorState.create({
+        extensions: [extension],
+      }),
+    });
+
+    view.contentDOM.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        bubbles: true,
+        ctrlKey: true,
+        key: "s",
+      }),
+    );
+
+    expect(run).toHaveBeenCalledWith(context);
+    view.destroy();
+  });
+
+  it("mounts and reference-counts external and inline styles", () => {
+    const cleanupFirst = mountMiraExtensionStyles([
+      "/extension.css",
+      {
+        id: "extension-inline",
+        cssText: ".extension { color: rebeccapurple; }",
+      },
+    ]);
+    const cleanupSecond = mountMiraExtensionStyles([
+      "/extension.css",
+      {
+        id: "extension-inline",
+        cssText: ".extension { color: rebeccapurple; }",
+      },
+    ]);
+
+    expect(
+      document.head.querySelectorAll("[data-mira-extension-style]"),
+    ).toHaveLength(2);
+    cleanupFirst();
+    expect(
+      document.head.querySelectorAll("[data-mira-extension-style]"),
+    ).toHaveLength(2);
+    cleanupSecond();
+    expect(
+      document.head.querySelectorAll("[data-mira-extension-style]"),
+    ).toHaveLength(0);
   });
 });
 

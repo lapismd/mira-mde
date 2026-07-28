@@ -182,7 +182,53 @@ const featureConfigs = {
 };
 ```
 
-Commands can still provide a `run(context)` callback for advanced editor-only behavior, but the default UI only ships portable Markdown snippets.
+Slash commands can still provide a `run(context)` callback for advanced editor-only behavior, but the default UI only ships portable Markdown snippets.
+
+## Extension commands, toolbar items, and styles
+
+Use extension `commands` for actions that should be available from a keybinding, the imperative editor handle, or an extension-contributed toolbar item. The command receives the same framework-neutral runtime context in Svelte and React.
+
+```ts
+import { defineMiraExtension } from "@mira-mde/extensions";
+
+export const decisionsExtension = defineMiraExtension({
+  name: "decisions",
+  commands: [
+    {
+      id: "insert-decision",
+      label: "Insert decision",
+      keybindings: ["Mod-Shift-d"],
+      enabled: (context) => !context.readonly,
+      run(context) {
+        context.insertMarkdown("\n> [!note] Decision\n> ", 24);
+      },
+    },
+  ],
+  toolbarItems: [
+    {
+      id: "insert-decision",
+      label: "Insert decision",
+      command: "insert-decision",
+      icon: "wand-sparkles",
+      group: "Extensions",
+    },
+  ],
+  styles: [
+    "/decisions.css",
+    {
+      id: "decisions-inline",
+      cssText: ".decision-marker { color: var(--interactive-accent); }",
+    },
+  ],
+});
+```
+
+String style entries are external stylesheet URLs. Object entries use either
+`href` or explicit `cssText`, plus optional `id`/`media`; equal IDs are
+reference-counted so multiple editors do not duplicate the style.
+
+The editor handles expose `getCommands()`, `isCommandEnabled(id)`, and
+`executeCommand(id)` for command palettes and other consumer UI.
 
 ## Imperative Handle
 
@@ -203,4 +249,4 @@ Commands can still provide a `run(context)` callback for advanced editor-only be
 <MiraDefaultMde bind:this={editor} />
 ```
 
-The handle exposes `focus`, `getMarkdown`, `setMarkdown`, `getMode`, `setMode`, `getSelection`, `setSelection`, `insertMarkdown`, and `setReadonly`.
+The handle exposes `focus`, `getMarkdown`, `setMarkdown`, `getMode`, `setMode`, `getSelection`, `setSelection`, `insertMarkdown`, `setReadonly`, `getCommands`, `isCommandEnabled`, and `executeCommand`.

@@ -82,8 +82,14 @@ export function createMiraDefaultEditor(
       reactRoot.unmount();
       handle = null;
     },
+    executeCommand(commandId) {
+      return handle?.executeCommand(commandId) ?? false;
+    },
     focus() {
       handle?.focus();
+    },
+    getCommands() {
+      return handle?.getCommands() ?? [];
     },
     getMarkdown() {
       return handle?.getMarkdown() ?? currentValue;
@@ -94,8 +100,8 @@ export function createMiraDefaultEditor(
     getSelection() {
       return handle?.getSelection() ?? null;
     },
-    insertMarkdown(markdown) {
-      handle?.insertMarkdown(markdown);
+    insertMarkdown(markdown, selection) {
+      handle?.insertMarkdown(markdown, selection);
     },
     insertImage() {
       handle?.insertImage();
@@ -105,6 +111,9 @@ export function createMiraDefaultEditor(
       return () => {
         listeners[event].delete(handler as never);
       };
+    },
+    isCommandEnabled(commandId) {
+      return handle?.isCommandEnabled(commandId) ?? false;
     },
     setMarkdown(markdown) {
       currentValue = markdown;

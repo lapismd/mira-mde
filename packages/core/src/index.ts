@@ -11,6 +11,7 @@ import type {
   MiraFileAdapter,
   MiraImageConfig,
   MiraLinkResolver,
+  MiraTemplateSelection,
   MiraMode,
   MiraTheme,
   MiraThemeConfig,
@@ -208,8 +209,29 @@ export class MiraEditorController {
     });
   }
 
-  replaceSelection(value: string): void {
-    this.view.dispatch(this.view.state.replaceSelection(value));
+  replaceSelection(value: string, selection?: MiraTemplateSelection): void {
+    const range = this.view.state.selection.main;
+    const transaction = this.view.state.replaceSelection(value);
+    if (selection === undefined) {
+      this.view.dispatch(transaction);
+      return;
+    }
+
+    const relativeAnchor =
+      typeof selection === "number" ? selection : selection.anchor;
+    const relativeHead =
+      typeof selection === "number"
+        ? selection
+        : (selection.head ?? selection.anchor);
+    const nextLength =
+      this.view.state.doc.length - (range.to - range.from) + value.length;
+    const anchor = clampOffset(range.from + relativeAnchor, nextLength);
+    const head = clampOffset(range.from + relativeHead, nextLength);
+
+    this.view.dispatch({
+      ...transaction,
+      selection: EditorSelection.single(anchor, head),
+    });
   }
 
   private createState(
@@ -223,6 +245,10 @@ export class MiraEditorController {
       extensions,
     });
   }
+}
+
+function clampOffset(value: number, max: number): number {
+  return Math.max(0, Math.min(max, value));
 }
 
 export function createMiraEditorController(

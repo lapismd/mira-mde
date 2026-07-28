@@ -2,9 +2,13 @@ import { createRoot } from "react-dom/client";
 import { act, useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { Bold } from "lucide-react";
-import type { MiraMode } from "@mira-mde/extensions";
+import type {
+  MiraExtensionRuntimeContext,
+  MiraMode,
+} from "@mira-mde/extensions";
 import {
   MiraDefaultToolbar,
+  MiraDefaultMde,
   MiraFeature,
   MiraMde,
   createMiraDefaultEditor,
@@ -153,5 +157,68 @@ describe("@mira-mde/react", () => {
     act(() => {
       editor.destroy();
     });
+  });
+
+  it("renders and executes framework-neutral extension toolbar commands", () => {
+    const host = document.createElement("div");
+    const root = createRoot(host);
+    const run = vi.fn((context: MiraExtensionRuntimeContext) => {
+      context.insertMarkdown("React extension command");
+    });
+
+    act(() => {
+      root.render(
+        <MiraDefaultMde
+          extensions={[
+            {
+              name: "react-command-example",
+              commands: [
+                {
+                  id: "insert-react-command",
+                  label: "Insert React command",
+                  run,
+                },
+              ],
+              toolbarItems: [
+                {
+                  id: "insert-react-command",
+                  label: "Insert React command",
+                  command: "insert-react-command",
+                  icon: "sparkles",
+                },
+              ],
+              styles: [
+                {
+                  id: "react-command-style",
+                  cssText: ".react-command { color: rebeccapurple; }",
+                },
+              ],
+            },
+          ]}
+        />,
+      );
+    });
+
+    act(() => {
+      host
+        .querySelector<HTMLButtonElement>('[aria-label="Insert React command"]')
+        ?.click();
+    });
+
+    expect(run).toHaveBeenCalledTimes(1);
+    expect(
+      document.head.querySelector(
+        '[data-mira-extension-style="id:react-command-style"]',
+      ),
+    ).toBeTruthy();
+
+    act(() => {
+      root.unmount();
+    });
+    expect(
+      document.head.querySelector(
+        '[data-mira-extension-style="id:react-command-style"]',
+      ),
+    ).toBeNull();
   });
 });

@@ -21,7 +21,10 @@
     MiraLinkResolver,
     MiraRendererComponents,
   } from "@mira-mde/extensions";
-  import { resolveMiraExtensions } from "@mira-mde/extensions";
+  import {
+    mountMiraExtensionStyles,
+    resolveMiraExtensions,
+  } from "@mira-mde/extensions";
   import Markdown from "./renderer/markdown.svelte";
   import {
     remarkCallouts,
@@ -130,6 +133,10 @@
       sourcePath,
     }),
   );
+
+  $effect(() => {
+    return mountMiraExtensionStyles(resolvedExtensions.styles);
+  });
 
   const remarkPlugins = $derived<Pluggable[]>([
     remarkFrontmatter,

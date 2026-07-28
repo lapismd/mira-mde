@@ -90,8 +90,14 @@ export function createMiraDefaultEditor(
     destroy() {
       unmount(component as never);
     },
+    executeCommand(commandId) {
+      return component.executeCommand(commandId);
+    },
     focus() {
       component.focus();
+    },
+    getCommands() {
+      return component.getCommands();
     },
     getMarkdown() {
       return component.getMarkdown?.() ?? currentValue;
@@ -102,8 +108,8 @@ export function createMiraDefaultEditor(
     getSelection() {
       return component.getSelection?.() ?? null;
     },
-    insertMarkdown(markdown) {
-      component.insertMarkdown(markdown);
+    insertMarkdown(markdown, selection) {
+      component.insertMarkdown(markdown, selection);
     },
     insertImage() {
       component.insertImage();
@@ -113,6 +119,9 @@ export function createMiraDefaultEditor(
       return () => {
         listeners[event].delete(handler as never);
       };
+    },
+    isCommandEnabled(commandId) {
+      return component.isCommandEnabled(commandId);
     },
     setMarkdown(markdown) {
       currentValue = markdown;
