@@ -10,6 +10,7 @@ import type {
   MiraExtension,
   MiraFileAdapter,
   MiraImageConfig,
+  MiraMarkdownAuthoringConfig,
   MiraLinkResolver,
   MiraTemplateSelection,
   MiraMode,
@@ -54,6 +55,7 @@ export type MiraEditorOptions = {
   assetResolver?: MiraAssetResolver;
   fileAdapter?: MiraFileAdapter;
   imageConfig?: MiraImageConfig;
+  authoring?: MiraMarkdownAuthoringConfig;
   frontmatterOpen?: boolean;
   frontmatterConfig?: unknown;
   onChange?: (value: string, change: MiraEditorChange) => void;

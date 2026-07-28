@@ -10,6 +10,7 @@
   import type {
     MiraExtension,
     MiraImageConfig,
+    MiraMarkdownAuthoringConfig,
     MiraMode,
     MiraTheme,
   } from "@mira-mde/extensions";
@@ -34,6 +35,7 @@
     featureConfigs?: MiraDefaultFeatureConfigs;
     extensions?: MiraExtension[];
     imageConfig?: MiraImageConfig;
+    authoring?: MiraMarkdownAuthoringConfig;
     toolbars?: MiraDefaultToolbarDefinition[];
     height?: string;
   };
@@ -57,6 +59,7 @@
     featureConfigs = {},
     extensions = [],
     imageConfig,
+    authoring,
     toolbars = [],
     height = "34rem",
   }: Props = $props();
@@ -93,6 +96,7 @@
     {featureConfigs}
     {extensions}
     {imageConfig}
+    {authoring}
     {toolbars}
     class="mira-story-editor"
   />

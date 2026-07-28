@@ -264,6 +264,53 @@ export type MiraFileRef = {
   kind?: "markdown" | "image" | "media" | "unknown";
 };
 
+export type MiraInternalLinkFormatTarget = {
+  targetPath: string;
+  sourcePath?: string;
+  file?: MiraFileRef;
+  files: readonly MiraFileRef[];
+  embed?: boolean;
+  heading?: string;
+  alias?: string;
+};
+
+export type MiraInternalLinkFormatter = (
+  target: MiraInternalLinkFormatTarget,
+) => string;
+
+export type MiraMarkdownCompletionConfig = {
+  enabled?: boolean;
+  files?: boolean;
+  embeds?: boolean;
+  headings?: boolean;
+  displayText?: boolean;
+  includeMissing?: boolean;
+  fileFilter?: (file: MiraFileRef) => boolean;
+  embedFilter?: (file: MiraFileRef) => boolean;
+  formatLink?: MiraInternalLinkFormatter;
+};
+
+export type MiraSmartPasteConfig = {
+  enabled?: boolean;
+  html?: boolean;
+  urlOverSelection?: boolean;
+  convertHtml?: (html: string) => string | Promise<string>;
+  onError?: (error: unknown) => void;
+};
+
+export type MiraMarkdownInputHandlerConfig = {
+  enabled?: boolean;
+  codeFence?: boolean;
+  frontmatter?: boolean;
+  ellipsis?: boolean;
+};
+
+export type MiraMarkdownAuthoringConfig = {
+  completions?: boolean | MiraMarkdownCompletionConfig;
+  smartPaste?: boolean | MiraSmartPasteConfig;
+  inputHandlers?: boolean | MiraMarkdownInputHandlerConfig;
+};
+
 export type MiraFileAdapter = {
   resolveLink: (target: {
     href: string;

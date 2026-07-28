@@ -12,6 +12,7 @@ import {
   type ViewUpdate,
 } from "@codemirror/view";
 import { Table } from "@lezer/markdown";
+import { GenericDirectives } from "./directives";
 import { GridTable } from "./grid-table";
 import { parseLatex } from "./latex";
 import {
@@ -21,6 +22,22 @@ import {
   WikiLinkParser,
 } from "./lapis-inline";
 
+export {
+  createMarkdownAuthoringExtensions,
+  type MiraMarkdownAuthoringOptions,
+} from "./authoring";
+export {
+  createMarkdownCompletionExtensions,
+  createMarkdownCompletionSources,
+  formatMiraInternalLink,
+  type MiraMarkdownCompletionOptions,
+} from "./completion";
+export { createMarkdownInputHandlerExtensions } from "./input-handlers";
+export {
+  convertHtmlToMarkdown,
+  createMarkdownSmartPasteExtension,
+} from "./paste";
+export { GenericDirectives } from "./directives";
 export {
   EmbedLinkParser,
   PathLinkParser,
@@ -52,6 +69,7 @@ export function createMarkdownCodeMirrorExtensions(
         extensions: [
           Table,
           GridTable,
+          GenericDirectives,
           EmbedLinkParser,
           WikiLinkParser,
           PathLinkParser,

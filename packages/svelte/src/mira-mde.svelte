@@ -5,7 +5,10 @@
     createBaseCodeMirrorExtensions,
     createSlashCommandExtensions,
   } from "@mira-mde/codemirror";
-  import { createMarkdownCodeMirrorExtensions } from "@mira-mde/codemirror-markdown";
+  import {
+    createMarkdownAuthoringExtensions,
+    createMarkdownCodeMirrorExtensions,
+  } from "@mira-mde/codemirror-markdown";
   import { createRichEditorExtensions } from "@mira-mde/codemirror-rich";
   import { createTableExtensions } from "@mira-mde/codemirror-tables";
   import {
@@ -52,6 +55,7 @@
     assetResolver,
     fileAdapter,
     imageConfig,
+    authoring,
     frontmatterOpen = true,
     frontmatterConfig,
     headingIds = false,
@@ -92,6 +96,7 @@
       indentWidth,
       sourcePath,
       JSON.stringify({
+        authoring,
         max: imageConfig?.imageMaxSizeBytes,
         mime: imageConfig?.imageMimeTypes,
         syntax: imageConfig?.imageSyntax,
@@ -145,6 +150,11 @@
       }),
       createTableExtensions(),
       createImageDropPasteExtension(imageConfig),
+      createMarkdownAuthoringExtensions({
+        config: authoring,
+        fileAdapter,
+        sourcePath,
+      }),
       createRichEditorExtensions({
         blockActions: resolved.blockActions,
         blockControls: blockControls && mode !== "preview" && !readonly,
@@ -300,6 +310,8 @@
   $effect(() => {
     resolvedExtensions;
     extensionSignature;
+    authoring;
+    fileAdapter;
     if (controller) {
       controller.update({
         codeMirrorExtensions: buildCodeMirrorExtensions(),

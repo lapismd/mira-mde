@@ -9,6 +9,7 @@
   import type {
     MiraExtension,
     MiraImageConfig,
+    MiraMarkdownAuthoringConfig,
     MiraMode,
     MiraTheme,
   } from "@mira-mde/extensions";
@@ -19,6 +20,8 @@
     value?: string;
     /** Active editor surface. */
     mode?: MiraMode;
+    /** Current Markdown file path for relative links and completion. */
+    sourcePath?: string;
     /** Theme tokens applied to the editor shell. */
     theme?: MiraTheme;
     /** Disable editing while keeping the current mode. */
@@ -49,6 +52,7 @@
     extensions?: MiraExtension[];
     /** Image paste/drop/picker upload configuration. */
     imageConfig?: MiraImageConfig;
+    authoring?: MiraMarkdownAuthoringConfig;
     /** Extra declarative toolbar sections. */
     toolbars?: MiraDefaultToolbarDefinition[];
     /** CSS height for the story chrome around the editor. */
@@ -58,6 +62,7 @@
   let {
     value = defaultUiSampleMarkdown,
     mode = "live-preview",
+    sourcePath = "story.md",
     theme = "light",
     readonly = false,
     lineWrapping = true,
@@ -73,6 +78,7 @@
     featureConfigs = {},
     extensions = [],
     imageConfig,
+    authoring,
     toolbars = [],
     height = "34rem",
   }: Props = $props();
@@ -81,6 +87,7 @@
 <EditorModeStory
   {value}
   {mode}
+  {sourcePath}
   {theme}
   {readonly}
   {lineWrapping}
@@ -96,6 +103,7 @@
   {featureConfigs}
   {extensions}
   {imageConfig}
+  {authoring}
   {toolbars}
   {height}
 />

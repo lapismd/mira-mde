@@ -55,6 +55,16 @@ const storyFiles = new Map<string, StoryFile>([
       path: "Embedded Note",
     },
   ],
+  [
+    "notes/project.md",
+    {
+      kind: "markdown",
+      markdown:
+        "# Project\n\n## Next Steps\n\n## Decisions\n\nPortable completion target.",
+      name: "project.md",
+      path: "notes/project.md",
+    },
+  ],
 ]);
 
 export const storyFileAdapter: MiraFileAdapter = {
@@ -73,5 +83,15 @@ export const storyFileAdapter: MiraFileAdapter = {
   },
   listFiles() {
     return Array.from(storyFiles.values());
+  },
+  getHeadings(file) {
+    if (file.path === "notes/project.md") {
+      return [
+        { id: "project", level: 1, text: "Project" },
+        { id: "next-steps", level: 2, text: "Next Steps" },
+        { id: "decisions", level: 2, text: "Decisions" },
+      ];
+    }
+    return [];
   },
 };

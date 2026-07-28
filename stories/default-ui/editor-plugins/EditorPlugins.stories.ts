@@ -72,6 +72,18 @@ const aiDemoExtension = aiExtension({
     "Storybook AI demo: wire `aiExtension({ run })` to your model provider.",
 });
 
+const markdownAuthoringMarkdown = `# Portable authoring
+
+The built-in authoring layer is backed by the story file adapter.
+
+- Type \`[[pro\` to complete a note.
+- Type \`![[dia\` to complete an embed.
+- Type \`[[project#Ne\` to complete a heading.
+- Select these words and paste a URL to wrap them as a Markdown link.
+- Paste rich HTML to convert it to Markdown.
+- On an empty line, type three backticks or start the document with three dashes.
+`;
+
 const commandContributionExtension = defineMiraExtension({
   name: "storybook-command-contributions",
   commands: [
@@ -262,6 +274,20 @@ export const ExtensionContributions: Story = {
     value:
       "# Extension contributions\n\nUse the extension toolbar button or press Mod+Shift+D.",
     extensions: [commandContributionExtension],
+  },
+};
+
+export const MarkdownAuthoring: Story = {
+  name: "Completions, Smart Paste, And Input Handlers",
+  tags: ["visual-pending"],
+  args: {
+    value: markdownAuthoringMarkdown,
+    sourcePath: "notes/today.md",
+    authoring: {
+      inputHandlers: {
+        ellipsis: true,
+      },
+    },
   },
 };
 

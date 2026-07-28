@@ -3,7 +3,10 @@ import {
   createBaseCodeMirrorExtensions,
   createSlashCommandExtensions,
 } from "@mira-mde/codemirror";
-import { createMarkdownCodeMirrorExtensions } from "@mira-mde/codemirror-markdown";
+import {
+  createMarkdownAuthoringExtensions,
+  createMarkdownCodeMirrorExtensions,
+} from "@mira-mde/codemirror-markdown";
 import { createRichEditorExtensions } from "@mira-mde/codemirror-rich";
 import { createTableExtensions } from "@mira-mde/codemirror-tables";
 import {
@@ -44,6 +47,7 @@ const defaultMode: MiraMode = "live-preview";
 export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
   {
     assetResolver,
+    authoring,
     className,
     defaultMode: defaultModeProp = defaultMode,
     defaultReadonly = false,
@@ -215,6 +219,11 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
       }),
       createTableExtensions(),
       createImageDropPasteExtension(imageConfig),
+      createMarkdownAuthoringExtensions({
+        config: authoring,
+        fileAdapter,
+        sourcePath,
+      }),
       createRichEditorExtensions({
         assetResolver,
         blockActions: resolved.blockActions,
@@ -250,6 +259,7 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
     ].flat();
   }, [
     assetResolver,
+    authoring,
     blockControls,
     commitValue,
     createExtensionRuntimeContext,

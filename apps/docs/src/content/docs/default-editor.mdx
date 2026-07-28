@@ -94,6 +94,27 @@ The default UI package is the fastest way to embed Mira MDE. It combines the Sve
       </td>
       <td>Document path used by resolvers and source-aware behavior.</td>
     </tr>
+    <tr>
+      <td>
+        <code>fileAdapter</code>
+      </td>
+      <td>
+        <code>MiraFileAdapter</code>
+      </td>
+      <td>
+        Supplies portable file resolution, completion data, headings, and
+        content.
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>authoring</code>
+      </td>
+      <td>
+        <code>MiraMarkdownAuthoringConfig</code>
+      </td>
+      <td>Configures completion, smart paste, and input conveniences.</td>
+    </tr>
   </tbody>
 </table>
 
@@ -183,6 +204,59 @@ const featureConfigs = {
 ```
 
 Slash commands can still provide a `run(context)` callback for advanced editor-only behavior, but the default UI only ships portable Markdown snippets.
+
+## Markdown authoring
+
+File, embed, heading, and display-text completion uses the existing
+`MiraFileAdapter` boundary. `listFiles()` enables target suggestions and
+`getHeadings(file)` adds heading suggestions. Mira never imports a vault or
+workspace index.
+
+```svelte
+<script lang="ts">
+  import { MiraDefaultMde } from "@mira-mde/default-ui/svelte";
+
+  const fileAdapter = {
+    resolveLink: ({ href }) => files.find((file) => file.path === href) ?? null,
+    listFiles: () => files,
+    getHeadings: (file) => headingsByPath[file.path] ?? [],
+  };
+</script>
+
+<MiraDefaultMde
+  bind:value
+  sourcePath="notes/today.md"
+  {fileAdapter}
+  authoring={{
+    completions: {
+      // Optional: replace Mira's shortest unambiguous wikilink formatter.
+      formatLink: (target) => formatApplicationLink(target),
+    },
+    smartPaste: {
+      // Optional: apply application-specific rich-text conversion.
+      convertHtml: (html) => convertWithApplicationRules(html),
+    },
+    inputHandlers: {
+      // Typographic substitution is deliberately opt-in.
+      ellipsis: true,
+    },
+  }}
+/>
+```
+
+Defaults:
+
+- `[[…]]`, `![[…]]`, heading, and display-text completion are enabled when
+  `listFiles` is available.
+- Rich HTML converts to GFM-compatible Markdown, including tables.
+- Pasting a URL over selected text wraps the selection as a Markdown link.
+- Typing the third backtick scaffolds a fenced block; typing the third leading
+  dash scaffolds frontmatter.
+- Three-dot-to-ellipsis substitution is disabled unless
+  `authoring.inputHandlers.ellipsis` is `true`.
+
+Set `completions`, `smartPaste`, or `inputHandlers` to `false` to disable that
+group. Each object also has an `enabled` switch and feature-level switches.
 
 ## Extension commands, toolbar items, and styles
 

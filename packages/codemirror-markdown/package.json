@@ -22,7 +22,17 @@
     "lint": "eslint src --ext .ts",
     "test": "vitest run"
   },
+  "dependencies": {
+    "@adobe/remark-gridtables": "^3.0.14",
+    "@mira-mde/extensions": "workspace:*",
+    "rehype-parse": "^9.0.1",
+    "rehype-remark": "^10.0.1",
+    "remark-gfm": "^4.0.1",
+    "remark-stringify": "^11.0.0",
+    "unified": "^11.0.5"
+  },
   "peerDependencies": {
+    "@codemirror/autocomplete": "^6.18.7",
     "@codemirror/lang-markdown": "^6.3.4",
     "@codemirror/lang-yaml": "^6.1.2",
     "@codemirror/legacy-modes": "^6.5.3",
@@ -35,6 +45,7 @@
     "@lezer/markdown": "^1.4.3"
   },
   "devDependencies": {
+    "@codemirror/autocomplete": "^6.18.7",
     "@codemirror/lang-markdown": "^6.3.4",
     "@codemirror/lang-yaml": "^6.1.2",
     "@codemirror/legacy-modes": "^6.5.3",

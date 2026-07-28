@@ -106,4 +106,31 @@ describe("createMarkdownCodeMirrorExtensions", () => {
     expect(tree).toContain("InlineMathBracket");
     expect(tree).toContain("BlockMathBracket");
   });
+
+  it("parses container, leaf, and inline directives structurally", () => {
+    const state = EditorState.create({
+      doc: [
+        ':::cell[Load data]{lang="ts"}',
+        "```ts",
+        "const value = 1;",
+        "```",
+        ":::",
+        "",
+        "::badge[Stable]{tone=success}",
+        "",
+        'Use :abbr[HTML]{title="HyperText Markup Language"}.',
+      ].join("\n"),
+      extensions: createMarkdownCodeMirrorExtensions(),
+    });
+    const tree = syntaxTree(state).toString();
+
+    expect(tree).toContain("ContainerDirective");
+    expect(tree).toContain("LeafDirective");
+    expect(tree).toContain("InlineDirective");
+    expect(tree).toContain("DirectiveName");
+    expect(tree).toContain("DirectiveArgs");
+    expect(tree).toContain("DirectiveAttrName");
+    expect(tree).toContain("DirectiveAttrValue");
+    expect(tree).toContain("FencedCode");
+  });
 });

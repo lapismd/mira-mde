@@ -5,6 +5,7 @@ import type {
   MiraFileAdapter,
   MiraImageConfig,
   MiraLinkResolver,
+  MiraMarkdownAuthoringConfig,
   MiraMode,
   MiraTheme,
   MiraThemeConfig,
@@ -39,6 +40,7 @@ export type MiraMdeProps = {
   assetResolver?: MiraAssetResolver;
   fileAdapter?: MiraFileAdapter;
   imageConfig?: MiraImageConfig;
+  authoring?: MiraMarkdownAuthoringConfig;
   frontmatterOpen?: boolean;
   frontmatterConfig?: MiraFrontmatterConfig;
   headingIds?: boolean;

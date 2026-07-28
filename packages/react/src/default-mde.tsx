@@ -65,6 +65,7 @@ export const MiraDefaultMde = forwardRef<
 >(function MiraDefaultMde(
   {
     assetResolver,
+    authoring,
     className,
     defaultEditMode = defaultMiraEditMode,
     defaultMode = defaultEditMode,
@@ -396,6 +397,7 @@ export const MiraDefaultMde = forwardRef<
       <div className="mira-default-ui__editor">
         <MiraMde
           assetResolver={assetResolver}
+          authoring={authoring}
           blockControls={
             resolvedFeatures[MiraFeature.BlockControls] &&
             featureConfigs[MiraFeature.BlockControls]?.enabled !== false

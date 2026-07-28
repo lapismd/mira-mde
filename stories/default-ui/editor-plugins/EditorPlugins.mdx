@@ -137,6 +137,38 @@ An extension can declare commands once and expose them through keyboard shortcut
   meta={EditorPluginsStories}
 />
 
+## Completions, Smart Paste, And Input Handlers
+
+Pass a `fileAdapter` with `listFiles` to enable note and embed completion.
+Adding `getHeadings` enables `[[note#heading]]` suggestions. Smart HTML paste,
+URL-over-selection paste, code-fence scaffolding, and frontmatter scaffolding
+are enabled by default; typographic ellipsis replacement remains opt-in.
+
+<Source
+  language="svelte"
+  code={`<MiraDefaultMde
+  bind:value
+  sourcePath="notes/today.md"
+  {fileAdapter}
+  authoring={{
+    completions: {
+      formatLink: (target) => customWikiLink(target),
+    },
+    smartPaste: {
+      convertHtml: (html) => convertWithApplicationRules(html),
+    },
+    inputHandlers: {
+      ellipsis: true,
+    },
+  }}
+/>`}
+/>
+
+<Canvas
+  of={EditorPluginsStories.MarkdownAuthoring}
+  meta={EditorPluginsStories}
+/>
+
 ## AI Plugin
 
 `@mira-mde/plugin-ai` contributes slash + block “Ask AI” actions and an optional toolbar helper. Wire `run` to your model; this story uses a stub response.

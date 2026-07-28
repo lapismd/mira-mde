@@ -6,7 +6,7 @@ description: Render portable directive syntax.
 import LiveEditorExample from "../../../components/LiveEditorExample.svelte";
 import { directivesMarkdown } from "../../../data/markdown-examples";
 
-Directives let Markdown include structured extension blocks without hard-coding application UI.
+Directives let Markdown include structured extension blocks without hard-coding application UI. Mira registers container, leaf, and inline directive syntax with both the reading pipeline and the CodeMirror Markdown parser, so source and live-preview modes share the same structure.
 
 <LiveEditorExample
   client:only="svelte"
@@ -23,6 +23,10 @@ Directives let Markdown include structured extension blocks without hard-coding 
 :::mira{title="Directive example"}
 Directive content.
 :::
+
+::badge[Stable]{tone=success}
+
+Use :abbr[HTML]{title="HyperText Markup Language"} inline.
 ```
 
 Applications can map directive names to custom rendering behavior.

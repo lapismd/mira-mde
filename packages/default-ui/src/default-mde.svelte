@@ -57,6 +57,7 @@
     assetResolver,
     fileAdapter,
     imageConfig,
+    authoring,
     frontmatterOpen = true,
     frontmatterConfig,
     headingIds = false,
@@ -337,6 +338,7 @@
       {assetResolver}
       {fileAdapter}
       {imageConfig}
+      {authoring}
       frontmatterOpen={resolvedFeatures[MiraFeature.Frontmatter] &&
         frontmatterOpen}
       {headingIds}
