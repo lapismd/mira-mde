@@ -10,6 +10,75 @@
   );
 }
 
+.markdown-editor-surface .cm-editor .cm-formatting-list-ul,
+.markdown-editor-surface .cm-editor .cm-formatting-list-ol {
+  font-variant-numeric: tabular-nums;
+  padding-inline-start: 0;
+}
+
+.markdown-live-preview-mode .cm-editor .cm-formatting-list-ul:not(.cm-line) {
+  box-sizing: border-box;
+  display: inline-block;
+  inline-size: var(--hmd-unordered-list-marker-slot-width);
+  padding-inline-start: var(--hmd-unordered-list-marker-padding-inline-start);
+}
+
+.markdown-editor-surface .cm-editor .HyperMD-list-line {
+  white-space: pre-wrap;
+}
+
+.markdown-editor-surface .cm-editor .indented-wrapped-line {
+  padding-inline-start: var(
+    --hmd-indent-padding-measured,
+    var(--hmd-indent-padding-fallback, 0px)
+  );
+  text-indent: calc(
+    0px -
+      var(--hmd-indent-prefix-measured, var(--hmd-indent-prefix-fallback, 0px))
+  );
+}
+
+.markdown-editor-surface .cm-editor .cm-hmd-list-indent {
+  display: inline-block;
+  white-space: pre;
+}
+
+.markdown-editor-surface .cm-editor .cm-plain-indent-line,
+.markdown-editor-surface .cm-editor .cm-plain-indent-widget {
+  position: relative;
+}
+
+.markdown-editor-surface .cm-editor .cm-hmd-list-indent .cm-indent,
+.markdown-editor-surface .cm-editor .cm-plain-indent-widget .cm-indent {
+  color: transparent;
+  display: inline-block;
+  position: relative;
+  white-space: pre;
+}
+
+.markdown-editor-surface
+  .cm-editor.markdown-source-view:has(.cm-formatting-code-language-text)
+  > .cm-scroller {
+  overflow-x: hidden;
+}
+
+.markdown-editor-surface
+  .cm-editor
+  .cm-content.cm-lineWrapping:has(.cm-formatting-code-language-text) {
+  overflow-x: auto;
+  overflow-y: visible;
+}
+
+.markdown-editor-surface .cm-editor .cm-line.cm-formatting-code-language-text {
+  max-width: none;
+  min-width: max-content;
+  overflow: visible;
+  padding-inline-start: 24px !important;
+  text-indent: 0 !important;
+  white-space: pre;
+  width: max-content;
+}
+
 .markdown-editor-surface .cm-editor.mod-inline {
   background-color: var(--code-background);
   color: var(--code-normal);

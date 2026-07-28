@@ -40,10 +40,12 @@
   },
   "peerDependencies": {
     "@codemirror/state": "^6.5.2",
+    "@codemirror/view": "^6.38.8",
     "svelte": "^5.0.0"
   },
   "devDependencies": {
     "@codemirror/state": "^6.5.2",
+    "@codemirror/view": "^6.38.8",
     "svelte": "^5.46.1"
   }
 }

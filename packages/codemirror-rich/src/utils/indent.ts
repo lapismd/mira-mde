@@ -1,4 +1,5 @@
-import { type Extension, type Range } from "@codemirror/state";
+import { syntaxTree } from "@codemirror/language";
+import { type Extension, type Line, type Range } from "@codemirror/state";
 import {
   Decoration,
   type DecorationSet,
@@ -13,6 +14,21 @@ import { sortRanges } from "./ranges";
 type IndentSegment = {
   text: string;
   guide: boolean;
+};
+
+type MiraLineIndentLayout = {
+  contentFrom: number;
+  depth: number;
+  fallbackColumns: number;
+  guideCount: number;
+  indentColumns: number;
+  indentText: string;
+  kind: "plain" | "quote" | "quote-list" | "ul" | "ol";
+  listKind?: "ul" | "ol";
+  markerFrom?: number;
+  markerTo?: number;
+  quoteFrom?: number;
+  quoteTo?: number;
 };
 
 export type MiraIndentInfo = {
@@ -106,19 +122,126 @@ export function selectionTouchesIndent(
   return selectionFrom < indentTo && selectionTo > indentFrom;
 }
 
+export function getIndentLineLayout(
+  lineText: string,
+): MiraLineIndentLayout | null {
+  const leading = lineText.match(/^\s*/u)?.[0] ?? "";
+  const quote = lineText.slice(leading.length).match(/^(?:>\s*)+/u)?.[0] ?? "";
+  const structuredOffset = leading.length + quote.length;
+  const list = lineText.slice(structuredOffset).match(/^([-*+]|\d+[.)])(\s+)/u);
+
+  if (list) {
+    const marker = `${list[1] ?? ""}${list[2] ?? ""}`;
+    const markerFrom = structuredOffset;
+    const markerTo = markerFrom + marker.length;
+    const task = lineText.slice(markerTo).match(/^(\[[^\]]\]\s+)/u)?.[0] ?? "";
+    const prefixTo = markerTo + task.length;
+    const indentColumns = toMarkdownColumns(leading);
+    const listKind = /^\d/u.test(list[1] ?? "") ? "ol" : "ul";
+    return {
+      contentFrom: prefixTo,
+      depth: Math.max(1, Math.floor(indentColumns / INDENT_UNIT) + 1),
+      fallbackColumns: toMarkdownColumns(lineText.slice(0, prefixTo)),
+      guideCount: Math.max(0, Math.floor(indentColumns / INDENT_UNIT)),
+      indentColumns,
+      indentText: leading,
+      kind: quote ? "quote-list" : listKind,
+      listKind,
+      markerFrom,
+      markerTo,
+      ...(quote
+        ? {
+            quoteFrom: leading.length,
+            quoteTo: structuredOffset,
+          }
+        : {}),
+    };
+  }
+
+  if (quote) {
+    const prefixTo = structuredOffset;
+    return {
+      contentFrom: prefixTo,
+      depth: 1,
+      fallbackColumns: toMarkdownColumns(lineText.slice(0, prefixTo)),
+      guideCount: Math.max(
+        0,
+        Math.floor(toMarkdownColumns(leading) / INDENT_UNIT),
+      ),
+      indentColumns: toMarkdownColumns(leading),
+      indentText: lineText.slice(0, prefixTo),
+      kind: "quote",
+      quoteFrom: leading.length,
+      quoteTo: prefixTo,
+    };
+  }
+
+  const plain = getLineIndentInfo(lineText);
+  if (!plain || plain.kind !== "plain") {
+    return null;
+  }
+  return {
+    contentFrom: plain.text.length,
+    depth: plain.depth,
+    fallbackColumns: plain.columns,
+    guideCount: Math.max(0, Math.floor(plain.columns / INDENT_UNIT)),
+    indentColumns: plain.columns,
+    indentText: plain.text,
+    kind: "plain",
+  };
+}
+
+function fallbackLength(columns: number, adjustment?: string): string {
+  return adjustment ? `calc(${columns}ch + ${adjustment})` : `${columns}ch`;
+}
+
+function buildIndentStyle(layout: MiraLineIndentLayout): string {
+  const markerColumns =
+    layout.markerFrom === undefined || layout.markerTo === undefined
+      ? 0
+      : layout.markerTo - layout.markerFrom;
+  const markerAdjustment =
+    layout.listKind === "ul"
+      ? `var(--hmd-unordered-list-marker-slot-width, ${markerColumns}ch) - ${markerColumns}ch`
+      : undefined;
+  const fallback = fallbackLength(layout.fallbackColumns, markerAdjustment);
+  return [
+    layout.guideCount > 0 ? `--indent-guide-count: ${layout.guideCount};` : "",
+    layout.listKind === "ul"
+      ? "--hmd-indent-guide-offset: var(--hmd-unordered-list-marker-guide-offset, 0px);"
+      : "",
+    `--hmd-indent-padding-fallback: ${fallback};`,
+    `--hmd-indent-prefix-fallback: ${fallback};`,
+  ]
+    .filter(Boolean)
+    .join(" ");
+}
+
 class IndentGuideWidget extends WidgetType {
-  constructor(private readonly segments: IndentSegment[]) {
+  constructor(
+    private readonly segments: IndentSegment[],
+    private readonly plain: boolean,
+  ) {
     super();
   }
 
   override eq(other: IndentGuideWidget): boolean {
-    return JSON.stringify(this.segments) === JSON.stringify(other.segments);
+    return (
+      this.plain === other.plain &&
+      JSON.stringify(this.segments) === JSON.stringify(other.segments)
+    );
   }
 
   override toDOM(): HTMLElement {
     const guideCount = this.segments.filter((segment) => segment.guide).length;
     const root = document.createElement("span");
-    root.className = `cm-hmd-list-indent cm-hmd-list-indent-${guideCount}`;
+    root.className = [
+      "cm-hmd-list-indent",
+      `cm-hmd-list-indent-${guideCount}`,
+      this.plain ? "cm-plain-indent-widget" : "",
+    ]
+      .filter(Boolean)
+      .join(" ");
     root.setAttribute("aria-hidden", "true");
 
     for (const segment of this.segments) {
@@ -166,44 +289,65 @@ export function indentGuideDecorations(): Extension {
         for (const { from, to } of view.visibleRanges) {
           let line = view.state.doc.lineAt(from);
           while (line.from <= to) {
-            const indent = getLineIndentInfo(line.text);
-            if (indent?.text) {
-              const indentTo = line.from + indent.text.length;
-              const guideCount = Math.max(0, Math.floor(indent.columns / 4));
-              const style = [
-                guideCount > 0 ? `--indent-guide-count: ${guideCount};` : "",
-                `--hmd-indent-padding-fallback: ${indent.columns}ch;`,
-                `--hmd-indent-prefix-fallback: ${indent.columns}ch;`,
-              ]
-                .filter(Boolean)
-                .join(" ");
-
+            const layout = getIndentLineLayout(line.text);
+            if (layout && isMarkdownIndentLine(view, line, layout)) {
+              const indentTo = line.from + layout.indentText.length;
+              const anchorFrom =
+                layout.kind === "plain"
+                  ? findPlainIndentAnchor(
+                      view,
+                      line.number,
+                      layout.indentColumns,
+                    )
+                  : null;
               decorations.push(
                 Decoration.line({
                   attributes: {
-                    "data-indent-prefix": indent.text,
-                    "data-indent-variant": indent.kind,
+                    "data-indent-prefix": layout.indentText,
+                    "data-indent-fallback-columns": `${layout.fallbackColumns}`,
+                    "data-indent-variant": layout.kind,
                     "data-line-from": `${line.from}`,
-                    "data-list-depth": `${indent.depth}`,
-                    style,
+                    "data-list-depth": `${layout.depth}`,
+                    ...(layout.listKind
+                      ? { "data-list-kind": layout.listKind }
+                      : {}),
+                    ...(anchorFrom !== null
+                      ? { "data-indent-anchor-line-from": `${anchorFrom}` }
+                      : {}),
+                    style: buildIndentStyle(layout),
                   },
                   class: [
                     "indented-wrapped-line",
-                    indent.kind === "plain"
-                      ? "cm-plain-indent-line"
-                      : "HyperMD-list-line",
-                    `HyperMD-list-line-${indent.depth}`,
+                    layout.kind === "plain" ? "cm-plain-indent-line" : "",
+                    layout.kind === "quote" || layout.kind === "quote-list"
+                      ? "cm-blockquote"
+                      : "",
+                    layout.listKind || layout.kind === "plain"
+                      ? "HyperMD-list-line"
+                      : "",
+                    layout.listKind || layout.kind === "plain"
+                      ? `HyperMD-list-line-${layout.depth}`
+                      : "",
                     "cm-formatting",
-                    "cm-formatting-list",
-                    indent.kind === "ol"
+                    layout.listKind || layout.kind === "plain"
+                      ? "cm-formatting-list"
+                      : "",
+                    layout.listKind === "ol"
                       ? "cm-formatting-list-ol"
-                      : "cm-formatting-list-ul",
-                    `cm-list-${indent.depth}`,
-                  ].join(" "),
+                      : layout.listKind === "ul" || layout.kind === "plain"
+                        ? "cm-formatting-list-ul"
+                        : "",
+                    layout.listKind || layout.kind === "plain"
+                      ? `cm-list-${layout.depth}`
+                      : "",
+                  ]
+                    .filter(Boolean)
+                    .join(" "),
                 }).range(line.from),
               );
 
               if (
+                layout.indentText.length > 0 &&
                 !selectionTouchesIndent(
                   cursor.from,
                   cursor.to,
@@ -214,9 +358,53 @@ export function indentGuideDecorations(): Extension {
                 decorations.push(
                   Decoration.replace({
                     widget: new IndentGuideWidget(
-                      splitIndentSegments(indent.text),
+                      splitIndentSegments(layout.indentText),
+                      layout.kind === "plain",
                     ),
                   }).range(line.from, indentTo),
+                );
+              }
+
+              if (
+                layout.markerFrom !== undefined &&
+                layout.markerTo !== undefined
+              ) {
+                decorations.push(
+                  Decoration.mark({
+                    class: [
+                      "cm-formatting",
+                      "cm-formatting-list",
+                      layout.listKind === "ol"
+                        ? "cm-formatting-list-ol"
+                        : "cm-formatting-list-ul",
+                      `cm-list-${layout.depth}`,
+                    ].join(" "),
+                  }).range(
+                    line.from + layout.markerFrom,
+                    line.from + layout.markerTo,
+                  ),
+                );
+              }
+
+              if (
+                layout.quoteFrom !== undefined &&
+                layout.quoteTo !== undefined
+              ) {
+                decorations.push(
+                  Decoration.mark({
+                    class: "cm-formatting-quote cm-blockquote-border",
+                  }).range(
+                    line.from + layout.quoteFrom,
+                    line.from + layout.quoteTo,
+                  ),
+                );
+              }
+
+              if (layout.contentFrom < line.text.length) {
+                decorations.push(
+                  Decoration.mark({
+                    class: `cm-list-${layout.depth}`,
+                  }).range(line.from + layout.contentFrom, line.to),
                 );
               }
             }
@@ -235,4 +423,53 @@ export function indentGuideDecorations(): Extension {
       decorations: (plugin) => plugin.decorations,
     },
   );
+}
+
+function isMarkdownIndentLine(
+  view: EditorView,
+  line: Line,
+  layout: MiraLineIndentLayout,
+): boolean {
+  if (!layout.listKind && layout.kind !== "quote") {
+    return true;
+  }
+
+  let list = false;
+  let quote = false;
+  syntaxTree(view.state).iterate({
+    from: line.from,
+    to: line.to,
+    enter(node) {
+      list ||= node.name === "ListMark";
+      quote ||= node.name === "QuoteMark";
+    },
+  });
+  return layout.listKind ? list : quote;
+}
+
+function findPlainIndentAnchor(
+  view: EditorView,
+  lineNumber: number,
+  indentColumns: number,
+): number | null {
+  for (
+    let candidateNumber = lineNumber - 1;
+    candidateNumber >= Math.max(1, lineNumber - 50);
+    candidateNumber -= 1
+  ) {
+    const candidate = view.state.doc.line(candidateNumber);
+    if (!candidate.text.trim()) {
+      continue;
+    }
+    const layout = getIndentLineLayout(candidate.text);
+    if (layout?.listKind) {
+      return indentColumns < layout.fallbackColumns + INDENT_UNIT
+        ? candidate.from
+        : null;
+    }
+    if (!layout || layout.kind === "quote") {
+      return null;
+    }
+  }
+  return null;
 }

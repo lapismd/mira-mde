@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onMount, tick } from "svelte";
   import type { Extension } from "@codemirror/state";
   import {
     createBaseCodeMirrorExtensions,
@@ -33,6 +33,12 @@
   import { Separator } from "@mira-mde/ui/separator";
   import * as ToggleGroup from "@mira-mde/ui/toggle-group";
   import type { MiraMdeProps } from "./types";
+  import {
+    captureModeSwitchPosition,
+    restoreEditorPosition,
+    restorePreviewPosition,
+    type MiraModeSwitchPosition,
+  } from "./mode-position";
 
   let {
     value = $bindable(""),
@@ -72,6 +78,8 @@
   let rootEl: HTMLDivElement | null = $state(null);
   let controller: MiraEditorController | null = $state(null);
   let cleanupExtensionMounts: Array<() => void> = [];
+  let previousMode = $state<MiraMode>(mode);
+  let pendingModePosition = $state<MiraModeSwitchPosition | null>(null);
   let inheritedTheme = $state<"obsidian" | "system" | "light" | "dark">(
     "system",
   );
@@ -353,6 +361,55 @@
     }
 
     return syncSplitScroll(controller.view.scrollDOM, previewPane);
+  });
+
+  $effect.pre(() => {
+    const nextMode = mode;
+    if (nextMode === previousMode) {
+      return;
+    }
+    const previewScroller =
+      previewPane?.querySelector<HTMLElement>(".mira-markdown-preview") ??
+      previewPane;
+    pendingModePosition = captureModeSwitchPosition(
+      previousMode,
+      nextMode,
+      controller?.view ?? null,
+      previewScroller,
+    );
+    previousMode = nextMode;
+  });
+
+  $effect(() => {
+    mode;
+    controller;
+    previewPane;
+    const position = pendingModePosition;
+    if (!position || !controller) {
+      return;
+    }
+
+    let cancelled = false;
+    void tick().then(() => {
+      if (cancelled || pendingModePosition !== position || !controller) {
+        return;
+      }
+      if (position.target === "editor") {
+        restoreEditorPosition(controller.view, position);
+      } else {
+        const previewScroller =
+          previewPane?.querySelector<HTMLElement>(".mira-markdown-preview") ??
+          previewPane;
+        if (previewScroller) {
+          restorePreviewPosition(previewScroller, position);
+        }
+      }
+      pendingModePosition = null;
+    });
+
+    return () => {
+      cancelled = true;
+    };
   });
 
   function themeClassName(

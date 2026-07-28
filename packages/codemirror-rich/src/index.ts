@@ -16,6 +16,7 @@ import {
 } from "@codemirror/view";
 import { miraRichEditorTheme } from "./theme";
 import type { MiraRichEditorOptions } from "./types";
+import { codeBlockLineDecorations } from "./utils/code-block-lines";
 import { getFencedCodeLanguage } from "./utils/fenced-code";
 import {
   getAtxHeadingMarkerRange,
@@ -33,6 +34,7 @@ import {
 } from "./utils/inline-code";
 import { findInlineMathRanges } from "./utils/inline-math";
 import { indentGuideDecorations } from "./utils/indent";
+import { measuredIndentExtension } from "./utils/measured-indent";
 import {
   getMarkdownLinkTextRange,
   isBareExternalAutolinkUrl,
@@ -66,6 +68,10 @@ export {
 
 export type { MiraRichEditorOptions } from "./types";
 export {
+  buildCodeBlockLineDecorations,
+  codeBlockLineDecorations,
+} from "./utils/code-block-lines";
+export {
   getFencedCodeLanguage,
   getFencedCodeWidgetRange,
 } from "./utils/fenced-code";
@@ -80,12 +86,17 @@ export {
   type InlineMathRange,
 } from "./utils/inline-math";
 export {
+  getIndentLineLayout,
   getLineIndentInfo,
   normalizeIndentText,
   selectionTouchesIndent,
   splitIndentSegments,
   toMarkdownColumns,
 } from "./utils/indent";
+export {
+  measuredIndentExtension,
+  syncMeasuredIndentStyles,
+} from "./utils/measured-indent";
 export {
   getMarkdownLinkTextRange,
   isBareExternalAutolinkUrl,
@@ -173,9 +184,10 @@ export function createRichEditorExtensions(
 
   return [
     miraRichEditorTheme,
+    codeBlockLineDecorations(),
     headingGutterExtension(),
-    livePreview && options.indentGuides !== false
-      ? indentGuideDecorations()
+    options.indentGuides !== false
+      ? [indentGuideDecorations(), measuredIndentExtension()]
       : [],
     livePreview ? blockPreviewDecorations(options) : [],
     // Inline marks (code/strong/emphasis + hide ticks) run in source and live

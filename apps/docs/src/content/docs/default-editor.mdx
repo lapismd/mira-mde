@@ -155,6 +155,31 @@ Feature flags apply to the toolbar, extension setup, and valid mode list. A disa
 | `MiraFeature.PreviewMode`     | Reading/preview mode availability.             |
 | `MiraFeature.SplitMode`       | Split mode availability.                       |
 
+## Mode and layout continuity
+
+Mira keeps the nearest visible Markdown source line in place when a document
+switches between editor and reading modes. Entering split mode maps the already
+visible surface to the surface that is being mounted; once split is active,
+both panes continue to synchronize by scrollable-range ratio. The current
+CodeMirror selection is retained without forcing focus.
+
+Wrapped list items, quoted lists, and plain continuation indentation use
+authored-column fallbacks on first paint and browser-measured pixel offsets once
+the lines are visible. This keeps content and line-number gutters aligned
+across fonts, tabs, ordered-marker widths, and narrow containers.
+
+Explicit `text` fences intentionally keep their source lines unwrapped and use
+the editor content area as the horizontal scrolling path:
+
+````md
+```text
+source --> live-preview --> preview --> split
+```
+````
+
+The Storybook `Markdown/Layout Parity` fixture exercises these behaviors in
+source, live-preview, reading, and split modes at a fixed document revision.
+
 ## Slash Commands
 
 The default editor enables a compact slash menu in source and live preview modes. Type `/` on an empty line to insert Markdown snippets for headings, lists, tasks, quotes, callouts, code, math, tables, grid tables, and Mermaid diagrams.

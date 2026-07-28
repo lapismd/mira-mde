@@ -28,3 +28,8 @@ Lists preserve nesting, continuation indentation, and list marker alignment acro
 ```
 
 Use consistent indentation to keep child items and continued text inside the intended list level.
+
+The editor applies a deterministic authored-column fallback before layout, then
+measures visible list, quote, and plain-indent prefixes in pixels. This keeps
+wrapped rows aligned with their content even when ordered markers, tabs, or the
+active font change width.

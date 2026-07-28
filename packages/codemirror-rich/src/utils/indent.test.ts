@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  getIndentLineLayout,
   getLineIndentInfo,
   normalizeIndentText,
   selectionTouchesIndent,
@@ -29,5 +30,29 @@ describe("indent helpers", () => {
     });
     expect(selectionTouchesIndent(2, 2, 0, 4)).toBe(true);
     expect(selectionTouchesIndent(5, 5, 0, 4)).toBe(false);
+  });
+
+  it("derives authored prefixes for top-level, quoted, and plain lines", () => {
+    expect(getIndentLineLayout("- wrapped item")).toMatchObject({
+      fallbackColumns: 2,
+      indentText: "",
+      kind: "ul",
+      listKind: "ul",
+      markerFrom: 0,
+      markerTo: 2,
+    });
+    expect(getIndentLineLayout("> 1. quoted item")).toMatchObject({
+      fallbackColumns: 5,
+      indentText: "",
+      kind: "quote-list",
+      listKind: "ol",
+      quoteFrom: 0,
+      quoteTo: 2,
+    });
+    expect(getIndentLineLayout("    continuation")).toMatchObject({
+      fallbackColumns: 4,
+      indentText: "    ",
+      kind: "plain",
+    });
   });
 });

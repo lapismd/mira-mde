@@ -1,0 +1,41 @@
+import { Meta, Canvas, Primary, Source } from "@storybook/addon-docs/blocks";
+import * as LayoutStories from "./Layout.stories";
+
+<Meta of={LayoutStories} />
+
+# CodeMirror layout parity
+
+This fixture exercises the same geometry-sensitive feature families across
+source, live-preview, reading, and split modes. It includes wrapped lists,
+quoted lists, continuation paragraphs, tab and space indentation, tables,
+widgets, directives, math, Mermaid, and an explicit `text` fence.
+
+Mode changes preserve the nearest visible source line. Split mode continues to
+synchronize the editor and preview by scrollable-range ratio.
+
+<Source of={LayoutStories.LivePreview} language="html" />
+
+## Live preview
+
+<Primary />
+
+## Source mode
+
+<Canvas of={LayoutStories.Source} meta={LayoutStories} />
+
+## Reading mode
+
+<Canvas of={LayoutStories.Preview} meta={LayoutStories} />
+
+## Split mode
+
+<Canvas of={LayoutStories.Split} meta={LayoutStories} />
+
+## Narrow and wide source geometry
+
+<Canvas of={LayoutStories.NarrowSource} meta={LayoutStories} />
+
+<Canvas of={LayoutStories.WideSource} meta={LayoutStories} />
+
+The fixture stories are `visual-pending`; they are intended for geometry review
+at both narrow and wide viewports before a baseline is accepted.

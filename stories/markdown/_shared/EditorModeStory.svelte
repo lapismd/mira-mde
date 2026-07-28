@@ -38,6 +38,7 @@
     authoring?: MiraMarkdownAuthoringConfig;
     toolbars?: MiraDefaultToolbarDefinition[];
     height?: string;
+    width?: string;
   };
 
   let {
@@ -62,6 +63,7 @@
     authoring,
     toolbars = [],
     height = "34rem",
+    width = "100%",
   }: Props = $props();
 
   const mergedFeatures = $derived({
@@ -74,7 +76,7 @@
 
 <div
   class="mira-story-surface mira-story-surface--editor"
-  style={`--mira-story-editor-height: ${height};`}
+  style={`--mira-story-editor-height: ${height}; max-width: 100%; width: ${width};`}
 >
   <MiraDefaultMde
     bind:value
