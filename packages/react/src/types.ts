@@ -16,13 +16,10 @@ import type {
   MiraDefaultSlashCommandConfig,
   MiraDefaultSlashCommandId,
 } from "@mira-mde/default-ui";
+import type { FrontmatterConfig } from "@mira-mde/preview";
 import type { ComponentType } from "react";
 
-export type MiraFrontmatterConfig = {
-  types?: Record<string, unknown>;
-  properties?: Record<string, unknown>;
-  widgets?: unknown[];
-};
+export type MiraFrontmatterConfig = FrontmatterConfig;
 
 export type MiraReactIcon = ComponentType<{
   "aria-hidden"?: boolean | "true" | "false";

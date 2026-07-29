@@ -45,6 +45,7 @@ Path image (resolved by `assetResolver` / `fileAdapter`):
 
 ```md
 ![Alt](/mira-markdown-demo.svg "Optional title")
+![Alt|320x180](/mira-markdown-demo.svg)
 ```
 
 Inline base64:
@@ -62,5 +63,9 @@ Reference-style base64 (default when pasting or inserting via the toolbar):
 ```
 
 The Preview story includes a visible 120×72 PNG data URI for both inline and reference forms.
+
+The Preview story also includes an invalid source. Failed loads render an
+accessible placeholder with the alt text and source rather than the browser's
+broken-image glyph.
 
 Paste, drop, and the toolbar image action use `imageConfig` on the editor. See **Default UI → Editor Plugins → Image Attachments**.

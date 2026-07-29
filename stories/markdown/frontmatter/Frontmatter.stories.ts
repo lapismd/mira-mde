@@ -6,6 +6,7 @@ import {
   markdownPreviewDocsSource,
 } from "../_shared/docs-source";
 import { frontmatterMarkdown } from "../fixtures";
+import FrontmatterActionsStory from "./FrontmatterActionsStory.svelte";
 
 const meta = {
   title: "Markdown/Frontmatter",
@@ -71,4 +72,12 @@ export const SourceMode: Story = {
       },
     },
   },
+};
+
+export const PropertyActions: Story = {
+  name: "Property actions and suggestions",
+  render: () => ({
+    Component: FrontmatterActionsStory,
+  }),
+  tags: ["visual-pending"],
 };

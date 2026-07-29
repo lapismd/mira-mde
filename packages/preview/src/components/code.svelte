@@ -2,6 +2,7 @@
   import CheckIcon from "@lucide/svelte/icons/check";
   import CopyIcon from "@lucide/svelte/icons/copy";
   import type { Snippet } from "svelte";
+  import { codeLanguageLabel } from "../code-language";
 
   type Props = {
     children?: Snippet;
@@ -23,6 +24,7 @@
   const textCodeBlock = $derived(
     /(?:^|\s)language-text(?:\s|$)/u.test(className),
   );
+  const language = $derived(codeLanguageLabel(className));
   let copied = $state(false);
   let copyTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -121,6 +123,9 @@
           title={copied ? "Copied" : "Copy code"}
           onclick={() => void copyCode()}
         >
+          {#if language}
+            <span class="mira-code-block__language">{language}</span>
+          {/if}
           {#if copied}
             <CheckIcon class="mira-code-block__copy-icon" aria-hidden="true" />
           {:else}

@@ -40,6 +40,67 @@
   outline-offset: 2px;
 }
 
+.mira-markdown-image__placeholder {
+  align-items: center;
+  background: color-mix(
+    in oklab,
+    var(--mira-muted, var(--background-secondary)) 30%,
+    transparent
+  );
+  border: 1px dashed var(--mira-border, var(--background-modifier-border));
+  border-radius: var(--radius-s, 4px);
+  color: var(--mira-muted-foreground, var(--text-muted));
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  justify-content: center;
+  max-width: 100%;
+  min-height: 7rem;
+  min-width: 12rem;
+  padding: 1.25rem 1rem;
+  text-align: center;
+}
+
+.mira-markdown-image__placeholder-icon {
+  height: 3rem;
+  width: 4rem;
+}
+
+.mira-markdown-image__placeholder-icon rect {
+  fill: var(--mira-background, var(--background-primary));
+  stroke: var(--mira-border, var(--background-modifier-border));
+  stroke-width: 2;
+}
+
+.mira-markdown-image__placeholder-icon path {
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 3;
+}
+
+.mira-markdown-image__placeholder-icon circle {
+  fill: currentColor;
+  opacity: 0.6;
+}
+
+.mira-markdown-image__placeholder-copy {
+  display: grid;
+  gap: 0.25rem;
+  max-width: 16rem;
+}
+
+.mira-markdown-image__placeholder-label {
+  color: var(--mira-foreground, var(--text-normal));
+  font-size: var(--font-smaller, 0.875rem);
+  font-weight: 500;
+}
+
+.mira-markdown-image__placeholder-source {
+  overflow-wrap: anywhere;
+  font-size: var(--font-smallest, 0.75rem);
+}
+
 .mira-markdown-image__dialog {
   background: var(--mira-widget-background, var(--mira-background));
   border: 1px solid var(--mira-border);

@@ -50,7 +50,7 @@ const docsFiles = new Map<string, DocsFile>([
     {
       kind: "markdown",
       markdown:
-        "# Embedded Note\n\nThis note is rendered inline through `![[Embedded Note]]` and the docs `MiraFileAdapter`.",
+        "# Embedded Note\n\nThis note is rendered inline through `![[Embedded Note]]` and the docs `MiraFileAdapter`.\n\n## Next Steps\n\nSection embeds stop at the next sibling heading.\n\nA portable referenced paragraph. ^portable-block\n\n## Decisions\n\nThis sibling section is excluded from the Next Steps embed.",
       name: "Embedded Note",
       path: "Embedded Note",
     },

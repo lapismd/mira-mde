@@ -1,7 +1,11 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
-  import type { MiraFileRef } from "@mira-mde/extensions";
+  import { parseMiraFileTarget, type MiraFileRef } from "@mira-mde/extensions";
   import { useMarkdownContext } from "../renderer/context.svelte";
+  import {
+    parseMiraImageDetails,
+    selectMarkdownEmbedFragment,
+  } from "../embed-target";
   import EmbeddedMarkdownPreview from "./embedded-markdown-preview.svelte";
 
   type Props = {
@@ -30,14 +34,29 @@
   let previewMarkdown = $state<string | null>(null);
   let previewAssetUrl = $state<string | null>(null);
   let customRendered = $state(false);
+  let fragmentMissing = $state(false);
+  let targetRevision = $state(0);
+  let contentRevision = $state(0);
 
   const target = $derived(id || href);
-  const displayText = $derived(text || label || target);
   const activeSourcePath = $derived(sourcePath || markdown.sourcePath);
+  const parsedTarget = $derived(parseMiraFileTarget(target, activeSourcePath));
+  const imageDetails = $derived(
+    parseMiraImageDetails(
+      text || label,
+      resolvedFile?.name || parsedTarget.path || target,
+    ),
+  );
+  const displayText = $derived(
+    imageDetails.width
+      ? imageDetails.alt
+      : text || label || resolvedFile?.name || parsedTarget.path || target,
+  );
 
   $effect(() => {
     const adapter = markdown.fileAdapter;
-    const currentTarget = target;
+    const currentTarget = parsedTarget;
+    targetRevision;
     if (!adapter || !currentTarget) {
       resolvedFile = null;
       return;
@@ -46,8 +65,7 @@
     let cancelled = false;
     Promise.resolve(
       adapter.resolveLink({
-        href: currentTarget,
-        sourcePath: activeSourcePath,
+        ...currentTarget,
       }),
     ).then(
       (file) => {
@@ -69,17 +87,52 @@
 
   $effect(() => {
     const adapter = markdown.fileAdapter;
+    const currentTarget = parsedTarget;
+    const file = resolvedFile;
+    if (!adapter?.watchTarget || !currentTarget.href) {
+      return;
+    }
+    return adapter.watchTarget({ ...currentTarget, file }, () => {
+      targetRevision += 1;
+    });
+  });
+
+  $effect(() => {
+    const adapter = markdown.fileAdapter;
+    const file = resolvedFile;
+    if (!adapter?.watchFile || !file) {
+      return;
+    }
+    return adapter.watchFile(file, () => {
+      contentRevision += 1;
+    });
+  });
+
+  $effect(() => {
+    const adapter = markdown.fileAdapter;
     const file = resolvedFile;
     const host = embedHost;
     customRendered = false;
 
-    if (!adapter || !file || !host || !adapter.renderEmbed) {
+    if (
+      !adapter ||
+      !file ||
+      !host ||
+      !adapter.renderEmbed ||
+      parsedTarget.fragment
+    ) {
       return;
     }
 
     host.replaceChildren();
     const cleanup = adapter.renderEmbed(
-      { file, label: displayText, sourcePath: activeSourcePath },
+      {
+        ...parsedTarget,
+        file,
+        label: displayText,
+        width: imageDetails.width,
+        height: imageDetails.height,
+      },
       host,
     );
     customRendered = true;
@@ -93,8 +146,10 @@
   $effect(() => {
     const adapter = markdown.fileAdapter;
     const file = resolvedFile;
+    contentRevision;
     previewMarkdown = null;
     previewAssetUrl = null;
+    fragmentMissing = false;
 
     if (!adapter || !file || customRendered) {
       return;
@@ -107,7 +162,14 @@
     ]).then(
       ([nextMarkdown, nextAssetUrl]) => {
         if (!cancelled) {
-          previewMarkdown = nextMarkdown;
+          if (nextMarkdown !== null) {
+            const selection = selectMarkdownEmbedFragment(
+              nextMarkdown,
+              parsedTarget.fragment,
+            );
+            previewMarkdown = selection.found ? selection.markdown : null;
+            fragmentMissing = !selection.found;
+          }
           previewAssetUrl = nextAssetUrl;
         }
       },
@@ -130,12 +192,18 @@
   class="mira-embed internal-embed"
   data-embed={target}
   data-embed-state={resolvedFile ? "resolved" : "unresolved"}
+  data-embed-fragment={parsedTarget.fragment?.kind}
 >
   <figcaption>{displayText}</figcaption>
   <div bind:this={embedHost} class="mira-embed__content">
     {#if !customRendered}
       {#if previewAssetUrl}
-        <img src={previewAssetUrl} alt={displayText} />
+        <img
+          src={previewAssetUrl}
+          alt={displayText}
+          width={imageDetails.width}
+          height={imageDetails.height}
+        />
       {:else if previewMarkdown}
         <EmbeddedMarkdownPreview
           class="mira-embed__markdown"
@@ -146,6 +214,11 @@
         {@render children()}
       {:else if !resolvedFile}
         <span class="mira-embed__missing">{target}</span>
+      {:else if fragmentMissing}
+        <span class="mira-embed__missing">
+          Unable to find {parsedTarget.fragment?.kind} "{parsedTarget.fragment
+            ?.value}" in {resolvedFile.name || resolvedFile.path}.
+        </span>
       {/if}
     {/if}
   </div>

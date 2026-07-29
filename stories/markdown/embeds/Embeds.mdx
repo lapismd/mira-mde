@@ -27,6 +27,14 @@ Each markdown feature is shown in reading preview (`MarkdownPreview`), live prev
 
 <Controls />
 
+## Adapter invalidation
+
+<Canvas of={EmbedsStories.AdapterInvalidation} meta={EmbedsStories} />
+
+`watchTarget` refreshes resolution for missing, created, deleted, or renamed
+targets. `watchFile` refreshes content for an already-resolved file. Both
+callbacks are portable subscriptions owned by the consumer adapter.
+
 ## Live Preview
 
 <Canvas of={EmbedsStories.LivePreview} meta={EmbedsStories} />
@@ -46,10 +54,13 @@ Image asset embed:
 ```md
 ![[Architecture Diagram]]
 ![[Architecture Diagram|Architecture diagram]]
+![[Architecture Diagram|320x180]]
 ```
 
 Markdown note embed:
 
 ```md
 ![[Embedded Note]]
+![[Embedded Note#Next Steps]]
+![[Embedded Note#^portable-block]]
 ```

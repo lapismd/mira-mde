@@ -62,9 +62,10 @@
 .markdown-widget-shell .mira-code-block__copy-button {
   border: 1px solid var(--background-modifier-border);
   color: var(--text-muted, var(--mira-muted-foreground));
+  gap: 0.375rem;
   height: 1.75rem;
-  padding: 0;
-  width: 1.75rem;
+  padding: 0 0.375rem;
+  width: auto;
 }
 
 .markdown-rendered .mira-code-block__copy-button:hover,
@@ -80,8 +81,18 @@
 .markdown-rendered .mira-code-block__copy-icon,
 .markdown-preview-surface .markdown .mira-code-block__copy-icon,
 .markdown-widget-shell .mira-code-block__copy-icon {
+  flex: 0 0 auto;
   height: 1rem;
   width: 1rem;
+}
+
+.markdown-rendered .mira-code-block__language,
+.markdown-preview-surface .markdown .mira-code-block__language,
+.markdown-widget-shell .mira-code-block__language {
+  font-family: var(--font-monospace);
+  font-size: var(--font-smallest, 0.75rem);
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .markdown-rendered pre code,

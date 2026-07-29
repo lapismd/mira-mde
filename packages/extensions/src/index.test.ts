@@ -9,6 +9,7 @@ import {
   executeMiraCommand,
   isMiraCommandEnabled,
   mountMiraExtensionStyles,
+  parseMiraFileTarget,
   resolveMiraExtensions,
 } from ".";
 
@@ -202,6 +203,44 @@ describe("extension runtime contributions", () => {
     expect(
       document.head.querySelectorAll("[data-mira-extension-style]"),
     ).toHaveLength(0);
+  });
+});
+
+describe("portable file targets", () => {
+  it("separates paths from heading and block fragments", () => {
+    expect(parseMiraFileTarget("notes/plan.md#Next Steps", "daily.md")).toEqual(
+      {
+        href: "notes/plan.md#Next Steps",
+        path: "notes/plan.md",
+        sourcePath: "daily.md",
+        subpath: "Next Steps",
+        fragment: {
+          kind: "heading",
+          value: "Next Steps",
+        },
+      },
+    );
+    expect(parseMiraFileTarget("notes/plan.md#^decision-1")).toEqual({
+      href: "notes/plan.md#^decision-1",
+      path: "notes/plan.md",
+      subpath: "^decision-1",
+      fragment: {
+        kind: "block",
+        value: "decision-1",
+      },
+      sourcePath: undefined,
+    });
+  });
+
+  it("keeps plain and empty-fragment targets portable", () => {
+    expect(parseMiraFileTarget("notes/plan.md")).toEqual({
+      href: "notes/plan.md",
+      path: "notes/plan.md",
+      sourcePath: undefined,
+      subpath: undefined,
+      fragment: undefined,
+    });
+    expect(parseMiraFileTarget("notes/plan.md#").fragment).toBeUndefined();
   });
 });
 

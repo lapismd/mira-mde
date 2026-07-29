@@ -264,6 +264,59 @@ export type MiraFileRef = {
   kind?: "markdown" | "image" | "media" | "unknown";
 };
 
+export type MiraTargetFragment =
+  | {
+      kind: "heading";
+      value: string;
+    }
+  | {
+      kind: "block";
+      value: string;
+    };
+
+export type MiraFileTarget = {
+  href: string;
+  path: string;
+  sourcePath?: string;
+  subpath?: string;
+  fragment?: MiraTargetFragment;
+};
+
+export type MiraFileWatchTarget = MiraFileTarget & {
+  file?: MiraFileRef | null;
+};
+
+export function parseMiraFileTarget(
+  href: string,
+  sourcePath?: string,
+): MiraFileTarget {
+  const hashIndex = href.indexOf("#");
+  const path = (hashIndex === -1 ? href : href.slice(0, hashIndex)).trim();
+  const subpath =
+    hashIndex === -1
+      ? undefined
+      : href.slice(hashIndex + 1).trim() || undefined;
+  const fragment = subpath
+    ? subpath.startsWith("^")
+      ? {
+          kind: "block" as const,
+          value: subpath.slice(1).trim(),
+        }
+      : {
+          kind: "heading" as const,
+          value: subpath,
+        }
+    : undefined;
+
+  return {
+    href,
+    path,
+    sourcePath,
+    subpath,
+    fragment: fragment?.value ? fragment : undefined,
+  };
+}
+
 export type MiraInternalLinkFormatTarget = {
   targetPath: string;
   sourcePath?: string;
@@ -312,15 +365,19 @@ export type MiraMarkdownAuthoringConfig = {
 };
 
 export type MiraFileAdapter = {
-  resolveLink: (target: {
-    href: string;
-    sourcePath?: string;
-  }) => MiraFileRef | null | Promise<MiraFileRef | null>;
+  resolveLink: (
+    target: MiraFileTarget,
+  ) => MiraFileRef | null | Promise<MiraFileRef | null>;
   readMarkdown?: (file: MiraFileRef) => string | null | Promise<string | null>;
   readAssetUrl?: (file: MiraFileRef) => string | null | Promise<string | null>;
   openFile?: (file: MiraFileRef, event?: MouseEvent) => void | Promise<void>;
   renderEmbed?: (
-    target: { file: MiraFileRef; sourcePath?: string; label?: string },
+    target: MiraFileTarget & {
+      file: MiraFileRef;
+      label?: string;
+      width?: number;
+      height?: number;
+    },
     element: HTMLElement,
   ) => void | (() => void);
   listFiles?: () => MiraFileRef[] | Promise<MiraFileRef[]>;
@@ -330,6 +387,10 @@ export type MiraFileAdapter = {
     | Array<{ id: string; text: string; level: number }>
     | Promise<Array<{ id: string; text: string; level: number }>>;
   watchFile?: (file: MiraFileRef, callback: () => void) => void | (() => void);
+  watchTarget?: (
+    target: MiraFileWatchTarget,
+    callback: () => void,
+  ) => void | (() => void);
 };
 
 export type MiraExtensionRuntimeContext = {

@@ -18,8 +18,10 @@
     "chevron-right",
     "circle-check",
     "circle-help",
+    "clipboard-paste",
     "clipboard-list",
     "clock",
+    "copy",
     "file-question",
     "flame",
     "info",
@@ -28,9 +30,11 @@
     "pencil",
     "plus",
     "quote",
+    "scissors",
     "tags",
     "text",
     "triangle-alert",
+    "trash-2",
     "x",
     "zap",
   ]);
@@ -134,6 +138,25 @@
     />
     <path d="M8 11h8" />
     <path d="M8 16h8" />
+  {:else if icon === "clipboard-paste"}
+    <path d="M15 2H9a1 1 0 0 0-1 1v2h8V3a1 1 0 0 0-1-1Z" />
+    <path d="M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h6" />
+    <path d="M16 4h2a2 2 0 0 1 2 2v7" />
+    <path d="m13 18 3 3 5-5" />
+  {:else if icon === "copy"}
+    <rect x="9" y="9" width="13" height="13" rx="2" />
+    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+  {:else if icon === "scissors"}
+    <circle cx="6" cy="7" r="3" />
+    <path d="m8.7 8.3 10.6 6.4" />
+    <circle cx="6" cy="17" r="3" />
+    <path d="m8.7 15.7 10.6-6.4" />
+  {:else if icon === "trash-2"}
+    <path d="M3 6h18" />
+    <path d="M8 6V4h8v2" />
+    <path d="m19 6-1 14H6L5 6" />
+    <path d="M10 11v5" />
+    <path d="M14 11v5" />
   {:else if icon === "circle-check"}
     <circle cx="12" cy="12" r="10" />
     <path d="m9 12 2 2 4-4" />

@@ -10,6 +10,9 @@
     frontmatterTypeOptions,
     parseFrontmatterValue,
     parseFrontmatterYaml,
+    parseFrontmatterPillWikilink,
+    mergeFrontmatterRecordProperties,
+    removeFrontmatterRecordProperty,
     resolveFrontmatterWidget,
     renameFrontmatterRecordProperty,
     serializeFrontmatterRecord,
@@ -20,6 +23,8 @@
   } from "./frontmatter-utils";
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
   import Icon from "./icon.svelte";
+  import Link from "./link.svelte";
+  import FrontmatterPropertyNameInput from "./frontmatter-property-name-input.svelte";
   import { useMarkdownContext } from "../renderer/context.svelte";
 
   type Props = {
@@ -105,15 +110,16 @@
     updateRecord(next.value);
   }
 
-  function renameProperty(event: Event, property: FrontmatterProperty): void {
+  function renameProperty(
+    nextPropertyName: string,
+    property: FrontmatterProperty,
+  ): void {
     if (!parsed.ok || !canRename(property)) {
       return;
     }
 
-    const target = event.currentTarget as HTMLInputElement;
-    const nextKey = target.value.trim();
+    const nextKey = nextPropertyName.trim();
     if (!nextKey || nextKey === property.key) {
-      target.value = property.key;
       return;
     }
 
@@ -123,7 +129,6 @@
       nextKey,
     );
     if (nextRecord === parsed.value) {
-      target.value = property.key;
       return;
     }
 
@@ -153,22 +158,6 @@
     return typeof property.path.at(-1) === "string";
   }
 
-  function handlePropertyNameKeydown(
-    event: KeyboardEvent,
-    property: FrontmatterProperty,
-  ): void {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      (event.currentTarget as HTMLInputElement).blur();
-    }
-    if (event.key === "Escape") {
-      event.preventDefault();
-      const target = event.currentTarget as HTMLInputElement;
-      target.value = property.key;
-      target.blur();
-    }
-  }
-
   function toggleTypeMenu(
     event: MouseEvent,
     property: FrontmatterProperty,
@@ -176,6 +165,122 @@
     event.stopPropagation();
     typeMenuPath =
       typeMenuPath === property.pathString ? null : property.pathString;
+  }
+
+  function siblingPropertyNames(property: FrontmatterProperty): string[] {
+    if (!property.parent) {
+      return rows
+        .filter((candidate) => candidate.id !== property.id)
+        .map((candidate) => candidate.key);
+    }
+
+    const parent = findProperty(rows, property.parent);
+    return (
+      parent?.children
+        .filter((candidate) => candidate.id !== property.id)
+        .map((candidate) => candidate.key) ?? []
+    );
+  }
+
+  function findProperty(
+    properties: FrontmatterProperty[],
+    path: string,
+  ): FrontmatterProperty | null {
+    for (const property of properties) {
+      if (property.pathString === path) {
+        return property;
+      }
+      const nested = findProperty(property.children, path);
+      if (nested) {
+        return nested;
+      }
+    }
+    return null;
+  }
+
+  function clipboardApi() {
+    return (
+      markdown.frontmatterConfig?.clipboard ??
+      (typeof navigator === "undefined" ? undefined : navigator.clipboard)
+    );
+  }
+
+  async function copyProperty(
+    property: FrontmatterProperty,
+    cut = false,
+  ): Promise<void> {
+    const clipboard = clipboardApi();
+    if (!clipboard) {
+      handleActionError(
+        new Error("Clipboard access is unavailable"),
+        cut ? "cut" : "copy",
+      );
+      return;
+    }
+
+    try {
+      await clipboard.writeText(
+        serializeFrontmatterRecord({ [property.key]: property.value }),
+      );
+      if (cut) {
+        removeProperty(property);
+      }
+    } catch (error) {
+      handleActionError(error, cut ? "cut" : "copy");
+    } finally {
+      typeMenuPath = null;
+    }
+  }
+
+  async function pasteProperties(property: FrontmatterProperty): Promise<void> {
+    if (!parsed.ok) {
+      return;
+    }
+    const clipboard = clipboardApi();
+    if (!clipboard) {
+      handleActionError(new Error("Clipboard access is unavailable"), "paste");
+      return;
+    }
+
+    try {
+      const pasted = parseFrontmatterYaml(await clipboard.readText());
+      if (!pasted.ok) {
+        throw new Error(pasted.error);
+      }
+      updateRecord(
+        mergeFrontmatterRecordProperties(
+          parsed.value,
+          property.path.slice(0, -1),
+          pasted.value,
+        ),
+      );
+    } catch (error) {
+      handleActionError(error, "paste");
+    } finally {
+      typeMenuPath = null;
+    }
+  }
+
+  function removeProperty(property: FrontmatterProperty): void {
+    if (!parsed.ok) {
+      return;
+    }
+    try {
+      updateRecord(
+        removeFrontmatterRecordProperty(parsed.value, property.path),
+      );
+    } catch (error) {
+      handleActionError(error, "remove");
+    } finally {
+      typeMenuPath = null;
+    }
+  }
+
+  function handleActionError(
+    error: unknown,
+    action: "copy" | "cut" | "paste" | "remove",
+  ): void {
+    markdown.frontmatterConfig?.onActionError?.(error, action);
   }
 
   function updateTextProperty(
@@ -489,13 +594,13 @@
             {@render TypeMenu({ property })}
           {/if}
         </span>
-        <input
-          class="metadata-property-key-input flex w-full grow items-center bg-transparent px-2 py-1 text-left text-ellipsis outline-none"
-          title={property.pathString}
+        <FrontmatterPropertyNameInput
           value={property.key}
+          config={markdown.frontmatterConfig}
+          excludedNames={siblingPropertyNames(property)}
+          title={property.pathString}
           readonly={!canRename(property)}
-          onblur={(event) => renameProperty(event, property)}
-          onkeydown={(event) => handlePropertyNameKeydown(event, property)}
+          onCommit={(value) => renameProperty(value, property)}
         />
       </div>
     </div>
@@ -535,16 +640,14 @@
             {@render TypeMenu({ property })}
           {/if}
         </span>
-        <input
-          class="metadata-property-key-input flex w-full grow items-center bg-transparent px-2 py-1 text-left text-ellipsis outline-none"
-          title={property.pathString}
+        <FrontmatterPropertyNameInput
           value={property.key}
+          config={markdown.frontmatterConfig}
+          excludedNames={siblingPropertyNames(property)}
+          title={property.pathString}
           readonly={!canRename(property)}
-          data-new={newPropertyPath === property.pathString
-            ? "true"
-            : undefined}
-          onblur={(event) => renameProperty(event, property)}
-          onkeydown={(event) => handlePropertyNameKeydown(event, property)}
+          autofocus={newPropertyPath === property.pathString}
+          onCommit={(value) => renameProperty(value, property)}
         />
       </div>
 
@@ -614,19 +717,7 @@
             class={`metadata-property-value-item metadata-property-value-list flex min-w-0 grow flex-wrap items-center gap-1 py-1 ${valueClass(property.kind)}`}
           >
             {#each listValues(property) as item, index (`${item}:${index}`)}
-              <span
-                class={`metadata-property-pill-chip inline-flex min-w-0 items-center gap-0.5 rounded-sm ${property.kind === "tags" ? "tag" : "bg-secondary text-secondary-foreground transition-colors hover:bg-[var(--background-modifier-hover)]"}`.trim()}
-              >
-                {displayListValue(property, item)}
-                <button
-                  type="button"
-                  class={`metadata-property-pill-remove text-muted-foreground hover:text-foreground inline-flex size-3.5 shrink-0 items-center justify-center rounded-full border-0 bg-transparent p-px [&_svg]:size-2.5 ${property.kind === "tags" ? "hover:bg-[color-mix(in_srgb,currentColor_12%,transparent)]" : "hover:bg-[var(--background-modifier-hover)] hover:text-foreground"}`}
-                  aria-label={`Remove ${item}`}
-                  onclick={() => removeListValue(property, index)}
-                >
-                  <Icon name="x" />
-                </button>
-              </span>
+              {@render Pill({ property, item, index })}
             {/each}
             <input
               class="metadata-input metadata-input-list min-w-[8ch] flex-1 bg-transparent px-1 py-0 text-xs outline-none"
@@ -688,5 +779,81 @@
         {/if}
       </button>
     {/each}
+    <div class="metadata-property-type-menu__separator" role="separator"></div>
+    <button
+      type="button"
+      class="metadata-property-type-menu__item"
+      role="menuitem"
+      onclick={() => void copyProperty(property, true)}
+    >
+      <Icon name="scissors" class="size-3.5" />
+      <span>Cut</span>
+    </button>
+    <button
+      type="button"
+      class="metadata-property-type-menu__item"
+      role="menuitem"
+      onclick={() => void copyProperty(property)}
+    >
+      <Icon name="copy" class="size-3.5" />
+      <span>Copy</span>
+    </button>
+    <button
+      type="button"
+      class="metadata-property-type-menu__item"
+      role="menuitem"
+      onclick={() => void pasteProperties(property)}
+    >
+      <Icon name="clipboard-paste" class="size-3.5" />
+      <span>Paste</span>
+    </button>
+    <div class="metadata-property-type-menu__separator" role="separator"></div>
+    <button
+      type="button"
+      class="metadata-property-type-menu__item metadata-property-type-menu__item--destructive"
+      role="menuitem"
+      onclick={() => removeProperty(property)}
+    >
+      <Icon name="trash-2" class="size-3.5" />
+      <span>Remove</span>
+    </button>
   </div>
+{/snippet}
+
+{#snippet Pill({
+  property,
+  item,
+  index,
+}: {
+  property: FrontmatterProperty;
+  item: string;
+  index: number;
+})}
+  {@const wikilink = parseFrontmatterPillWikilink(item)}
+  <span
+    class={`metadata-property-pill-chip inline-flex min-w-0 items-center gap-0.5 rounded-sm ${property.kind === "tags" ? "tag" : "bg-secondary text-secondary-foreground transition-colors hover:bg-[var(--background-modifier-hover)]"}`.trim()}
+  >
+    {#if wikilink}
+      <Link
+        id={wikilink.target}
+        text={wikilink.text}
+        sourcePath={markdown.sourcePath}
+        class="metadata-property-pill-link"
+      />
+    {:else}
+      {displayListValue(property, item)}
+    {/if}
+    <button
+      type="button"
+      class={`metadata-property-pill-remove text-muted-foreground hover:text-foreground inline-flex size-3.5 shrink-0 items-center justify-center rounded-full border-0 bg-transparent p-px [&_svg]:size-2.5 ${property.kind === "tags" ? "hover:bg-[color-mix(in_srgb,currentColor_12%,transparent)]" : "hover:bg-[var(--background-modifier-hover)] hover:text-foreground"}`}
+      aria-label={`Remove ${item}`}
+      onclick={(event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        removeListValue(property, index);
+      }}
+    >
+      <Icon name="x" />
+    </button>
+  </span>
 {/snippet}

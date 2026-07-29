@@ -6,6 +6,7 @@ import {
   markdownPreviewDocsSource,
 } from "../_shared/docs-source";
 import { embedsMarkdown } from "../fixtures";
+import AdapterInvalidationStory from "./AdapterInvalidationStory.svelte";
 
 const meta = {
   title: "Markdown/Embeds",
@@ -71,4 +72,12 @@ export const SourceMode: Story = {
       },
     },
   },
+};
+
+export const AdapterInvalidation: Story = {
+  name: "Adapter invalidation",
+  render: () => ({
+    Component: AdapterInvalidationStory,
+  }),
+  tags: ["visual-pending"],
 };

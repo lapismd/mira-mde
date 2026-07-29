@@ -6,7 +6,9 @@ import {
   coerceFrontmatterValue,
   createFrontmatterReplacement,
   frontmatterProperties,
+  mergeFrontmatterRecordProperties,
   parseFrontmatterYaml,
+  removeFrontmatterRecordProperty,
   resolveFrontmatterWidget,
   serializeFrontmatterRecord,
 } from ".";
@@ -106,6 +108,46 @@ describe("frontmatter utilities", () => {
         ],
       }),
     ).toBe("DRAFT");
+  });
+
+  it("removes nested object and array properties immutably", () => {
+    const source = {
+      nested: { keep: true, remove: "value" },
+      values: ["first", "second"],
+    };
+
+    expect(
+      removeFrontmatterRecordProperty(source, ["nested", "remove"]),
+    ).toEqual({
+      nested: { keep: true },
+      values: ["first", "second"],
+    });
+    expect(removeFrontmatterRecordProperty(source, ["values", 0])).toEqual({
+      nested: { keep: true, remove: "value" },
+      values: ["second"],
+    });
+    expect(source.nested.remove).toBe("value");
+  });
+
+  it("merges pasted properties into a portable parent record", () => {
+    const source = {
+      nested: { keep: true },
+      title: "Demo",
+    };
+
+    expect(
+      mergeFrontmatterRecordProperties(source, ["nested"], {
+        owner: "[[Ada]]",
+        status: "ready",
+      }),
+    ).toEqual({
+      nested: {
+        keep: true,
+        owner: "[[Ada]]",
+        status: "ready",
+      },
+      title: "Demo",
+    });
   });
 
   it("renders frontmatter as a component with source offsets", () => {

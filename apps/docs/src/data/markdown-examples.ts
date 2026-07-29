@@ -12,7 +12,8 @@ tags:
   - markdown
   - properties
 aliases:
-    - Markdown metadata
+  - Markdown metadata
+  - "[[Editor Architecture|Architecture note]]"
 ---
 
 # Frontmatter
@@ -58,9 +59,19 @@ Embed another note or asset with ![[Architecture Diagram]].
 
 Add display text with ![[Architecture Diagram|Architecture diagram]].
 
+Size image embeds with a width or width-by-height suffix:
+
+![[Architecture Diagram|320x180]]
+
 Markdown notes embed through the same adapter:
 
 ![[Embedded Note]]
+
+Embed one heading section or one referenced block:
+
+![[Embedded Note#Next Steps]]
+
+![[Embedded Note#^portable-block]]
 `;
 
 export const tagsMarkdown = String.raw`# Tags
@@ -185,6 +196,14 @@ Reference-style base64 image:
 ![Reference base64][base64-red]
 
 Images can be resolved through the configured asset resolver. Data-URI images render without a resolver.
+
+Sized image syntax keeps its intrinsic aspect ratio:
+
+![Mira Markdown demo asset|320x180](/mira-markdown-demo.svg)
+
+Broken images render an accessible placeholder:
+
+![Missing diagram](/missing-mira-diagram.svg)
 
 [base64-red]: ${base64DemoPng}
 `;

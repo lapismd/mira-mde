@@ -22,7 +22,40 @@ Markdown embeds use wikilink syntax with a leading `!` to render a referenced no
 ```md
 ![[Architecture Diagram]]
 ![[Architecture Diagram|Architecture diagram]]
+![[Architecture Diagram|320x180]]
 ![[Embedded Note]]
+![[Embedded Note#Next Steps]]
+![[Embedded Note#^portable-block]]
 ```
 
 Embeds use the configured file adapter (or asset/link resolvers) to find display content for both image assets and Markdown notes.
+
+Mira parses the part after `#` as a portable heading or `^block-id` fragment.
+Markdown note embeds select that fragment after `readMarkdown`; image embeds
+interpret a numeric display suffix as `width` or `widthxheight`.
+
+## Refreshing targets
+
+Use `watchTarget` when target resolution can change after a create, delete, or
+rename. It receives the parsed path and fragment even when no file currently
+resolves. Use `watchFile` for content changes to an already-resolved file:
+
+```ts
+const fileAdapter = {
+  resolveLink({ path, href }) {
+    return files.get(path || href) ?? null;
+  },
+  readMarkdown(file) {
+    return files.get(file.path)?.markdown ?? null;
+  },
+  watchTarget(target, refresh) {
+    return targetEvents.subscribe(target.path, refresh);
+  },
+  watchFile(file, refresh) {
+    return fileEvents.subscribe(file.path, refresh);
+  },
+};
+```
+
+Both subscriptions return an optional cleanup function. Consumers retain
+ownership of vault events, resource URLs, and persistence.

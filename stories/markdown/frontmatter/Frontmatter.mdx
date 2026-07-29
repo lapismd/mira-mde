@@ -27,6 +27,15 @@ Each markdown feature is shown in reading preview (`MarkdownPreview`), live prev
 
 <Controls />
 
+## Property actions and suggestions
+
+<Canvas of={FrontmatterStories.PropertyActions} meta={FrontmatterStories} />
+
+Focus a property name to load configured suggestions. The property icon menu
+contains type choices plus cut, copy, paste, and remove. The story injects an
+in-memory clipboard, demonstrating the same adapter contract consumers can use
+outside secure browser clipboard contexts.
+
 ## Live Preview
 
 <Canvas of={FrontmatterStories.LivePreview} meta={FrontmatterStories} />
@@ -44,6 +53,8 @@ Each markdown feature is shown in reading preview (`MarkdownPreview`), live prev
 ```md
 ---
 title: Release notes
+aliases:
+  - "[[Editor Architecture|Architecture note]]"
 ---
 
 # Body

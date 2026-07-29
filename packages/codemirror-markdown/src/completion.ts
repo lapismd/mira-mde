@@ -6,11 +6,12 @@ import type {
 } from "@codemirror/autocomplete";
 import { EditorState, type Extension } from "@codemirror/state";
 import type { EditorView } from "@codemirror/view";
-import type {
-  MiraFileAdapter,
-  MiraFileRef,
-  MiraInternalLinkFormatTarget,
-  MiraMarkdownCompletionConfig,
+import {
+  parseMiraFileTarget,
+  type MiraFileAdapter,
+  type MiraFileRef,
+  type MiraInternalLinkFormatTarget,
+  type MiraMarkdownCompletionConfig,
 } from "@mira-mde/extensions";
 
 export type MiraMarkdownCompletionOptions = {
@@ -403,7 +404,9 @@ async function resolveCompletionFile(
       }
     );
   }
-  const resolved = await adapter.resolveLink({ href: path, sourcePath });
+  const resolved = await adapter.resolveLink(
+    parseMiraFileTarget(path, sourcePath),
+  );
   const normalizedTarget = normalizePath(path).replace(/\.md$/i, "");
   const directMatch = files.find(
     (file) =>

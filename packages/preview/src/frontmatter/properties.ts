@@ -119,6 +119,40 @@ export function renameFrontmatterRecordProperty(
   return isRecord(next) ? next : value;
 }
 
+export function removeFrontmatterRecordProperty(
+  value: Record<string, unknown>,
+  path: FrontmatterPathSegment[],
+): Record<string, unknown> {
+  if (!path.length) {
+    return value;
+  }
+
+  const next = removeValueAtPath(value, path);
+  return isRecord(next) ? next : value;
+}
+
+export function mergeFrontmatterRecordProperties(
+  value: Record<string, unknown>,
+  parentPath: FrontmatterPathSegment[],
+  properties: Record<string, unknown>,
+): Record<string, unknown> {
+  const parent = getValueAtPath(value, parentPath);
+  if (!isRecord(parent)) {
+    return value;
+  }
+
+  const merged = {
+    ...parent,
+    ...properties,
+  };
+  if (!parentPath.length) {
+    return merged;
+  }
+
+  const next = setValueAtPath(value, parentPath, merged);
+  return isRecord(next) ? next : value;
+}
+
 export function addFrontmatterRecordProperty(
   value: Record<string, unknown>,
   kind: FrontmatterPropertyKind = "text",
@@ -280,6 +314,38 @@ function setValueAtPath(
       ...current,
       [segment]: setValueAtPath(current[segment], rest, nextValue),
     };
+  }
+
+  return current;
+}
+
+function removeValueAtPath(
+  current: unknown,
+  path: FrontmatterPathSegment[],
+): unknown {
+  const [segment, ...rest] = path;
+  if (segment === undefined) {
+    return current;
+  }
+
+  if (Array.isArray(current) && typeof segment === "number") {
+    const next = [...current];
+    if (rest.length) {
+      next[segment] = removeValueAtPath(next[segment], rest);
+    } else {
+      next.splice(segment, 1);
+    }
+    return next;
+  }
+
+  if (isRecord(current) && typeof segment === "string") {
+    const next = { ...current };
+    if (rest.length) {
+      next[segment] = removeValueAtPath(next[segment], rest);
+    } else {
+      delete next[segment];
+    }
+    return next;
   }
 
   return current;

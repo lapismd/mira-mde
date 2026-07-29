@@ -12,12 +12,9 @@ import type {
   MiraTemplateSelection,
 } from "@mira-mde/extensions";
 import type { MiraEditorSelection } from "@mira-mde/core";
+import type { FrontmatterConfig } from "@mira-mde/preview";
 
-export type MiraFrontmatterConfig = {
-  types?: Record<string, unknown>;
-  properties?: Record<string, unknown>;
-  widgets?: unknown[];
-};
+export type MiraFrontmatterConfig = FrontmatterConfig;
 
 export type MiraMdeProps = {
   value: string;

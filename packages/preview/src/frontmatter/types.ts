@@ -40,6 +40,27 @@ export type FrontmatterTypeDefinition = {
   render?: FrontmatterWidgetRenderer;
 };
 
+export type FrontmatterPropertySuggestion = {
+  name: string;
+  icon?: string;
+  kind?: FrontmatterPropertyKind;
+};
+
+export type FrontmatterPropertySuggestionInput =
+  | string
+  | FrontmatterPropertySuggestion;
+
+export type FrontmatterPropertySuggestionSource =
+  | readonly FrontmatterPropertySuggestionInput[]
+  | (() =>
+      | readonly FrontmatterPropertySuggestionInput[]
+      | Promise<readonly FrontmatterPropertySuggestionInput[]>);
+
+export type FrontmatterClipboard = {
+  readText: () => string | Promise<string>;
+  writeText: (value: string) => void | Promise<void>;
+};
+
 export type FrontmatterConfig = {
   types?: Record<string, FrontmatterPropertyKind | FrontmatterTypeDefinition>;
   properties?: Record<
@@ -47,6 +68,12 @@ export type FrontmatterConfig = {
     FrontmatterPropertyKind | FrontmatterTypeDefinition
   >;
   widgets?: FrontmatterTypeDefinition[];
+  propertySuggestions?: FrontmatterPropertySuggestionSource;
+  clipboard?: FrontmatterClipboard;
+  onActionError?: (
+    error: unknown,
+    action: "copy" | "cut" | "paste" | "remove",
+  ) => void;
 };
 
 export type FrontmatterParseResult =

@@ -29,3 +29,32 @@ tags:
 ```
 
 Frontmatter must appear at the beginning of the file. The default renderer supports YAML and TOML-style property blocks.
+
+## Property actions and suggestions
+
+The property icon opens a keyboard-accessible menu for changing type, cutting,
+copying, pasting, or removing that property. Clipboard operations are local to
+the current document; cross-document metadata changes stay in the consumer.
+
+Configure lazy or static name suggestions and, when browser clipboard access
+is not appropriate, inject a clipboard adapter:
+
+```ts
+const frontmatterConfig = {
+  propertySuggestions: [
+    { name: "owner", kind: "aliases" },
+    { name: "review-status", icon: "lucide-circle-check" },
+    "summary",
+  ],
+  clipboard: {
+    readText: () => appClipboard.readText(),
+    writeText: (value) => appClipboard.writeText(value),
+  },
+  onActionError(error, action) {
+    reportFrontmatterError(action, error);
+  },
+};
+```
+
+Whole-value wikilinks such as `"[[Editor Architecture|Architecture note]]"` in
+list properties use the configured file adapter and render as note links.

@@ -20,14 +20,10 @@ import type {
   MiraDefaultEditMode,
   MiraFeatureFlags,
 } from "./features";
+import type { MiraFrontmatterConfig } from "@mira-mde/svelte";
 
 export type { MiraDefaultEditMode } from "./features";
-
-export type MiraFrontmatterConfig = {
-  types?: Record<string, unknown>;
-  properties?: Record<string, unknown>;
-  widgets?: unknown[];
-};
+export type { MiraFrontmatterConfig } from "@mira-mde/svelte";
 
 export type MiraDefaultMdeProps = {
   value?: string;

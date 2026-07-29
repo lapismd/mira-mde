@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
-  import type { MiraFileRef } from "@mira-mde/extensions";
+  import { parseMiraFileTarget, type MiraFileRef } from "@mira-mde/extensions";
   import { useMarkdownContext } from "../renderer/context.svelte";
   import EmbeddedMarkdownPreview from "./embedded-markdown-preview.svelte";
 
@@ -32,10 +32,12 @@
   let resolvedFile = $state<MiraFileRef | null>(null);
   let previewMarkdown = $state<string | null>(null);
   let previewAssetUrl = $state<string | null>(null);
+  let targetRevision = $state(0);
 
   const target = $derived(id || href);
   const displayText = $derived(text || label || target);
   const activeSourcePath = $derived(sourcePath || markdown.sourcePath);
+  const parsedTarget = $derived(parseMiraFileTarget(target, activeSourcePath));
   const hasFileAdapter = $derived(Boolean(markdown.fileAdapter));
   const isExternal = $derived(isExternalHref(target));
   const resolvedHref = $derived(
@@ -49,6 +51,7 @@
   $effect(() => {
     const adapter = markdown.fileAdapter;
     const currentTarget = target;
+    targetRevision;
     if (!adapter || !currentTarget || isExternalHref(currentTarget)) {
       resolvedFile = null;
       previewMarkdown = null;
@@ -59,8 +62,7 @@
     let cancelled = false;
     Promise.resolve(
       adapter.resolveLink({
-        href: currentTarget,
-        sourcePath: activeSourcePath,
+        ...parsedTarget,
       }),
     ).then(
       (file) => {
@@ -78,6 +80,21 @@
     return () => {
       cancelled = true;
     };
+  });
+
+  $effect(() => {
+    const adapter = markdown.fileAdapter;
+    const file = resolvedFile;
+    if (
+      !adapter?.watchTarget ||
+      !parsedTarget.href ||
+      isExternalHref(parsedTarget.href)
+    ) {
+      return;
+    }
+    return adapter.watchTarget({ ...parsedTarget, file }, () => {
+      targetRevision += 1;
+    });
   });
 
   $effect(() => {
