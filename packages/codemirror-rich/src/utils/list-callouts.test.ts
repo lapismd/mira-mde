@@ -3,13 +3,13 @@ import { getListCalloutMarkerRange } from "./list-callouts";
 
 describe("list callout utilities", () => {
   it("resolves Lapis default list callout markers", () => {
-    expect(getListCalloutMarkerRange("- & Highlighted item", 0)).toEqual({
+    expect(getListCalloutMarkerRange("- & Highlighted item", 0)).toMatchObject({
       markerStart: 2,
       markerEnd: 3,
       marker: "&",
       color: "255, 214, 0",
     });
-    expect(getListCalloutMarkerRange("  1. ? Question", 10)).toEqual({
+    expect(getListCalloutMarkerRange("  1. ? Question", 10)).toMatchObject({
       markerStart: 15,
       markerEnd: 16,
       marker: "?",
@@ -18,11 +18,32 @@ describe("list callout utilities", () => {
   });
 
   it("supports task list callout markers after the checkbox token", () => {
-    expect(getListCalloutMarkerRange("- [ ] ! Warning", 0)).toEqual({
+    expect(getListCalloutMarkerRange("- [ ] ! Warning", 0)).toMatchObject({
       markerStart: 6,
       markerEnd: 7,
       marker: "!",
       color: "255, 23, 68",
     });
+  });
+
+  it("uses injected markers and disabled defaults", () => {
+    const callouts = [
+      { char: "&", enabled: false },
+      { char: "^^", color: "80, 70, 220", icon: "bookmark" },
+    ];
+
+    expect(getListCalloutMarkerRange("- ^^ Custom", 4, callouts)).toMatchObject(
+      {
+        markerStart: 6,
+        markerEnd: 8,
+        marker: "^^",
+        color: "80, 70, 220",
+        callout: {
+          char: "^^",
+          icon: "bookmark",
+        },
+      },
+    );
+    expect(getListCalloutMarkerRange("- & Plain", 0, callouts)).toBeNull();
   });
 });

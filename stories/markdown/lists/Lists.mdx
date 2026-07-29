@@ -39,6 +39,19 @@ Each markdown feature is shown in reading preview (`MarkdownPreview`), live prev
 
 <Source of={ListsStories.SourceMode} language="html" />
 
+## Configurable List Callouts
+
+Extensions can override built-in markers, add multi-character markers, disable
+defaults, select a Mira icon, or provide `renderMarker` for application-owned
+icon systems. The same resolved catalog drives preview and live preview;
+persistence and settings UI stay with the consumer.
+
+<Canvas of={ListsStories.CustomCalloutCatalog} meta={ListsStories} />
+
+<Source of={ListsStories.CustomCalloutCatalog} language="ts" />
+
+<Canvas of={ListsStories.CustomCalloutCatalogLive} meta={ListsStories} />
+
 ## Syntax
 
 ```md

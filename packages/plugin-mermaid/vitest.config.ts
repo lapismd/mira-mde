@@ -3,6 +3,9 @@ import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   plugins: [svelte({ preprocess: vitePreprocess() })],
+  resolve: {
+    conditions: ["browser"],
+  },
   test: {
     environment: "jsdom",
     include: ["src/**/*.test.ts"],

@@ -5,7 +5,16 @@ import {
   markdownEditorDocsSource,
   markdownPreviewDocsSource,
 } from "../_shared/docs-source";
-import { listsMarkdown } from "../fixtures";
+import { defineMiraExtension } from "@mira-mde/extensions";
+import { listCalloutsMarkdown, listsMarkdown } from "../fixtures";
+
+const listCalloutCatalogExtension = defineMiraExtension({
+  name: "storybook-list-callout-catalog",
+  listCallouts: [
+    { char: "^", color: "99, 102, 241" },
+    { char: "%", enabled: false },
+  ],
+});
 
 const meta = {
   title: "Markdown/Lists",
@@ -71,4 +80,47 @@ export const SourceMode: Story = {
       },
     },
   },
+};
+
+export const CustomCalloutCatalog: Story = {
+  name: "Custom List Callout Catalog",
+  args: {
+    value: listCalloutsMarkdown,
+    extensions: [listCalloutCatalogExtension],
+  },
+  tags: ["visual-pending"],
+  parameters: {
+    docs: {
+      source: {
+        language: "ts",
+        type: "code",
+        code: `const listCallouts = defineMiraExtension({
+  name: "list-callouts",
+  listCallouts: [
+    { char: "^", color: "99, 102, 241" },
+    { char: "%", enabled: false },
+  ],
+});
+
+<MarkdownPreview
+  value={listCalloutsMarkdown}
+  extensions={[listCallouts]}
+/>`,
+      },
+    },
+  },
+};
+
+export const CustomCalloutCatalogLive: Story = {
+  name: "Custom List Callout Catalog Live Preview",
+  render: (args) => ({
+    Component: EditorModeStory,
+    props: {
+      ...args,
+      value: listCalloutsMarkdown,
+      extensions: [listCalloutCatalogExtension],
+      mode: "live-preview",
+    },
+  }),
+  tags: ["visual-pending"],
 };

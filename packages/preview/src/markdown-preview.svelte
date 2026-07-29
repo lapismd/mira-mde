@@ -18,12 +18,15 @@
     MiraAssetResolver,
     MiraExtension,
     MiraFileAdapter,
+    MiraListCallout,
     MiraLinkResolver,
+    MiraMarkdownPostProcessor,
     MiraRendererComponents,
   } from "@mira-mde/extensions";
   import {
     mountMiraExtensionStyles,
     resolveMiraExtensions,
+    resolveMiraListCallouts,
   } from "@mira-mde/extensions";
   import Markdown from "./renderer/markdown.svelte";
   import {
@@ -48,6 +51,7 @@
   import Frontmatter from "./components/frontmatter.svelte";
   import Image from "./components/image.svelte";
   import ListItem from "./components/list-item.svelte";
+  import ListCalloutMarker from "./components/list-callout-marker.svelte";
   import Link from "./components/link.svelte";
   import Tag from "./components/tag.svelte";
   import rehypeCodeContext from "./rehype-code-context";
@@ -76,6 +80,8 @@
     htmlPolicy?: "trusted" | "safe";
     emoji?: boolean;
     dialog?: boolean;
+    listCallouts?: MiraListCallout[];
+    postProcess?: MiraMarkdownPostProcessor;
     onChange?: (replacement: string, from: number, to: number) => void;
     onFrontmatterChange?: (nextYaml: string, nextValue: string) => void;
   };
@@ -106,6 +112,8 @@
     htmlPolicy = "trusted",
     emoji = false,
     dialog = false,
+    listCallouts = [],
+    postProcess,
     onChange,
     onFrontmatterChange,
   }: Props = $props();
@@ -121,6 +129,7 @@
     img: Image,
     input: Checkbox,
     li: ListItem,
+    listcalloutmarker: ListCalloutMarker,
     pathlink: Link,
     tag: Tag,
     wikilink: Link,
@@ -138,6 +147,34 @@
     return mountMiraExtensionStyles(resolvedExtensions.styles);
   });
 
+  const listCalloutContributions = $derived([
+    ...resolvedExtensions.listCallouts,
+    ...listCallouts,
+  ]);
+  const resolvedListCallouts = $derived(
+    resolveMiraListCallouts(listCalloutContributions),
+  );
+  const resolvedPostProcess = $derived<MiraMarkdownPostProcessor>(
+    (contentEl, node, parent) => {
+      const cleanups = [
+        ...resolvedExtensions.postProcessors,
+        ...(postProcess ? [postProcess] : []),
+      ]
+        .map((processor) => processor(contentEl, node, parent))
+        .filter(
+          (cleanup): cleanup is () => void => typeof cleanup === "function",
+        );
+
+      if (cleanups.length) {
+        return () => {
+          for (const cleanup of cleanups.reverse()) {
+            cleanup();
+          }
+        };
+      }
+    },
+  );
+
   const remarkPlugins = $derived<Pluggable[]>([
     remarkFrontmatter,
     remarkDirective,
@@ -146,7 +183,7 @@
     ...(emoji ? [remarkEmoji] : []),
     remarkMultimarkdownTable,
     remarkCustomChecklists,
-    remarkListCallouts,
+    [remarkListCallouts, { callouts: listCalloutContributions }],
     remarkMath,
     remarkCallouts,
     remarkWikiLinks,
@@ -169,6 +206,9 @@
         "class",
         "data-heading",
         "data-line",
+        "data-list-callout-marker",
+        "data-callout-char",
+        "data-callout-icon",
         "data-sourcepos",
       ],
       img: [...(defaultSchema.attributes?.img ?? []), "src", "alt", "title"],
@@ -419,6 +459,8 @@
     {frontmatterOpen}
     {frontmatterConfig}
     {dialog}
+    listCallouts={resolvedListCallouts}
+    postProcess={resolvedPostProcess}
     {onChange}
     {onFrontmatterChange}
   />
@@ -442,6 +484,8 @@
           {frontmatterOpen}
           {frontmatterConfig}
           {dialog}
+          listCallouts={resolvedListCallouts}
+          postProcess={resolvedPostProcess}
           {onChange}
           {onFrontmatterChange}
         />

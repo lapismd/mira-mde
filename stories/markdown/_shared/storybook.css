@@ -102,3 +102,28 @@ html.dark .mira-story-surface,
 html.mira-theme-dark .mira-story-surface {
   color-scheme: dark;
 }
+
+.mira-portable-surfaces-story {
+  display: grid;
+  gap: 1.25rem;
+  max-width: 52rem;
+}
+
+.mira-portable-surfaces-story > section {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.mira-portable-surfaces-story > section > h2 {
+  font-size: 0.875rem;
+  font-weight: 650;
+  margin: 0;
+}
+
+.mira-mermaid-dialog-story {
+  min-height: 34rem;
+}
+
+.mira-mermaid-dialog-story > .mermaid {
+  height: 30rem;
+}

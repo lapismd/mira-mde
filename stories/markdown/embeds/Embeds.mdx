@@ -35,6 +35,15 @@ Each markdown feature is shown in reading preview (`MarkdownPreview`), live prev
 targets. `watchFile` refreshes content for an already-resolved file. Both
 callbacks are portable subscriptions owned by the consumer adapter.
 
+## Portable public surfaces
+
+`MarkdownEmbed`, `FileEmbed`, and `NoteLink` expose the same renderer and file
+adapter contracts without requiring a full editor instance.
+
+<Canvas of={EmbedsStories.PortableSurfaces} meta={EmbedsStories} />
+
+<Source of={EmbedsStories.PortableSurfaces} language="svelte" />
+
 ## Live Preview
 
 <Canvas of={EmbedsStories.LivePreview} meta={EmbedsStories} />

@@ -14,6 +14,8 @@ import {
   type ViewUpdate,
   WidgetType,
 } from "@codemirror/view";
+import type { MiraResolvedListCallout } from "@mira-mde/extensions";
+import { resolveMiraExtensions } from "@mira-mde/extensions";
 import { miraRichEditorTheme } from "./theme";
 import type { MiraRichEditorOptions } from "./types";
 import { codeBlockLineDecorations } from "./utils/code-block-lines";
@@ -40,7 +42,10 @@ import {
   isBareExternalAutolinkUrl,
   isExternalMarkdownLink,
 } from "./utils/links";
-import { getListCalloutMarkerRange } from "./utils/list-callouts";
+import {
+  createListCalloutMatcher,
+  type ListCalloutMatcher,
+} from "./utils/list-callouts";
 import {
   hasInitialFrontmatterCursor,
   hasRenderedInitialFrontmatterCursor,
@@ -181,20 +186,29 @@ export function createRichEditorExtensions(
   }
 
   const livePreview = options.livePreview ?? true;
+  const extensionListCallouts = resolveMiraExtensions(options.extensions, {
+    mode: livePreview ? "live-preview" : "source",
+    readonly: false,
+    sourcePath: options.sourcePath,
+  }).listCallouts;
+  const resolvedOptions: MiraRichEditorOptions = {
+    ...options,
+    listCallouts: [...extensionListCallouts, ...(options.listCallouts ?? [])],
+  };
 
   return [
     miraRichEditorTheme,
     codeBlockLineDecorations(),
     headingGutterExtension(),
-    options.indentGuides !== false
+    resolvedOptions.indentGuides !== false
       ? [indentGuideDecorations(), measuredIndentExtension()]
       : [],
-    livePreview ? blockPreviewDecorations(options) : [],
+    livePreview ? blockPreviewDecorations(resolvedOptions) : [],
     // Inline marks (code/strong/emphasis + hide ticks) run in source and live
     // preview; replace widgets stay live-preview-only.
-    inlinePreviewDecorations({ ...options, livePreview }),
+    inlinePreviewDecorations({ ...resolvedOptions, livePreview }),
     foldIndicatorDecorations(),
-    blockControlExtensions(options),
+    blockControlExtensions(resolvedOptions),
     livePreview
       ? EditorView.editorAttributes.compute(["doc", "selection"], (state) => ({
           class: [
@@ -374,6 +388,7 @@ function buildInlinePreviewDecorations(
   const ranges: Range<Decoration>[] = [];
   const replaceWidgets = options.livePreview ?? true;
   const fencedCodeLineClasses = getFencedCodeLineClasses(view.state);
+  const listCalloutMatcher = createListCalloutMatcher(options.listCallouts);
   const syntaxHiddenRanges: RangeBoundary[] = [];
   const activeInlineSourceRanges: RangeBoundary[] = [];
   if (replaceWidgets) {
@@ -398,7 +413,13 @@ function buildInlinePreviewDecorations(
       decorateHeadingLine(line.text, line.from, ranges);
       decorateFootnotes(line.text, line.from, ranges);
       if (replaceWidgets) {
-        decorateListCallouts(line.text, line.from, ranges, view.state);
+        decorateListCallouts(
+          line.text,
+          line.from,
+          ranges,
+          view.state,
+          listCalloutMatcher,
+        );
         decorateTaskCheckboxes(
           line.text,
           line.from,
@@ -459,7 +480,7 @@ function buildInlinePreviewDecorations(
 }
 
 class ListCalloutMarkerWidget extends WidgetType {
-  constructor(private readonly marker: string) {
+  constructor(private readonly callout: MiraResolvedListCallout) {
     super();
   }
 
@@ -467,14 +488,40 @@ class ListCalloutMarkerWidget extends WidgetType {
     const span = document.createElement("span");
     span.className = "lc-list-marker";
     span.setAttribute("aria-hidden", "true");
-    span.textContent = this.marker;
+    span.dataset.calloutChar = this.callout.char;
+    if (this.callout.icon) {
+      span.dataset.calloutIcon = this.callout.icon;
+    }
+
+    const cleanup = this.callout.renderMarker?.(span, this.callout);
+    if (typeof cleanup === "function") {
+      listCalloutMarkerCleanups.set(span, cleanup);
+    } else if (!span.childNodes.length) {
+      if (this.callout.icon === "book-open") {
+        span.append(createBookOpenIcon());
+      } else {
+        span.textContent = this.callout.char;
+      }
+    }
     return span;
   }
 
   override eq(widget: ListCalloutMarkerWidget): boolean {
-    return widget.marker === this.marker;
+    return (
+      widget.callout.char === this.callout.char &&
+      widget.callout.color === this.callout.color &&
+      widget.callout.icon === this.callout.icon &&
+      widget.callout.renderMarker === this.callout.renderMarker
+    );
+  }
+
+  override destroy(dom: HTMLElement): void {
+    listCalloutMarkerCleanups.get(dom)?.();
+    listCalloutMarkerCleanups.delete(dom);
   }
 }
+
+const listCalloutMarkerCleanups = new WeakMap<HTMLElement, () => void>();
 
 class ListCalloutBackgroundWidget extends WidgetType {
   override toDOM(): HTMLElement {
@@ -494,8 +541,9 @@ function decorateListCallouts(
   lineStart: number,
   ranges: Range<Decoration>[],
   state: EditorState,
+  matchListCallout: ListCalloutMatcher,
 ): void {
-  const markerRange = getListCalloutMarkerRange(text, lineStart);
+  const markerRange = matchListCallout(text, lineStart);
   if (!markerRange) {
     return;
   }
@@ -529,9 +577,32 @@ function decorateListCallouts(
 
   ranges.push(
     Decoration.replace({
-      widget: new ListCalloutMarkerWidget(markerRange.marker),
+      widget: new ListCalloutMarkerWidget(markerRange.callout),
     }).range(markerRange.markerStart, markerRange.markerEnd),
   );
+}
+
+function createBookOpenIcon(): SVGSVGElement {
+  const namespace = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(namespace, "svg");
+  svg.setAttribute("viewBox", "0 0 24 24");
+  svg.setAttribute("fill", "none");
+  svg.setAttribute("stroke", "currentColor");
+  svg.setAttribute("stroke-width", "2");
+  svg.setAttribute("stroke-linecap", "round");
+  svg.setAttribute("stroke-linejoin", "round");
+  svg.setAttribute("aria-hidden", "true");
+
+  for (const data of [
+    "M12 7v14",
+    "M3 18a1 1 0 0 1-1-1V5a2 2 0 0 1 2-2h5a3 3 0 0 1 3 3v15a3 3 0 0 0-3-3Z",
+    "M21 18a1 1 0 0 0 1-1V5a2 2 0 0 0-2-2h-5a3 3 0 0 0-3 3v15a3 3 0 0 1 3-3Z",
+  ]) {
+    const path = document.createElementNS(namespace, "path");
+    path.setAttribute("d", data);
+    svg.append(path);
+  }
+  return svg;
 }
 
 function decorateInlineSyntax(

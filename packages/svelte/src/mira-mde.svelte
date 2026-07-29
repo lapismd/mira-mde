@@ -122,6 +122,16 @@
           ].join(":"),
         )
         .join(","),
+      resolvedExtensions.listCallouts
+        .map((callout) =>
+          [
+            callout.char,
+            callout.color ?? "",
+            callout.icon ?? "",
+            callout.enabled === false ? "disabled" : "enabled",
+          ].join(":"),
+        )
+        .join(","),
     ].join("|"),
   );
   const showEditor = $derived(mode !== "preview");

@@ -8,16 +8,16 @@ Mira extensions let packages add CodeMirror behavior, preview rendering, toolbar
 ## Extension Shape
 
 ```ts
-import type { MiraExtension } from "@mira-mde/extensions";
+import { defineMiraExtension, type MiraExtension } from "@mira-mde/extensions";
 
 export function myExtension(): MiraExtension {
-  return {
+  return defineMiraExtension({
     name: "my-extension",
-    codemirror: [],
-    preview: {
-      rehypePlugins: [],
-    },
-  };
+    codeMirror: () => [],
+    remarkPlugins: [],
+    rehypePlugins: [],
+    components: {},
+  });
 }
 ```
 
@@ -26,14 +26,8 @@ export function myExtension(): MiraExtension {
 Resolvers keep app-specific behavior outside the Markdown components.
 
 ```ts
-const linkResolver = {
-  resolveLink(href, context) {
-    return {
-      href,
-      title: context.sourcePath,
-    };
-  },
-};
+const linkResolver = ({ href, sourcePath }) =>
+  routes.note(href, { from: sourcePath });
 ```
 
 ```svelte
@@ -49,4 +43,76 @@ const linkResolver = {
 | `createTableExtensions`      | Editable table and grid-table behavior.       |
 | `mermaidExtension`           | Mermaid rendering and live-widget support.    |
 | `MarkdownPreview`            | Rendered Markdown surface.                    |
+| `MarkdownEmbed`              | Standalone embedded Markdown surface.         |
+| `FileEmbed`                  | Adapter-backed note or asset embed.           |
+| `NoteLink`                   | Adapter-backed link with hover preview.       |
 | `MiraDefaultMde`             | Default editor and toolbar package.           |
+
+## Render contributions
+
+Extensions can contribute a shared list-callout catalog and DOM
+postprocessors alongside remark, rehype, component, and CodeMirror behavior.
+The same callout configuration reaches reading mode and live preview.
+
+```ts
+import { defineMiraExtension } from "@mira-mde/extensions";
+
+export const reviewExtension = defineMiraExtension({
+  name: "review-markdown",
+  listCallouts: [
+    { char: "^", color: "99, 102, 241" },
+    { char: "%", enabled: false },
+  ],
+  postProcessors: [
+    (element) => {
+      if (!element.matches("a[data-invalid='true']")) return;
+      element.dataset.diagnostic = "unresolved-link";
+
+      return () => {
+        delete element.dataset.diagnostic;
+      };
+    },
+  ],
+});
+```
+
+Use `renderMarker(element, callout)` on a list-callout item when a consumer
+already has an icon registry. Return a cleanup callback for mounted icons.
+Persisted catalogs and settings screens remain consumer-owned.
+
+`postProcessors` run for each rendered node after it mounts. They are intended
+for narrow DOM integration such as diagnostics or third-party widgets; prefer
+remark/rehype plugins and renderer `components` when the transformation can be
+expressed structurally.
+
+## Diagnostics providers
+
+Language services remain consumer-owned and plug into the ordinary CodeMirror
+extension hook. For example, a local rule can return diagnostics without
+introducing a vault index or worker lifecycle into Mira:
+
+```ts
+import { linter } from "@codemirror/lint";
+import { defineMiraExtension } from "@mira-mde/extensions";
+
+export const diagnosticsExtension = defineMiraExtension({
+  name: "team-diagnostics",
+  codeMirror: () =>
+    linter((view) => {
+      const diagnostics = [];
+      const match = /\bTODO\b/g;
+
+      for (const result of view.state.doc.toString().matchAll(match)) {
+        const from = result.index;
+        diagnostics.push({
+          from,
+          to: from + result[0].length,
+          severity: "warning",
+          message: "Replace TODO with an owned follow-up.",
+        });
+      }
+
+      return diagnostics;
+    }),
+});
+```

@@ -2,6 +2,7 @@
   import type {
     MiraAssetResolver,
     MiraFileAdapter,
+    MiraResolvedListCallout,
     MiraLinkResolver,
     MiraRendererComponents,
   } from "@mira-mde/extensions";
@@ -20,6 +21,7 @@
     linkResolver?: MiraLinkResolver;
     assetResolver?: MiraAssetResolver;
     fileAdapter?: MiraFileAdapter;
+    listCallouts?: MiraResolvedListCallout[];
     postProcess?: MarkdownPostProcess;
     onChange?: MarkdownChangeHandler;
     onFrontmatterChange?: (nextYaml: string, nextValue: string) => void;
@@ -45,6 +47,7 @@
     linkResolver,
     assetResolver,
     fileAdapter,
+    listCallouts = [],
     postProcess = () => {},
     onChange,
     onFrontmatterChange,
@@ -68,6 +71,7 @@
     linkResolver: undefined,
     assetResolver: undefined,
     fileAdapter: undefined,
+    listCallouts: [],
     postProcess: () => {},
     onChange: undefined,
     onFrontmatterChange: undefined,
@@ -87,6 +91,7 @@
     context.linkResolver = linkResolver;
     context.assetResolver = assetResolver;
     context.fileAdapter = fileAdapter;
+    context.listCallouts = listCallouts;
     context.postProcess = postProcess;
     context.onChange = onChange;
     context.onFrontmatterChange = onFrontmatterChange;

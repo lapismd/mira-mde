@@ -1,16 +1,22 @@
 <script lang="ts">
   import { MarkdownPreview } from "@mira-mde/preview";
   import { mermaidExtension } from "@mira-mde/plugin-mermaid";
+  import type { MiraExtension } from "@mira-mde/extensions";
   import { storyFileAdapter } from "./file-adapter";
 
   type Props = {
     value: string;
     sourcePath?: string;
+    extensions?: MiraExtension[];
   };
 
-  let { value, sourcePath = "story.md" }: Props = $props();
+  let {
+    value,
+    sourcePath = "story.md",
+    extensions: contributedExtensions = [],
+  }: Props = $props();
 
-  const extensions = [mermaidExtension()];
+  const extensions = $derived([mermaidExtension(), ...contributedExtensions]);
 </script>
 
 <div class="mira-story-surface mira-story-surface--preview">

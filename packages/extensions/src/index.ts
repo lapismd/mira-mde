@@ -12,6 +12,12 @@ export type MiraRendererComponent =
 
 export type MiraRendererComponents = Record<string, MiraRendererComponent>;
 
+export type MiraMarkdownPostProcessor = (
+  contentEl: HTMLElement,
+  node: unknown,
+  parent: unknown | null,
+) => void | (() => void);
+
 export type MiraTheme = "obsidian" | "system" | "light" | "dark" | "inherit";
 
 export type MiraThemeConfig = {
@@ -364,6 +370,66 @@ export type MiraMarkdownAuthoringConfig = {
   inputHandlers?: boolean | MiraMarkdownInputHandlerConfig;
 };
 
+export type MiraListCallout = {
+  char: string;
+  color?: string;
+  icon?: string;
+  enabled?: boolean;
+  renderMarker?: MiraListCalloutMarkerRenderer;
+};
+
+export type MiraResolvedListCallout = Omit<MiraListCallout, "color"> & {
+  color: string;
+};
+
+export type MiraListCalloutMarkerRenderer = (
+  element: HTMLElement,
+  callout: MiraResolvedListCallout,
+) => void | (() => void);
+
+export const defaultMiraListCallouts: readonly MiraResolvedListCallout[] = [
+  { color: "255, 214, 0", char: "&" },
+  { color: "255, 145, 0", char: "?" },
+  { color: "255, 23, 68", char: "!" },
+  { color: "124, 77, 255", char: "~" },
+  { color: "0, 184, 212", char: "@", icon: "book-open" },
+  { color: "0, 200, 83", char: "$" },
+  { color: "158, 158, 158", char: "%" },
+];
+
+export function resolveMiraListCallouts(
+  contributions: readonly MiraListCallout[] = [],
+): MiraResolvedListCallout[] {
+  const callouts = new Map(
+    defaultMiraListCallouts.map(
+      (callout) => [callout.char, { ...callout }] as const,
+    ),
+  );
+
+  for (const contribution of contributions) {
+    const char = contribution.char.trim();
+    if (!char) {
+      continue;
+    }
+    if (contribution.enabled === false) {
+      callouts.delete(char);
+      continue;
+    }
+
+    const current = callouts.get(char);
+    callouts.set(char, {
+      ...current,
+      ...contribution,
+      char,
+      color: contribution.color?.trim() || current?.color || "127, 127, 127",
+    });
+  }
+
+  return Array.from(callouts.values(), ({ enabled: _enabled, ...callout }) => ({
+    ...callout,
+  }));
+}
+
 export type MiraFileAdapter = {
   resolveLink: (
     target: MiraFileTarget,
@@ -428,6 +494,8 @@ export type MiraExtension = {
   slashCommands?: MiraSlashCommand[];
   blockActions?: MiraBlockAction[];
   toolbarItems?: MiraToolbarItem[];
+  listCallouts?: MiraListCallout[];
+  postProcessors?: MiraMarkdownPostProcessor[];
   styles?: MiraExtensionStyle[];
   onMount?: (context: MiraExtensionRuntimeContext) => void | (() => void);
 };
@@ -442,6 +510,8 @@ export type ResolvedMiraExtensions = {
   slashCommands: MiraSlashCommand[];
   blockActions: MiraBlockAction[];
   toolbarItems: MiraToolbarItem[];
+  listCallouts: MiraListCallout[];
+  postProcessors: MiraMarkdownPostProcessor[];
   styles: MiraExtensionStyle[];
   onMount: NonNullable<MiraExtension["onMount"]>[];
 };
@@ -461,6 +531,8 @@ export function emptyResolvedMiraExtensions(): ResolvedMiraExtensions {
     slashCommands: [],
     blockActions: [],
     toolbarItems: [],
+    listCallouts: [],
+    postProcessors: [],
     styles: [],
     onMount: [],
   };
@@ -486,6 +558,8 @@ export function resolveMiraExtensions(
     resolved.slashCommands.push(...(extension.slashCommands ?? []));
     resolved.blockActions.push(...(extension.blockActions ?? []));
     resolved.toolbarItems.push(...(extension.toolbarItems ?? []));
+    resolved.listCallouts.push(...(extension.listCallouts ?? []));
+    resolved.postProcessors.push(...(extension.postProcessors ?? []));
     resolved.styles.push(...(extension.styles ?? []));
     if (extension.onMount) {
       resolved.onMount.push(extension.onMount);

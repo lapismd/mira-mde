@@ -98,10 +98,36 @@ describe("Lapis preview parity plugins", () => {
     expect(items[0]?.properties?.class).toContain("lc-list-callout");
     expect(items[0]?.properties?.["data-callout"]).toBe("&");
     expect(items[1]?.properties?.["data-callout"]).toBe("?");
-    expect(markers.map((marker) => marker.children[0])).toMatchObject([
-      { value: "&" },
-      { value: "?" },
+    expect(
+      markers.map((marker) => marker.properties?.["data-callout-char"]),
+    ).toEqual(["&", "?"]);
+  });
+
+  it("renders an injected list callout catalog and can disable defaults", () => {
+    const parser = createParser([
+      remarkGfm,
+      [
+        remarkListCallouts,
+        {
+          callouts: [
+            { char: "&", enabled: false },
+            { char: "^", color: "80, 70, 220", icon: "bookmark" },
+          ],
+        },
+      ],
     ]);
+    const ast = parser("- & Plain item\n- ^ Custom item") as Root;
+    const items = findElements(ast, "li");
+    const marker = findElements(ast, "span").find(
+      (element) => element.properties?.["data-list-callout-marker"] === "true",
+    );
+
+    expect(String(items[0]?.properties?.class ?? "")).not.toContain(
+      "lc-list-callout",
+    );
+    expect(items[1]?.properties?.["data-callout"]).toBe("^");
+    expect(items[1]?.properties?.style).toContain("80, 70, 220");
+    expect(marker?.properties?.["data-callout-icon"]).toBe("bookmark");
   });
 });
 

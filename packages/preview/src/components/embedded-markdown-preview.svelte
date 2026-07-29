@@ -38,6 +38,7 @@
         linkResolver={markdown.linkResolver}
         assetResolver={markdown.assetResolver}
         fileAdapter={markdown.fileAdapter}
+        listCallouts={markdown.listCallouts}
         postProcess={markdown.postProcess}
         {frontmatterOpen}
         frontmatterConfig={markdown.frontmatterConfig}

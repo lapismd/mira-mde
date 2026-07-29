@@ -9,6 +9,7 @@
     "at-sign",
     "binary",
     "bookmark",
+    "book-open",
     "braces",
     "brackets",
     "bug",
@@ -202,6 +203,14 @@
     />
   {:else if icon === "bookmark"}
     <path d="M19 21 12 17 5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2Z" />
+  {:else if icon === "book-open"}
+    <path d="M12 7v14" />
+    <path
+      d="M3 18a1 1 0 0 1-1-1V5a2 2 0 0 1 2-2h5a3 3 0 0 1 3 3v15a3 3 0 0 0-3-3Z"
+    />
+    <path
+      d="M21 18a1 1 0 0 0 1-1V5a2 2 0 0 0-2-2h-5a3 3 0 0 0-3 3v15a3 3 0 0 1 3-3Z"
+    />
   {:else}
     <circle cx="12" cy="12" r="10" />
     <path d="M12 16v-4" />

@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { EditorView } from "@codemirror/view";
+import { defineMiraExtension } from "@mira-mde/extensions";
 import { createRichEditorExtensions } from ".";
 
 describe("createRichEditorExtensions", () => {
@@ -28,5 +30,35 @@ describe("createRichEditorExtensions", () => {
     // indent guides, and live-preview editor attributes.
     expect(sourceMode.length).toBeGreaterThan(0);
     expect(sourceMode.length).toBeLessThan(livePreview.length);
+  });
+
+  it("uses list-callout contributions from Mira extensions", async () => {
+    const parent = document.createElement("div");
+    document.body.append(parent);
+    const view = new EditorView({
+      doc: "- ^ Decision\n- % Plain",
+      extensions: [
+        createRichEditorExtensions({
+          extensions: [
+            defineMiraExtension({
+              name: "list-callouts",
+              listCallouts: [
+                { char: "^", color: "99, 102, 241" },
+                { char: "%", enabled: false },
+              ],
+            }),
+          ],
+        }),
+      ],
+      parent,
+    });
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+
+    expect(parent.querySelector(".cm-line[data-callout='^']")).not.toBeNull();
+    expect(parent.querySelector(".cm-line[data-callout='%']")).toBeNull();
+    expect(parent.querySelector("[data-callout-char='^']")).not.toBeNull();
+
+    view.destroy();
+    parent.remove();
   });
 });

@@ -6,6 +6,7 @@ import {
   markdownPreviewDocsSource,
 } from "../_shared/docs-source";
 import { mermaidMarkdownFeature } from "../fixtures";
+import MermaidDialogStory from "./MermaidDialogStory.svelte";
 
 const meta = {
   title: "Markdown/Mermaid",
@@ -74,4 +75,12 @@ export const SourceMode: Story = {
       },
     },
   },
+};
+
+export const DialogControls: Story = {
+  name: "Dialog controls",
+  render: () => ({
+    Component: MermaidDialogStory,
+  }),
+  tags: ["visual-pending"],
 };

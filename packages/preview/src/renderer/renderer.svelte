@@ -38,7 +38,10 @@
         `directive:${astNode.properties["data-directive"]}`
       ] !== undefined
       ? `directive:${astNode.properties["data-directive"]}`
-      : tagName,
+      : astNode.type === "element" &&
+          astNode.properties?.["data-list-callout-marker"] === "true"
+        ? "listcalloutmarker"
+        : tagName,
   );
   const Component = $derived(
     resolveComponent(markdown.components, componentKey),
@@ -61,9 +64,12 @@
 
   $effect(() => {
     if (contentEl) {
-      untrack(() => {
-        markdown.postProcess?.(contentEl as HTMLElement, astNode, parent);
-      });
+      const postProcess = markdown.postProcess;
+      const currentNode = astNode;
+      const currentParent = parent;
+      return untrack(() =>
+        postProcess?.(contentEl as HTMLElement, currentNode, currentParent),
+      );
     }
   });
 </script>

@@ -4,6 +4,7 @@ import type {
   MiraFileAdapter,
   MiraLinkResolver,
   MiraRendererComponents,
+  MiraResolvedListCallout,
 } from "@mira-mde/extensions";
 import type {
   HastNode,
@@ -27,6 +28,7 @@ export type MarkdownContext = {
   linkResolver?: MiraLinkResolver;
   assetResolver?: MiraAssetResolver;
   fileAdapter?: MiraFileAdapter;
+  listCallouts: MiraResolvedListCallout[];
   postProcess: MarkdownPostProcess;
   onChange?: MarkdownChangeHandler;
   onFrontmatterChange?: (nextYaml: string, nextValue: string) => void;

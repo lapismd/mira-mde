@@ -59,3 +59,25 @@ const fileAdapter = {
 
 Both subscriptions return an optional cleanup function. Consumers retain
 ownership of vault events, resource URLs, and persistence.
+
+## Narrow public surfaces
+
+Use the standalone surfaces when a consumer needs a rendered fragment, file
+card, or note link without mounting the full editor.
+
+```svelte
+<script lang="ts">
+  import { FileEmbed, MarkdownEmbed, NoteLink } from "@mira-mde/preview";
+</script>
+
+<NoteLink id="Embedded Note" text="portable note" {fileAdapter} />
+
+<FileEmbed id="Embedded Note#Next Steps" label="Next Steps" {fileAdapter} />
+
+<MarkdownEmbed value="## Embedded Markdown" />
+```
+
+All three accept the same portable resolvers, adapter, renderer components,
+extensions, list-callout catalog, and DOM postprocessor hooks as
+`MarkdownPreview`. `FileEmbed` also accepts `width` and `height` for sized asset
+embeds.

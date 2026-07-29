@@ -223,18 +223,24 @@
         variant="secondary"
         size="sm"
         class="zoom-in"
+        title="Zoom in"
+        aria-label="Zoom in"
         onclick={() => panZoomState.zoomIn()}><ZoomIn /></Button
       >
       <Button
         variant="secondary"
         size="sm"
         class="zoom-out"
+        title="Zoom out"
+        aria-label="Zoom out"
         onclick={() => panZoomState.zoomOut()}><ZoomOut /></Button
       >
       <Button
         variant="secondary"
         size="sm"
         class="up"
+        title="Pan up"
+        aria-label="Pan up"
         onclick={() => panZoomState.panBy({ x: 0, y: 100 })}
         ><ChevronUp /></Button
       >
@@ -242,6 +248,8 @@
         variant="secondary"
         size="sm"
         class="down"
+        title="Pan down"
+        aria-label="Pan down"
         onclick={() => panZoomState.panBy({ x: 0, y: -100 })}
         ><ChevronDown /></Button
       >
@@ -249,6 +257,8 @@
         variant="secondary"
         size="sm"
         class="left"
+        title="Pan left"
+        aria-label="Pan left"
         onclick={() => panZoomState.panBy({ x: 100, y: 0 })}
         ><ChevronLeft /></Button
       >
@@ -256,6 +266,8 @@
         variant="secondary"
         size="sm"
         class="right"
+        title="Pan right"
+        aria-label="Pan right"
         onclick={() => panZoomState.panBy({ x: -100, y: 0 })}
         ><ChevronRight /></Button
       >
@@ -263,6 +275,8 @@
         variant="secondary"
         size="sm"
         class="reset"
+        title="Reset view"
+        aria-label="Reset view"
         onclick={() => panZoomState.reset()}><Refresh /></Button
       >
     </div>

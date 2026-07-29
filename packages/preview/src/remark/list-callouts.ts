@@ -1,24 +1,23 @@
 import type { ListItem, Paragraph, Root, Text } from "mdast";
 import type { Plugin } from "unified";
 import { visit } from "unist-util-visit";
+import {
+  defaultMiraListCallouts,
+  resolveMiraListCallouts,
+  type MiraListCallout,
+  type MiraResolvedListCallout,
+} from "@mira-mde/extensions";
 
-export type ListCallout = {
-  char: string;
-  color: string;
-  icon?: string;
+export type ListCallout = MiraResolvedListCallout;
+
+export type RemarkListCalloutOptions = {
+  callouts?: readonly MiraListCallout[];
 };
 
-export const defaultListCallouts: readonly ListCallout[] = [
-  { color: "255, 214, 0", char: "&" },
-  { color: "255, 145, 0", char: "?" },
-  { color: "255, 23, 68", char: "!" },
-  { color: "124, 77, 255", char: "~" },
-  { color: "0, 184, 212", char: "@", icon: "book-open" },
-  { color: "0, 200, 83", char: "$" },
-  { color: "158, 158, 158", char: "%" },
-];
+export const defaultListCallouts: readonly ListCallout[] =
+  defaultMiraListCallouts;
 
-export const listCalloutMap = new Map(
+export const listCalloutMap = new Map<string, ListCallout>(
   defaultListCallouts.map((callout) => [callout.char, callout]),
 );
 
@@ -27,7 +26,15 @@ export const listCalloutMarkerRegexp = new RegExp(
   "u",
 );
 
-export const remarkListCallouts: Plugin<[], Root> = () => {
+export const remarkListCallouts: Plugin<[RemarkListCalloutOptions?], Root> = (
+  options = {},
+) => {
+  const callouts = resolveMiraListCallouts(options.callouts);
+  const calloutMap = new Map(
+    callouts.map((callout) => [callout.char, callout]),
+  );
+  const markerRegexp = createListCalloutMarkerRegexp(callouts);
+
   return (tree) => {
     visit(tree, "listItem", (node: ListItem) => {
       const paragraph = node.children[0] as Paragraph | undefined;
@@ -40,9 +47,9 @@ export const remarkListCallouts: Plugin<[], Root> = () => {
         return;
       }
 
-      const match = listCalloutMarkerRegexp.exec(first.value);
+      const match = markerRegexp.exec(first.value);
       const marker = match?.[1];
-      const callout = marker ? listCalloutMap.get(marker) : undefined;
+      const callout = marker ? calloutMap.get(marker) : undefined;
       if (!match || !marker || !callout) {
         return;
       }
@@ -55,9 +62,11 @@ export const remarkListCallouts: Plugin<[], Root> = () => {
           hProperties: {
             className: "lc-list-marker",
             "aria-hidden": "true",
-            ...(callout.icon ? { "data-icon": callout.icon } : {}),
+            "data-list-callout-marker": "true",
+            "data-callout-char": callout.char,
+            ...(callout.icon ? { "data-callout-icon": callout.icon } : {}),
           },
-          hChildren: [{ type: "text", value: callout.char }],
+          hChildren: [],
         },
       } as unknown as Text;
 
@@ -83,7 +92,19 @@ export const remarkListCallouts: Plugin<[], Root> = () => {
   };
 };
 
-function escapeRegExp(value: string): string {
+export function createListCalloutMarkerRegexp(
+  callouts: readonly Pick<MiraListCallout, "char">[],
+): RegExp {
+  const markers = callouts
+    .map((callout) => callout.char.trim())
+    .filter(Boolean)
+    .sort((left, right) => right.length - left.length);
+  return markers.length
+    ? new RegExp(`^\\s*(${markers.map(escapeRegExp).join("|")})\\s+`, "u")
+    : /$a/u;
+}
+
+export function escapeRegExp(value: string): string {
   return value.replace(/[|\\{}()[\]^$+*?.]/g, "\\$&").replace(/-/g, "\\x2d");
 }
 

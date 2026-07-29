@@ -7,6 +7,7 @@ import {
 } from "../_shared/docs-source";
 import { embedsMarkdown } from "../fixtures";
 import AdapterInvalidationStory from "./AdapterInvalidationStory.svelte";
+import PortableSurfacesStory from "./PortableSurfacesStory.svelte";
 
 const meta = {
   title: "Markdown/Embeds",
@@ -80,4 +81,27 @@ export const AdapterInvalidation: Story = {
     Component: AdapterInvalidationStory,
   }),
   tags: ["visual-pending"],
+};
+
+export const PortableSurfaces: Story = {
+  name: "Portable public surfaces",
+  render: () => ({
+    Component: PortableSurfacesStory,
+  }),
+  tags: ["visual-pending"],
+  parameters: {
+    docs: {
+      source: {
+        language: "svelte",
+        type: "code",
+        code: `<script lang="ts">
+  import { FileEmbed, MarkdownEmbed, NoteLink } from "@mira-mde/preview";
+</script>
+
+<NoteLink id="Embedded Note" text="portable note" {fileAdapter} />
+<FileEmbed id="Embedded Note#Next Steps" {fileAdapter} />
+<MarkdownEmbed value="## Embedded Markdown" />`,
+      },
+    },
+  },
 };

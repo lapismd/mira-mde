@@ -37,6 +37,15 @@ describe("link parity plugins", () => {
     expect(embed?.properties?.text).toBe("Diagram");
   });
 
+  it("preserves compound embed labels and dimensions", () => {
+    const parser = createParser([remarkWikiLinks]);
+    const ast = parser("![[Image Asset|Diagram|320x180]]") as Root;
+    const embed = findElement(ast, "embed");
+
+    expect(embed?.properties?.id).toBe("Image Asset");
+    expect(embed?.properties?.text).toBe("Diagram|320x180");
+  });
+
   it("parses implicit local path links as pathlink elements", () => {
     const parser = createParser([remarkPathLinks]);
     const ast = parser("[Project Plan]") as Root;

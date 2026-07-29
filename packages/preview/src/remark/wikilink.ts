@@ -6,7 +6,8 @@ export const remarkWikiLinks: Plugin<[], Root> = () => {
   return (tree) =>
     splitTextNodes(tree, /(!?)\[\[([^\]\n]+)]]/g, (match) => {
       const isEmbed = match[1] === "!";
-      const [target = "", alias] = (match[2] ?? "").split("|", 2);
+      const [target = "", ...details] = (match[2] ?? "").split("|");
+      const alias = details.join("|") || undefined;
       const label = alias || target;
 
       return {

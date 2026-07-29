@@ -2,6 +2,7 @@ import type {
   MiraAssetResolver,
   MiraExtension,
   MiraFileAdapter,
+  MiraListCallout,
   MiraLinkResolver,
   MiraBlockAction,
 } from "@mira-mde/extensions";
@@ -19,6 +20,7 @@ export type MiraRichEditorOptions = {
   fileAdapter?: MiraFileAdapter;
   frontmatterOpen?: boolean;
   frontmatterConfig?: unknown;
+  listCallouts?: MiraListCallout[];
   onChange?: (
     replacement: string,
     from: number,

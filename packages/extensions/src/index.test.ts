@@ -5,12 +5,14 @@ import {
   createMiraCommandKeymap,
   createMarkdownTemplate,
   createSlashSnippet,
+  defaultMiraListCallouts,
   defineMiraExtension,
   executeMiraCommand,
   isMiraCommandEnabled,
   mountMiraExtensionStyles,
   parseMiraFileTarget,
   resolveMiraExtensions,
+  resolveMiraListCallouts,
 } from ".";
 
 describe("resolveMiraExtensions", () => {
@@ -106,6 +108,35 @@ describe("resolveMiraExtensions", () => {
       "duplicate",
       "ask-ai",
     ]);
+  });
+
+  it("merges list callouts and postprocessors in extension order", () => {
+    const firstProcessor = vi.fn();
+    const secondProcessor = vi.fn();
+    const resolved = resolveMiraExtensions(
+      [
+        defineMiraExtension({
+          name: "first",
+          listCallouts: [{ char: "^", color: "80, 70, 220" }],
+          postProcessors: [firstProcessor],
+        }),
+        defineMiraExtension({
+          name: "second",
+          listCallouts: [{ char: "@", color: "20, 160, 140" }],
+          postProcessors: [secondProcessor],
+        }),
+      ],
+      {
+        mode: "preview",
+        readonly: true,
+      },
+    );
+
+    expect(resolved.listCallouts.map((callout) => callout.char)).toEqual([
+      "^",
+      "@",
+    ]);
+    expect(resolved.postProcessors).toEqual([firstProcessor, secondProcessor]);
   });
 });
 
@@ -241,6 +272,28 @@ describe("portable file targets", () => {
       fragment: undefined,
     });
     expect(parseMiraFileTarget("notes/plan.md#").fragment).toBeUndefined();
+  });
+});
+
+describe("portable list callout catalogs", () => {
+  it("overrides, disables, and appends markers without mutating defaults", () => {
+    const callouts = resolveMiraListCallouts([
+      { char: "@", color: "20, 160, 140", icon: "bookmark" },
+      { char: "%", enabled: false },
+      { char: "^", color: "80, 70, 220" },
+    ]);
+
+    expect(callouts.find((callout) => callout.char === "@")).toEqual({
+      char: "@",
+      color: "20, 160, 140",
+      icon: "bookmark",
+    });
+    expect(callouts.some((callout) => callout.char === "%")).toBe(false);
+    expect(callouts.at(-1)).toEqual({
+      char: "^",
+      color: "80, 70, 220",
+    });
+    expect(defaultMiraListCallouts).toHaveLength(7);
   });
 });
 

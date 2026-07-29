@@ -1,4 +1,5 @@
 import type { MiraRendererComponents } from "@mira-mde/extensions";
+import type { MiraMarkdownPostProcessor } from "@mira-mde/extensions";
 import type {
   Root as HastRoot,
   Element,
@@ -23,11 +24,7 @@ export type HastNode =
 export type HastProperties = Record<string, unknown>;
 export type Parser = (md: string) => HastNode;
 
-export type MarkdownPostProcess = (
-  contentEl: HTMLElement,
-  node: HastNode,
-  parent: HastNode | null,
-) => void;
+export type MarkdownPostProcess = MiraMarkdownPostProcessor;
 
 export type MarkdownChangeHandler = (
   replacement: string,

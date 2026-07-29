@@ -93,6 +93,14 @@ export const listsMarkdown = String.raw`# Lists
    - Wrapped list content stays aligned with the item body.
 `;
 
+export const listCalloutsMarkdown = String.raw`# List callouts
+
+- & Highlighted with the default catalog
+- @ Documentation uses the default book icon
+- ^ A custom decision marker contributed by an extension
+- % This disabled default stays a plain list item
+`;
+
 export const taskStatesMarkdown = String.raw`# Task states
 
 - [ ] Draft the docs

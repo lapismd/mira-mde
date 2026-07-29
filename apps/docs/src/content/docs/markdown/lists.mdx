@@ -33,3 +33,32 @@ The editor applies a deterministic authored-column fallback before layout, then
 measures visible list, quote, and plain-indent prefixes in pixels. This keeps
 wrapped rows aligned with their content even when ordered markers, tabs, or the
 active font change width.
+
+## Configurable list callouts
+
+List callout markers are extension contributions, so one catalog is shared by
+reading and live-preview modes. Built-ins can be overridden or disabled and
+custom markers can be appended without bringing persistence or a settings
+screen into Mira.
+
+```ts
+import { defineMiraExtension } from "@mira-mde/extensions";
+
+export const listCallouts = defineMiraExtension({
+  name: "team-list-callouts",
+  listCallouts: [
+    { char: "^", color: "99, 102, 241" },
+    { char: "@", color: "20, 160, 140", icon: "book-open" },
+    { char: "%", enabled: false },
+  ],
+});
+```
+
+```svelte
+<MiraDefaultMde bind:value extensions={[listCallouts]} />
+```
+
+Consumers with an existing icon registry can provide `renderMarker(element,
+callout)` on a catalog item and return an optional cleanup function. Store and
+edit the catalog in the host application; Mira only renders the supplied
+configuration.
