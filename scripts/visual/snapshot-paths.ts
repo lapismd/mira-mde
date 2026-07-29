@@ -5,7 +5,7 @@
  *   importPath: ./stories/markdown/callouts/Callouts.stories.svelte
  *   storyId:    markdown-callouts--preview
  *   →           markdown/callouts/preview.png
- * Playwright then appends `-chromium-darwin`.
+ * Playwright then appends `-chromium` (browser only; no OS suffix).
  */
 
 export type StoryIndexEntry = {
@@ -44,16 +44,15 @@ export function screenshotRelativePath(entry: StoryIndexEntry): string {
 }
 
 /**
- * Nested path after Playwright appends `-{project}-{platform}` before `.png`.
- * Defaults match the chromium/darwin layout used in this repo.
+ * Nested path after Playwright appends `-{project}` before `.png`.
+ * Defaults match the chromium layout used in this repo.
  */
 export function nestedSnapshotFileName(
   entry: StoryIndexEntry,
   project = "chromium",
-  platform: NodeJS.Platform | string = "darwin",
 ): string {
   const rel = screenshotRelativePath(entry);
-  return rel.replace(/\.png$/, `-${project}-${platform}.png`);
+  return rel.replace(/\.png$/, `-${project}.png`);
 }
 
 /** Storybook story-id prefix for `-g` filtering, e.g. `markdown-callouts--`. */
@@ -74,7 +73,7 @@ export function storyIdPrefixFromStoryId(storyId: string): string {
   return `${head}--`;
 }
 
-/** Component folder match for nested keys like `markdown/callouts/foo-chromium-darwin.png`. */
+/** Component folder match for nested keys like `markdown/callouts/foo-chromium.png`. */
 export function snapshotKeyMatchesComponent(
   key: string,
   component: string,

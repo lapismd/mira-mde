@@ -16,17 +16,16 @@ export { PLAYWRIGHT_PASS_THRESHOLD_PERCENT };
 
 export const VISUAL_SNAPSHOT_DIR = "tests/visual/storybook.spec.ts-snapshots";
 
-/** Absolute path to the on-disk baseline PNG for a story (chromium + host platform). */
+/** Absolute path to the on-disk baseline PNG for a story (chromium). */
 export function baselinePngPath(
   entry: StoryIndexEntry,
   packageRoot: string,
   project = "chromium",
-  platform: NodeJS.Platform = process.platform,
 ): string {
   return path.join(
     packageRoot,
     VISUAL_SNAPSHOT_DIR,
-    nestedSnapshotFileName(entry, project, platform),
+    nestedSnapshotFileName(entry, project),
   );
 }
 
@@ -59,11 +58,8 @@ export function sidecarPathForEntry(
   entry: StoryIndexEntry,
   packageRoot: string,
   project = "chromium",
-  platform: NodeJS.Platform = process.platform,
 ): string {
-  return sidecarJsonPath(
-    baselinePngPath(entry, packageRoot, project, platform),
-  );
+  return sidecarJsonPath(baselinePngPath(entry, packageRoot, project));
 }
 
 export function writeVisualDiffSidecar(
@@ -122,7 +118,6 @@ export function loadSidecarForStoryId(
   storyId: string,
   packageRoot: string,
   project = "chromium",
-  platform: NodeJS.Platform = process.platform,
 ): VisualDiffSidecar | null {
   const indexPath = path.join(packageRoot, "storybook-static", "index.json");
   try {
@@ -132,7 +127,7 @@ export function loadSidecarForStoryId(
     const entry = index.entries?.[storyId];
     if (!entry?.importPath) return null;
     return readVisualDiffSidecar(
-      sidecarPathForEntry(entry, packageRoot, project, platform),
+      sidecarPathForEntry(entry, packageRoot, project),
     );
   } catch {
     return null;

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { untrack } from "svelte";
   import type { Component as SvelteComponent } from "svelte";
-  import Renderer from "./renderer.svelte";
+  import RendererChild from "./renderer.svelte";
   import {
     type AstNodeContext,
     getNodeRenderKey,
@@ -76,7 +76,7 @@
 
 {#if astNode.type === "root"}
   {#each children as child, index (getNodeRenderKey(child, markdown.markdown, index))}
-    <Renderer astNode={child} parent={astNode} />
+    <RendererChild astNode={child} parent={astNode} />
   {/each}
 {:else if astNode.type === "element"}
   {#if typeof Component === "string"}
@@ -90,13 +90,13 @@
         {...properties}
       >
         {#each children as child, index (getNodeRenderKey(child, markdown.markdown, index))}
-          <Renderer astNode={child} parent={astNode} />
+          <RendererChild astNode={child} parent={astNode} />
         {/each}
       </svelte:element>
     {:else}
       <svelte:element this={Component} bind:this={contentEl} {...properties}>
         {#each children as child, index (getNodeRenderKey(child, markdown.markdown, index))}
-          <Renderer astNode={child} parent={astNode} />
+          <RendererChild astNode={child} parent={astNode} />
         {/each}
       </svelte:element>
     {/if}
@@ -109,7 +109,7 @@
       {...properties}
     >
       {#each children as child, index (getNodeRenderKey(child, markdown.markdown, index))}
-        <Renderer astNode={child} parent={astNode} />
+        <RendererChild astNode={child} parent={astNode} />
       {/each}
     </ResolvedComponent>
   {/if}

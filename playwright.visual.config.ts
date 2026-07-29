@@ -20,6 +20,8 @@ export default defineConfig({
         : "all"
       : "none",
   reporter: [["list"], ["html", { open: "never" }]],
+  snapshotPathTemplate:
+    "{testDir}/{testFilePath}-snapshots/{arg}-{projectName}{ext}",
   timeout: 60_000,
   expect: {
     toHaveScreenshot: {

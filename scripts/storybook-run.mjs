@@ -1,19 +1,15 @@
 #!/usr/bin/env node
 /**
- * Start Storybook and restart it when Visual Delta manager/panel source
- * (or related .storybook Vite plugins) change.
+ * Start Storybook and restart it when Mira .storybook manager / visual wiring
+ * files change.
  *
  * Why not rely on Vite HMR alone: Storybook's manager builder is a one-shot
  * esbuild bundle with no watch. Preview overlay edits still HMR via Vite
- * (see watchVisualDeltaSourcePlugin in .storybook/main.ts).
- *
- * The catalog loads the addon from package `src/` via
- * `.storybook/visual-delta-preset.ts` (not the node_modules package name).
+ * through the packaged Visual Delta preset.
  */
 import { spawn, execSync } from "node:child_process";
 import { watch, readFileSync, existsSync, statSync } from "node:fs";
 import { createHash } from "node:crypto";
-import { createRequire } from "node:module";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
@@ -28,29 +24,12 @@ const RESTART_DEBOUNCE_MS = 500;
 /** Ignore watch events while Storybook is still booting (avoids FSEvents noise). */
 const STARTUP_GRACE_MS = 10000;
 
-const require = createRequire(import.meta.url);
-const visualDeltaRoot = path.dirname(
-  require.resolve("storybook-addon-visual-delta/package.json"),
-);
-const visualDeltaSrc = path.join(visualDeltaRoot, "src");
-
 /**
  * Paths whose edits require a full Storybook process restart (manager /
  * middleware). Do not watch `.storybook/main.ts` — loading it can emit
  * spurious FSEvents on macOS and loop restarts.
  */
 const restartWatchPaths = [
-  path.join(visualDeltaSrc, "manager.tsx"),
-  path.join(visualDeltaSrc, "manager"),
-  path.join(visualDeltaSrc, "panel"),
-  path.join(visualDeltaSrc, "constants.ts"),
-  path.join(visualDeltaSrc, "types.ts"),
-  path.join(visualDeltaSrc, "visual-diff-sidecar.ts"),
-  path.join(visualDeltaSrc, "shared"),
-  path.join(visualDeltaSrc, "preset.ts"),
-  path.join(root, ".storybook/visual-delta-middleware.ts"),
-  path.join(root, ".storybook/visual-delta-preset.ts"),
-  path.join(root, ".storybook/visual-baseline-vite-plugin.ts"),
   path.join(root, ".storybook/visual-baseline-design.ts"),
   path.join(root, ".storybook/manager.ts"),
   path.join(root, ".storybook/manager-stacked-badges.ts"),
@@ -251,6 +230,6 @@ for (const sig of ["SIGINT", "SIGTERM"]) {
 }
 
 console.log(
-  `[storybook-run] watching Visual Delta manager/panel + related .storybook files; UI at http://localhost:${port}`,
+  `[storybook-run] watching Mira .storybook manager/visual wiring; UI at http://localhost:${port}`,
 );
 void startStorybook();

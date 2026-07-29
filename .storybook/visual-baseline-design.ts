@@ -5,7 +5,7 @@
 
 import { snapshotDirFromImportPath } from "../scripts/visual/snapshot-paths.ts";
 
-export const VISUAL_BASELINE_SUFFIX = "-chromium-darwin";
+export const VISUAL_BASELINE_SUFFIX = "-chromium";
 
 export type BaselineStoryRef = {
   title?: string;

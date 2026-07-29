@@ -132,8 +132,9 @@ preview, and the default editor shell around them.
   message descriptive enough for review context rather than using a terse label.
 - Root Storybook catalog: `pnpm storybook` on port **7007** (override with
   `STORYBOOK_PORT`). Use `pnpm storybook:restart` to kill stale listeners and
-  start fresh. Manager / Visual Delta source edits need a process restart
-  (`scripts/storybook-run.mjs` watches those paths). Visual gate:
+  start fresh. Manager / Visual Delta host wiring edits need a process restart
+  (`scripts/storybook-run.mjs` watches those paths). Addon package:
+  `@lapismd/storybook-addon-visual-delta`. Visual gate:
   `pnpm storybook:check` (`build-storybook` + `test:visual`).
 
 ## Verification

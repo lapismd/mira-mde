@@ -32,12 +32,12 @@ pnpm check:all
 
 ### Storybook
 
-Catalog lives at the repo root (port **7007**). Visual Delta manager edits
+Catalog lives at the repo root (port **7007**). Visual Delta host wiring edits
 trigger a full restart via the run wrapper (manager is a one-shot esbuild
-bundle).
+bundle). Addon: `@lapismd/storybook-addon-visual-delta`.
 
 ```sh
-pnpm storybook              # http://localhost:7007; restarts on Visual Delta / manager edits
+pnpm storybook              # http://localhost:7007; restarts on manager / visual wiring edits
 pnpm storybook:restart      # kill listeners on 7007 (+ legacy 9009) and start fresh
 pnpm build-storybook        # static build → storybook-static/
 pnpm test:visual            # Playwright baselines against storybook-static
