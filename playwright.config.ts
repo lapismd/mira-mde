@@ -1,3 +1,16 @@
-import { defineVisualPlaywrightConfig } from "@lapismd/storybook-addon-visual-delta/playwright";
+import {
+  defineVisualPlaywrightConfig,
+  visualPlaywrightWebServer,
+} from "@lapismd/storybook-addon-visual-delta/playwright";
 
-export default defineVisualPlaywrightConfig({ port: 6007 });
+const port = 6007;
+
+export default defineVisualPlaywrightConfig({
+  port,
+  override: {
+    webServer: {
+      ...visualPlaywrightWebServer(port),
+      reuseExistingServer: true,
+    },
+  },
+});

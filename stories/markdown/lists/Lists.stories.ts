@@ -40,9 +40,21 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Preview: Story = {};
+export const Preview: Story = {
+  tags: ["visual-pending"],
+  parameters: {
+    visualDelta: {
+      images: ["/visual-baselines/stories/markdown/lists/preview-chromium.png"],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
+  },
+};
 
 export const LivePreview: Story = {
+  tags: ["visual-pending"],
   name: "Live Preview",
   render: (args) => ({
     Component: EditorModeStory,
@@ -52,6 +64,15 @@ export const LivePreview: Story = {
     },
   }),
   parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/markdown/lists/live-preview-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
     docs: {
       source: {
         language: "html",
@@ -63,6 +84,7 @@ export const LivePreview: Story = {
 };
 
 export const SourceMode: Story = {
+  tags: ["visual-pending"],
   name: "Source Mode",
   render: (args) => ({
     Component: EditorModeStory,
@@ -72,6 +94,15 @@ export const SourceMode: Story = {
     },
   }),
   parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/markdown/lists/source-mode-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
     docs: {
       source: {
         language: "html",
@@ -90,6 +121,15 @@ export const CustomCalloutCatalog: Story = {
   },
   tags: ["visual-pending"],
   parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/markdown/lists/custom-callout-catalog-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
     docs: {
       source: {
         language: "ts",
@@ -112,6 +152,17 @@ export const CustomCalloutCatalog: Story = {
 };
 
 export const CustomCalloutCatalogLive: Story = {
+  parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/markdown/lists/custom-callout-catalog-live-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
+  },
   name: "Custom List Callout Catalog Live Preview",
   render: (args) => ({
     Component: EditorModeStory,

@@ -70,6 +70,16 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {
+  tags: ["visual-pending"],
+  parameters: {
+    visualDelta: {
+      images: ["/visual-baselines/stories/demo/playground-chromium.png"],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
+  },
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);
     const editor = canvasElement.querySelector<HTMLElement>(".mira-mde");
@@ -102,19 +112,73 @@ export const Playground: Story = {
 };
 
 export const LivePreview: Story = {
+  tags: ["visual-pending"],
+  parameters: {
+    visualDelta: {
+      images: ["/visual-baselines/stories/demo/live-preview-chromium.png"],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
+  },
   name: "Live Preview",
   args: { mode: "live-preview" },
 };
 
-export const Source: Story = { args: { mode: "source" } };
+export const Source: Story = {
+  tags: ["visual-pending"],
+  parameters: {
+    visualDelta: {
+      images: ["/visual-baselines/stories/demo/source-chromium.png"],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
+  },
+  args: { mode: "source" },
+};
 
 export const ReadingPreview: Story = {
+  tags: ["visual-pending"],
+  parameters: {
+    visualDelta: {
+      images: ["/visual-baselines/stories/demo/reading-preview-chromium.png"],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
+  },
   name: "Reading / Preview",
   args: { mode: "preview" },
 };
 
-export const Split: Story = { args: { mode: "split" } };
+export const Split: Story = {
+  tags: ["visual-pending"],
+  parameters: {
+    visualDelta: {
+      images: ["/visual-baselines/stories/demo/split-chromium.png"],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
+  },
+  args: { mode: "split" },
+};
 
 export const Composable: Story = {
+  tags: ["visual-pending"],
+  parameters: {
+    visualDelta: {
+      images: ["/visual-baselines/stories/demo/composable-chromium.png"],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
+  },
   args: { editorShell: "composable", mode: "live-preview" },
 };

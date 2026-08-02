@@ -33,6 +33,16 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Preview: Story = {
+  tags: ["visual-pending"],
+  parameters: {
+    visualDelta: {
+      images: ["/visual-baselines/stories/markdown/code/preview-chromium.png"],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
+  },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const writeText = fn(async (_value: string) => undefined);
@@ -51,6 +61,7 @@ export const Preview: Story = {
 };
 
 export const LivePreview: Story = {
+  tags: ["visual-pending"],
   name: "Live Preview",
   render: (args) => ({
     Component: EditorModeStory,
@@ -60,6 +71,15 @@ export const LivePreview: Story = {
     },
   }),
   parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/markdown/code/live-preview-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
     docs: {
       source: {
         language: "html",
@@ -71,6 +91,7 @@ export const LivePreview: Story = {
 };
 
 export const SourceMode: Story = {
+  tags: ["visual-pending"],
   name: "Source Mode",
   render: (args) => ({
     Component: EditorModeStory,
@@ -80,6 +101,15 @@ export const SourceMode: Story = {
     },
   }),
   parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/markdown/code/source-mode-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
     docs: {
       source: {
         language: "html",

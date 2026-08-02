@@ -49,6 +49,14 @@ policy are owned by the installed Visual Delta Playwright suite. The default
 `playwright.config.ts` is therefore reserved for Visual Delta; focused
 Storybook acceptance uses `playwright.storybook.config.ts`. Authoritative
 capture uses the addon's pinned profile and `nested-import` baseline layout.
+The add-on writes each committed baseline URL into the owning story's
+`parameters.visualDelta` metadata and marks regenerated stories
+`visual-pending`; Storybook MUST NOT infer a second URL scheme at preview time.
+The complete current catalog is a one-to-one set of 105 indexed stories, 105
+plugin-owned metadata entries, and 105 committed baseline images.
+`pnpm test:visual` invokes the affected preflight in the add-on's clean Docker
+stage; its deliberately missing cache produces a documented 105-story
+full-suite fallback before compare-only validation.
 
 ## Host and fixture ownership
 

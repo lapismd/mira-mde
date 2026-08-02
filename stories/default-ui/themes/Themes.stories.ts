@@ -27,13 +27,47 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Light: Story = {
+  tags: ["visual-pending"],
+  parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/default-ui/themes/light-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
+  },
   args: { theme: "light" },
 };
 
 export const Dark: Story = {
+  tags: ["visual-pending"],
+  parameters: {
+    visualDelta: {
+      images: ["/visual-baselines/stories/default-ui/themes/dark-chromium.png"],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
+  },
   args: { theme: "dark" },
 };
 
 export const Obsidian: Story = {
+  tags: ["visual-pending"],
+  parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/default-ui/themes/obsidian-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
+  },
   args: { theme: "obsidian" },
 };

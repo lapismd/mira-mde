@@ -34,9 +34,23 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Preview: Story = {};
+export const Preview: Story = {
+  tags: ["visual-pending"],
+  parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/markdown/tables/preview-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
+  },
+};
 
 export const LivePreview: Story = {
+  tags: ["visual-pending"],
   name: "Live Preview",
   render: (args) => ({
     Component: EditorModeStory,
@@ -46,6 +60,15 @@ export const LivePreview: Story = {
     },
   }),
   parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/markdown/tables/live-preview-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
     docs: {
       source: {
         language: "html",
@@ -71,6 +94,7 @@ export const LivePreview: Story = {
 };
 
 export const SourceMode: Story = {
+  tags: ["visual-pending"],
   name: "Source Mode",
   render: (args) => ({
     Component: EditorModeStory,
@@ -80,6 +104,15 @@ export const SourceMode: Story = {
     },
   }),
   parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/markdown/tables/source-mode-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
     docs: {
       source: {
         language: "html",

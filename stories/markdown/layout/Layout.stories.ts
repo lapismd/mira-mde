@@ -36,28 +36,96 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const LivePreview: Story = {
+  tags: ["visual-pending"],
+  parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/markdown/layout/live-preview-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
+  },
   name: "Live Preview",
   args: { mode: "live-preview" },
 };
 
 export const Source: Story = {
+  tags: ["visual-pending"],
+  parameters: {
+    visualDelta: {
+      images: ["/visual-baselines/stories/markdown/layout/source-chromium.png"],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
+  },
   args: { mode: "source" },
 };
 
 export const Preview: Story = {
+  tags: ["visual-pending"],
+  parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/markdown/layout/preview-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
+  },
   args: { mode: "preview" },
 };
 
 export const Split: Story = {
+  tags: ["visual-pending"],
+  parameters: {
+    visualDelta: {
+      images: ["/visual-baselines/stories/markdown/layout/split-chromium.png"],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
+  },
   args: { mode: "split" },
 };
 
 export const NarrowSource: Story = {
+  tags: ["visual-pending"],
+  parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/markdown/layout/narrow-source-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
+  },
   name: "Narrow Source Geometry",
   args: { mode: "source", width: "36rem" },
 };
 
 export const WideSource: Story = {
+  tags: ["visual-pending"],
+  parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/markdown/layout/wide-source-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
+  },
   name: "Wide Source Geometry",
   args: { mode: "source", width: "72rem" },
 };

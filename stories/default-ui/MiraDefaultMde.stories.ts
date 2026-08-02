@@ -30,5 +30,15 @@ type Story = StoryObj<typeof meta>;
 
 /** Interactive playground — Controls drive the public configuration props. */
 export const Playground: Story = {
+  tags: ["visual-pending"],
+  parameters: {
+    visualDelta: {
+      images: ["/visual-baselines/stories/default-ui/playground-chromium.png"],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
+  },
   name: "Playground",
 };

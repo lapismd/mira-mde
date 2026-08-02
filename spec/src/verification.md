@@ -1,8 +1,8 @@
 # Verification
 
 This matrix is both requirement traceability and the implementation progress
-artifact. Evidence marked **Planned** must be updated as the Storybook-only
-migration lands; existing package tests remain valid evidence where noted.
+artifact. The Storybook-only migration is complete; existing package tests
+remain valid evidence where noted and the gates below keep the matrix current.
 
 | Requirements                                                                                     | Evidence                                                          | Status                                |
 | ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------- | ------------------------------------- |
@@ -40,8 +40,22 @@ The 2026-08-02 canonical-host migration included an authorized full baseline
 regeneration because the addon's capture implementation and density superseded
 the repository's older custom 3x harness. Static Storybook builds also compile
 workspace packages first so the pinned clean capture environment cannot inherit
-local build output. The regenerated set is reviewed and validated in strict
-compare-only mode before delivery.
+local build output, and use the documented 4 GB heap ceiling required by the
+complete catalog. Visual runs reuse the addon's prewarmed static server in CI
+and locally. The regenerated set is reviewed and validated in strict
+compare-only mode before delivery. The obsolete pre-add-on baseline directories
+and preview-time URL mapper are removed after confirming all 105 indexed stories
+have plugin-owned images and metadata.
+
+The add-on's Docker stage excludes both `storybook-static` and its affected
+cache. The `test:visual` gate therefore uses the affected preflight to build in
+the pinned stage and deterministically fall back to all 105 stories; the direct
+`test --all` route would otherwise select zero stories before waiting on a
+missing static host.
+
+Every tested package owns an explicit Vitest configuration. In particular,
+`packages/core/vitest.config.ts` prevents its unit command from inheriting the
+root-only Storybook browser project during the full Turbo test gate.
 
 The portable parity audit recorded 59 present features, six consumer-adapter
 boundaries, six Lapis-only behaviors, and no remaining portable P0-P2 gaps at

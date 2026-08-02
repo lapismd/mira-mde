@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 /**
- * Start Storybook and restart it when Mira .storybook manager / visual wiring
- * files change.
+ * Start Storybook and restart it when Mira .storybook manager files change.
  *
  * Why not rely on Vite HMR alone: Storybook's manager builder is a one-shot
  * esbuild bundle with no watch. Preview overlay edits still HMR via Vite
@@ -30,7 +29,6 @@ const STARTUP_GRACE_MS = 10000;
  * spurious FSEvents on macOS and loop restarts.
  */
 const restartWatchPaths = [
-  path.join(root, ".storybook/visual-baseline-design.ts"),
   path.join(root, ".storybook/manager.ts"),
   path.join(root, ".storybook/manager-stacked-badges.ts"),
 ];

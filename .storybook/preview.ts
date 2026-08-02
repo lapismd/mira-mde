@@ -2,10 +2,6 @@ import type { Preview } from "@storybook/svelte-vite";
 import "@mira-mde/default-ui/styles.css";
 import "../stories/markdown/_shared/storybook.css";
 import { installFocusPrototypeGuard } from "./focus-prototype-guard";
-import {
-  baselineUrlForStory,
-  visualBaselineVisualDeltaParameter,
-} from "./visual-baseline-design";
 
 // Guard Storybook 10.5 focus instrumentation before Docs/react-aria wraps it.
 installFocusPrototypeGuard();
@@ -43,18 +39,6 @@ const preview: Preview = {
           "mira-theme-light",
           theme === "light",
         );
-      }
-
-      if (!context.parameters.visualDelta) {
-        const baseline = baselineUrlForStory({
-          title: context.title,
-          id: context.id,
-          tags: context.tags,
-        });
-        if (baseline) {
-          context.parameters.visualDelta =
-            visualBaselineVisualDeltaParameter(baseline);
-        }
       }
 
       return story();

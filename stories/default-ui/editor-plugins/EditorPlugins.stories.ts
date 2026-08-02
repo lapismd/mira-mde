@@ -189,6 +189,18 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const SlashCommands: Story = {
+  tags: ["visual-pending"],
+  parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/default-ui/editor-plugins/slash-commands-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
+  },
   name: "Slash Commands",
   args: {
     value: slashCommandsMarkdown,
@@ -209,6 +221,18 @@ export const SlashCommands: Story = {
 };
 
 export const CustomSlashSnippet: Story = {
+  tags: ["visual-pending"],
+  parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/default-ui/editor-plugins/custom-slash-snippet-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
+  },
   name: "Custom Slash Snippet",
   args: {
     value: slashCommandsMarkdown,
@@ -221,6 +245,18 @@ export const CustomSlashSnippet: Story = {
 };
 
 export const SlashAutocomplete: Story = {
+  tags: ["visual-pending"],
+  parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/default-ui/editor-plugins/slash-autocomplete-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
+  },
   name: "Slash Autocomplete UI",
   args: {
     value: slashCommandsMarkdown,
@@ -233,6 +269,18 @@ export const SlashAutocomplete: Story = {
 };
 
 export const BlockControls: Story = {
+  tags: ["visual-pending"],
+  parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/default-ui/editor-plugins/block-controls-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
+  },
   name: "Block Controls",
   args: {
     value: blockControlsMarkdown,
@@ -243,6 +291,18 @@ export const BlockControls: Story = {
 };
 
 export const FoldAndInlineHeadings: Story = {
+  tags: ["visual-pending"],
+  parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/default-ui/editor-plugins/fold-and-inline-headings-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
+  },
   name: "Fold And Inline Headings",
   args: {
     value: inlineHeadingsMarkdown,
@@ -253,6 +313,18 @@ export const FoldAndInlineHeadings: Story = {
 };
 
 export const ImageAttachments: Story = {
+  tags: ["visual-pending"],
+  parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/default-ui/editor-plugins/image-attachments-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
+  },
   name: "Image Attachments",
   args: {
     value: imageAttachmentsMarkdown,
@@ -272,6 +344,18 @@ export const ImageAttachments: Story = {
 };
 
 export const CustomToolbar: Story = {
+  tags: ["visual-pending"],
+  parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/default-ui/editor-plugins/custom-toolbar-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
+  },
   name: "Custom Toolbar",
   args: {
     value: blockControlsMarkdown,
@@ -289,6 +373,17 @@ export const CustomToolbar: Story = {
 };
 
 export const ExtensionContributions: Story = {
+  parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/default-ui/editor-plugins/extension-contributions-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
+  },
   name: "Extension Commands, Toolbar, And Styles",
   tags: ["visual-pending"],
   args: {
@@ -306,6 +401,17 @@ export const ExtensionContributions: Story = {
 };
 
 export const MarkdownAuthoring: Story = {
+  parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/default-ui/editor-plugins/markdown-authoring-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
+  },
   name: "Completions, Smart Paste, And Input Handlers",
   tags: ["visual-pending"],
   args: {
@@ -320,8 +426,20 @@ export const MarkdownAuthoring: Story = {
 };
 
 export const AiPlugin: Story = {
+  tags: ["visual-pending"],
   name: "AI Plugin",
-  parameters: catalogParameters("ai"),
+  parameters: {
+    ...catalogParameters("ai"),
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/default-ui/editor-plugins/ai-plugin-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
+  },
   args: {
     value: blockControlsMarkdown,
     extensions: [aiDemoExtension],

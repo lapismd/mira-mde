@@ -28,6 +28,18 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Defaults: Story = {
+  tags: ["visual-pending"],
+  parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/default-ui/features/defaults-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
+  },
   name: "Defaults",
   args: {
     features: {
@@ -42,6 +54,18 @@ export const Defaults: Story = {
 };
 
 export const WithoutToolbar: Story = {
+  tags: ["visual-pending"],
+  parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/default-ui/features/without-toolbar-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
+  },
   name: "Without Toolbar",
   args: {
     mode: "live-preview",
@@ -53,6 +77,18 @@ export const WithoutToolbar: Story = {
 };
 
 export const WithoutWidgets: Story = {
+  tags: ["visual-pending"],
+  parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/default-ui/features/without-widgets-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
+  },
   name: "Without Widgets",
   args: {
     mode: "live-preview",
@@ -67,6 +103,18 @@ export const WithoutWidgets: Story = {
 };
 
 export const EditModesOnly: Story = {
+  tags: ["visual-pending"],
+  parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/default-ui/features/edit-modes-only-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
+  },
   name: "Edit Modes Only",
   args: {
     mode: "live-preview",
@@ -80,6 +128,18 @@ export const EditModesOnly: Story = {
 };
 
 export const CompactToolbarItems: Story = {
+  tags: ["visual-pending"],
+  parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/default-ui/features/compact-toolbar-items-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
+  },
   name: "Compact Toolbar",
   args: {
     featureConfigs: {

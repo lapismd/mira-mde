@@ -27,15 +27,51 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Defaults: Story = {
+  tags: ["visual-pending"],
+  parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/default-ui/configuration/defaults-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
+  },
   name: "Defaults",
 };
 
 export const ReadonlyEditor: Story = {
+  tags: ["visual-pending"],
+  parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/default-ui/configuration/readonly-editor-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
+  },
   name: "Readonly",
   args: { readonly: true },
 };
 
 export const IndentationSettings: Story = {
+  tags: ["visual-pending"],
+  parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/default-ui/configuration/indentation-settings-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
+  },
   name: "Indentation",
   args: {
     indentGuides: true,
@@ -46,6 +82,18 @@ export const IndentationSettings: Story = {
 };
 
 export const ReadingOptionsSettings: Story = {
+  tags: ["visual-pending"],
+  parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/default-ui/configuration/reading-options-settings-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
+  },
   name: "Reading Options",
   args: {
     outline: true,
