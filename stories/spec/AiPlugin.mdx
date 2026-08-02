@@ -1,0 +1,10 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import SpecPage from "./SpecPage.svelte";
+import source from "../../spec/src/plugins/ai.md?raw";
+
+<Meta
+  title="Mira MDE/Specification/AI plugin"
+  parameters={{ layout: "fullscreen" }}
+/>
+
+<SpecPage source={source} sourcePath="plugins/ai.md" />

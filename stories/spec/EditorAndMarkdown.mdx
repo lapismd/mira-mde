@@ -1,0 +1,10 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import SpecPage from "./SpecPage.svelte";
+import source from "../../spec/src/editor-and-markdown.md?raw";
+
+<Meta
+  title="Mira MDE/Specification/Portable Markdown and editor"
+  parameters={{ layout: "fullscreen" }}
+/>
+
+<SpecPage source={source} sourcePath="editor-and-markdown.md" />

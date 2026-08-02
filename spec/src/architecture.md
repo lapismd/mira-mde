@@ -25,3 +25,7 @@ toward rendering, UI, plugins, and thin framework adapters.
 
 The root Storybook may compose every package for documentation and acceptance,
 but package source must not import Storybook-owned catalog data.
+
+The former `apps/demo` and `apps/docs` workspaces are retired. The root package
+owns Storybook development, static builds, and browser acceptance; the workspace
+contains publishable package families only.

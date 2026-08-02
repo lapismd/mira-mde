@@ -17,3 +17,11 @@ runtime dependency.
 
 Ordinary README prose points to Storybook and the specification. It must not
 become a parallel behavioral reference.
+
+## Host and fixture ownership
+
+The repository does not ship a separate documentation or demo application.
+`pnpm dev` starts the root Storybook, and `tests/storybook` targets published
+Storybook entries. `stories/demo/comprehensive-demo.md` is the full portable
+feature fixture; all four fixed view stories import that same file. Focused
+fixtures under `stories/markdown` remain the smaller debugging surfaces.

@@ -1,0 +1,10 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import SpecPage from "./SpecPage.svelte";
+import source from "../../spec/src/styling.md?raw";
+
+<Meta
+  title="Mira MDE/Specification/Styling and CSS tokens"
+  parameters={{ layout: "fullscreen" }}
+/>
+
+<SpecPage source={source} sourcePath="styling.md" />

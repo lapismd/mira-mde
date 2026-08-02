@@ -1,21 +1,20 @@
 import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
-  testDir: "apps/demo/e2e",
+  testDir: "tests/storybook",
   timeout: 30_000,
   expect: {
     timeout: 10_000,
   },
   use: {
-    baseURL: "http://127.0.0.1:4173",
+    baseURL: "http://127.0.0.1:7007",
     trace: "on-first-retry",
   },
   webServer: {
-    command:
-      "pnpm --filter @mira-mde/demo exec vite dev --host 127.0.0.1 --port 4173 --strictPort",
-    url: "http://127.0.0.1:4173",
+    command: "STORYBOOK_PORT=7007 pnpm storybook --ci",
+    url: "http://127.0.0.1:7007",
     reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
+    timeout: 180_000,
   },
   projects: [
     {

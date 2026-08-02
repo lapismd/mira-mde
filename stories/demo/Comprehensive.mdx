@@ -1,0 +1,32 @@
+import { Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Comprehensive.stories";
+
+<Meta of={Stories} />
+
+# Comprehensive demo
+
+This is Mira's canonical full-page playground. The focused stories below keep
+the content, adapter, Mermaid configuration, and layout constant while selecting
+one supported view, so mode-specific rendering can be debugged without first
+recreating the demo state.
+
+Normative behavior lives in the
+[portable Markdown and editor specification](?path=/docs/mira-mde-specification-portable-markdown-and-editor--docs#supported-surfaces).
+
+The fixture incorporates the portable portions of Lapis's Markdown Feature Tour.
+The separate [CodeMirror Layout Showcase](?path=/docs/markdown-layout--docs)
+remains the geometry-focused regression surface.
+
+## Playground
+
+<Canvas of={Stories.Playground} />
+
+## Fixed views
+
+<Canvas of={Stories.LivePreview} />
+
+<Canvas of={Stories.Source} />
+
+<Canvas of={Stories.ReadingPreview} />
+
+<Canvas of={Stories.Split} />

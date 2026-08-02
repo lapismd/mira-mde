@@ -8,9 +8,10 @@ export default tseslint.config(
     ignores: [
       "**/dist/**",
       "**/build/**",
-      "apps/docs/.astro/**",
       "**/test-results/**",
       "**/.svelte-kit/**",
+      "spec/book/**",
+      "storybook-static/**",
       "node_modules/**",
     ],
   },

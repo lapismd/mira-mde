@@ -16,7 +16,7 @@
     "check:format": "prettier . --check",
     "check:svelte": "turbo run check:svelte",
     "check:types": "turbo run check:types",
-    "dev": "turbo run dev --filter=@mira-mde/demo",
+    "dev": "pnpm storybook",
     "fmt": "prettier . --write",
     "lint": "eslint .",
     "storybook": "WATCHPACK_POLLING=250 node scripts/storybook-run.mjs --no-open",
@@ -28,7 +28,7 @@
     "spec:lint": "markdownlint-cli2 --config .markdownlint-cli2.jsonc",
     "spec:serve": "mdbook serve ./spec --open",
     "spec:test": "node --test ./scripts/check-spec-*.spec.mjs",
-    "spec:validate": "node ./scripts/check-spec-structure.mjs",
+    "spec:validate": "node ./scripts/check-spec-structure.mjs && node ./scripts/check-spec-storybook.mjs",
     "test": "turbo run test",
     "test:e2e": "playwright test",
     "test:visual": "playwright test -c playwright.visual.config.ts",
@@ -41,7 +41,8 @@
     "@mira-mde/extensions": "workspace:*",
     "@mira-mde/plugin-ai": "workspace:*",
     "@mira-mde/plugin-mermaid": "workspace:*",
-    "@mira-mde/preview": "workspace:*"
+    "@mira-mde/preview": "workspace:*",
+    "@mira-mde/svelte": "workspace:*"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
@@ -55,8 +56,6 @@
     "@storybook/addon-vitest": "^10.5.2",
     "@storybook/mcp": "0.8.0",
     "@storybook/svelte-vite": "^10.5.2",
-    "@sveltejs/adapter-auto": "^7.0.0",
-    "@sveltejs/kit": "^2.49.1",
     "@sveltejs/package": "^2.5.7",
     "@sveltejs/vite-plugin-svelte": "^6.2.1",
     "@types/node": "^24.10.2",

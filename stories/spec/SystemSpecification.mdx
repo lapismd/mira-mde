@@ -1,0 +1,10 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import SpecPage from "./SpecPage.svelte";
+import source from "../../spec/src/index.md?raw";
+
+<Meta
+  title="Mira MDE/Specification/System specification"
+  parameters={{ layout: "fullscreen" }}
+/>
+
+<SpecPage source={source} sourcePath="index.md" showBanner />

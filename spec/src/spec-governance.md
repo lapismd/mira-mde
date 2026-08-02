@@ -16,6 +16,11 @@ satisfy a plugin or package contract change.
 | MIRA-GOV-006 | Governance tooling MUST have regression tests and MUST fail closed when it cannot determine a trustworthy change set.                       |
 | MIRA-GOV-007 | Generated mdBook output MUST remain untracked.                                                                                              |
 
+`spec:validate` also enforces a one-to-one relationship between chapters
+indexed by `SUMMARY.md`, raw Markdown Storybook mirrors, and the internal-link
+registry. Mirror MDX files contain composition only; they do not copy normative
+prose.
+
 ## Change map
 
 | Protected area                                                         | Required chapter               |

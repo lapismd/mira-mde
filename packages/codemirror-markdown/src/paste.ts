@@ -1,4 +1,3 @@
-/// <reference path="./types.d.ts" />
 import remarkGridTable from "@adobe/remark-gridtables";
 import type { Extension } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";

@@ -26,3 +26,6 @@ cross-file property mutation, settings persistence, and sidebars are excluded.
 The Lapis Markdown Feature Tour and CodeMirror Layout Showcase are reference
 fixtures. Mira owns adapted Storybook copies with consumer-neutral paths and
 adapters.
+
+Portable parser type declarations are included through normal module imports so
+the package remains compatible with the repository TypeScript and lint gates.
