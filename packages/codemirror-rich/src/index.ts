@@ -200,13 +200,16 @@ export function createRichEditorExtensions(
     miraRichEditorTheme,
     codeBlockLineDecorations(),
     headingGutterExtension(),
+    headingLineDecorations(),
     resolvedOptions.indentGuides !== false
-      ? [indentGuideDecorations(), measuredIndentExtension()]
+      ? [indentGuideDecorations({ livePreview }), measuredIndentExtension()]
       : [],
+    // Lapis only mounts richEditor() for live-preview. Source keeps delimiters
+    // (`>`, backticks, fences) with HyperMD line classes only.
     livePreview ? blockPreviewDecorations(resolvedOptions) : [],
-    // Inline marks (code/strong/emphasis + hide ticks) run in source and live
-    // preview; replace widgets stay live-preview-only.
-    inlinePreviewDecorations({ ...resolvedOptions, livePreview }),
+    livePreview
+      ? inlinePreviewDecorations({ ...resolvedOptions, livePreview })
+      : [],
     foldIndicatorDecorations(),
     blockControlExtensions(resolvedOptions),
     livePreview
@@ -410,7 +413,7 @@ function buildInlinePreviewDecorations(
           Decoration.line({ class: fencedCodeLineClass }).range(line.from),
         );
       }
-      decorateHeadingLine(line.text, line.from, ranges);
+      // Heading line classes come from always-on headingLineDecorations().
       decorateFootnotes(line.text, line.from, ranges);
       if (replaceWidgets) {
         decorateListCallouts(
@@ -1019,7 +1022,7 @@ function decorateInlineMath(
   return absoluteRanges;
 }
 
-const headingLineDecorations = Array.from({ length: 6 }, (_, index) =>
+const headingLineDecorationMarks = Array.from({ length: 6 }, (_, index) =>
   Decoration.line({
     class: [
       "cm-header",
@@ -1030,16 +1033,30 @@ const headingLineDecorations = Array.from({ length: 6 }, (_, index) =>
   }),
 );
 
-function decorateHeadingLine(
-  text: string,
-  lineStart: number,
-  ranges: Range<Decoration>[],
-): void {
-  const match = text.match(/^(#{1,6})(?=\s)/);
-  if (!match?.[1]) {
-    return;
+function buildHeadingLineDecorations(state: EditorState): DecorationSet {
+  const ranges: Range<Decoration>[] = [];
+  for (let number = 1; number <= state.doc.lines; number += 1) {
+    const line = state.doc.line(number);
+    const match = line.text.match(/^(#{1,6})(?=\s)/);
+    if (match?.[1]) {
+      ranges.push(
+        headingLineDecorationMarks[match[1].length - 1]!.range(line.from),
+      );
+    }
   }
-  ranges.push(headingLineDecorations[match[1].length - 1]!.range(lineStart));
+  return Decoration.set(sortRanges(ranges));
+}
+
+function headingLineDecorations(): Extension {
+  return StateField.define<DecorationSet>({
+    create: buildHeadingLineDecorations,
+    update(value, transaction) {
+      return transaction.docChanged
+        ? buildHeadingLineDecorations(transaction.state)
+        : value.map(transaction.changes);
+    },
+    provide: (field) => EditorView.decorations.from(field),
+  });
 }
 
 function decorateHiddenFormatting(

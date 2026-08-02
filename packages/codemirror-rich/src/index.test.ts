@@ -3,12 +3,16 @@ import { EditorView } from "@codemirror/view";
 import { defineMiraExtension } from "@mira-mde/extensions";
 import { createRichEditorExtensions } from ".";
 
+function nextFrame(): Promise<void> {
+  return new Promise((resolve) => requestAnimationFrame(() => resolve()));
+}
+
 describe("createRichEditorExtensions", () => {
   it("can be disabled", () => {
     expect(createRichEditorExtensions({ enabled: false })).toEqual([]);
   });
 
-  it("keeps inline mark decorations when live preview is off", () => {
+  it("keeps source mode free of live-preview hide/replace decorations", async () => {
     const nonempty = (
       extensions: ReturnType<typeof createRichEditorExtensions>,
     ) =>
@@ -26,10 +30,37 @@ describe("createRichEditorExtensions", () => {
       createRichEditorExtensions({ livePreview: false }),
     );
 
-    // Source keeps marks/theme/fold/block-controls but drops block widgets,
-    // indent guides, and live-preview editor attributes.
     expect(sourceMode.length).toBeGreaterThan(0);
     expect(sourceMode.length).toBeLessThan(livePreview.length);
+
+    const parent = document.createElement("div");
+    document.body.append(parent);
+    const view = new EditorView({
+      doc: [
+        "> quoted line",
+        "",
+        "Has `inline code` here",
+        "",
+        "```js",
+        "const value = 1;",
+        "```",
+      ].join("\n"),
+      extensions: createRichEditorExtensions({ livePreview: false }),
+      parent,
+    });
+    await nextFrame();
+
+    expect(parent.querySelector(".cm-formatting-hidden")).toBeNull();
+    expect(parent.querySelector(".cm-inline-code")).toBeNull();
+    expect(parent.querySelector(".mira-rich-widget")).toBeNull();
+    expect(parent.querySelector(".cm-formatting-code")).toBeNull();
+    expect(parent.querySelector(".cm-formatting-quote")).toBeNull();
+    expect(parent.textContent).toContain("> quoted line");
+    expect(parent.textContent).toContain("`inline code`");
+    expect(parent.textContent).toContain("```js");
+
+    view.destroy();
+    parent.remove();
   });
 
   it("uses list-callout contributions from Mira extensions", async () => {
@@ -52,7 +83,7 @@ describe("createRichEditorExtensions", () => {
       ],
       parent,
     });
-    await new Promise((resolve) => requestAnimationFrame(resolve));
+    await nextFrame();
 
     expect(parent.querySelector(".cm-line[data-callout='^']")).not.toBeNull();
     expect(parent.querySelector(".cm-line[data-callout='%']")).toBeNull();

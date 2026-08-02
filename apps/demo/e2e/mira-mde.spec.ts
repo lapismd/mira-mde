@@ -563,30 +563,49 @@ test("inline fold controls, Source Code Pro, and Obsidian tokens are present", a
     );
   expect(monoToken).toContain("Source Code Pro");
 
-  const inlineCode = page
-    .locator(".cm-inline-code")
-    .filter({ hasText: "inline code" })
-    .first();
-  await expect(inlineCode).toBeVisible();
-  const inlineCodeStyle = await inlineCode.evaluate((element) => {
-    const probe = document.createElement("span");
-    probe.style.backgroundColor = "var(--markdown-code-background)";
-    element.append(probe);
-    const expectedBackground = getComputedStyle(probe).backgroundColor;
-    probe.remove();
-    const style = getComputedStyle(element);
-    return {
-      actualBackground: style.backgroundColor,
-      expectedBackground,
-      paddingInlineStart: Number.parseFloat(style.paddingInlineStart),
-    };
-  });
-  expect(inlineCodeStyle.actualBackground).toBe(
-    inlineCodeStyle.expectedBackground,
-  );
-  expect(inlineCodeStyle.paddingInlineStart).toBeGreaterThan(0);
-  await inlineCode.click();
+  // Source mode keeps markdown delimiters — no rich hide/replace widgets.
   await expect(page.locator(".cm-content")).toContainText("`inline code`");
+  await expect(page.locator(".cm-formatting-hidden")).toHaveCount(0);
+  await expect(page.locator(".mira-rich-widget")).toHaveCount(0);
+});
+
+test("source mode keeps fence markers, backticks, and blockquote delimiters", async ({
+  page,
+}) => {
+  await gotoDemo(page);
+  await setMode(page, "Source");
+  await scrollEditor(page, 0);
+
+  await expect(page.locator(".mira-mde")).toHaveAttribute(
+    "data-mode",
+    "source",
+  );
+  await expect(page.locator(".cm-editor.markdown-source-view")).toBeVisible();
+
+  await expect(page.locator(".cm-content")).toContainText("`inline code`");
+  await expect(page.locator(".cm-formatting-hidden")).toHaveCount(0);
+  await expect(page.locator(".cm-inline-code")).toHaveCount(0);
+  await expect(page.locator(".mira-rich-widget--fencedcode")).toHaveCount(0);
+  await expect(page.locator(".mira-rich-widget--blockquote")).toHaveCount(0);
+  await expect(page.locator(".cm-formatting-code")).toHaveCount(0);
+
+  // CM virtualizes lines — scroll into sections that contain delimiters.
+  await scrollEditorUntilVisible(
+    page,
+    page.locator(".cm-line").filter({ hasText: "Regular blockquotes" }),
+    { max: 8_000 },
+  );
+  await expect(page.locator(".cm-content")).toContainText(">");
+  await expect(page.locator(".cm-content")).toContainText(
+    "> Regular blockquotes remain regular blockquotes",
+  );
+
+  await scrollEditorUntilVisible(
+    page,
+    page.locator(".cm-line").filter({ hasText: "~~~mermaid" }),
+    { max: 10_000 },
+  );
+  await expect(page.locator(".cm-content")).toContainText("~~~mermaid");
 });
 
 test("task lists and live heading gutters match Lapis styling", async ({

@@ -169,7 +169,9 @@ export function getIndentLineLayout(
         Math.floor(toMarkdownColumns(leading) / INDENT_UNIT),
       ),
       indentColumns: toMarkdownColumns(leading),
-      indentText: lineText.slice(0, prefixTo),
+      // Lapis list/plain-indent only replace leading whitespace; `>` stays
+      // visible until live-preview rich decorations style/hide it.
+      indentText: leading,
       kind: "quote",
       quoteFrom: leading.length,
       quoteTo: prefixTo,
@@ -262,7 +264,10 @@ class IndentGuideWidget extends WidgetType {
   }
 }
 
-export function indentGuideDecorations(): Extension {
+export function indentGuideDecorations(
+  options: { livePreview?: boolean } = {},
+): Extension {
+  const livePreview = options.livePreview ?? true;
   return ViewPlugin.fromClass(
     class implements PluginValue {
       decorations: DecorationSet;
@@ -291,6 +296,16 @@ export function indentGuideDecorations(): Extension {
           while (line.from <= to) {
             const layout = getIndentLineLayout(line.text);
             if (layout && isMarkdownIndentLine(view, line, layout)) {
+              // Pure quote chrome (`>`, blockquote border) is live-preview-only
+              // in Lapis (RichEditPlugin). Source keeps literal `>` text.
+              if (!livePreview && layout.kind === "quote") {
+                if (line.number >= view.state.doc.lines) {
+                  break;
+                }
+                line = view.state.doc.line(line.number + 1);
+                continue;
+              }
+
               const indentTo = line.from + layout.indentText.length;
               const anchorFrom =
                 layout.kind === "plain"
@@ -300,6 +315,9 @@ export function indentGuideDecorations(): Extension {
                       layout.indentColumns,
                     )
                   : null;
+              const quoteChrome =
+                livePreview &&
+                (layout.kind === "quote" || layout.kind === "quote-list");
               decorations.push(
                 Decoration.line({
                   attributes: {
@@ -319,9 +337,7 @@ export function indentGuideDecorations(): Extension {
                   class: [
                     "indented-wrapped-line",
                     layout.kind === "plain" ? "cm-plain-indent-line" : "",
-                    layout.kind === "quote" || layout.kind === "quote-list"
-                      ? "cm-blockquote"
-                      : "",
+                    quoteChrome ? "cm-blockquote" : "",
                     layout.listKind || layout.kind === "plain"
                       ? "HyperMD-list-line"
                       : "",
@@ -387,6 +403,7 @@ export function indentGuideDecorations(): Extension {
               }
 
               if (
+                livePreview &&
                 layout.quoteFrom !== undefined &&
                 layout.quoteTo !== undefined
               ) {

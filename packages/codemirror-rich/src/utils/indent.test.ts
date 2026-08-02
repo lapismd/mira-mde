@@ -49,6 +49,20 @@ describe("indent helpers", () => {
       quoteFrom: 0,
       quoteTo: 2,
     });
+    expect(getIndentLineLayout("> quoted paragraph")).toMatchObject({
+      fallbackColumns: 2,
+      indentText: "",
+      kind: "quote",
+      quoteFrom: 0,
+      quoteTo: 2,
+    });
+    expect(getIndentLineLayout("    > indented quote")).toMatchObject({
+      fallbackColumns: 6,
+      indentText: "    ",
+      kind: "quote",
+      quoteFrom: 4,
+      quoteTo: 6,
+    });
     expect(getIndentLineLayout("    continuation")).toMatchObject({
       fallbackColumns: 4,
       indentText: "    ",

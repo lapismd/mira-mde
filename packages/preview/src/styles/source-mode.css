@@ -222,11 +222,11 @@
   inset-inline-start: 0;
 }
 
-.markdown-editor-surface .cm-blockquote .cm-formatting-quote > span {
+.markdown-live-preview-mode .cm-blockquote .cm-formatting-quote > span {
   color: transparent;
 }
 
-.markdown-editor-surface
+.markdown-live-preview-mode
   .cm-blockquote.cm-activeLine
   .cm-formatting-quote
   > span {

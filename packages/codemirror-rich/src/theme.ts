@@ -74,7 +74,8 @@ export const miraRichEditorTheme = EditorView.theme({
     {
       transform: "rotate(-90deg)",
     },
-  ".cm-formatting-hidden": {
+  // Collapse hidden marks only in live preview (Lapis richEditor scope).
+  "&.cm-live-preview .cm-formatting-hidden": {
     color: "transparent",
     display: "inline-block",
     overflow: "hidden",

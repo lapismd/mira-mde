@@ -7,12 +7,14 @@ import {
 import { Decoration, type DecorationSet, EditorView } from "@codemirror/view";
 import { sortRanges } from "./ranges";
 
+// Lapis source-mode codeBlockClassExtension classes. Live-preview adds
+// `cm-formatting-code` (+ start/end) via rich inline decorations only.
 const codeLine = Decoration.line({
-  class: "HyperMD-codeblock HyperMD-codeblock-bg cm-formatting-code",
+  class: "HyperMD-codeblock HyperMD-codeblock-bg",
 });
 const textCodeLine = Decoration.line({
   class:
-    "HyperMD-codeblock HyperMD-codeblock-bg cm-formatting-code cm-formatting-code-language-text",
+    "HyperMD-codeblock HyperMD-codeblock-bg cm-formatting-code-language-text",
 });
 
 export function buildCodeBlockLineDecorations(
