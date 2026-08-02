@@ -281,16 +281,50 @@ export function validateCatalog({
   };
 }
 
+export function validateUiPrimitiveStoryCoverage({
+  repoRoot = DEFAULT_REPO_ROOT,
+  registry = catalogRegistry,
+  storyFile = "stories/ui/Primitives.stories.ts",
+} = {}) {
+  const absoluteStoryFile = path.join(repoRoot, storyFile);
+  const expectedEntryIds = registry.entries
+    .filter((entry) => entry.id.startsWith("ui-"))
+    .map((entry) => entry.id);
+  const errors = [];
+
+  if (!existsSync(absoluteStoryFile)) {
+    errors.push(`UI primitive story file is missing: ${storyFile}`);
+  } else {
+    const source = readFileSync(absoluteStoryFile, "utf8");
+    for (const entryId of expectedEntryIds) {
+      const reference = new RegExp(
+        `(?:catalogParameters|parameters)\\(\\s*["']${entryId}["']`,
+      );
+      if (!reference.test(source)) {
+        errors.push(`UI primitive family has no rendered story: ${entryId}`);
+      }
+    }
+  }
+
+  return {
+    ok: errors.length === 0,
+    errors,
+    stats: { families: expectedEntryIds.length },
+  };
+}
+
 function main() {
   const result = validateCatalog();
-  if (!result.ok) {
+  const storyCoverage = validateUiPrimitiveStoryCoverage();
+  if (!result.ok || !storyCoverage.ok) {
     console.error("Mira catalog validation failed:");
-    for (const error of result.errors) console.error(`  - ${error}`);
+    for (const error of [...result.errors, ...storyCoverage.errors])
+      console.error(`  - ${error}`);
     process.exitCode = 1;
     return;
   }
   console.log(
-    `Mira catalog validated: ${result.stats.entries} entries, ${result.stats.tokens} documented tokens, ${result.stats.publicSurfaces} public surface families.`,
+    `Mira catalog validated: ${result.stats.entries} entries, ${result.stats.tokens} documented tokens, ${result.stats.publicSurfaces} public surface families, ${storyCoverage.stats.families} rendered UI primitive families.`,
   );
 }
 

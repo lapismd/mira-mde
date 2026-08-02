@@ -4,7 +4,10 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 
-import { validateCatalog } from "./check-catalog.mjs";
+import {
+  validateCatalog,
+  validateUiPrimitiveStoryCoverage,
+} from "./check-catalog.mjs";
 
 function fixture(css = ".surface { color: var(--mira-foreground); }\n") {
   const repoRoot = mkdtempSync(path.join(os.tmpdir(), "mira-catalog-"));
@@ -84,4 +87,31 @@ test("rejects unassigned tokens and incomplete entry metadata", () => {
     assert.match(result.errors.join("\n"), /missing description/);
     assert.match(result.errors.join("\n"), /Unassigned public token/);
   });
+});
+
+test("requires rendered stories for every UI primitive family", () => {
+  const repoRoot = fixture();
+  const storyPath = path.join(repoRoot, "stories/ui/Primitives.stories.ts");
+  mkdirSync(path.dirname(storyPath), { recursive: true });
+  writeFileSync(
+    storyPath,
+    'parameters("ui-core", "Core primitives");\nparameters("ui-dialog", "Dialog");\n',
+  );
+  const registry = {
+    entries: [{ id: "ui-core" }, { id: "ui-dialog" }, { id: "preview" }],
+  };
+
+  try {
+    assert.equal(
+      validateUiPrimitiveStoryCoverage({ repoRoot, registry }).ok,
+      true,
+    );
+
+    writeFileSync(storyPath, 'parameters("ui-core", "Core primitives");\n');
+    const missing = validateUiPrimitiveStoryCoverage({ repoRoot, registry });
+    assert.equal(missing.ok, false);
+    assert.match(missing.errors.join("\n"), /ui-dialog/);
+  } finally {
+    rmSync(repoRoot, { recursive: true, force: true });
+  }
 });

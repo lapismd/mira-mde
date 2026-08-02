@@ -46,7 +46,8 @@
     "@mira-mde/plugin-ai": "workspace:*",
     "@mira-mde/plugin-mermaid": "workspace:*",
     "@mira-mde/preview": "workspace:*",
-    "@mira-mde/svelte": "workspace:*"
+    "@mira-mde/svelte": "workspace:*",
+    "@mira-mde/ui": "workspace:*"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",

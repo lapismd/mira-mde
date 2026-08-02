@@ -29,6 +29,9 @@ importers:
       '@mira-mde/svelte':
         specifier: workspace:*
         version: link:packages/svelte
+      '@mira-mde/ui':
+        specifier: workspace:*
+        version: link:packages/ui
     devDependencies:
       '@eslint/js':
         specifier: ^9.39.2

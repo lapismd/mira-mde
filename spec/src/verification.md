@@ -24,6 +24,7 @@ remain valid evidence where noted and the gates below keep the matrix current.
 | MIRA-CAT-003, MIRA-CAT-004                                                                       | Storybook fixture consolidation and comprehensive demo stories    | Implemented by catalog-host slice     |
 | MIRA-CAT-005                                                                                     | Vitest Storybook browser project and interaction tests            | Implemented                           |
 | MIRA-CAT-006                                                                                     | Addon-owned Visual Delta suite, reviewed regenerated baselines    | Implemented                           |
+| MIRA-CAT-007                                                                                     | Catalog coverage checker and nine focused UI `play` assertions    | Implemented                           |
 | MIRA-GOV-001, MIRA-GOV-002, MIRA-GOV-003, MIRA-GOV-004, MIRA-GOV-005, MIRA-GOV-006, MIRA-GOV-007 | `pnpm spec:check`, checker tests, pull-request workflow           | Implemented by governance slice       |
 
 ## Validation tiers
@@ -49,9 +50,11 @@ have plugin-owned images and metadata.
 
 The add-on's Docker stage excludes both `storybook-static` and its affected
 cache. The `test:visual` gate therefore uses the affected preflight to build in
-the pinned stage and deterministically fall back to all 105 stories; the direct
+the pinned stage and deterministically fall back to the full catalog; the direct
 `test --all` route would otherwise select zero stories before waiting on a
-missing static host.
+missing static host. The nine UI-primitive stories added after the canonical
+regeneration remain `visual-pending` without committed baselines until a
+separate baseline mutation is authorized.
 
 Every tested package owns an explicit Vitest configuration. In particular,
 `packages/core/vitest.config.ts` prevents its unit command from inheriting the

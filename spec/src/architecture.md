@@ -24,7 +24,10 @@ toward rendering, UI, plugins, and thin framework adapters.
 - Adapters: `react` and `vanilla`; reserved adapters must remain thin.
 
 The root Storybook may compose every package for documentation and acceptance,
-but package source must not import Storybook-owned catalog data.
+but package source must not import Storybook-owned catalog data. Packages used
+directly by Storybook stories, including `@mira-mde/ui`, are explicit root
+workspace dependencies so clean Vite builds do not rely on transitive package
+resolution.
 
 The former `apps/demo` and `apps/docs` workspaces are retired. The root package
 owns Storybook development, static builds, and browser acceptance; the workspace

@@ -1,6 +1,7 @@
-import { Meta } from "@storybook/addon-docs/blocks";
+import { Canvas, Meta } from "@storybook/addon-docs/blocks";
 import { SvelteDocsBridge } from "./SvelteDocsBridge";
 import CatalogPage from "./CatalogPage.svelte";
+import * as PrimitiveStories from "../ui/Primitives.stories";
 
 <Meta
   title="Mira MDE/Catalog/UI primitives"
@@ -26,3 +27,45 @@ floating-surface tokens remain visible without duplicating a table per alias.
     ],
   }}
 />
+
+## Rendered verification
+
+These stories render the exact package components used by Mira rather than
+parallel mock markup. Their `play` assertions cover selection, menus, overlays,
+tooltips, table semantics, and scroll ownership.
+
+### Buttons and separators
+
+<Canvas of={PrimitiveStories.ButtonsAndSeparators} meta={PrimitiveStories} />
+
+### Toggle group
+
+<Canvas of={PrimitiveStories.ToggleGroup} meta={PrimitiveStories} />
+
+### Toolbar
+
+<Canvas of={PrimitiveStories.Toolbar} meta={PrimitiveStories} />
+
+### Dropdown menu
+
+<Canvas of={PrimitiveStories.DropdownMenu} meta={PrimitiveStories} />
+
+### Context menu
+
+<Canvas of={PrimitiveStories.ContextMenu} meta={PrimitiveStories} />
+
+### Dialog
+
+<Canvas of={PrimitiveStories.Dialog} meta={PrimitiveStories} />
+
+### Tooltip
+
+<Canvas of={PrimitiveStories.Tooltip} meta={PrimitiveStories} />
+
+### Table
+
+<Canvas of={PrimitiveStories.Table} meta={PrimitiveStories} />
+
+### Scroll area
+
+<Canvas of={PrimitiveStories.ScrollArea} meta={PrimitiveStories} />

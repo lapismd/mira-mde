@@ -42,7 +42,9 @@ without updating this chapter in the same logical change.
 The catalog checker scans shipped CSS, Svelte, TypeScript, and JavaScript style
 sources for public `--mira-*` references. Any internal layout-only variable
 must be explicitly allowlisted and regression-tested rather than silently
-omitted from the public token registry.
+omitted from the public token registry. It also cross-checks every `ui-*`
+catalog family against the rendered primitive story module so exported UI
+families cannot remain metadata-only.
 
 ## Agent workflow
 

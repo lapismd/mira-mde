@@ -14,6 +14,7 @@ runtime dependency.
 | MIRA-CAT-004 | The comprehensive demo MUST provide fixed source, live-preview, preview, and split stories using identical Markdown and adapter data.                            |
 | MIRA-CAT-005 | Every testable public story MUST render in the Storybook browser test project; meaningful stateful behavior MUST use a `play` interaction.                       |
 | MIRA-CAT-006 | New visual stories MUST enter review as `visual-pending`; baseline mutation MUST use the installed Visual Delta suite and requires a separate authorized review. |
+| MIRA-CAT-007 | Every shipped `@mira-mde/ui` primitive family MUST have representative rendered Storybook coverage with interaction or semantic assertions.                      |
 
 Ordinary README prose points to Storybook and the specification. It must not
 become a parallel behavioral reference.
@@ -52,11 +53,14 @@ capture uses the addon's pinned profile and `nested-import` baseline layout.
 The add-on writes each committed baseline URL into the owning story's
 `parameters.visualDelta` metadata and marks regenerated stories
 `visual-pending`; Storybook MUST NOT infer a second URL scheme at preview time.
-The complete current catalog is a one-to-one set of 105 indexed stories, 105
-plugin-owned metadata entries, and 105 committed baseline images.
-`pnpm test:visual` invokes the affected preflight in the add-on's clean Docker
-stage; its deliberately missing cache produces a documented 105-story
-full-suite fallback before compare-only validation.
+The current catalog contains 114 indexed stories: 105 have plugin-owned metadata
+and committed baseline images, while nine UI-primitive verification stories are
+`visual-pending` until a separately authorized baseline mutation. The visual
+gate intentionally exposes missing baselines for new pending stories rather than
+silently treating them as approved. Once baselines exist, `pnpm test:visual`
+invokes the affected preflight in the add-on's clean Docker stage; its
+deliberately missing cache produces a full-suite fallback before compare-only
+validation.
 
 ## Host and fixture ownership
 
