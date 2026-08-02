@@ -81,7 +81,9 @@ export const miraRichEditorTheme = EditorView.theme({
     overflow: "hidden",
     width: "0",
   },
-  "&.mira-mde-live-preview-hide-cursor .cm-cursorLayer": {
+  // Only hide the host editor caret — nested `.mod-inline` table cell
+  // editors live under the same scroller and must keep their cursor layer.
+  "&.mira-mde-live-preview-hide-cursor > .cm-scroller > .cm-cursorLayer": {
     visibility: "hidden",
   },
   ".mira-rich-widget": {

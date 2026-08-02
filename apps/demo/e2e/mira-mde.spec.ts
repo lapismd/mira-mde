@@ -1358,6 +1358,28 @@ test("tables and admonition callouts render in preview and live-preview", async 
   expect(tableMetrics.rowHandleBorderLeft).toBe("0px");
   expect(tableMetrics.rowHandle.width).toBeCloseTo(16, 1);
   expect(tableMetrics.rowHandleIcon.width).toBeCloseTo(16, 1);
+  // Nested cell shells must not inherit host file-margin padding.
+  const cellScrollerPadding = await liveTable.evaluate((element) => {
+    const scroller = element.querySelector<HTMLElement>(
+      "tbody td:not(.markdown-table-chrome) .cm-editor.mod-inline .cm-scroller",
+    );
+    if (!scroller) {
+      return null;
+    }
+    const style = getComputedStyle(scroller);
+    return {
+      paddingBottom: Number.parseFloat(style.paddingBottom),
+      paddingLeft: Number.parseFloat(style.paddingLeft),
+      paddingRight: Number.parseFloat(style.paddingRight),
+      paddingTop: Number.parseFloat(style.paddingTop),
+    };
+  });
+  expect(cellScrollerPadding).toEqual({
+    paddingBottom: 0,
+    paddingLeft: 0,
+    paddingRight: 0,
+    paddingTop: 0,
+  });
   const rightAlignedPipeCell = liveTable
     .locator("tbody td:not(.markdown-table-chrome)")
     .filter({ hasText: "ready" })
@@ -1374,6 +1396,32 @@ test("tables and admonition callouts render in preview and live-preview", async 
         .evaluate((element) => getComputedStyle(element).textAlign),
     )
     .toBe("right");
+  // Cell editors keep a visible caret even when the host is in
+  // frontmatter hide-cursor mode.
+  await expect
+    .poll(() =>
+      rightAlignedPipeCell.evaluate((element) => {
+        const editor = element.querySelector<HTMLElement>(
+          ".cm-editor.mod-inline",
+        );
+        const layer = editor?.querySelector<HTMLElement>(".cm-cursorLayer");
+        if (!editor || !layer) {
+          return null;
+        }
+        return {
+          focused: editor.classList.contains("cm-focused"),
+          parentHide: Boolean(
+            editor.closest(".mira-mde-live-preview-hide-cursor"),
+          ),
+          visibility: getComputedStyle(layer).visibility,
+        };
+      }),
+    )
+    .toEqual({
+      focused: true,
+      parentHide: expect.any(Boolean),
+      visibility: "visible",
+    });
   await liveTable.hover();
   await expect(
     page

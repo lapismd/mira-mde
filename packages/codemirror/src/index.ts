@@ -128,6 +128,10 @@ export const miraEditorTheme = EditorView.theme({
   ".cm-scroller": {
     fontFamily: "var(--mira-font-mono)",
     lineHeight: "var(--mira-line-height)",
+  },
+  // Only the top-level scroller — nested `.mod-inline` editors (table cells,
+  // etc.) must not inherit file-margin padding or they become oversized.
+  "& > .cm-scroller": {
     // Full-pane scroller (scrollbar on the edge) with a centered readable
     // column — Lapis/Obsidian file-margins + file-line-width behavior.
     paddingBlock: "var(--file-margins-y, var(--mira-editor-padding, 2rem))",
@@ -144,7 +148,9 @@ export const miraEditorTheme = EditorView.theme({
     lineHeight: "var(--cm-block-line-height)",
     padding: "var(--cm-block-padding-top) 0 0",
   },
-  ".cm-content": {
+  // Keep min-height on the host content only so nested inline editors stay
+  // compact (table cells, chrome columns).
+  "& > .cm-scroller > .cm-content": {
     minHeight: "100%",
     padding: "0",
     width: "100%",

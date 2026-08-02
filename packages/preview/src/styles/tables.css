@@ -142,6 +142,15 @@
   .cm-content {
   height: auto !important;
   min-height: 0 !important;
+  /* Nested shells share ancestor CM theme selectors; never inherit file margins. */
+  padding: 0 !important;
+}
+
+:is(.markdown-editor-surface, .markdown-widget-shell)
+  .mira-table-widget-shell
+  .cm-editor.mod-inline
+  .cm-cursorLayer {
+  visibility: visible;
 }
 
 :is(.markdown-editor-surface, .markdown-widget-shell)
