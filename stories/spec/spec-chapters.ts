@@ -16,6 +16,11 @@ export const specChapters: SpecChapter[] = [
     title: "Architecture and boundaries",
   },
   {
+    source: "packages.md",
+    storyId: "mira-mde-specification-public-packages-and-entry-points--docs",
+    title: "Public packages and entry points",
+  },
+  {
     source: "editor-and-markdown.md",
     storyId: "mira-mde-specification-portable-markdown-and-editor--docs",
     title: "Portable Markdown and editor",

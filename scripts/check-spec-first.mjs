@@ -24,35 +24,38 @@ const IGNORED_PATTERNS = [
 const RULES = [
   {
     name: "AI plugin",
-    pattern: /^packages\/plugin-ai\/(?:src\/|package\.json$)/,
-    chapters: ["spec/src/plugins/ai.md"],
+    pattern:
+      /^packages\/(?:plugin-ai|mira-plugin-ai)\/(?:src\/|package\.json$)/,
+    chapters: ["spec/src/packages.md", "spec/src/plugins/ai.md"],
   },
   {
     name: "Mermaid plugin",
-    pattern: /^packages\/plugin-mermaid\/(?:src\/|package\.json$)/,
-    chapters: ["spec/src/plugins/mermaid.md"],
+    pattern:
+      /^packages\/(?:plugin-mermaid|mira-plugin-mermaid)\/(?:src\/|package\.json$)/,
+    chapters: ["spec/src/packages.md", "spec/src/plugins/mermaid.md"],
   },
   {
     name: "Markdown editor",
     pattern:
-      /^packages\/(?:core|extensions|codemirror|codemirror-markdown|codemirror-rich|codemirror-tables|preview)\/(?:src\/|package\.json$)/,
-    chapters: ["spec/src/editor-and-markdown.md"],
+      /^packages\/(?:mira|core|extensions|codemirror|codemirror-markdown|codemirror-rich|codemirror-tables|preview)\/(?:src\/|package\.json$)/,
+    chapters: ["spec/src/editor-and-markdown.md", "spec/src/packages.md"],
   },
   {
     name: "Default UI",
-    pattern: /^packages\/(?:default-ui|ui)\/(?:src\/|package\.json$)/,
-    chapters: ["spec/src/default-ui-and-frameworks.md"],
+    pattern:
+      /^packages\/(?:mira-editor|default-ui|ui)\/(?:src\/|package\.json$)/,
+    chapters: ["spec/src/default-ui-and-frameworks.md", "spec/src/packages.md"],
   },
   {
     name: "Framework adapters",
     pattern:
-      /^packages\/(?:svelte|react|vanilla|vue|solid)\/(?:src\/|package\.json$)/,
-    chapters: ["spec/src/default-ui-and-frameworks.md"],
+      /^(?:packages\/(?:svelte|react|vanilla|mira-react|mira-vanilla)|internal\/adapters\/(?:vue|solid))\/(?:src\/|package\.json$)/,
+    chapters: ["spec/src/default-ui-and-frameworks.md", "spec/src/packages.md"],
   },
   {
     name: "Theme",
     pattern: /^packages\/theme-obsidian\/(?:src\/|styles\.css$|package\.json$)/,
-    chapters: ["spec/src/styling.md"],
+    chapters: ["spec/src/packages.md", "spec/src/styling.md"],
   },
   {
     name: "Storybook catalog",
@@ -62,14 +65,14 @@ const RULES = [
   {
     name: "Specification governance",
     pattern:
-      /^(?:scripts\/(?:check-spec-.+|check-catalog(?:\.spec)?)\.mjs|\.markdownlint-cli2\.jsonc|spec\/book\.toml|\.github\/workflows\/.+\.ya?ml$|AGENTS\.md$)/,
+      /^(?:scripts\/(?:check-spec-.+|check-catalog(?:\.spec)?|check-package-boundaries(?:\.spec)?)\.mjs|\.markdownlint-cli2\.jsonc|spec\/book\.toml|\.github\/workflows\/.+\.ya?ml$|AGENTS\.md$)/,
     chapters: ["spec/src/spec-governance.md"],
   },
   {
     name: "Repository architecture",
     pattern:
       /^(?:package\.json|pnpm-lock\.yaml|pnpm-workspace\.yaml|turbo\.json|tsconfig(?:\.[^.]+)*\.json|playwright(?:\.[^.]+)*\.config\.ts)$/,
-    chapters: ["spec/src/architecture.md"],
+    chapters: ["spec/src/architecture.md", "spec/src/packages.md"],
   },
 ];
 

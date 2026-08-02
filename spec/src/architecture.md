@@ -1,8 +1,9 @@
 # Architecture and Boundaries
 
-Mira is a pnpm monorepo of independently buildable packages. Package entrypoints
-remain stable and dependency direction flows from contracts and controller code
-toward rendering, UI, plugins, and thin framework adapters.
+Mira is a pnpm monorepo of independently buildable public products. Supported
+entry points are defined in [Public packages and entry points](packages.md), and
+dependency direction flows from the composable editor toward plugins, the
+batteries-included editor, and thin framework adapters.
 
 ## Requirements
 
@@ -14,14 +15,13 @@ toward rendering, UI, plugins, and thin framework adapters.
 | MIRA-ARCH-004 | Every workspace package MUST expose deterministic check, test where applicable, and build behavior compatible with root orchestration.                         |
 | MIRA-ARCH-005 | Storybook MUST be the only repository application used for browsable documentation, demos, component examples, and interaction scenarios.                      |
 
-## Package groups
+## Package boundary
 
-- Controller and contracts: `core`, `extensions`, and `codemirror`.
-- Markdown behavior: `codemirror-markdown`, `codemirror-rich`,
-  `codemirror-tables`, and `preview`.
-- Presentation: `ui`, `theme-obsidian`, `svelte`, and `default-ui`.
-- Plugins: `plugin-ai` and `plugin-mermaid`.
-- Adapters: `react` and `vanilla`; reserved adapters must remain thin.
+The six-package public graph separates installation products from implementation
+modules. `@lapismd/mira` owns the portable runtime and supported advanced
+subpaths; plugins, the default editor, and adapters depend only on those public
+entry points. Private placeholder adapters and source under `src/internal` are
+never shipped as independent products.
 
 The root Storybook may compose every package for documentation and acceptance,
 but package source must not import Storybook-owned catalog data. Packages used

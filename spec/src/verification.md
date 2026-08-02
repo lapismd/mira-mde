@@ -1,34 +1,36 @@
 # Verification
 
 This matrix is both requirement traceability and the implementation progress
-artifact. The Storybook-only migration is complete; existing package tests
-remain valid evidence where noted and the gates below keep the matrix current.
+artifact. The Storybook-only migration is complete, and the six-package public
+architecture migration is in progress.
 
-| Requirements                                                                                     | Evidence                                                           | Status                                |
-| ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------ | ------------------------------------- |
-| MIRA-ARCH-001, MIRA-ARCH-002, MIRA-ARCH-003, MIRA-ARCH-004                                       | Package exports, package checks/tests/builds, boundary review      | Implemented                           |
-| MIRA-ARCH-005                                                                                    | Storybook-only host migration and root script checks               | Implemented by catalog-host slice     |
-| MIRA-MD-001, MIRA-MD-002, MIRA-MD-003, MIRA-MD-004, MIRA-MD-005, MIRA-MD-006                     | Package unit tests, Layout Showcase, Storybook browser acceptance  | Implemented                           |
-| MIRA-MD-007                                                                                      | Comprehensive fixture plus focused Storybook fixtures              | Implemented; catalog checker enforced |
-| MIRA-MD-008, MIRA-MD-009                                                                         | Enforced Storybook accessibility and icon-bearing editor controls  | Implemented                           |
-| MIRA-MD-010                                                                                      | Focused outline story plus Storybook browser navigation acceptance | Implemented                           |
-| MIRA-UI-001, MIRA-UI-002, MIRA-UI-003, MIRA-UI-004, MIRA-UI-005                                  | Default UI, Svelte, React, and Vanilla tests/builds                | Implemented                           |
-| MIRA-UI-006, MIRA-UI-007, MIRA-UI-008                                                            | Storybook browser project and UI primitive `play` interactions     | Implemented                           |
-| MIRA-UI-009                                                                                      | Svelte package checks and focused outline browser acceptance       | Implemented                           |
-| MIRA-CSS-001, MIRA-CSS-002                                                                       | Package stylesheet exports, no-Tailwind package checks             | Implemented                           |
-| MIRA-CSS-003, MIRA-CSS-004, MIRA-CSS-005, MIRA-CSS-006                                           | Public surface/token registry and catalog checker                  | Implemented by catalog/token slice    |
-| MIRA-AI-001, MIRA-AI-002, MIRA-AI-003                                                            | `packages/plugin-ai` unit tests                                    | Implemented                           |
-| MIRA-AI-004                                                                                      | Deterministic AI story interaction                                 | Implemented                           |
-| MIRA-MERMAID-001, MIRA-MERMAID-002, MIRA-MERMAID-003, MIRA-MERMAID-004                           | Mermaid package tests and existing Storybook stories               | Implemented                           |
-| MIRA-MERMAID-005                                                                                 | Expanded Mermaid story interaction matrix                          | Implemented                           |
-| MIRA-CAT-001                                                                                     | Raw spec mirrors, link rewriting, one-to-one checker tests         | Implemented by catalog-host slice     |
-| MIRA-CAT-002                                                                                     | Catalog descriptions and governing-spec links                      | Implemented by catalog/token slice    |
-| MIRA-CAT-003, MIRA-CAT-004                                                                       | Storybook fixture consolidation and comprehensive demo stories     | Implemented by catalog-host slice     |
-| MIRA-CAT-005                                                                                     | Vitest Storybook browser project and interaction tests             | Implemented                           |
-| MIRA-CAT-006                                                                                     | Addon-owned Visual Delta suite, reviewed regenerated baselines     | Implemented                           |
-| MIRA-CAT-007                                                                                     | Catalog coverage checker and ten focused UI `play` assertions      | Implemented                           |
-| MIRA-CAT-008                                                                                     | Focused outline story and comprehensive outline control            | Implemented                           |
-| MIRA-GOV-001, MIRA-GOV-002, MIRA-GOV-003, MIRA-GOV-004, MIRA-GOV-005, MIRA-GOV-006, MIRA-GOV-007 | `pnpm spec:check`, checker tests, pull-request workflow            | Implemented by governance slice       |
+| Requirements                                                                                            | Evidence                                                                  | Status                                |
+| ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ------------------------------------- |
+| MIRA-ARCH-001, MIRA-ARCH-002, MIRA-ARCH-003, MIRA-ARCH-004                                              | Package exports, package checks/tests/builds, boundary review             | Implemented                           |
+| MIRA-ARCH-005                                                                                           | Storybook-only host migration and root script checks                      | Implemented by catalog-host slice     |
+| MIRA-ARCH-006, MIRA-ARCH-007, MIRA-ARCH-008, MIRA-ARCH-009, MIRA-ARCH-010, MIRA-ARCH-011, MIRA-ARCH-012 | Package manifests, boundary checker, pack fixtures, and catalog migration | In progress: specification slice      |
+| MIRA-MD-001, MIRA-MD-002, MIRA-MD-003, MIRA-MD-004, MIRA-MD-005, MIRA-MD-006                            | Package unit tests, Layout Showcase, Storybook browser acceptance         | Implemented                           |
+| MIRA-MD-007                                                                                             | Comprehensive fixture plus focused Storybook fixtures                     | Implemented; catalog checker enforced |
+| MIRA-MD-008, MIRA-MD-009                                                                                | Enforced Storybook accessibility and icon-bearing editor controls         | Implemented                           |
+| MIRA-MD-010                                                                                             | Focused outline story plus Storybook browser navigation acceptance        | Implemented                           |
+| MIRA-UI-001, MIRA-UI-002, MIRA-UI-003, MIRA-UI-004, MIRA-UI-005                                         | Default UI, Svelte, React, and Vanilla tests/builds                       | Implemented                           |
+| MIRA-UI-006, MIRA-UI-007, MIRA-UI-008                                                                   | Storybook browser project and UI primitive `play` interactions            | Implemented                           |
+| MIRA-UI-009                                                                                             | Svelte package checks and focused outline browser acceptance              | Implemented                           |
+| MIRA-CSS-001, MIRA-CSS-002                                                                              | Package stylesheet exports, no-Tailwind package checks                    | Implemented                           |
+| MIRA-CSS-003, MIRA-CSS-004, MIRA-CSS-005, MIRA-CSS-006                                                  | Public surface/token registry and catalog checker                         | Implemented by catalog/token slice    |
+| MIRA-AI-001, MIRA-AI-002, MIRA-AI-003                                                                   | `packages/plugin-ai` unit tests                                           | Implemented                           |
+| MIRA-AI-004                                                                                             | Deterministic AI story interaction                                        | Implemented                           |
+| MIRA-MERMAID-001, MIRA-MERMAID-002, MIRA-MERMAID-003, MIRA-MERMAID-004                                  | Mermaid package tests and existing Storybook stories                      | Implemented                           |
+| MIRA-MERMAID-005                                                                                        | Expanded Mermaid story interaction matrix                                 | Implemented                           |
+| MIRA-CAT-001                                                                                            | Raw spec mirrors, link rewriting, one-to-one checker tests                | Implemented by catalog-host slice     |
+| MIRA-CAT-002                                                                                            | Catalog descriptions and governing-spec links                             | Implemented by catalog/token slice    |
+| MIRA-CAT-003, MIRA-CAT-004                                                                              | Storybook fixture consolidation and comprehensive demo stories            | Implemented by catalog-host slice     |
+| MIRA-CAT-005                                                                                            | Vitest Storybook browser project and interaction tests                    | Implemented                           |
+| MIRA-CAT-006                                                                                            | Addon-owned Visual Delta suite, reviewed regenerated baselines            | Implemented                           |
+| MIRA-CAT-007                                                                                            | Catalog coverage checker and ten focused UI `play` assertions             | Implemented                           |
+| MIRA-CAT-008                                                                                            | Focused outline story and comprehensive outline control                   | Implemented                           |
+| MIRA-GOV-001, MIRA-GOV-002, MIRA-GOV-003, MIRA-GOV-004, MIRA-GOV-005, MIRA-GOV-006, MIRA-GOV-007        | `pnpm spec:check`, checker tests, pull-request workflow                   | Implemented by governance slice       |
+| MIRA-GOV-008                                                                                            | Package-boundary checker and tarball leak tests                           | In progress: specification slice      |
 
 ## Validation tiers
 

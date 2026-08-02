@@ -1,0 +1,14 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import { SvelteDocsBridge } from "../catalog/SvelteDocsBridge";
+import SpecPage from "./SpecPage.svelte";
+import source from "../../spec/src/packages.md?raw";
+
+<Meta
+  title="Mira MDE/Specification/Public packages and entry points"
+  parameters={{ layout: "fullscreen" }}
+/>
+
+<SvelteDocsBridge
+  component={SpecPage}
+  props={{ source, sourcePath: "packages.md" }}
+/>

@@ -12,11 +12,15 @@ test("requires the exact plugin chapter", () => {
     "spec/src/plugins/mermaid.md",
   ]);
   assert.equal(missing.ok, false);
-  assert.deepEqual(missing.missingChapters, ["spec/src/plugins/ai.md"]);
+  assert.deepEqual(missing.missingChapters, [
+    "spec/src/packages.md",
+    "spec/src/plugins/ai.md",
+  ]);
 
   const covered = classifySpecFirstChanges([
     "packages/plugin-ai/src/index.ts",
     "spec/src/plugins/ai.md",
+    "spec/src/packages.md",
   ]);
   assert.equal(covered.ok, true);
 });
@@ -26,6 +30,7 @@ test("requires every chapter for a cross-boundary change", () => {
     "packages/core/src/index.ts",
     "packages/default-ui/src/default-mde.svelte",
     "spec/src/editor-and-markdown.md",
+    "spec/src/packages.md",
   ]);
   assert.equal(result.ok, false);
   assert.deepEqual(result.missingChapters, [
