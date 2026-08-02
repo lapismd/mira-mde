@@ -61,6 +61,15 @@ export const OutlineNavigation: Story = {
     },
   }),
   parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/markdown/headings/outline-navigation-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
     docs: {
       description: {
         story:
@@ -123,6 +132,15 @@ export const OutlineSidebar: Story = {
     },
   }),
   parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/markdown/headings/outline-sidebar-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
     docs: {
       description: {
         story:

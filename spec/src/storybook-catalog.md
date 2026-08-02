@@ -59,12 +59,11 @@ capture uses the addon's pinned profile and `nested-import` baseline layout.
 The add-on writes each committed baseline URL into the owning story's
 `parameters.visualDelta` metadata and marks regenerated stories
 `visual-pending`; Storybook MUST NOT infer a second URL scheme at preview time.
-The current catalog contains 117 indexed stories: 105 have plugin-owned metadata
-and committed baseline images, while ten UI-primitive verification stories and
-the two focused Markdown outline variants are `visual-pending` until a
-separately authorized baseline mutation. The visual
-gate intentionally exposes missing baselines for new pending stories rather than
-silently treating them as approved. Once baselines exist, `pnpm test:visual`
+The current catalog contains 117 indexed stories, all with plugin-owned metadata
+and committed baseline images. Stories retain `visual-pending` until human
+acceptance is recorded separately. The visual gate intentionally exposes
+missing baselines for new pending stories rather than silently treating them as
+approved. Once baselines exist, `pnpm test:visual`
 invokes the affected preflight in the add-on's clean Docker stage; its
 deliberately missing cache produces a full-suite fallback before compare-only
 validation.

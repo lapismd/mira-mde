@@ -1,9 +1,8 @@
 # Verification
 
 This matrix is both requirement traceability and the implementation progress
-artifact. The Storybook-only host and six-package public architecture
-migrations are complete; the authorized baseline regeneration remains the final
-delivery slice.
+artifact. The Storybook-only host, six-package public architecture, and
+authorized baseline regeneration migrations are complete.
 
 | Requirements                                                                                            | Evidence                                                                  | Status                                |
 | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ------------------------------------- |
@@ -27,7 +26,7 @@ delivery slice.
 | MIRA-CAT-002                                                                                            | Catalog descriptions and governing-spec links                             | Implemented by catalog/token slice    |
 | MIRA-CAT-003, MIRA-CAT-004                                                                              | Storybook fixture consolidation and comprehensive demo stories            | Implemented by catalog-host slice     |
 | MIRA-CAT-005                                                                                            | Vitest Storybook browser project and interaction tests                    | Implemented                           |
-| MIRA-CAT-006                                                                                            | Addon-owned Visual Delta suite, reviewed regenerated baselines            | Pending authorized regeneration       |
+| MIRA-CAT-006                                                                                            | Addon-owned Visual Delta suite and authorized regenerated baselines       | Implemented by visual baseline slice  |
 | MIRA-CAT-007                                                                                            | Catalog coverage checker and ten focused UI `play` assertions             | Implemented                           |
 | MIRA-CAT-008                                                                                            | Focused outline story and comprehensive outline control                   | Implemented                           |
 | MIRA-GOV-001, MIRA-GOV-002, MIRA-GOV-003, MIRA-GOV-004, MIRA-GOV-005, MIRA-GOV-006, MIRA-GOV-007        | `pnpm spec:check`, checker tests, pull-request workflow                   | Implemented by governance slice       |
@@ -43,23 +42,26 @@ delivery slice.
 - Visual change: compare-only validation first; baseline mutation requires a
   separate approved review step through the installed Visual Delta suite.
 
-The 2026-08-02 canonical-host migration includes an authorized full baseline
+The 2026-08-02 canonical-host migration included an authorized full baseline
 regeneration because the addon's capture implementation and density supersede
 the repository's older custom 3x harness. Static Storybook builds also compile
 workspace packages first so the pinned clean capture environment cannot inherit
 local build output, and use the documented 4 GB heap ceiling required by the
 complete catalog. Visual runs reuse the addon's prewarmed static server in CI
-and locally. The 117-story regenerated set is reviewed and validated in strict
-compare-only mode before delivery. Renamed Mira Editor identities replace the
-orphaned Default UI paths during the same mutation step.
+and locally. All 117 indexed stories have regenerated baselines and explicit
+`parameters.visualDelta` metadata. Representative high-risk surfaces were
+spot-reviewed, and the complete set passed strict compare-only validation.
+Renamed Mira Editor identities replaced the orphaned Default UI paths during
+the same mutation step.
 
 The add-on's Docker stage excludes both `storybook-static` and its affected
 cache. The `test:visual` gate therefore uses the affected preflight to build in
 the pinned stage and deterministically fall back to the full catalog; the direct
 `test --all` route would otherwise select zero stories before waiting on a
 missing static host. The ten UI-primitive stories and two focused Markdown
-outline variants added after the canonical regeneration remain `visual-pending`
-until the authorized baseline mutation is completed and reviewed.
+outline variants are now baseline-covered. Stories retain `visual-pending`
+until human acceptance is recorded separately; this review state does not mean
+their committed baseline or deterministic comparison is missing.
 
 The UI primitive review also verifies that portaled dropdown and context menus
 use the Lapis-compatible 14/20 interface type scale with leading semantic action
