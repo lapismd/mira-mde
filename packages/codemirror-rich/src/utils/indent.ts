@@ -9,6 +9,7 @@ import {
   type ViewUpdate,
   WidgetType,
 } from "@codemirror/view";
+import { isFencedCodeLine } from "./code-block-lines";
 import { sortRanges } from "./ranges";
 
 type IndentSegment = {
@@ -447,6 +448,13 @@ function isMarkdownIndentLine(
   line: Line,
   layout: MiraLineIndentLayout,
 ): boolean {
+  // Fenced code keeps literal leading whitespace + the shared 24px fence
+  // padding. Hanging-indent chrome here pulls lines left of that padding
+  // until the cursor sits on the indent and clears the replace widget.
+  if (isFencedCodeLine(view.state, line.number)) {
+    return false;
+  }
+
   if (!layout.listKind && layout.kind !== "quote") {
     return true;
   }

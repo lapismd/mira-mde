@@ -121,6 +121,15 @@
 .markdown-editor-surface .cm-editor .cm-formatting-code {
   padding-inline-start: 24px;
   position: relative;
+  /* Fence lines must not inherit hanging-indent text-indent. */
+  text-indent: 0;
+}
+
+.markdown-editor-surface
+  .cm-editor
+  .cm-line.cm-formatting-code.indented-wrapped-line {
+  padding-inline-start: 24px !important;
+  text-indent: 0 !important;
 }
 
 /* Lapis source HyperMD chrome + formatting-code background. */

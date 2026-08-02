@@ -75,6 +75,7 @@ export type { MiraRichEditorOptions } from "./types";
 export {
   buildCodeBlockLineDecorations,
   codeBlockLineDecorations,
+  isFencedCodeLine,
 } from "./utils/code-block-lines";
 export {
   getFencedCodeLanguage,

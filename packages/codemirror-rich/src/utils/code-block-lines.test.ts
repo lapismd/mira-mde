@@ -1,6 +1,9 @@
 import { EditorState } from "@codemirror/state";
 import { describe, expect, it } from "vitest";
-import { buildCodeBlockLineDecorations } from "./code-block-lines";
+import {
+  buildCodeBlockLineDecorations,
+  isFencedCodeLine,
+} from "./code-block-lines";
 
 function lineClasses(source: string): string[] {
   const state = EditorState.create({
@@ -40,5 +43,17 @@ describe("code block line decorations", () => {
       "HyperMD-codeblock HyperMD-codeblock-bg cm-formatting-code",
       "HyperMD-codeblock HyperMD-codeblock-bg cm-formatting-code cm-formatting-code-end",
     ]);
+  });
+
+  it("detects fenced body lines for indent suppression", () => {
+    const state = EditorState.create({
+      doc: ["~~~mermaid", "  Source --> LivePreview", "~~~", "  outside"].join(
+        "\n",
+      ),
+    });
+    expect(isFencedCodeLine(state, 1)).toBe(true);
+    expect(isFencedCodeLine(state, 2)).toBe(true);
+    expect(isFencedCodeLine(state, 3)).toBe(true);
+    expect(isFencedCodeLine(state, 4)).toBe(false);
   });
 });

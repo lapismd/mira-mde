@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
+import { EditorView } from "@codemirror/view";
 import {
   getIndentLineLayout,
   getLineIndentInfo,
+  indentGuideDecorations,
   normalizeIndentText,
   selectionTouchesIndent,
   splitIndentSegments,
@@ -68,5 +70,39 @@ describe("indent helpers", () => {
       indentText: "    ",
       kind: "plain",
     });
+  });
+
+  it("does not apply hanging indent inside fenced code blocks", async () => {
+    const parent = document.createElement("div");
+    document.body.append(parent);
+    const view = new EditorView({
+      doc: [
+        "~~~mermaid",
+        "  Source --> LivePreview",
+        "  LivePreview --> Preview",
+        "~~~",
+        "  outside continuation",
+      ].join("\n"),
+      extensions: indentGuideDecorations({ livePreview: false }),
+      parent,
+    });
+    await new Promise((resolve) => requestAnimationFrame(() => resolve(null)));
+
+    const fenceBody = [...parent.querySelectorAll(".cm-line")].filter((line) =>
+      (line.textContent || "").includes("Source --> LivePreview"),
+    );
+    expect(fenceBody.length).toBe(1);
+    expect(fenceBody[0]?.classList.contains("indented-wrapped-line")).toBe(
+      false,
+    );
+    expect(fenceBody[0]?.querySelector(".cm-hmd-list-indent")).toBeNull();
+
+    const outside = [...parent.querySelectorAll(".cm-line")].find((line) =>
+      (line.textContent || "").includes("outside continuation"),
+    );
+    expect(outside?.classList.contains("indented-wrapped-line")).toBe(true);
+
+    view.destroy();
+    parent.remove();
   });
 });
