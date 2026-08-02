@@ -417,6 +417,41 @@ test("split view button toggles back to the previous view", async ({
   await expect(splitButton).not.toHaveAttribute("aria-pressed", "true");
 });
 
+test("editor CodeMirror scroller owns vertical overflow for long documents", async ({
+  page,
+}) => {
+  await gotoDemo(page);
+  await setMode(page, "Live");
+
+  const editorScroller = page
+    .locator(".mira-mde__editor-host > .cm-editor > .cm-scroller")
+    .first();
+  const scrollShell = page.locator(".mira-mde__editor-scroll").first();
+
+  const metrics = await editorScroller.evaluate((element) => ({
+    clientHeight: element.clientHeight,
+    scrollHeight: element.scrollHeight,
+    overflowY: getComputedStyle(element).overflowY,
+  }));
+  expect(metrics.clientHeight).toBeGreaterThan(0);
+  expect(metrics.scrollHeight).toBeGreaterThan(metrics.clientHeight);
+  expect(["auto", "scroll", "overlay"]).toContain(metrics.overflowY);
+
+  // Outer shell stays clipped; CM scroller is the scroll owner.
+  const shell = await scrollShell.evaluate((element) => ({
+    clientHeight: element.clientHeight,
+    scrollHeight: element.scrollHeight,
+    overflowY: getComputedStyle(element).overflowY,
+  }));
+  expect(shell.overflowY).toBe("hidden");
+  expect(shell.scrollHeight).toBeLessThanOrEqual(shell.clientHeight + 1);
+
+  await scrollEditor(page, 800);
+  await expect
+    .poll(() => editorScroller.evaluate((element) => element.scrollTop))
+    .toBeGreaterThan(0);
+});
+
 test("split view synchronizes vertical scroll between editor and preview", async ({
   page,
 }) => {

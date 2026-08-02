@@ -71,8 +71,15 @@
   border-inline-start: 0;
 }
 
+/*
+ * Keep the CM scroller as the only vertical scroll owner (split sync +
+ * existing e2e helpers target `.cm-scroller`). The sizer centers the column
+ * but must stay height-bounded to the pane — not grow with document content.
+ */
 .mira-mde__editor-scroll {
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
   height: 100%;
   min-height: 0;
   overflow: hidden;
@@ -80,12 +87,16 @@
 }
 
 .mira-mde__editor-scroll > .cm-sizer {
-  min-height: 100%;
+  flex: 1 1 auto;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .mira-mde__editor-host {
   height: 100%;
-  min-height: 100%;
+  min-height: 0;
+  overflow: hidden;
 }
 
 @media (max-width: 760px) {
