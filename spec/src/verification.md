@@ -75,6 +75,17 @@ outline variants are now baseline-covered. Stories retain `visual-pending`
 until human acceptance is recorded separately; this review state does not mean
 their committed baseline or deterministic comparison is missing.
 
+The Visual Delta suite is reviewed at `0.0.3`. This release routes Storybook's
+Diff Browser action through the same canonical capture runner used by the CLI,
+so a host-local browser cannot be mislabeled as the Linux/ARM64 baseline target.
+The published tarball includes source files but omits its source-build tsconfig,
+and its compare-only artifact scan includes newly generated `.turbo` manifests
+as though they were Visual Delta sidecars. Mira therefore applies a narrow pnpm
+patch that uses the shipped `dist` worker unless the tsconfig exists and excludes
+Turbo's disposable build cache from capture staging and artifact validation.
+Remove the patch when an upstream release includes both guards. The upgrade is
+compare-only and does not authorize baseline image changes.
+
 The UI primitive review also verifies that portaled dropdown and context menus
 use the Lapis-compatible 14/20 interface type scale with leading semantic action
 icons, and that a dialog's footer close action cannot inherit the absolute

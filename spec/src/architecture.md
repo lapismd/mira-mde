@@ -35,6 +35,11 @@ directly by Storybook stories, including `@lapismd/mira/ui`, are explicit root
 workspace dependencies so clean Vite builds do not rely on transitive package
 resolution.
 
+Storybook infrastructure dependencies are root-only development tools and MUST
+NOT leak into a public package manifest or emitted package output. The reviewed
+Visual Delta release is upgraded independently from Mira's six-package runtime
+graph and remains subject to the catalog's build and compare-only gates.
+
 Storybook's palette addon and manager color-mode control are host-only tooling.
 They update the preview document's public theme attribute and shadcn-compatible
 mode classes; runtime packages remain unaware of Storybook. Fixed appearance

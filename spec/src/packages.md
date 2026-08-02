@@ -32,6 +32,10 @@ install internal CodeMirror, renderer, UI, or theme workspaces separately.
 is part of its default feature set. The AI plugin remains opt-in. React and
 Vanilla depend only on the public products they adapt.
 
+Repository-only tools such as `@lapismd/storybook-addon-visual-delta` belong in
+the private root manifest. They are not part of the six-package public release
+set and MUST NOT appear in packed consumer dependency graphs.
+
 ## Supported `@lapismd/mira` entry points
 
 - The package root exports `Mira`, `MiraProps`, and `MiraHandle` and defaults to

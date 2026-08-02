@@ -9,3 +9,5 @@ minimumReleaseAgeExclude:
   - "@marijn/find-cluster-break@1.0.3"
   - crelt@1.0.7
   - esrap@2.2.13
+patchedDependencies:
+  "@lapismd/storybook-addon-visual-delta@0.0.3": patches/@lapismd__storybook-addon-visual-delta@0.0.3.patch

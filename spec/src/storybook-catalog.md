@@ -6,17 +6,17 @@ runtime dependency.
 
 ## Requirements
 
-| ID           | Requirement                                                                                                                                                                                                                            |
-| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| MIRA-CAT-001 | Storybook MUST render every canonical spec chapter from raw `spec/src` Markdown and link internal chapter references to their Storybook mirrors.                                                                                       |
-| MIRA-CAT-002 | Plugin and public component pages MUST provide a concise description and a link to the governing spec chapter or anchor.                                                                                                               |
-| MIRA-CAT-003 | Focused fixtures and the comprehensive demo document MUST live under the Storybook catalog with no manually synchronized copies.                                                                                                       |
-| MIRA-CAT-004 | The comprehensive demo MUST provide fixed source, live-preview, preview, and split stories using identical Markdown and adapter data.                                                                                                  |
-| MIRA-CAT-005 | Every testable public story MUST render in the Storybook browser test project; meaningful stateful behavior MUST use a `play` interaction.                                                                                             |
-| MIRA-CAT-006 | New visual stories MUST enter review as `visual-pending`; baseline mutation MUST use the installed Visual Delta suite and requires a separate authorized review.                                                                       |
-| MIRA-CAT-007 | Every shipped `@lapismd/mira/ui` primitive family MUST have representative rendered Storybook coverage with interaction or semantic assertions.                                                                                        |
-| MIRA-CAT-008 | Public opt-in preview surfaces MUST have a discoverable focused story, and the comprehensive demo MUST expose the same option wherever it materially changes a supported view.                                                         |
-| MIRA-CAT-009 | Storybook MUST expose independent built-in-palette and light/dark globals, render ordinary stories through inherited page appearance, and provide fixed built-in, system, custom-extension, and targeted-overlay verification stories. |
+| ID           | Requirement                                                                                                                                                                                                                                                         |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| MIRA-CAT-001 | Storybook MUST render every canonical spec chapter from raw `spec/src` Markdown and link internal chapter references to their Storybook mirrors.                                                                                                                    |
+| MIRA-CAT-002 | Plugin and public component pages MUST provide a concise description and a link to the governing spec chapter or anchor.                                                                                                                                            |
+| MIRA-CAT-003 | Focused fixtures and the comprehensive demo document MUST live under the Storybook catalog with no manually synchronized copies.                                                                                                                                    |
+| MIRA-CAT-004 | The comprehensive demo MUST provide fixed source, live-preview, preview, and split stories using identical Markdown and adapter data.                                                                                                                               |
+| MIRA-CAT-005 | Every testable public story MUST render in the Storybook browser test project; meaningful stateful behavior MUST use a `play` interaction.                                                                                                                          |
+| MIRA-CAT-006 | New visual stories MUST enter review as `visual-pending`; baseline mutation MUST use the installed Visual Delta suite and requires a separate authorized review. Visual Delta upgrades MUST pass the Storybook build and compare-only visual gates before adoption. |
+| MIRA-CAT-007 | Every shipped `@lapismd/mira/ui` primitive family MUST have representative rendered Storybook coverage with interaction or semantic assertions.                                                                                                                     |
+| MIRA-CAT-008 | Public opt-in preview surfaces MUST have a discoverable focused story, and the comprehensive demo MUST expose the same option wherever it materially changes a supported view.                                                                                      |
+| MIRA-CAT-009 | Storybook MUST expose independent built-in-palette and light/dark globals, render ordinary stories through inherited page appearance, and provide fixed built-in, system, custom-extension, and targeted-overlay verification stories.                              |
 
 Ordinary README prose points to Storybook and the specification. It must not
 become a parallel behavioral reference.
@@ -66,6 +66,10 @@ policy are owned by the installed Visual Delta Playwright suite. The default
 `playwright.config.ts` is therefore reserved for Visual Delta; focused
 Storybook acceptance uses `playwright.storybook.config.ts`. Authoritative
 capture uses the addon's pinned profile and `nested-import` baseline layout.
+The root dependency range records the reviewed add-on release; upgrading it is
+a catalog-infrastructure change and does not authorize baseline mutation.
+Repository-local dependency patches MUST be narrow, documented in verification,
+and removed after an upstream release provides the same tested behavior.
 Compare-only acceptance uses a repository-wide `0.064%` changed-pixel pass
 threshold; any result above that value requires a code correction or an
 explicitly reviewed baseline refresh rather than a looser local override.

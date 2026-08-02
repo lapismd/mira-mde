@@ -1,0 +1,22 @@
+diff --git a/src/node/capture-runner.ts b/src/node/capture-runner.ts
+index 5099cee7272dfb5bc6a0b9572780fae85438c247..b3cef92cc8e211097483cab19ee5c4932b4e5056 100644
+--- a/src/node/capture-runner.ts
++++ b/src/node/capture-runner.ts
+@@ -47,7 +47,8 @@ const currentPackageRoot = path.resolve(
+   "../..",
+ );
+ const runningPackageFromSource =
+-  path.basename(path.dirname(path.dirname(currentPackageModulePath))) === "src";
++  path.basename(path.dirname(path.dirname(currentPackageModulePath))) === "src" &&
++  existsSync(path.join(currentPackageRoot, "tsconfig.node-build.json"));
+ 
+ function commandAvailable(command: string): boolean {
+   try {
+@@ -63,6 +64,7 @@ const STAGE_COPY_IGNORES = new Set([
+   ".git",
+   ".jj",
+   ".cache",
++  ".turbo",
+   "blob-report",
+   "dist",
+   "node_modules",
