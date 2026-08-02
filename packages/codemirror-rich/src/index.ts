@@ -1072,7 +1072,10 @@ function decorateHiddenFormatting(
   addRegexMarks(text, lineStart, ranges, /(\*\*|__|\*|_|~~|`)/g, options);
   addRegexMarks(text, lineStart, ranges, /(!?\[|\]\(|\)|\[\[|\]\])/g, options);
   decorateHeadingFormatting(text, lineStart, ranges, options);
-  addRegexMarks(text, lineStart, ranges, /^(\s*>+\s?)/g, options);
+  // Blockquote `>` is owned by indent quote chrome + .cm-formatting-quote CSS
+  // (transparent / faint on active line). Collapsing it with formatting-hidden
+  // removes marker width and the hanging quote padding as soon as focus leaves
+  // the `>` characters.
 }
 
 function decorateHeadingFormatting(

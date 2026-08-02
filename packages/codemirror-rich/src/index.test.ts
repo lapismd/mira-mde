@@ -65,6 +65,34 @@ describe("createRichEditorExtensions", () => {
     parent.remove();
   });
 
+  it("keeps blockquote markers from collapsing when the line is focused", async () => {
+    const parent = document.createElement("div");
+    document.body.append(parent);
+    const view = new EditorView({
+      doc: "> quoted line\n\nAfter",
+      extensions: createRichEditorExtensions({ livePreview: true }),
+      parent,
+    });
+    await nextFrame();
+
+    // Caret in quote content (after "> "), not on the marker itself.
+    view.dispatch({ selection: { anchor: 4, head: 4 } });
+    await nextFrame();
+
+    const quoteLine = [...parent.querySelectorAll(".cm-line")].find((line) =>
+      (line.textContent || "").includes("quoted line"),
+    );
+    expect(quoteLine).toBeTruthy();
+    const hiddenQuoteMarks = [
+      ...quoteLine!.querySelectorAll(".cm-formatting-hidden"),
+    ].filter((node) => (node.textContent || "").includes(">"));
+    expect(hiddenQuoteMarks).toHaveLength(0);
+    expect(quoteLine!.textContent).toContain(">");
+
+    view.destroy();
+    parent.remove();
+  });
+
   it("uses list-callout contributions from Mira extensions", async () => {
     const parent = document.createElement("div");
     document.body.append(parent);
