@@ -33,7 +33,9 @@ contains publishable package families only.
 Root quality gates compose the specification, catalog, package, Storybook, and
 browser checks. In particular, `storybook:check` validates catalog metadata and
 CSS-token coverage before building the static host and running compare-only
-visual validation.
+visual validation. `build-storybook` first builds every workspace package so
+the static host and canonical container capture do not depend on stale local
+`dist` output.
 
 The root owns the Vitest 4 Storybook project and its Chromium browser provider;
 package-local Vitest configurations continue to own pure unit tests. Playwright

@@ -38,8 +38,10 @@ migration lands; existing package tests remain valid evidence where noted.
 
 The 2026-08-02 canonical-host migration included an authorized full baseline
 regeneration because the addon's capture implementation and density superseded
-the repository's older custom 3x harness. The regenerated set is reviewed and
-validated in strict compare-only mode before delivery.
+the repository's older custom 3x harness. Static Storybook builds also compile
+workspace packages first so the pinned clean capture environment cannot inherit
+local build output. The regenerated set is reviewed and validated in strict
+compare-only mode before delivery.
 
 The portable parity audit recorded 59 present features, six consumer-adapter
 boundaries, six Lapis-only behaviors, and no remaining portable P0-P2 gaps at

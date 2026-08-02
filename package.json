@@ -10,7 +10,7 @@
   },
   "scripts": {
     "build": "turbo run build",
-    "build-storybook": "node -e \"require('node:fs').mkdirSync('.cache/visual-delta',{recursive:true})\" && storybook build --stats-json .cache/visual-delta",
+    "build-storybook": "pnpm build && node -e \"require('node:fs').mkdirSync('.cache/visual-delta',{recursive:true})\" && storybook build --stats-json .cache/visual-delta",
     "catalog:check": "node ./scripts/check-catalog.mjs && node --test ./scripts/check-catalog.spec.mjs",
     "check": "pnpm check:format && turbo run check",
     "check:all": "pnpm check && pnpm lint && pnpm test && pnpm build",
