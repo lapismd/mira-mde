@@ -34,7 +34,7 @@ describe("block controls", () => {
     parent.remove();
   });
 
-  it("top-aligns block handles in the gutter like line numbers", async () => {
+  it("pins block handles to the first line and matches line-number band", async () => {
     const parent = document.createElement("div");
     document.body.append(parent);
     const view = new EditorView({
@@ -50,11 +50,14 @@ describe("block controls", () => {
 
     await nextFrame();
 
-    const gutterElement = parent.querySelector(
+    const gutterElement = parent.querySelector<HTMLElement>(
       ".mira-block-controls-gutter .cm-gutterElement",
     );
+    const handle = parent.querySelector<HTMLElement>(".mira-block-handle");
     expect(gutterElement).not.toBeNull();
+    expect(handle).not.toBeNull();
     expect(getComputedStyle(gutterElement!).alignItems).toBe("flex-start");
+    expect(handle!.classList.contains("mira-block-handle")).toBe(true);
 
     view.destroy();
     parent.remove();

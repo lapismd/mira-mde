@@ -1117,8 +1117,7 @@ const blockControlsTheme = EditorView.theme({
     width: "1.25rem",
   },
   ".mira-block-controls-gutter .cm-gutterElement": {
-    // Match line-number gutters: keep the grip on the first visual line
-    // when a markdown block wraps to multiple lines.
+    // Stay on the first visual line when a block wraps (not mid-block).
     alignItems: "flex-start",
     display: "flex",
     justifyContent: "center",
@@ -1128,6 +1127,8 @@ const blockControlsTheme = EditorView.theme({
   ".mira-block-handle-spacer": {
     display: "block",
     height: "1rem",
+    // Optically match line-number glyphs within the first line box.
+    marginTop: "max(0px, calc((1lh - 1rem) / 2))",
     width: "1rem",
   },
   ".mira-block-handle": {
@@ -1142,6 +1143,8 @@ const blockControlsTheme = EditorView.theme({
     display: "inline-flex",
     height: "1rem",
     justifyContent: "center",
+    // Pin to the first line, then nudge down to the line-number band.
+    marginTop: "max(0px, calc((1lh - 1rem) / 2))",
     opacity: "0",
     padding: "0",
     pointerEvents: "auto",
