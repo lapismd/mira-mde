@@ -40,6 +40,8 @@ They update the preview document's public theme attribute and shadcn-compatible
 mode classes; runtime packages remain unaware of Storybook. Fixed appearance
 stories apply their variants through public editor props and story-local page
 wrappers so rendering a Canvas cannot replace the Docs page's global selection.
+The preview palette addon is explicitly prebundled so concurrent browser workers
+cannot trigger a mid-suite dependency-optimization reload.
 
 The former `apps/demo` and `apps/docs` workspaces are retired. The root package
 owns Storybook development, static builds, and browser acceptance. The

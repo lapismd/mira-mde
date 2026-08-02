@@ -49,6 +49,7 @@ const config: StorybookConfig = {
       optimizeDeps: {
         exclude: ["@storybook/svelte"],
         include: [
+          "@storybook/addon-themes",
           "@lucide/svelte/icons/align-vertical-justify-center",
           "@lucide/svelte/icons/align-vertical-justify-end",
           "@lucide/svelte/icons/align-vertical-justify-start",

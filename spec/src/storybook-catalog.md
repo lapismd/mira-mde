@@ -45,8 +45,9 @@ user-visible interactions; browser-sensitive geometry and native browser APIs
 remain in focused Playwright acceptance against Storybook iframes. That
 acceptance covers scroll ownership and synchronization, pointer drag/drop,
 table mutation and source reveal, native clipboard behavior, and Mermaid SVG
-and portal settlement. Story-only icon dependencies are prebundled so a clean
-browser run cannot invalidate its story modules with a mid-suite Vite reload.
+and portal settlement. Story-only icon dependencies and the preview palette
+addon are prebundled so a clean browser run cannot invalidate story modules
+with a mid-suite Vite reload.
 
 Public stories run the accessibility addon as an enforced browser assertion.
 The non-content CodeMirror gutter remains the sole global exclusion; any new
