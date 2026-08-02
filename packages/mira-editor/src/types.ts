@@ -8,8 +8,8 @@ import type {
   MiraLinkResolver,
   MiraMarkdownAuthoringConfig,
   MiraMode,
+  MiraColorMode,
   MiraTheme,
-  MiraThemeConfig,
   MiraTemplateSelection,
 } from "@lapismd/mira/extensions";
 import type {
@@ -37,7 +37,7 @@ export type MiraEditorProps = {
   indentWithTabs?: boolean;
   indentWidth?: number;
   theme?: MiraTheme;
-  themeConfig?: MiraThemeConfig;
+  colorMode?: MiraColorMode;
   sourcePath?: string;
   class?: string;
   editorClass?: string;

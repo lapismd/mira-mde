@@ -18,16 +18,14 @@ export type MiraMarkdownPostProcessor = (
   parent: unknown | null,
 ) => void | (() => void);
 
-export type MiraTheme = "obsidian" | "system" | "light" | "dark" | "inherit";
+/** An opaque, case-sensitive whitespace-separated CSS theme token list. */
+export type MiraTheme = string;
 
-export type MiraThemeConfig = {
-  root?: HTMLElement | Document;
-  lightClassNames?: string[];
-  darkClassNames?: string[];
-  lightDataThemeValues?: string[];
-  darkDataThemeValues?: string[];
-  attributeNames?: string[];
-  fallback?: Exclude<MiraTheme, "inherit">;
+export type MiraColorMode = "inherit" | "light" | "dark" | "system";
+
+export type MiraAppearanceProps = {
+  theme?: MiraTheme;
+  colorMode?: MiraColorMode;
 };
 
 export type MiraImageSyntax = "reference" | "inline";

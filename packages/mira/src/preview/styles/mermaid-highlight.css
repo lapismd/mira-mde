@@ -77,90 +77,36 @@
 .markdown-preview-surface .hljs,
 .markdown-rendered .hljs,
 .markdown-widget-shell .hljs {
-  color: #24292e;
+  color: var(--mira-code-foreground);
   font-size: 0.875rem;
 }
 
 .markdown-preview-surface :is(.hljs-keyword, .hljs-doctag, .hljs-type),
 .markdown-rendered :is(.hljs-keyword, .hljs-doctag, .hljs-type),
 .markdown-widget-shell :is(.hljs-keyword, .hljs-doctag, .hljs-type) {
-  color: #c92d3c;
+  color: var(--mira-syntax-keyword);
 }
 
 .markdown-preview-surface :is(.hljs-title, .hljs-title.function_),
 .markdown-rendered :is(.hljs-title, .hljs-title.function_),
 .markdown-widget-shell :is(.hljs-title, .hljs-title.function_) {
-  color: #6f42c1;
+  color: var(--mira-syntax-heading);
 }
 
 .markdown-preview-surface :is(.hljs-number, .hljs-literal, .hljs-attr),
 .markdown-rendered :is(.hljs-number, .hljs-literal, .hljs-attr),
 .markdown-widget-shell :is(.hljs-number, .hljs-literal, .hljs-attr) {
-  color: #005cc5;
+  color: var(--mira-syntax-number);
 }
 
 .markdown-preview-surface :is(.hljs-string, .hljs-regexp),
 .markdown-rendered :is(.hljs-string, .hljs-regexp),
 .markdown-widget-shell :is(.hljs-string, .hljs-regexp) {
-  color: #032f62;
+  color: var(--mira-syntax-string);
 }
 
 .markdown-preview-surface :is(.hljs-comment, .hljs-code),
 .markdown-rendered :is(.hljs-comment, .hljs-code),
 .markdown-widget-shell :is(.hljs-comment, .hljs-code) {
-  color: #6a737d;
-}
-
-.theme-dark .markdown-preview-surface .hljs,
-.theme-dark .markdown-rendered .hljs,
-.theme-dark .markdown-widget-shell .hljs,
-.dark .markdown-preview-surface .hljs,
-.dark .markdown-rendered .hljs,
-.dark .markdown-widget-shell .hljs {
-  color: #c9d1d9;
-}
-
-.theme-dark
-  :is(.markdown-preview-surface, .markdown-rendered, .markdown-widget-shell)
-  :is(.hljs-keyword, .hljs-doctag, .hljs-type),
-.dark
-  :is(.markdown-preview-surface, .markdown-rendered, .markdown-widget-shell)
-  :is(.hljs-keyword, .hljs-doctag, .hljs-type) {
-  color: #ff7b72;
-}
-
-.theme-dark
-  :is(.markdown-preview-surface, .markdown-rendered, .markdown-widget-shell)
-  :is(.hljs-title, .hljs-title.function_),
-.dark
-  :is(.markdown-preview-surface, .markdown-rendered, .markdown-widget-shell)
-  :is(.hljs-title, .hljs-title.function_) {
-  color: #d2a8ff;
-}
-
-.theme-dark
-  :is(.markdown-preview-surface, .markdown-rendered, .markdown-widget-shell)
-  :is(.hljs-number, .hljs-literal, .hljs-attr),
-.dark
-  :is(.markdown-preview-surface, .markdown-rendered, .markdown-widget-shell)
-  :is(.hljs-number, .hljs-literal, .hljs-attr) {
-  color: #79c0ff;
-}
-
-.theme-dark
-  :is(.markdown-preview-surface, .markdown-rendered, .markdown-widget-shell)
-  :is(.hljs-string, .hljs-regexp),
-.dark
-  :is(.markdown-preview-surface, .markdown-rendered, .markdown-widget-shell)
-  :is(.hljs-string, .hljs-regexp) {
-  color: #a5d6ff;
-}
-
-.theme-dark
-  :is(.markdown-preview-surface, .markdown-rendered, .markdown-widget-shell)
-  :is(.hljs-comment, .hljs-code),
-.dark
-  :is(.markdown-preview-surface, .markdown-rendered, .markdown-widget-shell)
-  :is(.hljs-comment, .hljs-code) {
-  color: #8b949e;
+  color: var(--mira-syntax-comment);
 }

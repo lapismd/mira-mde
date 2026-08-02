@@ -14,8 +14,6 @@ import type {
   MiraLinkResolver,
   MiraTemplateSelection,
   MiraMode,
-  MiraTheme,
-  MiraThemeConfig,
 } from "@lapismd/mira/extensions";
 export {
   createMiraCodeMirrorExtensions,
@@ -52,8 +50,6 @@ export type MiraEditorOptions = {
   placeholder?: string;
   lineWrapping?: boolean;
   spellcheck?: boolean;
-  theme?: MiraTheme;
-  themeConfig?: MiraThemeConfig;
   sourcePath?: string;
   linkResolver?: MiraLinkResolver;
   assetResolver?: MiraAssetResolver;

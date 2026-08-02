@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount, tick } from "svelte";
+  import { onMount, setContext, tick } from "svelte";
   import type { Extension } from "@codemirror/state";
   import {
     createMiraCodeMirrorExtensions,
@@ -23,6 +23,13 @@
   import * as ToggleGroup from "@lapismd/mira/ui/toggle-group";
   import type { MiraProps } from "./types";
   import {
+    miraAppearanceContextKey,
+    miraColorModeAttribute,
+    miraColorModeClassName,
+    normalizeMiraTheme,
+    type MiraAppearanceContext,
+  } from "./internal/appearance-context";
+  import {
     captureModeSwitchPosition,
     restoreEditorPosition,
     restorePreviewPosition,
@@ -41,8 +48,8 @@
     indentGuides = true,
     indentWithTabs = true,
     indentWidth = 4,
-    theme = "obsidian",
-    themeConfig,
+    theme,
+    colorMode = "inherit",
     sourcePath,
     class: className = "",
     toolbar = true,
@@ -65,14 +72,19 @@
 
   let editorHost: HTMLDivElement | null = $state(null);
   let previewPane: HTMLElement | null = $state(null);
-  let rootEl: HTMLDivElement | null = $state(null);
   let controller: MiraEditorController | null = $state(null);
   let cleanupExtensionMounts: Array<() => void> = [];
   let previousMode = $state<MiraMode>(mode);
   let pendingModePosition = $state<MiraModeSwitchPosition | null>(null);
-  let inheritedTheme = $state<"obsidian" | "system" | "light" | "dark">(
-    "system",
-  );
+
+  setContext<MiraAppearanceContext>(miraAppearanceContextKey, {
+    get theme() {
+      return normalizeMiraTheme(theme);
+    },
+    get colorMode() {
+      return colorMode;
+    },
+  });
 
   const resolvedExtensions = $derived(
     resolveMiraExtensions(extensions, {
@@ -126,9 +138,9 @@
   );
   const showEditor = $derived(mode !== "preview");
   const showPreview = $derived(mode === "preview" || mode === "split");
-  const themeClass = $derived(
-    themeClassName(theme === "inherit" ? inheritedTheme : theme),
-  );
+  const themeAttribute = $derived(normalizeMiraTheme(theme));
+  const colorModeAttribute = $derived(miraColorModeAttribute(colorMode));
+  const colorModeClass = $derived(miraColorModeClassName(colorMode));
 
   function buildCodeMirrorExtensions(): Extension[] {
     return createMiraCodeMirrorExtensions({
@@ -300,33 +312,6 @@
   });
 
   $effect(() => {
-    if (theme !== "inherit") {
-      return;
-    }
-
-    inheritedTheme = resolveInheritedTheme(rootEl, themeConfig);
-    const observer = new MutationObserver(() => {
-      inheritedTheme = resolveInheritedTheme(rootEl, themeConfig);
-    });
-
-    for (const element of themeObservationTargets(rootEl, themeConfig)) {
-      observer.observe(element, {
-        attributeFilter: [
-          "class",
-          ...(themeConfig?.attributeNames ?? [
-            "data-theme",
-            "data-color-scheme",
-            "data-mode",
-          ]),
-        ],
-        attributes: true,
-      });
-    }
-
-    return () => observer.disconnect();
-  });
-
-  $effect(() => {
     if (mode !== "split" || !controller || !previewPane) {
       return;
     }
@@ -382,110 +367,6 @@
       cancelled = true;
     };
   });
-
-  function themeClassName(
-    value: "obsidian" | "system" | "light" | "dark" | "inherit",
-  ): string {
-    if (value === "dark") {
-      return "mira-theme-dark theme-dark dark";
-    }
-    if (value === "light") {
-      return "mira-theme-light theme-light";
-    }
-    if (value === "system") {
-      return "mira-theme-system";
-    }
-    return "mira-theme-obsidian theme-light";
-  }
-
-  function resolveInheritedTheme(
-    element: HTMLElement | null,
-    config: typeof themeConfig,
-  ): "obsidian" | "system" | "light" | "dark" {
-    const darkClasses = config?.darkClassNames ?? [
-      "dark",
-      "theme-dark",
-      "mira-theme-dark",
-    ];
-    const lightClasses = config?.lightClassNames ?? [
-      "light",
-      "theme-light",
-      "mira-theme-light",
-    ];
-    const darkValues = config?.darkDataThemeValues ?? ["dark", "theme-dark"];
-    const lightValues = config?.lightDataThemeValues ?? [
-      "light",
-      "theme-light",
-    ];
-    const attributeNames = config?.attributeNames ?? [
-      "data-theme",
-      "data-color-scheme",
-      "data-mode",
-    ];
-
-    for (const target of themeLookupTargets(element, config)) {
-      for (const className of darkClasses) {
-        if (target.classList.contains(className)) {
-          return "dark";
-        }
-      }
-      for (const className of lightClasses) {
-        if (target.classList.contains(className)) {
-          return "light";
-        }
-      }
-      for (const attribute of attributeNames) {
-        const value = target.getAttribute(attribute)?.toLowerCase();
-        if (value && darkValues.includes(value)) {
-          return "dark";
-        }
-        if (value && lightValues.includes(value)) {
-          return "light";
-        }
-      }
-    }
-
-    return config?.fallback ?? "system";
-  }
-
-  function themeLookupTargets(
-    element: HTMLElement | null,
-    config: typeof themeConfig,
-  ): HTMLElement[] {
-    if (typeof document === "undefined") {
-      return [];
-    }
-
-    const configuredRoot = config?.root;
-    const rootElement = isDocument(configuredRoot)
-      ? configuredRoot.documentElement
-      : configuredRoot;
-    const targets: HTMLElement[] = [];
-    let current: HTMLElement | null =
-      rootElement ?? element?.parentElement ?? document.documentElement;
-    while (current) {
-      targets.push(current);
-      current = current.parentElement;
-    }
-    if (document.body && !targets.includes(document.body)) {
-      targets.push(document.body);
-    }
-    if (!targets.includes(document.documentElement)) {
-      targets.push(document.documentElement);
-    }
-    return targets;
-  }
-
-  function themeObservationTargets(
-    element: HTMLElement | null,
-    config: typeof themeConfig,
-  ): HTMLElement[] {
-    return themeLookupTargets(element, config);
-  }
-
-  function isDocument(value: unknown): value is Document {
-    return typeof Document !== "undefined" && value instanceof Document;
-  }
 
   function syncSplitScroll(
     editorScroller: HTMLElement,
@@ -565,8 +446,9 @@
 </script>
 
 <div
-  bind:this={rootEl}
-  class={`mira ${themeClass} ${className}`.trim()}
+  class={`mira ${colorModeClass ?? ""} ${className}`.trim()}
+  data-mira-theme={themeAttribute}
+  data-mira-color-mode={colorModeAttribute}
   data-mode={mode}
   data-readonly={readonly}
 >

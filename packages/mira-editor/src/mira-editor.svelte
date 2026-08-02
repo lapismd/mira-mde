@@ -19,6 +19,12 @@
     type MiraToolbarIconName,
   } from "@lapismd/mira/extensions";
   import type { Component } from "svelte";
+  import {
+    miraColorModeAttribute,
+    miraColorModeClassName,
+    normalizeMiraTheme,
+    provideMiraAppearance,
+  } from "@lapismd/mira/ui/appearance";
   import MiraEditorToolbar from "./mira-editor-toolbar.svelte";
   import {
     createMiraEditorExtensions,
@@ -43,8 +49,8 @@
     indentGuides = true,
     indentWithTabs = true,
     indentWidth = 4,
-    theme = "obsidian",
-    themeConfig,
+    theme,
+    colorMode = "inherit",
     sourcePath,
     class: className = "",
     editorClass = "",
@@ -74,6 +80,19 @@
     onIndentWithTabsChange,
     onFrontmatterChange,
   }: MiraEditorProps = $props();
+
+  provideMiraAppearance({
+    get theme() {
+      return normalizeMiraTheme(theme);
+    },
+    get colorMode() {
+      return colorMode;
+    },
+  });
+
+  const themeAttribute = $derived(normalizeMiraTheme(theme));
+  const colorModeAttribute = $derived(miraColorModeAttribute(colorMode));
+  const colorModeClass = $derived(miraColorModeClassName(colorMode));
 
   let editor: MiraHandle | null = $state(null);
 
@@ -290,7 +309,9 @@
 </script>
 
 <div
-  class={`mira-editor ${className}`.trim()}
+  class={`mira-editor ${colorModeClass ?? ""} ${className}`.trim()}
+  data-mira-theme={themeAttribute}
+  data-mira-color-mode={colorModeAttribute}
   data-mode={mode}
   data-readonly={readonly}
 >
@@ -329,7 +350,7 @@
       {indentWithTabs}
       {indentWidth}
       {theme}
-      {themeConfig}
+      {colorMode}
       {sourcePath}
       blockControls={resolvedFeatures[MiraFeature.BlockControls] &&
         featureConfigs[MiraFeature.BlockControls]?.enabled !== false}

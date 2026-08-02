@@ -19,6 +19,29 @@ describe("@lapismd/mira-react", () => {
     expect(Mira).toBeTruthy();
   });
 
+  it("passes open-ended theme tokens and color mode to React surfaces", () => {
+    const host = document.createElement("div");
+    const root = createRoot(host);
+
+    act(() => {
+      root.render(
+        <Mira
+          value="# React appearance"
+          mode="source"
+          theme="obsidian company-brand"
+          colorMode="light"
+        />,
+      );
+    });
+
+    const editor = host.querySelector<HTMLElement>(".mira");
+    expect(editor?.dataset.miraTheme).toBe("obsidian company-brand");
+    expect(editor?.dataset.miraColorMode).toBe("light");
+    expect(editor?.classList.contains("light")).toBe(true);
+
+    act(() => root.unmount());
+  });
+
   it("enables block controls in the default feature set", () => {
     expect(resolveMiraEditorFeatures()[MiraFeature.BlockControls]).toBe(true);
   });

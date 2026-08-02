@@ -1,0 +1,98 @@
+:root,
+[data-mira-theme~="mira"] {
+  --mira-background: light-dark(#fbfbfc, #17181c);
+  --mira-foreground: light-dark(#1d1d20, #f1f3f7);
+  --mira-muted: light-dark(#f0f1f3, #24262c);
+  --mira-muted-foreground: light-dark(#63656f, #a7adba);
+  --mira-border: light-dark(#d8dbe1, #353944);
+  --mira-border-strong: light-dark(#aeb4bf, #555d6d);
+  --mira-accent: light-dark(#0f766e, #2dd4bf);
+  --mira-accent-foreground: light-dark(#ffffff, #042f2e);
+  --mira-accent-soft: light-dark(
+    color-mix(in oklab, #0f766e 11%, transparent),
+    color-mix(in oklab, #2dd4bf 13%, transparent)
+  );
+  --mira-focus-ring: var(--mira-accent);
+  --mira-danger: light-dark(#dc2626, #f87171);
+  --mira-active-line-background: transparent;
+  --mira-selection: light-dark(
+    color-mix(in oklab, #0f766e 25%, transparent),
+    color-mix(in oklab, #2dd4bf 30%, transparent)
+  );
+  --mira-popover: light-dark(#ffffff, #202228);
+  --mira-popover-foreground: var(--mira-foreground);
+  --mira-editor-background: light-dark(#ffffff, #1b1d22);
+  --mira-preview-background: light-dark(#ffffff, #1b1d22);
+  --mira-code-background: light-dark(#f4f5f7, #111318);
+  --mira-code-foreground: light-dark(#24262d, #edf0f5);
+  --mira-heading-color: var(--mira-foreground);
+  --mira-syntax-heading: light-dark(#0f766e, #5eead4);
+  --mira-syntax-link: light-dark(#0b6fcb, #7cc4ff);
+  --mira-syntax-comment: light-dark(#697386, #8b95a7);
+  --mira-syntax-keyword: light-dark(#7c3aed, #c4b5fd);
+  --mira-syntax-string: light-dark(#0f766e, #5eead4);
+  --mira-syntax-number: light-dark(#b45309, #fbbf24);
+  --mira-syntax-variable: light-dark(#0b6fcb, #93c5fd);
+  --mira-syntax-property: light-dark(#9a3412, #fca5a5);
+  --mira-syntax-type: light-dark(#8b3a94, #f0abfc);
+  --mira-syntax-operator: light-dark(#475569, #cbd5e1);
+  --mira-syntax-invalid: light-dark(#dc2626, #f87171);
+  --mira-syntax-invalid-background: light-dark(#fee2e2, #4a1d24);
+  --mira-callout-background: light-dark(#f7faf9, #162522);
+  --_mira-callout-bug-light: 220, 38, 38;
+  --_mira-callout-bug-dark: 248, 113, 113;
+  --_mira-callout-default-light: 8, 109, 221;
+  --_mira-callout-default-dark: 125, 188, 255;
+  --_mira-callout-example-light: 124, 58, 237;
+  --_mira-callout-example-dark: 196, 181, 253;
+  --_mira-callout-question-light: 213, 138, 0;
+  --_mira-callout-question-dark: 251, 191, 36;
+  --_mira-callout-quote-light: 107, 114, 128;
+  --_mira-callout-quote-dark: 156, 163, 175;
+  --_mira-callout-success-light: 0, 153, 102;
+  --_mira-callout-success-dark: 94, 234, 212;
+  --_mira-callout-summary-light: 0, 114, 178;
+  --_mira-callout-summary-dark: 103, 232, 249;
+  --mira-callout-bug: light-dark(
+    var(--_mira-callout-bug-light),
+    var(--_mira-callout-bug-dark)
+  );
+  --mira-callout-default: light-dark(
+    var(--_mira-callout-default-light),
+    var(--_mira-callout-default-dark)
+  );
+  --mira-callout-error: var(--mira-callout-bug);
+  --mira-callout-example: light-dark(
+    var(--_mira-callout-example-light),
+    var(--_mira-callout-example-dark)
+  );
+  --mira-callout-info: var(--mira-callout-default);
+  --mira-callout-question: light-dark(
+    var(--_mira-callout-question-light),
+    var(--_mira-callout-question-dark)
+  );
+  --mira-callout-quote: light-dark(
+    var(--_mira-callout-quote-light),
+    var(--_mira-callout-quote-dark)
+  );
+  --mira-callout-success: light-dark(
+    var(--_mira-callout-success-light),
+    var(--_mira-callout-success-dark)
+  );
+  --mira-callout-summary: light-dark(
+    var(--_mira-callout-summary-light),
+    var(--_mira-callout-summary-dark)
+  );
+  --mira-callout-tip: var(--mira-callout-success);
+  --mira-callout-warning: var(--mira-callout-question);
+  --mira-tag-background: light-dark(#e6f4f1, #163a36);
+  --mira-tag-foreground: light-dark(#0f5f59, #8ee9dd);
+  --mira-link: light-dark(#0b6fcb, #7cc4ff);
+  --mira-frontmatter-background: light-dark(#f7f8fa, #202228);
+  --mira-frontmatter-label: light-dark(#4b5563, #c2c8d2);
+  --mira-widget-background: light-dark(#ffffff, #1f2229);
+  --mira-widget-shadow: light-dark(
+    0 8px 28px rgb(15 23 42 / 8%),
+    0 10px 34px rgb(0 0 0 / 32%)
+  );
+}

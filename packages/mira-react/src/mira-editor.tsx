@@ -36,6 +36,11 @@ import {
 } from "./features";
 import { cx } from "./hooks";
 import { Mira } from "./mira";
+import {
+  miraColorModeAttribute,
+  miraColorModeClassName,
+  normalizeMiraTheme,
+} from "./appearance";
 import type {
   MiraEditorHandle,
   MiraEditorProps,
@@ -100,8 +105,8 @@ export const MiraEditor = forwardRef<MiraEditorHandle, MiraEditorProps>(
       readonly: readonlyProp,
       sourcePath,
       spellcheck = true,
-      theme = "obsidian",
-      themeConfig,
+      theme,
+      colorMode = "inherit",
       toolbarActions = [],
       toolbars = [],
       value: valueProp,
@@ -369,7 +374,13 @@ export const MiraEditor = forwardRef<MiraEditorHandle, MiraEditorProps>(
 
     return (
       <div
-        className={cx("mira-editor", className)}
+        className={cx(
+          "mira-editor",
+          miraColorModeClassName(colorMode),
+          className,
+        )}
+        data-mira-theme={normalizeMiraTheme(theme)}
+        data-mira-color-mode={miraColorModeAttribute(colorMode)}
         data-mode={mode}
         data-readonly={readonly}
       >
@@ -435,7 +446,7 @@ export const MiraEditor = forwardRef<MiraEditorHandle, MiraEditorProps>(
             sourcePath={sourcePath}
             spellcheck={spellcheck}
             theme={theme}
-            themeConfig={themeConfig}
+            colorMode={colorMode}
             toolbar={false}
             value={value}
           />

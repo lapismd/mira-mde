@@ -8,6 +8,13 @@
     tooltipPortalContextKey,
     type OverlayPortalContext,
   } from "../internal/overlay-portal-context.js";
+  import {
+    miraAppearanceContextKey,
+    miraColorModeAttribute,
+    miraColorModeClassName,
+    normalizeMiraTheme,
+    type MiraAppearanceContext,
+  } from "../../internal/appearance-context.js";
 
   let {
     ref = $bindable(null),
@@ -28,6 +35,16 @@
   );
   const disablePortals =
     getContext<boolean | undefined>(disableOverlayPortalContextKey) ?? false;
+  const appearance = getContext<MiraAppearanceContext | undefined>(
+    miraAppearanceContextKey,
+  );
+  const appearanceTheme = $derived(normalizeMiraTheme(appearance?.theme));
+  const appearanceMode = $derived(
+    miraColorModeAttribute(appearance?.colorMode),
+  );
+  const appearanceClass = $derived(
+    miraColorModeClassName(appearance?.colorMode),
+  );
 </script>
 
 <TooltipPrimitive.Portal
@@ -36,10 +53,14 @@
   <TooltipPrimitive.Content
     bind:ref
     data-slot="tooltip-content"
+    data-mira-overlay
+    data-mira-theme={appearanceTheme}
+    data-mira-color-mode={appearanceMode}
     {sideOffset}
     {side}
     class={cn(
       "animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-(--layer-tooltip) w-fit origin-(--bits-tooltip-content-transform-origin) rounded-md bg-[var(--interactive-accent)] px-3 py-1.5 text-xs text-balance text-[var(--text-on-accent)]",
+      appearanceClass,
       className,
     )}
     {...restProps}

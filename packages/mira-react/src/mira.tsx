@@ -14,8 +14,6 @@ import {
   type MiraExtensionRuntimeContext,
   type MiraMode,
   type MiraTemplateSelection,
-  type MiraTheme,
-  type MiraThemeConfig,
 } from "@lapismd/mira/extensions";
 import {
   forwardRef,
@@ -25,9 +23,13 @@ import {
   useMemo,
   useRef,
   useState,
-  type RefObject,
 } from "react";
 import { useLatestRef, cx } from "./hooks";
+import {
+  miraColorModeAttribute,
+  miraColorModeClassName,
+  normalizeMiraTheme,
+} from "./appearance";
 import { MarkdownPreviewHost } from "./preview-host";
 import type { MiraHandle, MiraProps } from "./types";
 
@@ -67,8 +69,8 @@ export const Mira = forwardRef<MiraHandle, MiraProps>(function Mira(
     readonly: readonlyProp,
     sourcePath,
     spellcheck = true,
-    theme = "obsidian",
-    themeConfig,
+    theme,
+    colorMode = "inherit",
     toolbar = true,
     value: valueProp,
   },
@@ -409,10 +411,9 @@ export const Mira = forwardRef<MiraHandle, MiraProps>(function Mira(
 
   const showEditor = mode !== "preview";
   const showPreview = mode === "preview" || mode === "split";
-  const inheritedTheme = useInheritedTheme(theme, themeConfig, rootRef);
-  const themeClass = themeClassName(
-    theme === "inherit" ? inheritedTheme : theme,
-  );
+  const themeAttribute = normalizeMiraTheme(theme);
+  const colorModeAttribute = miraColorModeAttribute(colorMode);
+  const colorModeClass = miraColorModeClassName(colorMode);
 
   useEffect(() => {
     const controller = controllerRef.current;
@@ -426,7 +427,9 @@ export const Mira = forwardRef<MiraHandle, MiraProps>(function Mira(
 
   return (
     <div
-      className={cx("mira", themeClass, className)}
+      className={cx("mira", colorModeClass, className)}
+      data-mira-theme={themeAttribute}
+      data-mira-color-mode={colorModeAttribute}
       data-mode={mode}
       data-readonly={readonly}
       ref={rootRef}
@@ -575,139 +578,4 @@ function syncSplitScroll(
     editorScroller.removeEventListener("scroll", syncPreview);
     previewScroller.removeEventListener("scroll", syncEditor);
   };
-}
-
-function themeClassName(theme: MiraTheme): string {
-  if (theme === "dark") {
-    return "mira-theme-dark theme-dark dark";
-  }
-  if (theme === "light") {
-    return "mira-theme-light theme-light";
-  }
-  if (theme === "system") {
-    return "mira-theme-system";
-  }
-  return "mira-theme-obsidian theme-light";
-}
-
-function useInheritedTheme(
-  theme: MiraTheme,
-  config: MiraThemeConfig | undefined,
-  rootRef: RefObject<HTMLElement | null>,
-): Exclude<MiraTheme, "inherit"> {
-  const [inheritedTheme, setInheritedTheme] = useState<
-    Exclude<MiraTheme, "inherit">
-  >(config?.fallback ?? "system");
-
-  useEffect(() => {
-    if (theme !== "inherit" || typeof document === "undefined") {
-      return;
-    }
-
-    const updateTheme = () => {
-      setInheritedTheme(resolveInheritedTheme(rootRef.current, config));
-    };
-    updateTheme();
-
-    const observer = new MutationObserver(updateTheme);
-    for (const element of themeLookupTargets(rootRef.current, config)) {
-      observer.observe(element, {
-        attributeFilter: [
-          "class",
-          ...(config?.attributeNames ?? [
-            "data-theme",
-            "data-color-scheme",
-            "data-mode",
-          ]),
-        ],
-        attributes: true,
-      });
-    }
-
-    return () => observer.disconnect();
-  }, [config, rootRef, theme]);
-
-  return inheritedTheme;
-}
-
-function resolveInheritedTheme(
-  element: HTMLElement | null,
-  config: MiraThemeConfig | undefined,
-): Exclude<MiraTheme, "inherit"> {
-  const darkClasses = config?.darkClassNames ?? [
-    "dark",
-    "theme-dark",
-    "mira-theme-dark",
-  ];
-  const lightClasses = config?.lightClassNames ?? [
-    "light",
-    "theme-light",
-    "mira-theme-light",
-  ];
-  const darkValues = config?.darkDataThemeValues ?? ["dark", "theme-dark"];
-  const lightValues = config?.lightDataThemeValues ?? ["light", "theme-light"];
-  const attributeNames = config?.attributeNames ?? [
-    "data-theme",
-    "data-color-scheme",
-    "data-mode",
-  ];
-
-  for (const target of themeLookupTargets(element, config)) {
-    for (const className of darkClasses) {
-      if (target.classList.contains(className)) {
-        return "dark";
-      }
-    }
-    for (const className of lightClasses) {
-      if (target.classList.contains(className)) {
-        return "light";
-      }
-    }
-    for (const attribute of attributeNames) {
-      const value = target.getAttribute(attribute)?.toLowerCase();
-      if (value && darkValues.includes(value)) {
-        return "dark";
-      }
-      if (value && lightValues.includes(value)) {
-        return "light";
-      }
-    }
-  }
-
-  return config?.fallback ?? "system";
-}
-
-function themeLookupTargets(
-  element: HTMLElement | null,
-  config: MiraThemeConfig | undefined,
-): HTMLElement[] {
-  if (typeof document === "undefined") {
-    return [];
-  }
-
-  const configuredRoot = config?.root;
-  const rootElement = isDocument(configuredRoot)
-    ? configuredRoot.documentElement
-    : configuredRoot;
-  const targets: HTMLElement[] = [];
-  let current: HTMLElement | null =
-    rootElement ?? element?.parentElement ?? document.documentElement;
-
-  while (current) {
-    targets.push(current);
-    current = current.parentElement;
-  }
-
-  if (document.body && !targets.includes(document.body)) {
-    targets.push(document.body);
-  }
-  if (!targets.includes(document.documentElement)) {
-    targets.push(document.documentElement);
-  }
-
-  return targets;
-}
-
-function isDocument(value: unknown): value is Document {
-  return typeof Document !== "undefined" && value instanceof Document;
 }

@@ -172,6 +172,8 @@ void [createMira, createMiraEditor];
         "--eval",
         [
           'import.meta.resolve("@lapismd/mira/styles.css")',
+          'import.meta.resolve("@lapismd/mira/themes.css")',
+          'import.meta.resolve("@lapismd/mira/themes/mira.css")',
           'import.meta.resolve("@lapismd/mira/themes/obsidian.css")',
           'import.meta.resolve("@lapismd/mira-editor/styles.css")',
           'import.meta.resolve("@lapismd/mira-react/styles.css")',

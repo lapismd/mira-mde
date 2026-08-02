@@ -160,11 +160,11 @@
 .mira-toolbar__button:focus-visible,
 .mira-toolbar__group-item:focus-visible,
 .mira-toolbar__link:focus-visible {
-  border-color: var(--interactive-accent, var(--mira-accent));
+  border-color: var(--mira-focus-ring, var(--mira-accent));
   box-shadow: 0 0 0 2px
     color-mix(
       in srgb,
-      var(--interactive-accent, var(--mira-accent)) 30%,
+      var(--mira-focus-ring, var(--mira-accent)) 30%,
       transparent
     );
   outline: none;

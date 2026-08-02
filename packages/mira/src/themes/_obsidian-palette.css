@@ -1,0 +1,97 @@
+[data-mira-theme~="obsidian"] {
+  --mira-background: light-dark(#ffffff, #1e1e1e);
+  --mira-foreground: light-dark(#222222, #dadada);
+  --mira-muted: light-dark(#f6f6f6, #262626);
+  --mira-muted-foreground: light-dark(#5c5c5c, #b3b3b3);
+  --mira-border: light-dark(#e0e0e0, #363636);
+  --mira-border-strong: light-dark(#d4d4d4, #555555);
+  --mira-accent: light-dark(hsl(257 88.88% 70.95%), #7852ee);
+  --mira-accent-foreground: #ffffff;
+  --mira-accent-soft: light-dark(
+    hsl(258 88% 66% / 11%),
+    hsl(258 88% 66% / 18%)
+  );
+  --mira-focus-ring: var(--mira-accent);
+  --mira-danger: light-dark(#e93147, #fb464c);
+  --mira-active-line-background: transparent;
+  --mira-selection: light-dark(hsl(258 88% 66% / 20%), hsl(258 88% 66% / 33%));
+  --mira-popover: light-dark(#ffffff, #262626);
+  --mira-popover-foreground: var(--mira-foreground);
+  --mira-editor-background: light-dark(#ffffff, #1e1e1e);
+  --mira-preview-background: light-dark(#ffffff, #1e1e1e);
+  --mira-code-background: light-dark(#f6f6f6, #242424);
+  --mira-code-foreground: var(--mira-foreground);
+  --mira-heading-color: var(--mira-foreground);
+  --mira-syntax-heading: light-dark(#7852ee, #a882ff);
+  --mira-syntax-link: light-dark(#086ddd, #027aff);
+  --mira-syntax-comment: light-dark(#707070, #999999);
+  --mira-syntax-keyword: light-dark(#7852ee, #a882ff);
+  --mira-syntax-string: light-dark(#008f67, #53dfdd);
+  --mira-syntax-number: light-dark(#ec7500, #e9973f);
+  --mira-syntax-variable: light-dark(#086ddd, #027aff);
+  --mira-syntax-property: light-dark(#d53984, #fa99cd);
+  --mira-syntax-type: light-dark(#7852ee, #a882ff);
+  --mira-syntax-operator: light-dark(#5c5c5c, #b3b3b3);
+  --mira-syntax-invalid: light-dark(#e93147, #fb464c);
+  --mira-syntax-invalid-background: light-dark(#ffe8eb, #4a1d24);
+  --mira-callout-background: light-dark(#fafafa, #242424);
+  --_mira-obsidian-callout-bug-light: 233, 49, 71;
+  --_mira-obsidian-callout-bug-dark: 251, 70, 76;
+  --_mira-obsidian-callout-default-light: 8, 109, 221;
+  --_mira-obsidian-callout-default-dark: 2, 122, 255;
+  --_mira-obsidian-callout-example-light: 120, 82, 238;
+  --_mira-obsidian-callout-example-dark: 168, 130, 255;
+  --_mira-obsidian-callout-question-light: 224, 172, 0;
+  --_mira-obsidian-callout-question-dark: 224, 222, 113;
+  --_mira-obsidian-callout-quote-light: 112, 112, 112;
+  --_mira-obsidian-callout-quote-dark: 153, 153, 153;
+  --_mira-obsidian-callout-success-light: 8, 185, 78;
+  --_mira-obsidian-callout-success-dark: 68, 207, 110;
+  --_mira-obsidian-callout-summary-light: 0, 191, 188;
+  --_mira-obsidian-callout-summary-dark: 83, 223, 221;
+  --mira-callout-bug: light-dark(
+    var(--_mira-obsidian-callout-bug-light),
+    var(--_mira-obsidian-callout-bug-dark)
+  );
+  --mira-callout-default: light-dark(
+    var(--_mira-obsidian-callout-default-light),
+    var(--_mira-obsidian-callout-default-dark)
+  );
+  --mira-callout-error: var(--mira-callout-bug);
+  --mira-callout-example: light-dark(
+    var(--_mira-obsidian-callout-example-light),
+    var(--_mira-obsidian-callout-example-dark)
+  );
+  --mira-callout-info: var(--mira-callout-default);
+  --mira-callout-question: light-dark(
+    var(--_mira-obsidian-callout-question-light),
+    var(--_mira-obsidian-callout-question-dark)
+  );
+  --mira-callout-quote: light-dark(
+    var(--_mira-obsidian-callout-quote-light),
+    var(--_mira-obsidian-callout-quote-dark)
+  );
+  --mira-callout-success: light-dark(
+    var(--_mira-obsidian-callout-success-light),
+    var(--_mira-obsidian-callout-success-dark)
+  );
+  --mira-callout-summary: light-dark(
+    var(--_mira-obsidian-callout-summary-light),
+    var(--_mira-obsidian-callout-summary-dark)
+  );
+  --mira-callout-tip: var(--mira-callout-success);
+  --mira-callout-warning: var(--mira-callout-question);
+  --mira-tag-background: light-dark(hsl(258 88% 66% / 12%), #363052);
+  --mira-tag-foreground: light-dark(#6540d6, #c6b5ff);
+  --mira-link: light-dark(#7852ee, #a882ff);
+  --mira-frontmatter-background: light-dark(#fafafa, #242424);
+  --mira-frontmatter-label: light-dark(#5c5c5c, #b3b3b3);
+  --mira-widget-background: light-dark(#ffffff, #242424);
+  --_mira-obsidian-widget-shadow-light:
+    0 0 0 1px rgb(0 0 0 / 8%), 0 8px 24px rgb(0 0 0 / 10%);
+  --_mira-obsidian-widget-shadow-dark: 0 10px 34px rgb(0 0 0 / 32%);
+  --mira-widget-shadow: light-dark(
+    var(--_mira-obsidian-widget-shadow-light),
+    var(--_mira-obsidian-widget-shadow-dark)
+  );
+}

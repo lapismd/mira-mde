@@ -5,6 +5,39 @@ import type { MiraEditorHandle } from "./types";
 import MiraEditor from "./mira-editor.svelte";
 
 describe("MiraEditor extension contributions", () => {
+  it("applies targeted appearance to the shell and portaled menus", async () => {
+    const target = document.createElement("div");
+    document.body.append(target);
+    const component = mount(MiraEditor, {
+      target,
+      props: {
+        value: "# Targeted appearance",
+        theme: "obsidian company-brand",
+        colorMode: "dark",
+      },
+    });
+
+    await tick();
+    const shell = target.querySelector<HTMLElement>(".mira-editor");
+    expect(shell?.dataset.miraTheme).toBe("obsidian company-brand");
+    expect(shell?.dataset.miraColorMode).toBe("dark");
+
+    target
+      .querySelector<HTMLButtonElement>('[aria-label="View options"]')
+      ?.click();
+    await tick();
+
+    const menu = document.body.querySelector<HTMLElement>(
+      '[data-slot="dropdown-menu-content"]',
+    );
+    expect(menu?.dataset.miraTheme).toBe("obsidian company-brand");
+    expect(menu?.dataset.miraColorMode).toBe("dark");
+    expect(menu?.hasAttribute("data-mira-overlay")).toBe(true);
+
+    await unmount(component as never);
+    target.remove();
+  });
+
   it("runs extension commands from the toolbar and mounts extension styles", async () => {
     const target = document.createElement("div");
     document.body.append(target);

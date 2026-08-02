@@ -66,7 +66,9 @@
       "svelte": "./dist/ui/*/index.js",
       "import": "./dist/ui/*/index.js"
     },
+    "./themes/mira.css": "./dist/themes/mira.css",
     "./themes/obsidian.css": "./dist/themes/obsidian.css",
+    "./themes.css": "./dist/themes.css",
     "./styles.css": "./dist/styles.css"
   },
   "scripts": {
