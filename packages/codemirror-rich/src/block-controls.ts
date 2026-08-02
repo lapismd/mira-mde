@@ -1127,7 +1127,8 @@ const blockControlsTheme = EditorView.theme({
   ".mira-block-handle-spacer": {
     display: "block",
     height: "1rem",
-    // Optically match line-number glyphs within the first line box.
+    // Inherit gutter line-height so 1lh matches the first content line.
+    lineHeight: "inherit",
     marginTop: "max(0px, calc((1lh - 1rem) / 2))",
     width: "1rem",
   },
@@ -1143,7 +1144,9 @@ const blockControlsTheme = EditorView.theme({
     display: "inline-flex",
     height: "1rem",
     justifyContent: "center",
-    // Pin to the first line, then nudge down to the line-number band.
+    // Inherit gutter line-height so 1lh is the first-line box, not the
+    // button's own metrics; then center the 1rem grip in that band.
+    lineHeight: "inherit",
     marginTop: "max(0px, calc((1lh - 1rem) / 2))",
     opacity: "0",
     padding: "0",
