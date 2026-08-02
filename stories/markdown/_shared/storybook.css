@@ -98,9 +98,18 @@ body {
   height: auto;
 }
 
-html.dark .mira-story-surface,
-html.mira-theme-dark .mira-story-surface {
+html.dark .mira-story-surface {
   color-scheme: dark;
+}
+
+[data-mira-theme~="story-mira-brand"] {
+  --mira-accent: #006adc;
+  --mira-focus-ring: #006adc;
+}
+
+[data-mira-theme~="story-obsidian-brand"] {
+  --mira-accent: light-dark(#d6409f, #ff8bd5);
+  --mira-focus-ring: var(--mira-accent);
 }
 
 .mira-portable-surfaces-story {

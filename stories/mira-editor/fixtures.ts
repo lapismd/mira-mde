@@ -28,7 +28,8 @@ The default editor composes toolbar, mode switching, live widgets, and preview r
 | Setting | Prop | Default |
 | :--- | :--- | :--- |
 | Mode | ${tick}mode${tick} | live-preview |
-| Theme | ${tick}theme${tick} | light |
+| Theme | ${tick}theme${tick} | inherit page |
+| Color mode | ${tick}colorMode${tick} | inherit |
 | Line wrap | ${tick}lineWrapping${tick} | true |
 
 ## Math and code

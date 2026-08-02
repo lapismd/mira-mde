@@ -11,6 +11,7 @@
     MiraImageConfig,
     MiraMarkdownAuthoringConfig,
     MiraMode,
+    MiraColorMode,
     MiraTheme,
   } from "@lapismd/mira/extensions";
   import { miraEditorSampleMarkdown } from "../fixtures";
@@ -24,6 +25,12 @@
     sourcePath?: string;
     /** Theme tokens applied to the editor shell. */
     theme?: MiraTheme;
+    /** Color-mode override independent from the selected theme. */
+    colorMode?: MiraColorMode;
+    /** Story-only page palette used to demonstrate inheritance and islands. */
+    pageTheme?: MiraTheme;
+    /** Story-only page color mode used to demonstrate inheritance and islands. */
+    pageColorMode?: MiraColorMode;
     /** Disable editing while keeping the current mode. */
     readonly?: boolean;
     /** Wrap long source lines. */
@@ -65,7 +72,10 @@
     value = miraEditorSampleMarkdown,
     mode = "live-preview",
     sourcePath = "story.md",
-    theme = "light",
+    theme,
+    colorMode = "inherit",
+    pageTheme,
+    pageColorMode,
     readonly = false,
     lineWrapping = true,
     spellcheck = true,
@@ -87,27 +97,57 @@
   }: Props = $props();
 </script>
 
-<EditorModeStory
-  {value}
-  {mode}
-  {sourcePath}
-  {theme}
-  {readonly}
-  {lineWrapping}
-  {spellcheck}
-  {indentGuides}
-  {indentWithTabs}
-  {indentWidth}
-  {outline}
-  {outlineVariant}
-  {emoji}
-  {frontmatterOpen}
-  {htmlPolicy}
-  {features}
-  {featureConfigs}
-  {extensions}
-  {imageConfig}
-  {authoring}
-  {toolbars}
-  {height}
-/>
+{#snippet editor()}
+  <EditorModeStory
+    {value}
+    {mode}
+    {sourcePath}
+    {theme}
+    {colorMode}
+    {readonly}
+    {lineWrapping}
+    {spellcheck}
+    {indentGuides}
+    {indentWithTabs}
+    {indentWidth}
+    {outline}
+    {outlineVariant}
+    {emoji}
+    {frontmatterOpen}
+    {htmlPolicy}
+    {features}
+    {featureConfigs}
+    {extensions}
+    {imageConfig}
+    {authoring}
+    {toolbars}
+    {height}
+  />
+{/snippet}
+
+{#if pageTheme || (pageColorMode && pageColorMode !== "inherit")}
+  <div
+    class="mira-story-appearance-page"
+    class:dark={pageColorMode === "dark"}
+    class:theme-dark={pageColorMode === "dark"}
+    class:light={pageColorMode === "light"}
+    class:theme-light={pageColorMode === "light"}
+    data-mira-theme={pageTheme || undefined}
+    data-mira-color-mode={pageColorMode && pageColorMode !== "inherit"
+      ? pageColorMode
+      : undefined}
+  >
+    {@render editor()}
+  </div>
+{:else}
+  {@render editor()}
+{/if}
+
+<style>
+  .mira-story-appearance-page {
+    min-height: 100%;
+    padding: 1rem;
+    color: var(--mira-foreground);
+    background: var(--mira-background);
+  }
+</style>

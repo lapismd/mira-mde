@@ -11,7 +11,8 @@ const meta = {
   args: {
     value: comprehensiveMarkdown,
     mode: "live-preview",
-    theme: "light",
+    theme: "",
+    colorMode: "inherit",
     editorShell: "default",
     mermaidEnabled: true,
     outline: true,
@@ -29,8 +30,12 @@ const meta = {
       table: { category: "View" },
     },
     theme: {
+      control: "text",
+      table: { category: "Appearance" },
+    },
+    colorMode: {
       control: "select",
-      options: ["light", "dark", "system", "obsidian"],
+      options: ["inherit", "light", "dark", "system"],
       table: { category: "Appearance" },
     },
     editorShell: {

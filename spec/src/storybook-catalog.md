@@ -55,8 +55,10 @@ technical exclusion must be documented and scoped to the narrowest story.
 The preview document owns `data-mira-theme` and the shadcn-compatible
 `.light`/`.dark` color-mode signal. Storybook starts in deterministic light mode
 for visual capture even though a consumer page without an explicit mode uses
-the system preference. Fixed theme stories override globals locally and include
-computed-token assertions; ordinary stories inherit the toolbar globals.
+the system preference. Ordinary stories inherit the toolbar globals. Fixed
+theme stories use targeted component props and story-local page wrappers so
+their variants cannot overwrite the owning Docs page's toolbar globals; they
+also include computed-token assertions.
 
 Visual capture, comparison, readiness, clipping, diff sidecars, and failure
 policy are owned by the installed Visual Delta Playwright suite. The default
@@ -66,7 +68,7 @@ capture uses the addon's pinned profile and `nested-import` baseline layout.
 The add-on writes each committed baseline URL into the owning story's
 `parameters.visualDelta` metadata and marks regenerated stories
 `visual-pending`; Storybook MUST NOT infer a second URL scheme at preview time.
-The current catalog contains 117 indexed stories, all with plugin-owned metadata
+The current catalog contains 122 indexed stories, all with plugin-owned metadata
 and committed baseline images. Stories retain `visual-pending` until human
 acceptance is recorded separately. The visual gate intentionally exposes
 missing baselines for new pending stories rather than silently treating them as

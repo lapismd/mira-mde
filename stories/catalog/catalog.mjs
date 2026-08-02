@@ -64,6 +64,12 @@ const semanticTokens = [
     "Accent buttons and checkbox markers.",
   ),
   token(
+    "--mira-focus-ring",
+    "Keyboard focus-ring color.",
+    "var(--mira-accent)",
+    "Focused editor controls and shadcn-derived primitives.",
+  ),
+  token(
     "--mira-accent-soft",
     "Low-emphasis accent surface.",
     "color-mix(in oklab, var(--mira-accent) 11%, transparent)",
@@ -366,6 +372,7 @@ const commonTokens = [
   "--mira-border-strong",
   "--mira-accent",
   "--mira-accent-foreground",
+  "--mira-focus-ring",
   "--mira-accent-soft",
   "--mira-danger",
   "--mira-radius",
@@ -736,6 +743,15 @@ export const catalogEntries = [
 ];
 
 export const catalogRegistry = { tokens: cssTokens, entries: catalogEntries };
+
+export const customThemeTemplate = `[data-mira-theme~="company-brand"] {
+${cssTokens
+  .map(
+    (entry) =>
+      `  /* ${entry.purpose} Default: ${entry.defaultValue} */\n  /* ${entry.name}: ${entry.defaultValue}; */`,
+  )
+  .join("\n")}
+}`;
 
 export function catalogEntry(id) {
   const entry = catalogEntries.find((candidate) => candidate.id === id);

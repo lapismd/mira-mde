@@ -35,6 +35,12 @@ directly by Storybook stories, including `@lapismd/mira/ui`, are explicit root
 workspace dependencies so clean Vite builds do not rely on transitive package
 resolution.
 
+Storybook's palette addon and manager color-mode control are host-only tooling.
+They update the preview document's public theme attribute and shadcn-compatible
+mode classes; runtime packages remain unaware of Storybook. Fixed appearance
+stories apply their variants through public editor props and story-local page
+wrappers so rendering a Canvas cannot replace the Docs page's global selection.
+
 The former `apps/demo` and `apps/docs` workspaces are retired. The root package
 owns Storybook development, static builds, and browser acceptance. The
 `packages` directory contains exactly six public products; unimplemented Vue

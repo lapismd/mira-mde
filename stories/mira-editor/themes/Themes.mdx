@@ -6,18 +6,71 @@ import {
   Source,
 } from "@storybook/addon-docs/blocks";
 import * as ThemesStories from "./Themes.stories";
+import { customThemeTemplate } from "../../catalog/catalog.mjs";
 
 <Meta of={ThemesStories} />
 
-# Themes
+# Themes and color modes
 
-Pass `theme` to `MiraEditor` to select packaged theme tokens. Storybook’s toolbar theme toggle also flips document classes for light/dark chrome.
+Mira separates an open-ended theme token list from the `light`, `dark`, and
+`system` color modes. See the [styling specification](?path=/docs/spec-styling--docs#requirements)
+for the normative inheritance and export contract.
 
-Supported values: `light`, `dark`, `obsidian`, `system`, `inherit`.
+## Page appearance
 
-## Usage
+Load every built-in palette and select one on the page root. With no explicit
+mode, Mira follows the operating-system preference.
 
-<Source language="html" code={`<MiraEditor bind:value theme="obsidian" />`} />
+<Source
+  language="html"
+  code={`import "@lapismd/mira/themes.css";
+
+<html data-mira-theme="obsidian" class="dark">
+  <MiraEditor bind:value />
+</html>`}
+/>
+
+## Targeted editor appearance
+
+`theme` accepts any case-sensitive whitespace-separated token list. `colorMode`
+is independent and can override the page without a JavaScript observer.
+
+<Source
+  language="html"
+  code={`<MiraEditor
+  bind:value
+  theme="obsidian company-brand"
+  colorMode="light"
+/>`}
+/>
+
+## Extending a built-in palette
+
+Load consumer CSS after Mira, compose a built-in base token, and override only
+the public variables that differ. The complete token table is available on the
+Storybook catalog page for each styled surface.
+
+<Source
+  language="css"
+  code={`@import "@lapismd/mira/styles.css";
+
+[data-mira-theme~="company-brand"] {
+--mira-accent: #006adc;
+--mira-focus-ring: #006adc;
+}
+
+[data-mira-theme~="company-brand"][data-mira-color-mode="dark"],
+.dark [data-mira-theme~="company-brand"] {
+--mira-accent: #70b8ff;
+}`}
+/>
+
+### Complete token template
+
+This commented template is generated from Storybook's canonical token registry,
+so it stays aligned with every shipped public `--mira-*` token.
+
+<Source language="css" code={customThemeTemplate} />
 
 <Primary />
 
@@ -25,12 +78,19 @@ Supported values: `light`, `dark`, `obsidian`, `system`, `inherit`.
 
 <Controls />
 
-## Examples
+## Built-in palettes
 
-### Dark
+### Mira
 
-<Canvas of={ThemesStories.Dark} meta={ThemesStories} />
+<Canvas of={ThemesStories.MiraLight} meta={ThemesStories} />
+<Canvas of={ThemesStories.MiraDark} meta={ThemesStories} />
 
 ### Obsidian
 
-<Canvas of={ThemesStories.Obsidian} meta={ThemesStories} />
+<Canvas of={ThemesStories.ObsidianLight} meta={ThemesStories} />
+<Canvas of={ThemesStories.ObsidianDark} meta={ThemesStories} />
+
+## Consumer extensions and targeting
+
+<Canvas of={ThemesStories.CustomThemeExtendingMira} meta={ThemesStories} />
+<Canvas of={ThemesStories.TargetedOverride} meta={ThemesStories} />

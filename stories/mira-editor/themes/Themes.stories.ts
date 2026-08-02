@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/svelte-vite";
+import { expect, userEvent, within } from "storybook/test";
 import MiraEditorStory from "../_shared/MiraEditorStory.svelte";
 import {
   defaultEditorArgs,
@@ -17,7 +18,7 @@ const meta = {
       ...defaultEditorDocsParameters.docs,
       description: {
         component:
-          "Theme tokens for MiraEditor via the theme prop (light, dark, obsidian, system, inherit).",
+          "Open-ended palette tokens and independent color modes for MiraEditor, including composable consumer themes and targeted overlays.",
       },
     },
   },
@@ -26,50 +27,194 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Light: Story = {
-  tags: ["visual-pending"],
-  parameters: {
-    visualDelta: {
-      images: [
-        "/visual-baselines/stories/mira-editor/themes/light-chromium.png",
-      ],
-      opacity: 0.5,
-      colorInversion: false,
-      align: "canvas",
-      placement: "right",
-    },
-  },
-  args: { theme: "light" },
+type ExpectedAppearance = {
+  background: string;
+  foreground: string;
+  colorScheme: "light" | "dark";
 };
 
-export const Dark: Story = {
-  tags: ["visual-pending"],
-  parameters: {
+async function expectAppearance(
+  canvasElement: HTMLElement,
+  expected: ExpectedAppearance,
+): Promise<HTMLElement> {
+  const shell = canvasElement.querySelector<HTMLElement>(".mira-editor");
+  if (!shell) throw new Error("Mira Editor shell did not render");
+  const style = getComputedStyle(shell);
+  await expect(style.backgroundColor).toBe(expected.background);
+  await expect(style.color).toBe(expected.foreground);
+  await expect(style.colorScheme).toContain(expected.colorScheme);
+  return shell;
+}
+
+function visual(image: string) {
+  return {
     visualDelta: {
-      images: [
-        "/visual-baselines/stories/mira-editor/themes/dark-chromium.png",
-      ],
+      images: [image],
       opacity: 0.5,
       colorInversion: false,
       align: "canvas",
       placement: "right",
     },
+  };
+}
+
+function resolveTokenColor(element: HTMLElement, token: string): string {
+  const probe = element.ownerDocument.createElement("span");
+  probe.style.color = `var(${token})`;
+  element.append(probe);
+  const color = getComputedStyle(probe).color;
+  probe.remove();
+  return color;
+}
+
+export const MiraLight: Story = {
+  tags: ["visual-pending"],
+  parameters: visual(
+    "/visual-baselines/stories/mira-editor/themes/mira-light-chromium.png",
+  ),
+  args: { theme: "mira", colorMode: "light" },
+  play: async ({ canvasElement }) => {
+    const shell = await expectAppearance(canvasElement, {
+      background: "rgb(251, 251, 252)",
+      foreground: "rgb(29, 29, 32)",
+      colorScheme: "light",
+    });
+    await expect(shell).toHaveAttribute("data-mira-theme", "mira");
   },
-  args: { theme: "dark" },
 };
 
-export const Obsidian: Story = {
+export const MiraDark: Story = {
   tags: ["visual-pending"],
-  parameters: {
-    visualDelta: {
-      images: [
-        "/visual-baselines/stories/mira-editor/themes/obsidian-chromium.png",
-      ],
-      opacity: 0.5,
-      colorInversion: false,
-      align: "canvas",
-      placement: "right",
-    },
+  parameters: visual(
+    "/visual-baselines/stories/mira-editor/themes/mira-dark-chromium.png",
+  ),
+  args: { theme: "mira", colorMode: "dark" },
+  play: async ({ canvasElement }) => {
+    await expectAppearance(canvasElement, {
+      background: "rgb(23, 24, 28)",
+      foreground: "rgb(241, 243, 247)",
+      colorScheme: "dark",
+    });
   },
-  args: { theme: "obsidian" },
+};
+
+export const ObsidianLight: Story = {
+  tags: ["visual-pending"],
+  parameters: visual(
+    "/visual-baselines/stories/mira-editor/themes/obsidian-light-chromium.png",
+  ),
+  args: { theme: "obsidian", colorMode: "light" },
+  play: async ({ canvasElement }) => {
+    await expectAppearance(canvasElement, {
+      background: "rgb(255, 255, 255)",
+      foreground: "rgb(34, 34, 34)",
+      colorScheme: "light",
+    });
+  },
+};
+
+export const ObsidianDark: Story = {
+  tags: ["visual-pending"],
+  parameters: visual(
+    "/visual-baselines/stories/mira-editor/themes/obsidian-dark-chromium.png",
+  ),
+  args: { theme: "obsidian", colorMode: "dark" },
+  play: async ({ canvasElement }) => {
+    await expectAppearance(canvasElement, {
+      background: "rgb(30, 30, 30)",
+      foreground: "rgb(218, 218, 218)",
+      colorScheme: "dark",
+    });
+  },
+};
+
+export const PageInheritanceAndSystem: Story = {
+  tags: ["visual-pending"],
+  parameters: visual(
+    "/visual-baselines/stories/mira-editor/themes/page-inheritance-system-chromium.png",
+  ),
+  args: {
+    theme: "",
+    colorMode: "system",
+    pageTheme: "obsidian",
+    pageColorMode: "dark",
+  },
+  play: async ({ canvasElement }) => {
+    const shell = await expectAppearance(canvasElement, {
+      background: "rgb(255, 255, 255)",
+      foreground: "rgb(34, 34, 34)",
+      colorScheme: "light",
+    });
+    await expect(shell).not.toHaveAttribute("data-mira-theme");
+    await expect(shell).toHaveAttribute("data-mira-color-mode", "system");
+  },
+};
+
+export const CustomThemeExtendingMira: Story = {
+  tags: ["visual-pending"],
+  parameters: visual(
+    "/visual-baselines/stories/mira-editor/themes/custom-mira-chromium.png",
+  ),
+  args: { theme: "mira story-mira-brand", colorMode: "light" },
+  play: async ({ canvasElement }) => {
+    const shell = await expectAppearance(canvasElement, {
+      background: "rgb(251, 251, 252)",
+      foreground: "rgb(29, 29, 32)",
+      colorScheme: "light",
+    });
+    await expect(resolveTokenColor(shell, "--mira-accent")).toBe(
+      "rgb(0, 106, 220)",
+    );
+  },
+};
+
+export const CustomThemeExtendingObsidian: Story = {
+  tags: ["visual-pending"],
+  parameters: visual(
+    "/visual-baselines/stories/mira-editor/themes/custom-obsidian-chromium.png",
+  ),
+  args: { theme: "obsidian story-obsidian-brand", colorMode: "dark" },
+  play: async ({ canvasElement }) => {
+    const shell = await expectAppearance(canvasElement, {
+      background: "rgb(30, 30, 30)",
+      foreground: "rgb(218, 218, 218)",
+      colorScheme: "dark",
+    });
+    await expect(resolveTokenColor(shell, "--mira-accent")).toBe(
+      "rgb(255, 139, 213)",
+    );
+  },
+};
+
+export const TargetedOverride: Story = {
+  tags: ["visual-pending"],
+  parameters: visual(
+    "/visual-baselines/stories/mira-editor/themes/targeted-override-chromium.png",
+  ),
+  args: {
+    theme: "obsidian",
+    colorMode: "light",
+    pageTheme: "mira",
+    pageColorMode: "dark",
+  },
+  play: async ({ canvasElement }) => {
+    const shell = await expectAppearance(canvasElement, {
+      background: "rgb(255, 255, 255)",
+      foreground: "rgb(34, 34, 34)",
+      colorScheme: "light",
+    });
+    await expect(shell).toHaveAttribute("data-mira-theme", "obsidian");
+
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole("button", { name: "View options" }));
+    const menu = canvasElement.ownerDocument.body.querySelector<HTMLElement>(
+      '[data-slot="dropdown-menu-content"]',
+    );
+    if (!menu) throw new Error("View options menu did not render");
+    await expect(menu).toHaveAttribute("data-mira-theme", "obsidian");
+    await expect(menu).toHaveAttribute("data-mira-color-mode", "light");
+    await expect(getComputedStyle(menu).backgroundColor).toBe(
+      "rgb(255, 255, 255)",
+    );
+  },
 };

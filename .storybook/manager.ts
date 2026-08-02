@@ -1,3 +1,4 @@
+import "./manager-color-mode-toggle.js";
 import { addons } from "storybook/manager-api";
 import {
   defaultConfig,

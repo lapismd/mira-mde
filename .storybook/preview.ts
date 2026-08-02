@@ -1,4 +1,5 @@
 import type { Preview } from "@storybook/svelte-vite";
+import { withThemeByDataAttribute } from "@storybook/addon-themes";
 import "@lapismd/mira-editor/styles.css";
 import "../stories/markdown/_shared/storybook.css";
 import { installFocusPrototypeGuard } from "./focus-prototype-guard";
@@ -10,34 +11,49 @@ const preview: Preview = {
   tags: ["autodocs", "test"],
   globalTypes: {
     theme: {
-      description: "Color theme",
+      description: "Mira palette",
       toolbar: {
         icon: "paintbrush",
         items: [
-          { value: "light", title: "Light" },
-          { value: "dark", title: "Dark" },
+          { value: "mira", title: "Mira" },
+          { value: "obsidian", title: "Obsidian" },
         ],
+        dynamicTitle: true,
       },
     },
   },
   initialGlobals: {
-    theme: "light",
+    theme: "mira",
+    colorMode: "light",
   },
   decorators: [
+    withThemeByDataAttribute({
+      themes: {
+        mira: "mira",
+        obsidian: "obsidian",
+      },
+      defaultTheme: "mira",
+      attributeName: "data-mira-theme",
+    }),
     (story, context) => {
       // Re-apply if Storybook installed its accessor after the first attempt.
       installFocusPrototypeGuard();
       if (typeof document !== "undefined") {
-        const theme = context.globals.theme === "dark" ? "dark" : "light";
-        document.documentElement.dataset.theme = theme;
-        document.documentElement.classList.toggle("dark", theme === "dark");
+        const colorMode =
+          context.globals.colorMode === "dark" ? "dark" : "light";
+        document.documentElement.dataset.miraColorMode = colorMode;
+        document.documentElement.classList.toggle("dark", colorMode === "dark");
         document.documentElement.classList.toggle(
-          "mira-theme-dark",
-          theme === "dark",
+          "theme-dark",
+          colorMode === "dark",
         );
         document.documentElement.classList.toggle(
-          "mira-theme-light",
-          theme === "light",
+          "light",
+          colorMode === "light",
+        );
+        document.documentElement.classList.toggle(
+          "theme-light",
+          colorMode === "light",
         );
       }
 
@@ -52,6 +68,9 @@ const preview: Preview = {
       },
     },
     backgrounds: {
+      disable: true,
+    },
+    themes: {
       disable: true,
     },
     layout: "fullscreen",

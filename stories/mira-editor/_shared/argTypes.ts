@@ -4,7 +4,10 @@ import { miraEditorSampleMarkdown } from "../fixtures";
 export type MiraEditorStoryProps = {
   value?: string;
   mode?: "source" | "live-preview" | "preview" | "split";
-  theme?: "obsidian" | "system" | "light" | "dark" | "inherit";
+  theme?: string;
+  colorMode?: "inherit" | "light" | "dark" | "system";
+  pageTheme?: string;
+  pageColorMode?: "inherit" | "light" | "dark" | "system";
   readonly?: boolean;
   lineWrapping?: boolean;
   spellcheck?: boolean;
@@ -22,7 +25,8 @@ export type MiraEditorStoryProps = {
 export const defaultEditorArgs: MiraEditorStoryProps = {
   value: miraEditorSampleMarkdown,
   mode: "live-preview",
-  theme: "light",
+  theme: "",
+  colorMode: "inherit",
   readonly: false,
   lineWrapping: true,
   spellcheck: true,
@@ -49,7 +53,6 @@ export const defaultEditorDocsSource = `<script lang="ts">
 <MiraEditor
   bind:value
   bind:mode
-  theme="light"
   indentGuides
 />`;
 
@@ -65,6 +68,8 @@ export const defaultEditorDocsParameters = {
 
 /** Controls surface matching MiraEditor public configuration props. */
 export const defaultEditorArgTypes = {
+  pageTheme: { table: { disable: true } },
+  pageColorMode: { table: { disable: true } },
   value: {
     control: "text",
     description: "Markdown document content.",
@@ -77,10 +82,16 @@ export const defaultEditorArgTypes = {
     table: { category: "Mode", type: { summary: "MiraMode" } },
   },
   theme: {
+    control: "text",
+    description:
+      'Opaque theme token list, for example "obsidian company-brand". Empty inherits the page.',
+    table: { category: "Appearance", type: { summary: "string" } },
+  },
+  colorMode: {
     control: "select",
-    options: ["light", "dark", "obsidian", "system", "inherit"],
-    description: "Theme tokens applied to the editor shell.",
-    table: { category: "Appearance", type: { summary: "MiraTheme" } },
+    options: ["inherit", "light", "dark", "system"],
+    description: "Color-mode override independent from the theme palette.",
+    table: { category: "Appearance", type: { summary: "MiraColorMode" } },
   },
   height: {
     control: "text",

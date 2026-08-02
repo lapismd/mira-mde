@@ -12,6 +12,7 @@
     MiraImageConfig,
     MiraMarkdownAuthoringConfig,
     MiraMode,
+    MiraColorMode,
     MiraTheme,
   } from "@lapismd/mira/extensions";
   import { storyFileAdapter } from "./file-adapter";
@@ -21,6 +22,7 @@
     mode?: MiraMode;
     sourcePath?: string;
     theme?: MiraTheme;
+    colorMode?: MiraColorMode;
     readonly?: boolean;
     lineWrapping?: boolean;
     spellcheck?: boolean;
@@ -46,7 +48,8 @@
     value = $bindable(""),
     mode = $bindable<MiraMode>("live-preview"),
     sourcePath = "story.md",
-    theme = "light",
+    theme,
+    colorMode = "inherit",
     readonly = false,
     lineWrapping = true,
     spellcheck = true,
@@ -84,6 +87,7 @@
     bind:value
     bind:mode
     {theme}
+    {colorMode}
     {sourcePath}
     {readonly}
     {lineWrapping}

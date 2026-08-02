@@ -5,7 +5,11 @@
     type MiraFeatureFlags,
     type MiraOutlineVariant,
   } from "@lapismd/mira-editor";
-  import type { MiraMode, MiraTheme } from "@lapismd/mira/extensions";
+  import type {
+    MiraColorMode,
+    MiraMode,
+    MiraTheme,
+  } from "@lapismd/mira/extensions";
   import { mermaidExtension } from "@lapismd/mira-plugin-mermaid";
   import { Mira } from "@lapismd/mira";
   import { storyFileAdapter } from "../markdown/_shared/file-adapter";
@@ -16,6 +20,7 @@
     value: string;
     mode?: MiraMode;
     theme?: MiraTheme;
+    colorMode?: MiraColorMode;
     editorShell?: EditorShell;
     mermaidEnabled?: boolean;
     outline?: boolean;
@@ -29,7 +34,8 @@
   let {
     value = $bindable(""),
     mode = $bindable<MiraMode>("live-preview"),
-    theme = "light",
+    theme,
+    colorMode = "inherit",
     editorShell = "default",
     mermaidEnabled = true,
     outline = true,
@@ -47,7 +53,15 @@
   const wordCount = $derived(value.trim().split(/\s+/).filter(Boolean).length);
 </script>
 
-<div class={`mira-comprehensive mira-theme-${theme}`}>
+<div
+  class:dark={colorMode === "dark"}
+  class:theme-dark={colorMode === "dark"}
+  class:light={colorMode === "light"}
+  class:theme-light={colorMode === "light"}
+  class="mira-comprehensive"
+  data-mira-theme={theme?.trim() ? theme : undefined}
+  data-mira-color-mode={colorMode === "inherit" ? undefined : colorMode}
+>
   <header class="mira-comprehensive__header">
     <div>
       <h1>Mira</h1>
@@ -78,6 +92,7 @@
         bind:value
         bind:mode
         {theme}
+        {colorMode}
         sourcePath="comprehensive-demo.md"
         fileAdapter={storyFileAdapter}
         {outline}
@@ -93,6 +108,7 @@
         bind:value
         bind:mode
         {theme}
+        {colorMode}
         sourcePath="comprehensive-demo.md"
         fileAdapter={storyFileAdapter}
         {outline}

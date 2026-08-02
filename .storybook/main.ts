@@ -9,6 +9,7 @@ const config: StorybookConfig = {
     "@storybook/addon-a11y",
     "@storybook/addon-svelte-csf",
     "@storybook/addon-vitest",
+    "@storybook/addon-themes",
     "@storybook/addon-mcp",
     {
       name: "@lapismd/storybook-addon-visual-delta",

@@ -66,7 +66,10 @@ components only, while both imperative mounting factories are isolated in
 `pnpm packages:pack` packs and installs all six products together in a temporary
 consumer project. Its Svelte, React, and Vanilla compile fixtures validate type
 resolution, the public CSS entrypoints are resolved through package export
-maps, and extracted tarball text is scanned for private or legacy imports.
+maps, and extracted tarball text is scanned for private or legacy imports. The
+CSS resolution fixture covers `themes/mira.css`, `themes/obsidian.css`, and the
+aggregate `themes.css` independently so consumers can choose a deterministic
+base without importing an unused built-in palette.
 
 ## Canonical names
 
