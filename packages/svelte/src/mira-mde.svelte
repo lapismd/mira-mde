@@ -672,9 +672,7 @@
       aria-hidden={showEditor ? "false" : "true"}
     >
       <div class="mira-mde__editor-scroll">
-        <div class="cm-sizer">
-          <div bind:this={editorHost} class="mira-mde__editor-host"></div>
-        </div>
+        <div bind:this={editorHost} class="mira-mde__editor-host"></div>
       </div>
     </section>
 

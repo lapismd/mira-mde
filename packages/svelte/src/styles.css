@@ -73,30 +73,23 @@
 
 /*
  * Keep the CM scroller as the only vertical scroll owner (split sync +
- * existing e2e helpers target `.cm-scroller`). The sizer centers the column
- * but must stay height-bounded to the pane — not grow with document content.
+ * existing e2e helpers target `.cm-scroller`). The host stays full-pane
+ * width so the scrollbar sits on the pane edge; readable column width is
+ * applied via scroller padding in the CodeMirror theme.
  */
 .mira-mde__editor-scroll {
   box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
   height: 100%;
   min-height: 0;
   overflow: hidden;
   width: 100%;
 }
 
-.mira-mde__editor-scroll > .cm-sizer {
-  flex: 1 1 auto;
-  height: 100%;
-  min-height: 0;
-  overflow: hidden;
-}
-
 .mira-mde__editor-host {
   height: 100%;
   min-height: 0;
   overflow: hidden;
+  width: 100%;
 }
 
 @media (max-width: 760px) {

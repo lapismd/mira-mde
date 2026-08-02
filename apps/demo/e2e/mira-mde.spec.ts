@@ -446,6 +446,31 @@ test("editor CodeMirror scroller owns vertical overflow for long documents", asy
   expect(shell.overflowY).toBe("hidden");
   expect(shell.scrollHeight).toBeLessThanOrEqual(shell.clientHeight + 1);
 
+  // Scrollbar tracks the pane edge, not the centered readable column.
+  const edge = await page.evaluate(() => {
+    const pane = document.querySelector(".mira-mde__pane--editor");
+    const scroller = document.querySelector(
+      ".mira-mde__editor-host > .cm-editor > .cm-scroller",
+    );
+    if (!(pane instanceof HTMLElement) || !(scroller instanceof HTMLElement)) {
+      return null;
+    }
+    const paneRect = pane.getBoundingClientRect();
+    const scrollerRect = scroller.getBoundingClientRect();
+    const fileLineWidth = Number.parseFloat(
+      getComputedStyle(scroller).getPropertyValue("--file-line-width"),
+    );
+    return {
+      paneRight: paneRect.right,
+      scrollerRight: scrollerRect.right,
+      scrollerWidth: scrollerRect.width,
+      fileLineWidth: Number.isFinite(fileLineWidth) ? fileLineWidth : 700,
+    };
+  });
+  expect(edge).not.toBeNull();
+  expect(Math.abs(edge!.scrollerRight - edge!.paneRight)).toBeLessThan(2);
+  expect(edge!.scrollerWidth).toBeGreaterThan(edge!.fileLineWidth + 40);
+
   await scrollEditor(page, 800);
   await expect
     .poll(() => editorScroller.evaluate((element) => element.scrollTop))

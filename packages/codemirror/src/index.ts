@@ -128,7 +128,11 @@ export const miraEditorTheme = EditorView.theme({
   ".cm-scroller": {
     fontFamily: "var(--mira-font-mono)",
     lineHeight: "var(--mira-line-height)",
-    padding: "var(--file-margins, var(--mira-editor-padding))",
+    // Full-pane scroller (scrollbar on the edge) with a centered readable
+    // column — Lapis/Obsidian file-margins + file-line-width behavior.
+    paddingBlock: "var(--file-margins-y, var(--mira-editor-padding, 2rem))",
+    paddingInline:
+      "max(var(--file-margins-x, var(--mira-editor-padding, 2rem)), calc((100% - var(--file-line-width, 700px)) / 2))",
     scrollbarGutter: "stable",
   },
   ".cm-line, .cm-gutterElement": {
