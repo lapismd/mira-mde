@@ -98,9 +98,20 @@ export const DropdownMenu: Story = {
     await userEvent.click(
       canvas.getByRole("button", { name: "Open document actions" }),
     );
-    await userEvent.click(
-      await body.findByRole("menuitem", { name: /Duplicate/ }),
-    );
+    const duplicate = await body.findByRole("menuitem", { name: /Duplicate/ });
+    const lineNumbers = body.getByRole("menuitemcheckbox", {
+      name: "Show line numbers",
+    });
+    await expect(duplicate.querySelector("svg")).toBeInTheDocument();
+    await expect(
+      lineNumbers.querySelector('[data-menu-icon="line-numbers"]'),
+    ).toBeInTheDocument();
+    await expect(
+      getComputedStyle(lineNumbers.firstElementChild as Element).position,
+    ).toBe("absolute");
+    await expect(getComputedStyle(duplicate).fontSize).toBe("14px");
+    await expect(getComputedStyle(duplicate).lineHeight).toBe("20px");
+    await userEvent.click(duplicate);
     await expect(canvas.getByTestId("primitive-status")).toHaveTextContent(
       "Duplicated document",
     );
@@ -118,9 +129,18 @@ export const ContextMenu: Story = {
     const canvas = within(canvasElement);
     const body = within(canvasElement.ownerDocument.body);
     await fireEvent.contextMenu(canvas.getByTestId("context-menu-target"));
-    await userEvent.click(
-      await body.findByRole("menuitem", { name: /Copy block/ }),
-    );
+    const copy = await body.findByRole("menuitem", { name: /Copy block/ });
+    const wrapText = body.getByRole("menuitemcheckbox", { name: "Wrap text" });
+    await expect(copy.querySelector("svg")).toBeInTheDocument();
+    await expect(
+      wrapText.querySelector('[data-menu-icon="wrap-text"]'),
+    ).toBeInTheDocument();
+    await expect(
+      getComputedStyle(wrapText.firstElementChild as Element).position,
+    ).toBe("absolute");
+    await expect(getComputedStyle(copy).fontSize).toBe("14px");
+    await expect(getComputedStyle(copy).lineHeight).toBe("20px");
+    await userEvent.click(copy);
     await waitFor(() =>
       expect(body.queryByRole("menu")).not.toBeInTheDocument(),
     );
@@ -152,11 +172,52 @@ export const Dialog: Story = {
       name: "Publish document",
     });
     await expect(dialog).toBeVisible();
+    const cancel = within(dialog).getByRole("button", { name: "Cancel" });
+    const iconClose = within(dialog).getByRole("button", { name: "Close" });
+    await expect(getComputedStyle(cancel).position).toBe("static");
+    await expect(getComputedStyle(iconClose).position).toBe("absolute");
     await userEvent.click(
       within(dialog).getByRole("button", { name: "Confirm publish" }),
     );
+    await waitFor(() =>
+      expect(canvasElement.ownerDocument.body).not.toHaveStyle({
+        pointerEvents: "none",
+      }),
+    );
     await expect(canvas.getByTestId("primitive-status")).toHaveTextContent(
       "Document published",
+    );
+  },
+};
+
+export const Popover: Story = {
+  tags: ["visual-pending"],
+  args: { primitive: "popover" },
+  parameters: parameters(
+    "ui-popover",
+    "Shared portaled popover chrome used by rich controls and mirrored by CodeMirror command overlays.",
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const body = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Open slash command help" }),
+    );
+    await waitFor(() =>
+      expect(
+        canvasElement.ownerDocument.body.querySelector(
+          '[data-slot="popover-content"]',
+        ),
+      ).toBeVisible(),
+    );
+    const content = canvasElement.ownerDocument.body.querySelector<HTMLElement>(
+      '[data-slot="popover-content"]',
+    );
+    await expect(content).toHaveTextContent("Insert Markdown");
+    await expect(getComputedStyle(content!).fontSize).toBe("14px");
+    await userEvent.click(body.getByRole("button", { name: "Dismiss" }));
+    await expect(canvas.getByTestId("primitive-status")).toHaveTextContent(
+      "Slash command help dismissed",
     );
   },
 };

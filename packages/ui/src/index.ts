@@ -11,6 +11,7 @@ export { ScrollArea } from "./scroll-area";
 export * as ContextMenu from "./context-menu";
 export * as Dialog from "./dialog";
 export * as DropdownMenu from "./dropdown-menu";
+export * as Popover from "./popover";
 export * as Table from "./table";
 export * as Toolbar from "./toolbar";
 export * as Tooltip from "./tooltip";

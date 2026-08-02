@@ -47,6 +47,24 @@ const config: StorybookConfig = {
     return mergeConfig(viteConfig, {
       optimizeDeps: {
         exclude: ["@storybook/svelte"],
+        include: [
+          "@lucide/svelte/icons/align-vertical-justify-center",
+          "@lucide/svelte/icons/align-vertical-justify-end",
+          "@lucide/svelte/icons/align-vertical-justify-start",
+          "@lucide/svelte/icons/arrow-up-down",
+          "@lucide/svelte/icons/columns-3",
+          "@lucide/svelte/icons/eraser",
+          "@lucide/svelte/icons/indent-increase",
+          "@lucide/svelte/icons/list-ordered",
+          "@lucide/svelte/icons/list-tree",
+          "@lucide/svelte/icons/move",
+          "@lucide/svelte/icons/plus",
+          "@lucide/svelte/icons/repeat-2",
+          "@lucide/svelte/icons/rows-3",
+          "@lucide/svelte/icons/space",
+          "@lucide/svelte/icons/trash-2",
+          "@lucide/svelte/icons/wrap-text",
+        ],
       },
       server: {
         watch: {

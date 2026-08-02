@@ -9,12 +9,15 @@
   import FileCodeIcon from "@lucide/svelte/icons/file-code";
   import Heading1Icon from "@lucide/svelte/icons/heading-1";
   import ImageIcon from "@lucide/svelte/icons/image";
+  import IndentIncreaseIcon from "@lucide/svelte/icons/indent-increase";
   import ItalicIcon from "@lucide/svelte/icons/italic";
   import LinkIcon from "@lucide/svelte/icons/link";
   import ListIcon from "@lucide/svelte/icons/list";
   import ListChecksIcon from "@lucide/svelte/icons/list-checks";
+  import ListTreeIcon from "@lucide/svelte/icons/list-tree";
   import PencilLineIcon from "@lucide/svelte/icons/pencil-line";
   import QuoteIcon from "@lucide/svelte/icons/quote";
+  import SpaceIcon from "@lucide/svelte/icons/space";
   import Table2Icon from "@lucide/svelte/icons/table-2";
   import TableCellsSplitIcon from "@lucide/svelte/icons/table-cells-split";
   import WorkflowIcon from "@lucide/svelte/icons/workflow";
@@ -313,7 +316,7 @@
     if (item.type === "label" || item.type === "separator") {
       return undefined;
     }
-    return item.icon ?? (isMenuItemChecked(item) ? CheckIcon : undefined);
+    return item.icon;
   }
 
   function runMenuItem(item: MiraDefaultToolbarMenuItem): void {
@@ -483,10 +486,21 @@
                   class="mira-default-toolbar__menu-icon"
                   aria-hidden="true"
                 />
+              {:else}
+                <span
+                  class="mira-default-toolbar__menu-icon-placeholder"
+                  aria-hidden="true"
+                ></span>
               {/if}
               <span>{item.label}</span>
               {#if item.shortcut}
                 <DropdownMenu.Shortcut>{item.shortcut}</DropdownMenu.Shortcut>
+              {/if}
+              {#if isMenuItemChecked(item)}
+                <CheckIcon
+                  class="mira-default-toolbar__menu-check"
+                  aria-hidden="true"
+                />
               {/if}
             </DropdownMenu.Item>
           {/if}
@@ -609,36 +623,48 @@
       <DropdownMenu.Item
         onclick={() => setIndentGuidesSetting(!getIndentGuidesSetting())}
       >
+        <ListTreeIcon
+          class="mira-default-toolbar__menu-icon"
+          aria-hidden="true"
+        />
+        <span>Indentation guides</span>
         {#if getIndentGuidesSetting()}
           <CheckIcon
-            class="mira-default-toolbar__menu-icon"
+            class="mira-default-toolbar__menu-check"
             aria-hidden="true"
           />
         {/if}
-        <span>Indentation guides</span>
       </DropdownMenu.Item>
       <DropdownMenu.Item
         onclick={() => setIndentWithTabsSetting(!getIndentWithTabsSetting())}
       >
+        <IndentIncreaseIcon
+          class="mira-default-toolbar__menu-icon"
+          aria-hidden="true"
+        />
+        <span>Use tabs for indentation</span>
         {#if getIndentWithTabsSetting()}
           <CheckIcon
-            class="mira-default-toolbar__menu-icon"
+            class="mira-default-toolbar__menu-check"
             aria-hidden="true"
           />
         {/if}
-        <span>Use tabs for indentation</span>
       </DropdownMenu.Item>
       <DropdownMenu.Separator />
       <DropdownMenu.Label>Tab size</DropdownMenu.Label>
       {#each tabSizeOptions as size}
         <DropdownMenu.Item onclick={() => setIndentWidthSetting(size)}>
+          <SpaceIcon
+            class="mira-default-toolbar__menu-icon"
+            aria-hidden="true"
+          />
+          <span>{size} spaces</span>
           {#if getIndentWidthSetting() === size}
             <CheckIcon
-              class="mira-default-toolbar__menu-icon"
+              class="mira-default-toolbar__menu-check"
               aria-hidden="true"
             />
           {/if}
-          <span>{size} spaces</span>
         </DropdownMenu.Item>
       {/each}
     </DropdownMenu.Content>

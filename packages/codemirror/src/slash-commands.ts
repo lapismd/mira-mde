@@ -695,9 +695,10 @@ const slashCommandTheme = EditorView.theme({
     boxSizing: "border-box",
     color:
       "var(--popover-foreground, var(--mira-popover-foreground, var(--mira-foreground)))",
-    fontFamily: "var(--font-sans, var(--mira-font-sans))",
-    fontSize: "var(--mira-font-size, 0.875rem)",
-    lineHeight: "1.4",
+    fontFamily:
+      "var(--font-interface, var(--mira-font-sans, ui-sans-serif, system-ui, sans-serif))",
+    fontSize: "0.875rem",
+    lineHeight: "1.25rem",
     maxHeight: "min(18rem, 50vh)",
     overflowY: "auto",
     padding: "0.25rem",

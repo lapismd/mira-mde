@@ -39,7 +39,8 @@ user-visible interactions; browser-sensitive geometry and native browser APIs
 remain in focused Playwright acceptance against Storybook iframes. That
 acceptance covers scroll ownership and synchronization, pointer drag/drop,
 table mutation and source reveal, native clipboard behavior, and Mermaid SVG
-and portal settlement.
+and portal settlement. Story-only icon dependencies are prebundled so a clean
+browser run cannot invalidate its story modules with a mid-suite Vite reload.
 
 Public stories run the accessibility addon as an enforced browser assertion.
 The non-content CodeMirror gutter remains the sole global exclusion; any new
@@ -53,8 +54,8 @@ capture uses the addon's pinned profile and `nested-import` baseline layout.
 The add-on writes each committed baseline URL into the owning story's
 `parameters.visualDelta` metadata and marks regenerated stories
 `visual-pending`; Storybook MUST NOT infer a second URL scheme at preview time.
-The current catalog contains 114 indexed stories: 105 have plugin-owned metadata
-and committed baseline images, while nine UI-primitive verification stories are
+The current catalog contains 115 indexed stories: 105 have plugin-owned metadata
+and committed baseline images, while ten UI-primitive verification stories are
 `visual-pending` until a separately authorized baseline mutation. The visual
 gate intentionally exposes missing baselines for new pending stories rather than
 silently treating them as approved. Once baselines exist, `pnpm test:visual`

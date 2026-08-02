@@ -119,6 +119,11 @@ export const PUBLIC_SURFACES = [
     ],
   },
   {
+    entryId: "ui-popover",
+    files: ["packages/ui/src/popover/index.ts"],
+    exports: ["Root", "Trigger", "Content", "Close"],
+  },
+  {
     entryId: "ui-table",
     files: ["packages/ui/src/table/index.ts"],
     exports: [

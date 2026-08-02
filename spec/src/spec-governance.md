@@ -44,7 +44,9 @@ sources for public `--mira-*` references. Any internal layout-only variable
 must be explicitly allowlisted and regression-tested rather than silently
 omitted from the public token registry. It also cross-checks every `ui-*`
 catalog family against the rendered primitive story module so exported UI
-families cannot remain metadata-only.
+families cannot remain metadata-only. Newly exported compound families, such as
+Popover, MUST be registered as public subpath surfaces and represented by a
+focused story before the catalog gate passes.
 
 ## Agent workflow
 

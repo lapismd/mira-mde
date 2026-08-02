@@ -56,6 +56,13 @@
 }
 
 .mira-default-toolbar__menu-icon {
+  flex: 0 0 1rem;
+  height: 1rem;
+  width: 1rem;
+}
+
+.mira-default-toolbar__menu-icon-placeholder {
+  flex: 0 0 1rem;
   height: 1rem;
   width: 1rem;
 }

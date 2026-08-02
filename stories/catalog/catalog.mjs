@@ -609,6 +609,23 @@ export const catalogEntries = [
     publicSurface: true,
   },
   {
+    id: "ui-popover",
+    name: "Popover family",
+    packageName: "@mira-mde/ui",
+    importPath: "@mira-mde/ui/popover",
+    components: ["Root", "Trigger", "Content", "Close"],
+    description:
+      "Shared portaled popover surface for rich controls. CodeMirror slash-command suggestions retain editor-coordinate positioning while sharing this typography, chrome, and token contract.",
+    spec: "default-ui-and-frameworks.md#requirements",
+    tokens: [
+      ...commonTokens,
+      "--mira-popover",
+      "--mira-popover-foreground",
+      "--mira-widget-shadow",
+    ],
+    publicSurface: true,
+  },
+  {
     id: "ui-table",
     name: "Table primitive family",
     packageName: "@mira-mde/ui",

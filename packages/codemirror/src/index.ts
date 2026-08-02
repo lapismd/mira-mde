@@ -248,9 +248,10 @@ export const miraEditorTheme = EditorView.theme({
     boxShadow: "var(--mira-widget-shadow)",
     color:
       "var(--popover-foreground, var(--mira-popover-foreground, var(--mira-foreground)))",
-    fontFamily: "var(--font-sans, var(--mira-font-sans))",
-    fontSize: "var(--mira-font-size, 0.875rem)",
-    lineHeight: "1.4",
+    fontFamily:
+      "var(--font-interface, var(--mira-font-sans, ui-sans-serif, system-ui, sans-serif))",
+    fontSize: "0.875rem",
+    lineHeight: "1.25rem",
     zIndex: "1100",
   },
   ".cm-tooltip.cm-tooltip-autocomplete > ul": {
@@ -306,7 +307,8 @@ export const miraEditorTheme = EditorView.theme({
     boxShadow: "var(--mira-widget-shadow)",
     color:
       "var(--popover-foreground, var(--mira-popover-foreground, var(--mira-foreground)))",
-    fontFamily: "var(--font-sans, var(--mira-font-sans))",
+    fontFamily:
+      "var(--font-interface, var(--mira-font-sans, ui-sans-serif, system-ui, sans-serif))",
     fontSize: "0.8125rem",
     padding: "0.5rem 0.75rem",
   },

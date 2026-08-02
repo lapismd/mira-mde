@@ -1,15 +1,21 @@
 <script lang="ts">
   import BoldIcon from "@lucide/svelte/icons/bold";
   import CodeIcon from "@lucide/svelte/icons/code";
+  import CopyIcon from "@lucide/svelte/icons/copy";
   import ItalicIcon from "@lucide/svelte/icons/italic";
+  import ListOrderedIcon from "@lucide/svelte/icons/list-ordered";
+  import PencilLineIcon from "@lucide/svelte/icons/pencil-line";
   import Redo2Icon from "@lucide/svelte/icons/redo-2";
   import SaveIcon from "@lucide/svelte/icons/save";
+  import Trash2Icon from "@lucide/svelte/icons/trash-2";
   import Undo2Icon from "@lucide/svelte/icons/undo-2";
+  import WrapTextIcon from "@lucide/svelte/icons/wrap-text";
   import {
     Button,
     ContextMenu,
     Dialog,
     DropdownMenu,
+    Popover,
     ScrollArea,
     Separator,
     Table,
@@ -26,6 +32,7 @@
     | "dropdown-menu"
     | "context-menu"
     | "dialog"
+    | "popover"
     | "tooltip"
     | "table"
     | "scroll-area";
@@ -41,6 +48,7 @@
     "dropdown-menu": "Dropdown menu",
     "context-menu": "Context menu",
     dialog: "Dialog",
+    popover: "Popover",
     tooltip: "Tooltip",
     table: "Table",
     "scroll-area": "Scroll area",
@@ -61,6 +69,7 @@
   let wrapText = $state(false);
   let dialogOpen = $state(false);
   let dialogResult = $state("No dialog action selected");
+  let popoverResult = $state("No slash command selected");
 
   const status = $derived.by(() => {
     switch (primitive) {
@@ -76,6 +85,8 @@
         return `${contextChoice}; wrap text ${wrapText ? "on" : "off"}`;
       case "dialog":
         return dialogResult;
+      case "popover":
+        return popoverResult;
       case "tooltip":
         return "Hover or focus the action to inspect its tooltip";
       case "table":
@@ -166,24 +177,31 @@
             <DropdownMenu.Item
               onclick={() => (menuChoice = "Duplicated document")}
             >
+              <CopyIcon />
               Duplicate
               <DropdownMenu.Shortcut>⌘D</DropdownMenu.Shortcut>
             </DropdownMenu.Item>
             <DropdownMenu.Item
               onclick={() => (menuChoice = "Renamed document")}
             >
+              <PencilLineIcon />
               Rename
             </DropdownMenu.Item>
           </DropdownMenu.Group>
           <DropdownMenu.Separator />
           <DropdownMenu.Group>
             <DropdownMenu.CheckboxItem bind:checked={showLineNumbers}>
+              <ListOrderedIcon
+                data-menu-icon="line-numbers"
+                aria-hidden="true"
+              />
               Show line numbers
             </DropdownMenu.CheckboxItem>
             <DropdownMenu.Item
               variant="destructive"
               onclick={() => (menuChoice = "Delete requested")}
             >
+              <Trash2Icon aria-hidden="true" />
               Delete
             </DropdownMenu.Item>
           </DropdownMenu.Group>
@@ -201,15 +219,18 @@
           <ContextMenu.Group>
             <ContextMenu.Label>Block actions</ContextMenu.Label>
             <ContextMenu.Item onclick={() => (contextChoice = "Copied block")}>
+              <CopyIcon />
               Copy block
               <ContextMenu.Shortcut>⌘C</ContextMenu.Shortcut>
             </ContextMenu.Item>
             <ContextMenu.Item
               onclick={() => (contextChoice = "Duplicated block")}
             >
+              <CopyIcon />
               Duplicate block
             </ContextMenu.Item>
             <ContextMenu.CheckboxItem bind:checked={wrapText}>
+              <WrapTextIcon data-menu-icon="wrap-text" aria-hidden="true" />
               Wrap text
             </ContextMenu.CheckboxItem>
           </ContextMenu.Group>
@@ -248,6 +269,29 @@
           </Dialog.Footer>
         </Dialog.Content>
       </Dialog.Root>
+    {:else if primitive === "popover"}
+      <Popover.Root>
+        <Popover.Trigger
+          class={buttonVariants({ variant: "outline" })}
+          aria-label="Open slash command help"
+        >
+          Slash commands
+        </Popover.Trigger>
+        <Popover.Content align="start">
+          <div class="mira-ui-story__popover-copy">
+            <strong>Insert Markdown</strong>
+            <span>
+              Shared popover chrome for rich controls and editor command help.
+            </span>
+          </div>
+          <Popover.Close
+            class={buttonVariants({ variant: "secondary", size: "sm" })}
+            onclick={() => (popoverResult = "Slash command help dismissed")}
+          >
+            Dismiss
+          </Popover.Close>
+        </Popover.Content>
+      </Popover.Root>
     {:else if primitive === "tooltip"}
       <Tooltip.Provider delayDuration={0}>
         <Tooltip.Root>
@@ -345,6 +389,16 @@
   .mira-ui-story__header h2 {
     margin-top: 0.25rem;
     font-size: 1.5rem;
+  }
+
+  .mira-ui-story__popover-copy {
+    display: grid;
+    gap: 0.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .mira-ui-story__popover-copy span {
+    color: var(--mira-muted-foreground);
   }
 
   .mira-ui-story__surface {
