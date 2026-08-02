@@ -49,6 +49,7 @@ test("protects Storybook catalog metadata and governance", () => {
   const result = classifySpecFirstChanges([
     "stories/catalog/components.ts",
     ".storybook/main.ts",
+    "scripts/check-catalog.mjs",
     "scripts/check-spec-first.mjs",
   ]);
   assert.equal(result.ok, false);

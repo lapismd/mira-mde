@@ -35,6 +35,10 @@ prose.
 | Root architecture, workspace, build, and public manifest configuration | `architecture.md`              |
 | Governance scripts, spec configuration, and CI workflows               | `spec-governance.md`           |
 
+The protected governance set includes both the specification checkers and the
+catalog/token checker. Changes to either cannot weaken or bypass the contract
+without updating this chapter in the same logical change.
+
 ## Agent workflow
 
 1. Inspect Jujutsu status and preserve unrelated work.

@@ -62,7 +62,7 @@ const RULES = [
   {
     name: "Specification governance",
     pattern:
-      /^(?:scripts\/check-spec-.+\.mjs|\.markdownlint-cli2\.jsonc|spec\/book\.toml|\.github\/workflows\/.+\.ya?ml$|AGENTS\.md$)/,
+      /^(?:scripts\/(?:check-spec-.+|check-catalog(?:\.spec)?)\.mjs|\.markdownlint-cli2\.jsonc|spec\/book\.toml|\.github\/workflows\/.+\.ya?ml$|AGENTS\.md$)/,
     chapters: ["spec/src/spec-governance.md"],
   },
   {

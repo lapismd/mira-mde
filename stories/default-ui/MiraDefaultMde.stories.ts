@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/svelte-vite";
+import { catalogParameters } from "../catalog/catalog.mjs";
 import DefaultEditorStory from "./_shared/DefaultEditorStory.svelte";
 import {
   defaultEditorArgs,
@@ -13,6 +14,7 @@ const meta = {
   argTypes: defaultEditorArgTypes,
   parameters: {
     ...defaultEditorDocsParameters,
+    ...catalogParameters("mira-mde"),
     docs: {
       ...defaultEditorDocsParameters.docs,
       description: {

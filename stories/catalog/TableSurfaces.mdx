@@ -1,0 +1,15 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import { SvelteDocsBridge } from "./SvelteDocsBridge";
+import CatalogPage from "./CatalogPage.svelte";
+
+<Meta
+  title="Mira MDE/Catalog/Editable table surfaces"
+  parameters={{ layout: "fullscreen" }}
+/>
+
+# Editable table surfaces
+
+Pipe and grid table components share the rendered Markdown token contract while
+retaining their rich editor menus, cells, selection, and drag chrome.
+
+<SvelteDocsBridge component={CatalogPage} props={{ entryIds: ["tables"] }} />

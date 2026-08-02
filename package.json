@@ -11,6 +11,7 @@
   "scripts": {
     "build": "turbo run build",
     "build-storybook": "storybook build",
+    "catalog:check": "node ./scripts/check-catalog.mjs && node --test ./scripts/check-catalog.spec.mjs",
     "check": "pnpm check:format && turbo run check",
     "check:all": "pnpm check && pnpm lint && pnpm test && pnpm build",
     "check:format": "prettier . --check",
@@ -21,7 +22,7 @@
     "lint": "eslint .",
     "storybook": "WATCHPACK_POLLING=250 node scripts/storybook-run.mjs --no-open",
     "storybook:restart": "bash scripts/storybook-restart.sh",
-    "storybook:check": "pnpm build-storybook && pnpm test:visual",
+    "storybook:check": "pnpm catalog:check && pnpm build-storybook && pnpm test:visual",
     "spec:build": "mdbook build ./spec",
     "spec:check": "pnpm spec:lint && pnpm spec:validate && pnpm spec:build && pnpm spec:test && pnpm spec:first",
     "spec:first": "node ./scripts/check-spec-first.mjs",

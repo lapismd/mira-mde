@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/svelte-vite";
+import { catalogParameters } from "../catalog/catalog.mjs";
 import ComprehensiveDemoStory from "./ComprehensiveDemoStory.svelte";
 import comprehensiveMarkdown from "./comprehensive-demo.md?raw";
 
@@ -53,15 +54,13 @@ const meta = {
     height: { control: "text", table: { category: "Layout" } },
   },
   parameters: {
+    ...catalogParameters("storybook-comprehensive"),
     layout: "fullscreen",
     docs: {
       description: {
         component:
           "The canonical full-content Mira playground. Every fixed view uses the same Storybook-owned Markdown fixture and portable file adapter.",
       },
-    },
-    mira: {
-      spec: "editor-and-markdown.md#supported-surfaces",
     },
   },
 } satisfies Meta<typeof ComprehensiveDemoStory>;

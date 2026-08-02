@@ -1,0 +1,18 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import { SvelteDocsBridge } from "./SvelteDocsBridge";
+import CatalogPage from "./CatalogPage.svelte";
+
+<Meta
+  title="Mira MDE/Catalog/Editor surfaces"
+  parameters={{ layout: "fullscreen" }}
+/>
+
+# Editor surfaces
+
+Public editor shells and the default toolbar share Mira's portable controller,
+preview pipeline, and inherited stable CSS tokens.
+
+<SvelteDocsBridge
+  component={CatalogPage}
+  props={{ entryIds: ["mira-mde", "default-ui"] }}
+/>

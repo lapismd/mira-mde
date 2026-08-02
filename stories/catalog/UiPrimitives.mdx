@@ -1,0 +1,28 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import { SvelteDocsBridge } from "./SvelteDocsBridge";
+import CatalogPage from "./CatalogPage.svelte";
+
+<Meta
+  title="Mira MDE/Catalog/UI primitives"
+  parameters={{ layout: "fullscreen" }}
+/>
+
+# UI primitives
+
+Compound primitives are documented by family so their shared styling and
+floating-surface tokens remain visible without duplicating a table per alias.
+
+<SvelteDocsBridge
+  component={CatalogPage}
+  props={{
+    entryIds: [
+      "ui-core",
+      "ui-context-menu",
+      "ui-dialog",
+      "ui-dropdown-menu",
+      "ui-table",
+      "ui-toolbar",
+      "ui-tooltip",
+    ],
+  }}
+/>

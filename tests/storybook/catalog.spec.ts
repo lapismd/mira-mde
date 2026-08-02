@@ -21,6 +21,38 @@ test("publishes one docs mirror for every canonical specification chapter", asyn
       entry.title.startsWith("Mira MDE/Specification/"),
   );
   expect(specDocs).toHaveLength(10);
+
+  const catalogDocs = Object.values(index.entries).filter(
+    (entry) =>
+      entry.type === "docs" && entry.title.startsWith("Mira MDE/Catalog/"),
+  );
+  expect(catalogDocs).toHaveLength(7);
+});
+
+test("publishes catalog descriptions, spec links, and token metadata", async ({
+  page,
+}) => {
+  await page.goto(
+    "/iframe.html?id=mira-mde-catalog-editor-surfaces--docs&viewMode=docs",
+  );
+  await expect(page.getByRole("heading", { name: "MiraMde" })).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: /governing specification/i }).first(),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("rowheader", { name: "--mira-editor-background" }).first(),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Available stable Mira CSS tokens").first(),
+  ).toBeVisible();
+
+  await page.goto(
+    "/iframe.html?id=mira-mde-specification-architecture-and-boundaries--docs&viewMode=docs",
+  );
+  await expect(
+    page.getByRole("heading", { name: "Architecture and Boundaries" }),
+  ).toBeVisible();
+  await expect(page.getByText("MIRA-ARCH-005")).toBeVisible();
 });
 
 for (const view of views) {

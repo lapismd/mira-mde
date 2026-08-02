@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/svelte-vite";
+import { catalogParameters } from "../../catalog/catalog.mjs";
 import EditorModeStory from "../_shared/EditorModeStory.svelte";
 import MarkdownPreviewStory from "../_shared/MarkdownPreviewStory.svelte";
 import {
@@ -14,6 +15,7 @@ const meta = {
     value: gridTablesMarkdown,
   },
   parameters: {
+    ...catalogParameters("tables"),
     docs: {
       description: {
         component:

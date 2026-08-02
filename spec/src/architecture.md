@@ -29,3 +29,8 @@ but package source must not import Storybook-owned catalog data.
 The former `apps/demo` and `apps/docs` workspaces are retired. The root package
 owns Storybook development, static builds, and browser acceptance; the workspace
 contains publishable package families only.
+
+Root quality gates compose the specification, catalog, package, Storybook, and
+browser checks. In particular, `storybook:check` validates catalog metadata and
+CSS-token coverage before building the static host and running compare-only
+visual validation.

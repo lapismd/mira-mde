@@ -1,0 +1,18 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import { SvelteDocsBridge } from "./SvelteDocsBridge";
+import CatalogPage from "./CatalogPage.svelte";
+
+<Meta
+  title="Mira MDE/Catalog/Preview surfaces"
+  parameters={{ layout: "fullscreen" }}
+/>
+
+# Preview surfaces
+
+Standalone reading, renderer, outline, link, and embed components expose one
+portable Markdown styling contract.
+
+<SvelteDocsBridge
+  component={CatalogPage}
+  props={{ entryIds: ["preview"], showCompatibilityAliases: true }}
+/>

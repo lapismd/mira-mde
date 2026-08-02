@@ -1,0 +1,18 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import { SvelteDocsBridge } from "./SvelteDocsBridge";
+import CatalogPage from "./CatalogPage.svelte";
+
+<Meta
+  title="Mira MDE/Catalog/Framework adapters"
+  parameters={{ layout: "fullscreen" }}
+/>
+
+# Framework adapters
+
+React and Vanilla wrappers do not define an independent styling API. Their
+tables resolve from the underlying public surface in the canonical registry.
+
+<SvelteDocsBridge
+  component={CatalogPage}
+  props={{ entryIds: ["react-wrapper", "vanilla-wrapper"] }}
+/>

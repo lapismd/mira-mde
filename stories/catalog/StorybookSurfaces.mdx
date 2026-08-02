@@ -1,0 +1,24 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import { SvelteDocsBridge } from "./SvelteDocsBridge";
+import CatalogPage from "./CatalogPage.svelte";
+
+<Meta
+  title="Mira MDE/Catalog/Storybook-only surfaces"
+  parameters={{ layout: "fullscreen" }}
+/>
+
+# Storybook-only surfaces
+
+These styled documentation and demo shells remain internal to the catalog and
+are not published runtime APIs.
+
+<SvelteDocsBridge
+  component={CatalogPage}
+  props={{
+    entryIds: [
+      "storybook-spec-page",
+      "storybook-comprehensive",
+      "storybook-catalog-page",
+    ],
+  }}
+/>
