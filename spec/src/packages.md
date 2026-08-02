@@ -46,6 +46,11 @@ Vanilla depend only on the public products they adapt.
 - `themes/mira.css`, `themes/obsidian.css`, `themes.css`, and `styles.css`
   provide explicit CSS entry points.
 
+Individual and aggregate theme entry points MUST preserve the documented value
+grammar of every public token. In particular, RGB-channel tokens and complete
+shadow declarations remain valid after packaging in inherited, explicit, and
+system color modes.
+
 Source beneath a package's `src/internal` directory is not a public entry point
 and MUST NOT appear in a package export map. Tests and Storybook may exercise
 internal behavior through public surfaces but MUST NOT teach consumers to

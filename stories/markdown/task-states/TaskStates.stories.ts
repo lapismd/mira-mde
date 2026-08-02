@@ -45,6 +45,21 @@ export const Preview: Story = {
       placement: "right",
     },
   },
+  play: async ({ canvasElement }) => {
+    const question = canvasElement.querySelector<HTMLElement>(
+      'input[type="checkbox"][data-task="?"]',
+    );
+    const important = canvasElement.querySelector<HTMLElement>(
+      'input[type="checkbox"][data-task="!"]',
+    );
+    if (!question || !important)
+      throw new Error("Custom task-state controls did not render");
+
+    await expect(getComputedStyle(question).backgroundColor).toBe(
+      "rgb(213, 138, 0)",
+    );
+    await expect(getComputedStyle(important).color).toBe("rgb(213, 138, 0)");
+  },
 };
 
 export const LivePreview: Story = {

@@ -35,50 +35,32 @@
   --mira-syntax-invalid: light-dark(#e93147, #fb464c);
   --mira-syntax-invalid-background: light-dark(#ffe8eb, #4a1d24);
   --mira-callout-background: light-dark(#fafafa, #242424);
-  --_mira-obsidian-callout-bug-light: 233, 49, 71;
-  --_mira-obsidian-callout-bug-dark: 251, 70, 76;
-  --_mira-obsidian-callout-default-light: 8, 109, 221;
-  --_mira-obsidian-callout-default-dark: 2, 122, 255;
-  --_mira-obsidian-callout-example-light: 120, 82, 238;
-  --_mira-obsidian-callout-example-dark: 168, 130, 255;
-  --_mira-obsidian-callout-question-light: 224, 172, 0;
-  --_mira-obsidian-callout-question-dark: 224, 222, 113;
-  --_mira-obsidian-callout-quote-light: 112, 112, 112;
-  --_mira-obsidian-callout-quote-dark: 153, 153, 153;
-  --_mira-obsidian-callout-success-light: 8, 185, 78;
-  --_mira-obsidian-callout-success-dark: 68, 207, 110;
-  --_mira-obsidian-callout-summary-light: 0, 191, 188;
-  --_mira-obsidian-callout-summary-dark: 83, 223, 221;
-  --mira-callout-bug: light-dark(
-    var(--_mira-obsidian-callout-bug-light),
-    var(--_mira-obsidian-callout-bug-dark)
-  );
-  --mira-callout-default: light-dark(
-    var(--_mira-obsidian-callout-default-light),
-    var(--_mira-obsidian-callout-default-dark)
-  );
+  --_mira-callout-bug-light: 233, 49, 71;
+  --_mira-callout-bug-dark: 251, 70, 76;
+  --_mira-callout-default-light: 8, 109, 221;
+  --_mira-callout-default-dark: 2, 122, 255;
+  --_mira-callout-example-light: 120, 82, 238;
+  --_mira-callout-example-dark: 168, 130, 255;
+  --_mira-callout-question-light: 224, 172, 0;
+  --_mira-callout-question-dark: 224, 222, 113;
+  --_mira-callout-quote-light: 112, 112, 112;
+  --_mira-callout-quote-dark: 153, 153, 153;
+  --_mira-callout-success-light: 8, 185, 78;
+  --_mira-callout-success-dark: 68, 207, 110;
+  --_mira-callout-summary-light: 0, 191, 188;
+  --_mira-callout-summary-dark: 83, 223, 221;
+  --_mira-widget-shadow-light:
+    0 0 0 1px rgb(0 0 0 / 8%), 0 8px 24px rgb(0 0 0 / 10%);
+  --_mira-widget-shadow-dark: 0 10px 34px rgb(0 0 0 / 32%);
+  --mira-callout-bug: var(--_mira-callout-bug-light);
+  --mira-callout-default: var(--_mira-callout-default-light);
   --mira-callout-error: var(--mira-callout-bug);
-  --mira-callout-example: light-dark(
-    var(--_mira-obsidian-callout-example-light),
-    var(--_mira-obsidian-callout-example-dark)
-  );
+  --mira-callout-example: var(--_mira-callout-example-light);
   --mira-callout-info: var(--mira-callout-default);
-  --mira-callout-question: light-dark(
-    var(--_mira-obsidian-callout-question-light),
-    var(--_mira-obsidian-callout-question-dark)
-  );
-  --mira-callout-quote: light-dark(
-    var(--_mira-obsidian-callout-quote-light),
-    var(--_mira-obsidian-callout-quote-dark)
-  );
-  --mira-callout-success: light-dark(
-    var(--_mira-obsidian-callout-success-light),
-    var(--_mira-obsidian-callout-success-dark)
-  );
-  --mira-callout-summary: light-dark(
-    var(--_mira-obsidian-callout-summary-light),
-    var(--_mira-obsidian-callout-summary-dark)
-  );
+  --mira-callout-question: var(--_mira-callout-question-light);
+  --mira-callout-quote: var(--_mira-callout-quote-light);
+  --mira-callout-success: var(--_mira-callout-success-light);
+  --mira-callout-summary: var(--_mira-callout-summary-light);
   --mira-callout-tip: var(--mira-callout-success);
   --mira-callout-warning: var(--mira-callout-question);
   --mira-tag-background: light-dark(hsl(258 88% 66% / 12%), #363052);
@@ -87,11 +69,116 @@
   --mira-frontmatter-background: light-dark(#fafafa, #242424);
   --mira-frontmatter-label: light-dark(#5c5c5c, #b3b3b3);
   --mira-widget-background: light-dark(#ffffff, #242424);
-  --_mira-obsidian-widget-shadow-light:
-    0 0 0 1px rgb(0 0 0 / 8%), 0 8px 24px rgb(0 0 0 / 10%);
-  --_mira-obsidian-widget-shadow-dark: 0 10px 34px rgb(0 0 0 / 32%);
-  --mira-widget-shadow: light-dark(
-    var(--_mira-obsidian-widget-shadow-light),
-    var(--_mira-obsidian-widget-shadow-dark)
-  );
+  --mira-widget-shadow: var(--_mira-widget-shadow-light);
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-mira-theme~="obsidian"] {
+    --mira-callout-bug: var(--_mira-callout-bug-dark);
+    --mira-callout-default: var(--_mira-callout-default-dark);
+    --mira-callout-error: var(--mira-callout-bug);
+    --mira-callout-example: var(--_mira-callout-example-dark);
+    --mira-callout-info: var(--mira-callout-default);
+    --mira-callout-question: var(--_mira-callout-question-dark);
+    --mira-callout-quote: var(--_mira-callout-quote-dark);
+    --mira-callout-success: var(--_mira-callout-success-dark);
+    --mira-callout-summary: var(--_mira-callout-summary-dark);
+    --mira-callout-tip: var(--mira-callout-success);
+    --mira-callout-warning: var(--mira-callout-question);
+    --mira-widget-shadow: var(--_mira-widget-shadow-dark);
+  }
+}
+
+:where(.dark, .theme-dark)[data-mira-theme~="obsidian"],
+:where(.dark, .theme-dark) [data-mira-theme~="obsidian"] {
+  --mira-callout-bug: var(--_mira-callout-bug-dark);
+  --mira-callout-default: var(--_mira-callout-default-dark);
+  --mira-callout-error: var(--mira-callout-bug);
+  --mira-callout-example: var(--_mira-callout-example-dark);
+  --mira-callout-info: var(--mira-callout-default);
+  --mira-callout-question: var(--_mira-callout-question-dark);
+  --mira-callout-quote: var(--_mira-callout-quote-dark);
+  --mira-callout-success: var(--_mira-callout-success-dark);
+  --mira-callout-summary: var(--_mira-callout-summary-dark);
+  --mira-callout-tip: var(--mira-callout-success);
+  --mira-callout-warning: var(--mira-callout-question);
+  --mira-widget-shadow: var(--_mira-widget-shadow-dark);
+}
+
+:where(.light, .theme-light)[data-mira-theme~="obsidian"],
+:where(.light, .theme-light) [data-mira-theme~="obsidian"] {
+  --mira-callout-bug: var(--_mira-callout-bug-light);
+  --mira-callout-default: var(--_mira-callout-default-light);
+  --mira-callout-error: var(--mira-callout-bug);
+  --mira-callout-example: var(--_mira-callout-example-light);
+  --mira-callout-info: var(--mira-callout-default);
+  --mira-callout-question: var(--_mira-callout-question-light);
+  --mira-callout-quote: var(--_mira-callout-quote-light);
+  --mira-callout-success: var(--_mira-callout-success-light);
+  --mira-callout-summary: var(--_mira-callout-summary-light);
+  --mira-callout-tip: var(--mira-callout-success);
+  --mira-callout-warning: var(--mira-callout-question);
+  --mira-widget-shadow: var(--_mira-widget-shadow-light);
+}
+
+[data-mira-theme~="obsidian"][data-mira-color-mode="system"] {
+  --mira-callout-bug: var(--_mira-callout-bug-light);
+  --mira-callout-default: var(--_mira-callout-default-light);
+  --mira-callout-error: var(--mira-callout-bug);
+  --mira-callout-example: var(--_mira-callout-example-light);
+  --mira-callout-info: var(--mira-callout-default);
+  --mira-callout-question: var(--_mira-callout-question-light);
+  --mira-callout-quote: var(--_mira-callout-quote-light);
+  --mira-callout-success: var(--_mira-callout-success-light);
+  --mira-callout-summary: var(--_mira-callout-summary-light);
+  --mira-callout-tip: var(--mira-callout-success);
+  --mira-callout-warning: var(--mira-callout-question);
+  --mira-widget-shadow: var(--_mira-widget-shadow-light);
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-mira-theme~="obsidian"][data-mira-color-mode="system"] {
+    --mira-callout-bug: var(--_mira-callout-bug-dark);
+    --mira-callout-default: var(--_mira-callout-default-dark);
+    --mira-callout-error: var(--mira-callout-bug);
+    --mira-callout-example: var(--_mira-callout-example-dark);
+    --mira-callout-info: var(--mira-callout-default);
+    --mira-callout-question: var(--_mira-callout-question-dark);
+    --mira-callout-quote: var(--_mira-callout-quote-dark);
+    --mira-callout-success: var(--_mira-callout-success-dark);
+    --mira-callout-summary: var(--_mira-callout-summary-dark);
+    --mira-callout-tip: var(--mira-callout-success);
+    --mira-callout-warning: var(--mira-callout-question);
+    --mira-widget-shadow: var(--_mira-widget-shadow-dark);
+  }
+}
+
+[data-mira-theme~="obsidian"][data-mira-color-mode="dark"] {
+  --mira-callout-bug: var(--_mira-callout-bug-dark);
+  --mira-callout-default: var(--_mira-callout-default-dark);
+  --mira-callout-error: var(--mira-callout-bug);
+  --mira-callout-example: var(--_mira-callout-example-dark);
+  --mira-callout-info: var(--mira-callout-default);
+  --mira-callout-question: var(--_mira-callout-question-dark);
+  --mira-callout-quote: var(--_mira-callout-quote-dark);
+  --mira-callout-success: var(--_mira-callout-success-dark);
+  --mira-callout-summary: var(--_mira-callout-summary-dark);
+  --mira-callout-tip: var(--mira-callout-success);
+  --mira-callout-warning: var(--mira-callout-question);
+  --mira-widget-shadow: var(--_mira-widget-shadow-dark);
+}
+
+[data-mira-theme~="obsidian"][data-mira-color-mode="light"] {
+  --mira-callout-bug: var(--_mira-callout-bug-light);
+  --mira-callout-default: var(--_mira-callout-default-light);
+  --mira-callout-error: var(--mira-callout-bug);
+  --mira-callout-example: var(--_mira-callout-example-light);
+  --mira-callout-info: var(--mira-callout-default);
+  --mira-callout-question: var(--_mira-callout-question-light);
+  --mira-callout-quote: var(--_mira-callout-quote-light);
+  --mira-callout-success: var(--_mira-callout-success-light);
+  --mira-callout-summary: var(--_mira-callout-summary-light);
+  --mira-callout-tip: var(--mira-callout-success);
+  --mira-callout-warning: var(--mira-callout-question);
+  --mira-widget-shadow: var(--_mira-widget-shadow-light);
 }

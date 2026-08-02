@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/svelte-vite";
+import { expect } from "storybook/test";
 import EditorModeStory from "../_shared/EditorModeStory.svelte";
 import MarkdownPreviewStory from "../_shared/MarkdownPreviewStory.svelte";
 import {
@@ -31,6 +32,22 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+async function expectRenderedCalloutColors(canvasElement: HTMLElement) {
+  const callouts = canvasElement.querySelectorAll<HTMLElement>(".callout");
+  await expect(callouts.length).toBeGreaterThan(0);
+
+  const callout = callouts[0];
+  const title = callout?.querySelector<HTMLElement>(".callout-title");
+  if (!callout || !title) throw new Error("Rendered callout is incomplete");
+
+  const style = getComputedStyle(callout);
+  await expect(style.backgroundColor).not.toBe("rgba(0, 0, 0, 0)");
+  await expect(style.getPropertyValue("--callout-color").trim()).toBe(
+    "8, 109, 221",
+  );
+  await expect(getComputedStyle(title).color).not.toBe(style.color);
+}
+
 export const Preview: Story = {
   tags: ["visual-pending"],
   parameters: {
@@ -43,6 +60,9 @@ export const Preview: Story = {
       align: "canvas",
       placement: "right",
     },
+  },
+  play: async ({ canvasElement }) => {
+    await expectRenderedCalloutColors(canvasElement);
   },
 };
 
@@ -73,6 +93,9 @@ export const LivePreview: Story = {
         code: markdownEditorDocsSource("calloutsMarkdown", "live-preview"),
       },
     },
+  },
+  play: async ({ canvasElement }) => {
+    await expectRenderedCalloutColors(canvasElement);
   },
 };
 

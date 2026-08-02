@@ -215,6 +215,7 @@ export const Popover: Story = {
     );
     await expect(content).toHaveTextContent("Insert Markdown");
     await expect(getComputedStyle(content!).fontSize).toBe("14px");
+    await expect(getComputedStyle(content!).boxShadow).not.toBe("none");
     await userEvent.click(body.getByRole("button", { name: "Dismiss" }));
     await expect(canvas.getByTestId("primitive-status")).toHaveTextContent(
       "Slash command help dismissed",

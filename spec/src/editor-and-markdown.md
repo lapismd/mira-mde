@@ -30,6 +30,12 @@ The Lapis Markdown Feature Tour and CodeMirror Layout Showcase are reference
 fixtures. Mira owns adapted Storybook copies with consumer-neutral paths and
 adapters.
 
+Callout and task-state rendering consumes public RGB-channel tokens inside
+`rgb()` and `rgba()` declarations. Those tokens therefore remain raw channel
+triplets in every color mode; mode selection changes the channel value without
+changing its grammar. Floating Markdown surfaces similarly consume a complete
+shadow token rather than a color-only function.
+
 Portable parser type declarations are included through normal module imports so
 the package remains compatible with the repository TypeScript and lint gates.
 

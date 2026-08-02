@@ -29,6 +29,7 @@ type Story = StoryObj<typeof meta>;
 
 type ExpectedAppearance = {
   background: string;
+  calloutChannels: string;
   foreground: string;
   colorScheme: "light" | "dark";
 };
@@ -43,6 +44,18 @@ async function expectAppearance(
   await expect(style.backgroundColor).toBe(expected.background);
   await expect(style.color).toBe(expected.foreground);
   await expect(style.colorScheme).toContain(expected.colorScheme);
+  await expect(
+    style.getPropertyValue("--mira-callout-default").replaceAll(" ", ""),
+  ).toBe(expected.calloutChannels);
+
+  const probe = shell.ownerDocument.createElement("span");
+  probe.style.backgroundColor = "rgba(var(--mira-callout-default), 0.1)";
+  probe.style.boxShadow = "var(--mira-widget-shadow)";
+  shell.append(probe);
+  const probeStyle = getComputedStyle(probe);
+  await expect(probeStyle.backgroundColor).not.toBe("rgba(0, 0, 0, 0)");
+  await expect(probeStyle.boxShadow).not.toBe("none");
+  probe.remove();
   return shell;
 }
 
@@ -76,6 +89,7 @@ export const MiraLight: Story = {
   play: async ({ canvasElement }) => {
     const shell = await expectAppearance(canvasElement, {
       background: "rgb(251, 251, 252)",
+      calloutChannels: "8,109,221",
       foreground: "rgb(29, 29, 32)",
       colorScheme: "light",
     });
@@ -92,6 +106,7 @@ export const MiraDark: Story = {
   play: async ({ canvasElement }) => {
     await expectAppearance(canvasElement, {
       background: "rgb(23, 24, 28)",
+      calloutChannels: "125,188,255",
       foreground: "rgb(241, 243, 247)",
       colorScheme: "dark",
     });
@@ -107,6 +122,7 @@ export const ObsidianLight: Story = {
   play: async ({ canvasElement }) => {
     await expectAppearance(canvasElement, {
       background: "rgb(255, 255, 255)",
+      calloutChannels: "8,109,221",
       foreground: "rgb(34, 34, 34)",
       colorScheme: "light",
     });
@@ -122,6 +138,7 @@ export const ObsidianDark: Story = {
   play: async ({ canvasElement }) => {
     await expectAppearance(canvasElement, {
       background: "rgb(30, 30, 30)",
+      calloutChannels: "2,122,255",
       foreground: "rgb(218, 218, 218)",
       colorScheme: "dark",
     });
@@ -142,6 +159,7 @@ export const PageInheritanceAndSystem: Story = {
   play: async ({ canvasElement }) => {
     const shell = await expectAppearance(canvasElement, {
       background: "rgb(255, 255, 255)",
+      calloutChannels: "8,109,221",
       foreground: "rgb(34, 34, 34)",
       colorScheme: "light",
     });
@@ -159,6 +177,7 @@ export const CustomThemeExtendingMira: Story = {
   play: async ({ canvasElement }) => {
     const shell = await expectAppearance(canvasElement, {
       background: "rgb(251, 251, 252)",
+      calloutChannels: "8,109,221",
       foreground: "rgb(29, 29, 32)",
       colorScheme: "light",
     });
@@ -177,6 +196,7 @@ export const CustomThemeExtendingObsidian: Story = {
   play: async ({ canvasElement }) => {
     const shell = await expectAppearance(canvasElement, {
       background: "rgb(30, 30, 30)",
+      calloutChannels: "2,122,255",
       foreground: "rgb(218, 218, 218)",
       colorScheme: "dark",
     });
@@ -200,6 +220,7 @@ export const TargetedOverride: Story = {
   play: async ({ canvasElement }) => {
     const shell = await expectAppearance(canvasElement, {
       background: "rgb(255, 255, 255)",
+      calloutChannels: "8,109,221",
       foreground: "rgb(34, 34, 34)",
       colorScheme: "light",
     });

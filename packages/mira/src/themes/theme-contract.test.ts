@@ -11,6 +11,14 @@ describe("Mira theme CSS contract", () => {
     expect(source).toContain("light-dark(#fbfbfc, #17181c)");
     expect(source).toContain("light-dark(#0f766e, #2dd4bf)");
     expect(source).toContain("--mira-focus-ring: var(--mira-accent)");
+    expect(source).toContain(
+      "--mira-callout-default: var(--_mira-callout-default-light)",
+    );
+    expect(source).toContain('[data-mira-color-mode="dark"]');
+    expect(source).not.toMatch(
+      /--mira-callout-(?!background\b)[\w-]+:\s*light-dark\(/u,
+    );
+    expect(source).not.toMatch(/--mira-widget-shadow:\s*light-dark\(/u);
   });
 
   it("maps the distinct Lapis Obsidian palette", () => {
@@ -21,6 +29,16 @@ describe("Mira theme CSS contract", () => {
     expect(source).toContain("light-dark(#222222, #dadada)");
     expect(source).toContain("light-dark(hsl(257 88.88% 70.95%), #7852ee)");
     expect(source).not.toContain("light-dark(#fbfbfc, #17181c)");
+    expect(source).toContain(
+      "--mira-callout-default: var(--_mira-callout-default-light)",
+    );
+    expect(source).toContain(
+      '[data-mira-theme~="obsidian"][data-mira-color-mode="dark"]',
+    );
+    expect(source).not.toMatch(
+      /--mira-callout-(?!background\b)[\w-]+:\s*light-dark\(/u,
+    );
+    expect(source).not.toMatch(/--mira-widget-shadow:\s*light-dark\(/u);
   });
 
   it("loads the contract, Mira fallback, and Obsidian override in order", () => {
