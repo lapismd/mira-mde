@@ -126,6 +126,7 @@
   {...restProps}
   class={`task-list-item-checkbox ${className}`.trim()}
   type="checkbox"
+  aria-label="Toggle task"
   data-task={task}
   {checked}
   {disabled}

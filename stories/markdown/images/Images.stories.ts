@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/svelte-vite";
+import { expect, userEvent, within } from "storybook/test";
 import EditorModeStory from "../_shared/EditorModeStory.svelte";
 import MarkdownPreviewStory from "../_shared/MarkdownPreviewStory.svelte";
 import {
@@ -31,7 +32,21 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Preview: Story = {};
+export const Preview: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(
+      canvas.getAllByRole("button", { name: /Expand image:/ })[0],
+    );
+    const body = within(canvasElement.ownerDocument.body);
+    await expect(
+      body.getByRole("dialog", { name: /Image preview:/ }),
+    ).toBeVisible();
+    await userEvent.click(
+      body.getByRole("button", { name: "Close image preview" }),
+    );
+  },
+};
 
 export const LivePreview: Story = {
   name: "Live Preview",

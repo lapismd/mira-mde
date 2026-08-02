@@ -570,6 +570,7 @@ export function createBaseCodeMirrorExtensions(
     EditorState.readOnly.of(readonly),
     EditorView.editable.of(!readonly),
     EditorView.contentAttributes.of({
+      "aria-label": "Markdown editor",
       spellcheck: String(options.spellcheck ?? true),
     }),
     indentOnInput(),

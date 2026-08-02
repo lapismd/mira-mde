@@ -62,7 +62,7 @@ const preview: Preview = {
   ],
   parameters: {
     a11y: {
-      test: "todo",
+      test: "error",
       context: {
         exclude: [".cm-gutters"],
       },

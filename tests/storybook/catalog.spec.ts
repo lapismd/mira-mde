@@ -26,7 +26,7 @@ test("publishes one docs mirror for every canonical specification chapter", asyn
     (entry) =>
       entry.type === "docs" && entry.title.startsWith("Mira MDE/Catalog/"),
   );
-  expect(catalogDocs).toHaveLength(7);
+  expect(catalogDocs).toHaveLength(8);
 });
 
 test("publishes catalog descriptions, spec links, and token metadata", async ({

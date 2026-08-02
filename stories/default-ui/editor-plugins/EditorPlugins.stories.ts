@@ -1,4 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/svelte-vite";
+import { expect, userEvent, within } from "storybook/test";
+import { catalogParameters } from "../../catalog/catalog.mjs";
 import { createSlashCommandExtensions } from "@mira-mde/codemirror";
 import {
   MiraFeature,
@@ -172,6 +174,7 @@ const meta = {
   argTypes: defaultEditorArgTypes,
   parameters: {
     ...defaultEditorDocsParameters,
+    ...catalogParameters("default-ui"),
     docs: {
       ...defaultEditorDocsParameters.docs,
       description: {
@@ -192,6 +195,16 @@ export const SlashCommands: Story = {
     features: {
       [MiraFeature.SlashCommands]: true,
     },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const editor = canvasElement.querySelector<HTMLElement>(".cm-content");
+    if (!editor) throw new Error("Slash command editor did not render");
+    await userEvent.click(editor);
+    await userEvent.type(editor, "/hea");
+    await userEvent.click(canvas.getByRole("option", { name: /Heading 1/ }));
+    await userEvent.type(editor, "Inserted heading");
+    await expect(editor).toHaveTextContent("Inserted heading");
   },
 };
 
@@ -265,6 +278,14 @@ export const CustomToolbar: Story = {
     toolbars: customToolbars,
     extensions: [aiDemoExtension],
   },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole("button", { name: "Templates" }));
+    const body = within(canvasElement.ownerDocument.body);
+    await userEvent.click(body.getByText("Checklist", { selector: "span" }));
+    await expect(canvas.getByText("First task")).toBeVisible();
+    await expect(canvas.getByText("Second task")).toBeVisible();
+  },
 };
 
 export const ExtensionContributions: Story = {
@@ -274,6 +295,13 @@ export const ExtensionContributions: Story = {
     value:
       "# Extension contributions\n\nUse the extension toolbar button or press Mod+Shift+D.",
     extensions: [commandContributionExtension],
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Insert decision" }),
+    );
+    await expect(canvas.getByText("Describe the decision here.")).toBeVisible();
   },
 };
 
@@ -293,6 +321,7 @@ export const MarkdownAuthoring: Story = {
 
 export const AiPlugin: Story = {
   name: "AI Plugin",
+  parameters: catalogParameters("ai"),
   args: {
     value: blockControlsMarkdown,
     extensions: [aiDemoExtension],
@@ -313,5 +342,35 @@ export const AiPlugin: Story = {
       [MiraFeature.SlashCommands]: true,
       [MiraFeature.BlockControls]: true,
     },
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+
+    await step("open and run the stubbed AI request", async () => {
+      await userEvent.click(canvas.getByRole("button", { name: "Ask AI" }));
+      const dialog = canvas.getByRole("dialog", { name: "Ask AI" });
+      await expect(dialog).toBeVisible();
+      const prompt = within(dialog).getByRole("textbox", {
+        name: "AI prompt",
+      });
+      await userEvent.type(prompt, "Draft a portable response");
+      await userEvent.click(
+        within(dialog).getByRole("button", { name: "Run" }),
+      );
+      await expect(within(dialog).getByText("Ready")).toBeVisible();
+      await expect(
+        within(dialog).getByText(/Storybook AI demo:/),
+      ).toBeVisible();
+    });
+
+    await step("accept the generated Markdown", async () => {
+      await userEvent.click(
+        within(canvas.getByRole("dialog", { name: "Ask AI" })).getByRole(
+          "button",
+          { name: "Accept" },
+        ),
+      );
+      await expect(canvas.getByText(/Storybook AI demo:/)).toBeVisible();
+    });
   },
 };

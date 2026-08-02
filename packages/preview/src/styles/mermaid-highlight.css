@@ -84,7 +84,7 @@
 .markdown-preview-surface :is(.hljs-keyword, .hljs-doctag, .hljs-type),
 .markdown-rendered :is(.hljs-keyword, .hljs-doctag, .hljs-type),
 .markdown-widget-shell :is(.hljs-keyword, .hljs-doctag, .hljs-type) {
-  color: #d73a49;
+  color: #c92d3c;
 }
 
 .markdown-preview-surface :is(.hljs-title, .hljs-title.function_),

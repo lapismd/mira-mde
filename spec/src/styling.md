@@ -21,7 +21,8 @@ wrapper composition as documented by the package entrypoints.
 The Storybook catalog assigns every shipped `--mira-*` reference to a styled
 surface and records its purpose, default or fallback, inheritance behavior,
 and affected element or state. `pnpm catalog:check` compares those assignments
-with package exports and shipped CSS, rejecting missing public surfaces,
-unassigned or stale tokens, and unknown references. Obsidian-compatible
-variables appear in a separate compatibility section and are not described as
-Mira's preferred theming API.
+with package exports and token references in shipped CSS, Svelte components,
+and runtime style contributions, rejecting missing public surfaces, unassigned
+or stale tokens, and unknown references. Obsidian-compatible variables appear
+in a separate compatibility section and are not described as Mira's preferred
+theming API.

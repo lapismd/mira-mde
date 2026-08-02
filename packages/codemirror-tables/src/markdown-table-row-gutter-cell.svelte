@@ -102,6 +102,7 @@
   </Button>
   <DropdownMenu.Root>
     <DropdownMenu.Trigger
+      aria-label={`Row ${rowIndex + 1} actions`}
       class={buttonVariants({
         variant: "ghost",
         size: "xs",
@@ -113,6 +114,7 @@
     </DropdownMenu.Trigger>
     <DropdownMenu.Content class="flex">
       <DropdownMenuItem
+        aria-label="Insert row above"
         title="Insert a row above this one"
         class="[&_svg]:size-5"
         onclick={(evt) => onInsertRow(evt, rowIndex)}
@@ -130,6 +132,7 @@
         >
       </DropdownMenuItem>
       <DropdownMenuItem
+        aria-label="Insert row below"
         title="Insert a row below this one"
         class="[&_svg]:size-5"
         onclick={(evt) => onInsertRow(evt, rowIndex + 1)}
@@ -147,6 +150,7 @@
         >
       </DropdownMenuItem>
       <DropdownMenuItem
+        aria-label="Delete row"
         title="Delete row"
         class="[&_svg]:size-5"
         onclick={(evt) => onDeleteRow(evt, rowIndex)}

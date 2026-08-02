@@ -76,7 +76,7 @@
 
 .mira-link-preview[data-link-preview-state="unresolved"]
   .mira-link-preview__trigger {
-  opacity: 0.6;
+  text-decoration-style: dashed;
 }
 
 .mira-link-preview__card {

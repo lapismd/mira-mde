@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/svelte-vite";
+import { expect, userEvent, within } from "storybook/test";
 import EditorModeStory from "../_shared/EditorModeStory.svelte";
 import MarkdownPreviewStory from "../_shared/MarkdownPreviewStory.svelte";
 import {
@@ -81,6 +82,39 @@ export const AdapterInvalidation: Story = {
     Component: AdapterInvalidationStory,
   }),
   tags: ["visual-pending"],
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+
+    await step("resolve a previously missing target", async () => {
+      await userEvent.click(
+        canvas.getByRole("button", { name: "Create missing note" }),
+      );
+      await expect(
+        canvas.getByText("Future Note was created and resolved."),
+      ).toBeVisible();
+      const futureNote = canvasElement.querySelector<HTMLElement>(
+        '[data-embed="Future Note"]',
+      );
+      await expect(futureNote).toHaveTextContent(
+        "This unresolved embed recovered through watchTarget.",
+      );
+    });
+
+    await step("refresh an already resolved target", async () => {
+      await userEvent.click(
+        canvas.getByRole("button", { name: "Update resolved note" }),
+      );
+      await expect(
+        canvas.getByText("Mutable Note content was refreshed."),
+      ).toBeVisible();
+      const mutableNote = canvasElement.querySelector<HTMLElement>(
+        '[data-embed="Mutable Note"]',
+      );
+      await expect(mutableNote).toHaveTextContent(
+        "watchFile refreshed this content in place.",
+      );
+    });
+  },
 };
 
 export const PortableSurfaces: Story = {

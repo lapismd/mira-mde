@@ -105,11 +105,7 @@
   {:else if editing}
     <div use:codeMirror={content} class={cn("p-2", className)}></div>
   {:else}
-    <button
-      onclick={(evt) => enableEdit(evt)}
-      onfocus={(evt) => (editing = true)}
-      class={cn("h-full w-full p-2", className)}
-    >
+    <div class={cn("relative h-full w-full p-2", className)}>
       <div class="cm-editor cm-focused mod-inline">
         <div class="cm-scroller">
           <div class="cm-content">
@@ -123,6 +119,13 @@
           </div>
         </div>
       </div>
-    </button>
+      <button
+        type="button"
+        aria-label="Edit table cell"
+        onclick={(evt) => enableEdit(evt)}
+        onfocus={(evt) => (editing = true)}
+        style="position: absolute; inset: 0; opacity: 0;"
+      ></button>
+    </div>
   {/if}
 </div>

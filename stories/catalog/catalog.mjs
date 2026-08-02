@@ -70,6 +70,12 @@ const semanticTokens = [
     "Hover, selection, and soft active states.",
   ),
   token(
+    "--mira-danger",
+    "Destructive action foreground.",
+    "#dc2626",
+    "Block deletion controls and other destructive editor actions.",
+  ),
+  token(
     "--mira-active-line-background",
     "Active CodeMirror line fill.",
     "transparent",
@@ -361,6 +367,7 @@ const commonTokens = [
   "--mira-accent",
   "--mira-accent-foreground",
   "--mira-accent-soft",
+  "--mira-danger",
   "--mira-radius",
   "--mira-font-sans",
 ];
@@ -461,6 +468,25 @@ export const catalogEntries = [
       "Pipe-table and grid-table widgets, cells, menus, and editing chrome.",
     spec: "editor-and-markdown.md#requirements",
     tokens: markdownTokens,
+    publicSurface: true,
+  },
+  {
+    id: "ai",
+    name: "AI plugin",
+    packageName: "@mira-mde/plugin-ai",
+    importPath: "@mira-mde/plugin-ai",
+    components: ["aiExtension", "createMiraAiToolbarAction"],
+    description:
+      "Consumer-wired AI actions with slash, block, and toolbar entry points plus an accessible prompt and review popover.",
+    spec: "plugins/ai.md#requirements",
+    tokens: [
+      ...commonTokens,
+      "--mira-popover",
+      "--mira-popover-foreground",
+      "--mira-widget-shadow",
+      "--mira-font-mono",
+      "--mira-accent-soft",
+    ],
     publicSurface: true,
   },
   {

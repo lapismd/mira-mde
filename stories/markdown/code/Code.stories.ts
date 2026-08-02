@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/svelte-vite";
+import { expect, fn, userEvent, within } from "storybook/test";
 import EditorModeStory from "../_shared/EditorModeStory.svelte";
 import MarkdownPreviewStory from "../_shared/MarkdownPreviewStory.svelte";
 import {
@@ -31,7 +32,23 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Preview: Story = {};
+export const Preview: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const writeText = fn(async (_value: string) => undefined);
+    Object.defineProperty(navigator.clipboard, "writeText", {
+      configurable: true,
+      value: writeText,
+    });
+    const copy = canvas.getAllByRole("button", { name: "Copy code" })[0];
+    copy.focus();
+    await userEvent.keyboard("{Enter}");
+    await expect(writeText).toHaveBeenCalledOnce();
+    await expect(
+      canvas.getAllByRole("button", { name: "Copied" })[0],
+    ).toHaveAttribute("title", "Copied");
+  },
+};
 
 export const LivePreview: Story = {
   name: "Live Preview",

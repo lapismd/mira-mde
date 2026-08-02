@@ -156,6 +156,7 @@
     class="metadata-property-key-input"
     {title}
     {readonly}
+    aria-label={title || `Property name: ${value}`}
     role="combobox"
     aria-autocomplete="list"
     aria-controls={suggestionListId}

@@ -45,7 +45,7 @@ export function normalizeProperties(
       normalizedKey = "class";
       normalizedValue = Array.isArray(value) ? value.join(" ") : value;
     } else if (key.startsWith("aria") && key !== "aria") {
-      normalizedKey = toKebabAttribute(key);
+      normalizedKey = `aria-${key.slice(4).toLowerCase()}`;
     } else if (key.startsWith("data") && key !== "data") {
       normalizedKey = toKebabAttribute(key);
     } else if (svgCamelCaseAttributes.has(key)) {

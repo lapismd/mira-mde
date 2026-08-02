@@ -696,7 +696,10 @@
             <Table.Row
               class="border-none hover:[&,&>svelte-css-wrapper]:[&>th,td]:bg-transparent"
             >
-              <Table.Head class="group h-5 border-none p-0">
+              <Table.Head
+                aria-label="Table actions"
+                class="group h-5 border-none p-0"
+              >
                 <div
                   class="markdown-table-chrome absolute top-0 z-10 flex items-center opacity-0"
                   data-markdown-table-chrome="delete-table"
@@ -704,6 +707,7 @@
                   <Tooltip.Provider>
                     <Tooltip.Root>
                       <Tooltip.Trigger
+                        aria-label="Delete table"
                         class={buttonVariants({
                           variant: "ghost",
                           size: "xs",
@@ -731,7 +735,12 @@
                   {@render columnMenu({ index })}
                 </MarkdownTableColumnHead>
               {/each}
-              <Table.Head class="group h-5 w-5 border-none"></Table.Head>
+              <Table.Head
+                aria-label="Column actions"
+                class="group h-5 w-5 border-none"
+              >
+                <span class="sr-only">Column actions</span>
+              </Table.Head>
             </Table.Row>
           </Table.Header>
           <Table.Body>
@@ -817,8 +826,11 @@
           </Table.Body>
           <Table.Footer class="border-t-0 bg-transparent">
             <Table.Row class="group border-none p-0 hover:bg-transparent">
-              <Table.Head class="h-5 !bg-transparent"></Table.Head>
+              <Table.Head aria-label="Row actions" class="h-5 !bg-transparent">
+                <span class="sr-only">Row actions</span>
+              </Table.Head>
               <Table.Head
+                aria-label="Add row"
                 colspan={columnCount}
                 class="markdown-table-chrome markdown-table-chrome--footer-cell group m-0 h-5 p-0 group-hover:border-x group-hover:border-b"
               >
@@ -827,6 +839,7 @@
                   data-markdown-table-chrome="add-row"
                 >
                   <Button
+                    aria-label="Add row"
                     size="sm"
                     variant="ghost"
                     class="h-5 w-full cursor-s-resize rounded-none  [&_svg]:size-6"
@@ -851,7 +864,12 @@
                   </Button>
                 </div>
               </Table.Head>
-              <Table.Head class="h-5 !bg-transparent"></Table.Head>
+              <Table.Head
+                aria-label="Column actions"
+                class="h-5 !bg-transparent"
+              >
+                <span class="sr-only">Column actions</span>
+              </Table.Head>
             </Table.Row>
           </Table.Footer>
         </Table.Root>
@@ -864,6 +882,7 @@
 {#snippet columnMenu({ index }: { index: number })}
   <DropdownMenu.Root>
     <DropdownMenu.Trigger
+      aria-label={`Column ${index + 1} actions`}
       class={buttonVariants({
         variant: "ghost",
         size: "xs",
@@ -875,24 +894,28 @@
     </DropdownMenu.Trigger>
     <DropdownMenu.Content class="flex">
       <DropdownMenuItem
+        aria-label="Align column left"
         disabled={node.__mdastNode.align?.[index] === "left"}
         class="[&_svg]:size-5"
         onclick={(evt) => alignContent(evt, index, "left")}
         ><AlignLeft /></DropdownMenuItem
       >
       <DropdownMenuItem
+        aria-label="Align column center"
         disabled={node.__mdastNode.align?.[index] === "center"}
         class="[&_svg]:size-5"
         onclick={(evt) => alignContent(evt, index, "center")}
         ><AlignCenter /></DropdownMenuItem
       >
       <DropdownMenuItem
+        aria-label="Align column right"
         disabled={node.__mdastNode.align?.[index] === "right"}
         class="[&_svg]:size-5"
         onclick={(evt) => alignContent(evt, index, "right")}
         ><AlignRight /></DropdownMenuItem
       >
       <DropdownMenuItem
+        aria-label="Insert column left"
         title="Insert a column to the left of this one"
         class="[&_svg]:size-5"
         onclick={(evt) => {
@@ -912,6 +935,7 @@
         >
       </DropdownMenuItem>
       <DropdownMenuItem
+        aria-label="Insert column right"
         title="Insert a column to the right of this one"
         class="[&_svg]:size-5"
         onclick={(evt) => {
@@ -931,6 +955,7 @@
         >
       </DropdownMenuItem>
       <DropdownMenuItem
+        aria-label="Delete column"
         title="Delete column"
         class="[&_svg]:size-5"
         onclick={(evt) => {

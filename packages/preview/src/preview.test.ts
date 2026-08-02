@@ -138,6 +138,7 @@ describe("renderer prop normalization", () => {
           const paragraph = root.children[0] as Element;
           paragraph.properties = {
             className: ["from-plugin"],
+            ariaDescribedBy: "details",
             ariaSelected: true,
             colSpan: 2,
             dataSourceOffset: 4,
@@ -151,6 +152,7 @@ describe("renderer prop normalization", () => {
     const paragraph = ast.children[0] as Element;
 
     expect(paragraph.properties?.class).toBe("from-plugin");
+    expect(paragraph.properties?.["aria-describedby"]).toBe("details");
     expect(paragraph.properties?.["aria-selected"]).toBe(true);
     expect(paragraph.properties?.colspan).toBe(2);
     expect(paragraph.properties?.["data-source-offset"]).toBe(4);

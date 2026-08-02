@@ -55,6 +55,14 @@ test("accepts documented and assigned shipped Mira tokens", () => {
   });
 });
 
+test("ignores explicitly internal layout variables", () => {
+  verify(
+    ".surface { --mira-property-depth: 2; color: var(--mira-foreground); }\n",
+    validRegistry,
+    (result) => assert.equal(result.ok, true),
+  );
+});
+
 test("rejects undocumented and stale tokens", () => {
   verify(
     ".surface { color: var(--mira-new-token); }\n",

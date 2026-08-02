@@ -15,6 +15,7 @@ resolvers, extension contributions, source fallback, and shipped plain CSS.
 | MIRA-MD-005 | Live-preview widgets MUST preserve CodeMirror line, gutter, wrapping, selection, and scroll geometry.                                                                                                                                                            |
 | MIRA-MD-006 | Split view MUST synchronize editor and preview scrolling by ratio while keeping each surface independently scrollable.                                                                                                                                           |
 | MIRA-MD-007 | The comprehensive and focused Storybook fixtures MUST cover every feature listed by MIRA-MD-002.                                                                                                                                                                 |
+| MIRA-MD-008 | Editor inputs, task controls, and icon-only widget chrome MUST expose stable accessible names; public Storybook stories MUST pass automated accessibility checks except for explicitly documented non-content CodeMirror geometry.                               |
 
 ## Lapis reference boundary
 

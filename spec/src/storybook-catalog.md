@@ -32,6 +32,18 @@ Every public or Storybook-visible styled surface has a concise catalog page.
 Compound primitives share family pages, and React and Vanilla wrappers point
 to the Svelte/default UI surface they adapt.
 
+`pnpm test:storybook` runs the indexed CSF stories in a dedicated Vitest 4
+project using Chromium browser mode. Story `play` functions own portable,
+user-visible interactions; browser-sensitive geometry and native browser APIs
+remain in focused Playwright acceptance against Storybook iframes. That
+acceptance covers scroll ownership and synchronization, pointer drag/drop,
+table mutation and source reveal, native clipboard behavior, and Mermaid SVG
+and portal settlement.
+
+Public stories run the accessibility addon as an enforced browser assertion.
+The non-content CodeMirror gutter remains the sole global exclusion; any new
+technical exclusion must be documented and scoped to the narrowest story.
+
 ## Host and fixture ownership
 
 The repository does not ship a separate documentation or demo application.

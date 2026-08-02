@@ -8,6 +8,7 @@ import { catalogRegistry } from "../stories/catalog/catalog.mjs";
 
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 export const DEFAULT_REPO_ROOT = path.resolve(SCRIPT_DIR, "..");
+export const INTERNAL_STYLE_TOKENS = new Set(["--mira-property-depth"]);
 
 export const PUBLIC_SURFACES = [
   {
@@ -42,6 +43,11 @@ export const PUBLIC_SURFACES = [
       "GridEditorTable",
       "GridEditorColumn",
     ],
+  },
+  {
+    entryId: "ai",
+    files: ["packages/plugin-ai/src/index.ts"],
+    exports: ["aiExtension", "createMiraAiToolbarAction"],
   },
   {
     entryId: "mermaid",
@@ -148,13 +154,17 @@ export const PUBLIC_SURFACES = [
   },
 ];
 
-function cssFiles(directory) {
+function shippedStyleFiles(directory) {
   if (!existsSync(directory)) return [];
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
     if (["dist", ".svelte-kit"].includes(entry.name)) return [];
     const absolutePath = path.join(directory, entry.name);
-    if (entry.isDirectory()) return cssFiles(absolutePath);
-    return entry.isFile() && entry.name.endsWith(".css") ? [absolutePath] : [];
+    if (entry.isDirectory()) return shippedStyleFiles(absolutePath);
+    if (!entry.isFile() || /\.(?:spec|test)\.[cm]?[jt]s$/u.test(entry.name))
+      return [];
+    return /\.(?:css|svelte|[cm]?[jt]s)$/u.test(entry.name)
+      ? [absolutePath]
+      : [];
   });
 }
 
@@ -210,10 +220,11 @@ export function validateCatalog({
   }
 
   const cssTokenNames = new Set();
-  for (const file of cssFiles(path.join(repoRoot, "packages"))) {
+  for (const file of shippedStyleFiles(path.join(repoRoot, "packages"))) {
     const source = readFileSync(file, "utf8");
-    for (const match of source.matchAll(/--mira-[\w-]+/g))
-      cssTokenNames.add(match[0]);
+    for (const match of source.matchAll(/--mira-[\w-]+/g)) {
+      if (!INTERNAL_STYLE_TOKENS.has(match[0])) cssTokenNames.add(match[0]);
+    }
   }
   for (const name of cssTokenNames) {
     if (!tokenNameSet.has(name))

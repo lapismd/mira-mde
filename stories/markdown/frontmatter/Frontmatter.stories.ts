@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/svelte-vite";
+import { expect, userEvent, within } from "storybook/test";
 import EditorModeStory from "../_shared/EditorModeStory.svelte";
 import MarkdownPreviewStory from "../_shared/MarkdownPreviewStory.svelte";
 import {
@@ -80,4 +81,37 @@ export const PropertyActions: Story = {
     Component: FrontmatterActionsStory,
   }),
   tags: ["visual-pending"],
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+
+    await step("collapse and expand the property editor", async () => {
+      await userEvent.click(
+        canvas.getByRole("button", { name: "Collapse properties" }),
+      );
+      await expect(
+        canvas.getByRole("button", { name: "Expand properties" }),
+      ).toHaveAttribute("aria-expanded", "false");
+      await userEvent.click(
+        canvas.getByRole("button", { name: "Expand properties" }),
+      );
+    });
+
+    await step("edit and remove a property", async () => {
+      const statusValue = canvas.getByRole("textbox", {
+        name: "status value",
+      });
+      await userEvent.clear(statusValue);
+      await userEvent.type(statusValue, "approved");
+      await userEvent.tab();
+      await expect(statusValue).toHaveTextContent("approved");
+
+      await userEvent.click(
+        canvas.getByRole("button", { name: "Change status type" }),
+      );
+      await userEvent.click(canvas.getByRole("menuitem", { name: "Remove" }));
+      await expect(
+        canvas.queryByRole("textbox", { name: "status value" }),
+      ).not.toBeInTheDocument();
+    });
+  },
 };

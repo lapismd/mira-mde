@@ -1,0 +1,15 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import { SvelteDocsBridge } from "./SvelteDocsBridge";
+import CatalogPage from "./CatalogPage.svelte";
+
+<Meta
+  title="Mira MDE/Catalog/AI plugin surface"
+  parameters={{ layout: "fullscreen" }}
+/>
+
+# AI plugin surface
+
+The optional AI plugin contributes consumer-wired editor actions and a prompt,
+preview, and acceptance surface without owning a model provider or credentials.
+
+<SvelteDocsBridge component={CatalogPage} props={{ entryIds: ["ai"] }} />

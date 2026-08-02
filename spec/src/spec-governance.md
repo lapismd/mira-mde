@@ -39,6 +39,11 @@ The protected governance set includes both the specification checkers and the
 catalog/token checker. Changes to either cannot weaken or bypass the contract
 without updating this chapter in the same logical change.
 
+The catalog checker scans shipped CSS, Svelte, TypeScript, and JavaScript style
+sources for public `--mira-*` references. Any internal layout-only variable
+must be explicitly allowlisted and regression-tested rather than silently
+omitted from the public token registry.
+
 ## Agent workflow
 
 1. Inspect Jujutsu status and preserve unrelated work.

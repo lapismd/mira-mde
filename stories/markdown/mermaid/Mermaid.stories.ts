@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/svelte-vite";
+import { expect, userEvent, waitFor, within } from "storybook/test";
 import { catalogParameters } from "../../catalog/catalog.mjs";
 import EditorModeStory from "../_shared/EditorModeStory.svelte";
 import MarkdownPreviewStory from "../_shared/MarkdownPreviewStory.svelte";
@@ -34,7 +35,21 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Preview: Story = {};
+export const Preview: Story = {
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await waitFor(() => {
+      expect(canvasElement.querySelector(".mermaid svg")).toBeTruthy();
+    });
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Expand Mermaid diagram" }),
+    );
+    const body = within(canvasElement.ownerDocument.body);
+    await expect(
+      body.getByRole("dialog", { name: "Mermaid diagram" }),
+    ).toBeVisible();
+  },
+};
 
 export const LivePreview: Story = {
   name: "Live Preview",
@@ -85,4 +100,16 @@ export const DialogControls: Story = {
     Component: MermaidDialogStory,
   }),
   tags: ["visual-pending"],
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    await waitFor(() => {
+      expect(canvasElement.querySelector(".mermaid svg")).toBeTruthy();
+    });
+
+    await step("exercise expanded-view controls", async () => {
+      await userEvent.click(canvas.getByRole("button", { name: "Zoom in" }));
+      await userEvent.click(canvas.getByRole("button", { name: "Pan right" }));
+      await userEvent.click(canvas.getByRole("button", { name: "Reset view" }));
+    });
+  },
 };

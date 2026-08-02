@@ -864,7 +864,10 @@
           <Table.Row
             class="border-none hover:[&,&>svelte-css-wrapper]:[&>th,td]:bg-transparent"
           >
-            <Table.Head class="group h-5 border-none p-0">
+            <Table.Head
+              aria-label="Table actions"
+              class="group h-5 border-none p-0"
+            >
               <div
                 class="markdown-table-chrome absolute top-0 z-10 flex items-center opacity-0"
                 data-markdown-table-chrome="delete-table"
@@ -872,6 +875,7 @@
                 <Tooltip.Provider>
                   <Tooltip.Root>
                     <Tooltip.Trigger
+                      aria-label="Delete table"
                       class={buttonVariants({
                         variant: "ghost",
                         size: "xs",
@@ -888,6 +892,7 @@
             </Table.Head>
             {#each { length: columnCount } as _, index}
               <Table.Head
+                aria-label={`Column ${index + 1} actions`}
                 class={cn(
                   "markdown-table-chrome markdown-table-chrome--cell group relative h-5 border-b p-0 opacity-0 group-hover:opacity-100",
                   activeCol === index && "is-chrome-active",
@@ -897,6 +902,7 @@
                 ondragenter={() => (dragState.end = index)}
               >
                 <Button
+                  aria-label={`Drag column ${index + 1}`}
                   ondragend={(evt) => dragEnd(evt)}
                   ondragstart={(evt) => dragStart(evt, index, "col")}
                   draggable="true"
@@ -915,7 +921,12 @@
                 </div>
               </Table.Head>
             {/each}
-            <Table.Head class="group h-5 w-5 border-none"></Table.Head>
+            <Table.Head
+              aria-label="Column actions"
+              class="group h-5 w-5 border-none"
+            >
+              <span class="sr-only">Column actions</span>
+            </Table.Head>
           </Table.Row>
         </Table.Header>
         <Table.Body>
@@ -923,8 +934,11 @@
         </Table.Body>
         <Table.Footer class="border-t-0 bg-transparent">
           <Table.Row class="group border-none p-0 hover:bg-transparent">
-            <Table.Head class="h-5 !bg-transparent"></Table.Head>
+            <Table.Head aria-label="Row actions" class="h-5 !bg-transparent">
+              <span class="sr-only">Row actions</span>
+            </Table.Head>
             <Table.Head
+              aria-label="Add row"
               colspan={columnCount}
               class="markdown-table-chrome markdown-table-chrome--footer-cell group m-0 h-5 p-0 group-hover:border-x group-hover:border-b"
             >
@@ -933,6 +947,7 @@
                 data-markdown-table-chrome="add-row"
               >
                 <Button
+                  aria-label="Add row"
                   size="sm"
                   variant="ghost"
                   class="h-5 w-full cursor-s-resize rounded-none  [&_svg]:size-6"
@@ -957,7 +972,9 @@
                 </Button>
               </div>
             </Table.Head>
-            <Table.Head class="h-5 !bg-transparent"></Table.Head>
+            <Table.Head aria-label="Column actions" class="h-5 !bg-transparent">
+              <span class="sr-only">Column actions</span>
+            </Table.Head>
           </Table.Row>
         </Table.Footer>
       </Table.Root>
@@ -983,6 +1000,7 @@
         data-markdown-table-chrome="row-gutter"
       >
         <Button
+          aria-label={`Drag row ${rowIndex + 1}`}
           ondragend={(evt) => dragEnd(evt)}
           ondragstart={(evt) => dragStart(evt, rowIndex, "row")}
           draggable="true"
@@ -998,6 +1016,7 @@
         </Button>
         <DropdownMenu.Root>
           <DropdownMenu.Trigger
+            aria-label={`Row ${rowIndex + 1} actions`}
             class={buttonVariants({
               variant: "ghost",
               size: "xs",
@@ -1009,6 +1028,7 @@
           </DropdownMenu.Trigger>
           <DropdownMenu.Content class="flex">
             <DropdownMenuItem
+              aria-label="Insert row above"
               data-tooltip="Insert a row above this one"
               class="[&_svg]:size-5"
               onclick={(evt: MouseEvent) => insertRow(evt, rowIndex)}
@@ -1026,6 +1046,7 @@
               >
             </DropdownMenuItem>
             <DropdownMenuItem
+              aria-label="Insert row below"
               data-tooltip="Insert a row below this one"
               class="[&_svg]:size-5"
               onclick={(evt: MouseEvent) => insertRow(evt, rowIndex + 1)}
@@ -1043,6 +1064,7 @@
               >
             </DropdownMenuItem>
             <DropdownMenuItem
+              aria-label="Delete row"
               data-tooltip="Delete row"
               class="[&_svg]:size-5"
               onclick={(evt: MouseEvent) => deleteRow(evt, rowIndex)}
@@ -1142,6 +1164,7 @@
   {@const columns = columnsFor(index).map(([y, x]) => ({ x, y }))}
   <DropdownMenu.Root>
     <DropdownMenu.Trigger
+      aria-label={`Column ${index + 1} actions`}
       class={buttonVariants({
         variant: "ghost",
         size: "xs",
@@ -1153,6 +1176,7 @@
     </DropdownMenu.Trigger>
     <DropdownMenu.Content class="flex">
       <DropdownMenuItem
+        aria-label="Align column left"
         data-tooltip="Align Left"
         class="[&_svg]:size-5"
         onclick={(evt: MouseEvent) =>
@@ -1160,6 +1184,7 @@
         ><AlignLeft /></DropdownMenuItem
       >
       <DropdownMenuItem
+        aria-label="Align column center"
         data-tooltip="Align Center"
         class="[&_svg]:size-5"
         onclick={(evt: MouseEvent) =>
@@ -1167,6 +1192,7 @@
         ><AlignCenter /></DropdownMenuItem
       >
       <DropdownMenuItem
+        aria-label="Align column right"
         data-tooltip="Align Right"
         class="[&_svg]:size-5"
         onclick={(evt: MouseEvent) =>
@@ -1174,6 +1200,7 @@
         ><AlignRight /></DropdownMenuItem
       >
       <DropdownMenuItem
+        aria-label="Justify column"
         data-tooltip="Align Justify"
         class="[&_svg]:size-5"
         onclick={(evt: MouseEvent) =>
@@ -1181,6 +1208,7 @@
         ><AlignJustify /></DropdownMenuItem
       >
       <DropdownMenuItem
+        aria-label="Insert column left"
         data-tooltip="Insert a column to the left of this one"
         class="[&_svg]:size-5"
         onclick={(evt: MouseEvent) => {
@@ -1200,6 +1228,7 @@
         >
       </DropdownMenuItem>
       <DropdownMenuItem
+        aria-label="Insert column right"
         data-tooltip="Insert a column to the right of this one"
         class="[&_svg]:size-5"
         onclick={(evt: MouseEvent) => {
@@ -1219,6 +1248,7 @@
         >
       </DropdownMenuItem>
       <DropdownMenuItem
+        aria-label="Delete column"
         data-tooltip="Delete column"
         class="[&_svg]:size-5"
         onclick={(evt: MouseEvent) => {

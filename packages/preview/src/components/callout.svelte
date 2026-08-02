@@ -76,6 +76,8 @@
 
 <aside
   bind:this={ref}
+  role="note"
+  aria-label={heading}
   class={`callout mira-callout callout-${calloutType}`}
   data-callout={calloutType}
   data-expandable={dataExpandable}
