@@ -10,6 +10,7 @@ test-results
 .DS_Store
 storybook-static
 storybook-static-check
+spec/book
 tests/visual/storybook.spec.ts-snapshots/**/*.json
 tests/visual/storybook.spec.ts-snapshots/**/*.actual.png
 tests/visual/storybook.spec.ts-snapshots/**/*.diff.png

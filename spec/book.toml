@@ -1,0 +1,12 @@
+[book]
+title = "Mira MDE System Specification"
+authors = ["Mira MDE contributors"]
+language = "en"
+src = "src"
+
+[build]
+build-dir = "book"
+
+[output.html]
+default-theme = "light"
+preferred-dark-theme = "navy"
