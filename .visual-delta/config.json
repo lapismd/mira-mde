@@ -1,0 +1,11 @@
+{
+  "browsers": ["chromium"],
+  "workflow": {
+    "autoAcceptLiveStoryComparisons": false,
+    "visualTestFailureMode": "strict",
+    "vcs": {
+      "mode": "off",
+      "commitMessageTemplate": "Visual Delta: {action} {scope}"
+    }
+  }
+}

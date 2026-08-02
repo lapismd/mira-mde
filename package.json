@@ -10,7 +10,7 @@
   },
   "scripts": {
     "build": "turbo run build",
-    "build-storybook": "storybook build",
+    "build-storybook": "node -e \"require('node:fs').mkdirSync('.cache/visual-delta',{recursive:true})\" && storybook build --stats-json .cache/visual-delta",
     "catalog:check": "node ./scripts/check-catalog.mjs && node --test ./scripts/check-catalog.spec.mjs",
     "check": "pnpm check:format && turbo run check",
     "check:all": "pnpm check && pnpm lint && pnpm test && pnpm build",
@@ -31,10 +31,12 @@
     "spec:test": "node --test ./scripts/check-spec-*.spec.mjs",
     "spec:validate": "node ./scripts/check-spec-structure.mjs && node ./scripts/check-spec-storybook.mjs",
     "test": "turbo run test",
-    "test:e2e": "playwright test",
+    "test:e2e": "playwright test -c playwright.storybook.config.ts",
     "test:storybook": "vitest run --project storybook",
-    "test:visual": "playwright test -c playwright.visual.config.ts",
-    "test:visual:update": "tsx scripts/visual/visual-update.ts",
+    "test:visual": "visual-delta test --all",
+    "test:visual:affected": "visual-delta test --affected",
+    "test:visual:update": "visual-delta update",
+    "visual-delta": "visual-delta",
     "test:visual:report": "playwright show-report"
   },
   "dependencies": {

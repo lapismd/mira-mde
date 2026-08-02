@@ -36,4 +36,7 @@ CSS-token coverage before building the static host and running compare-only
 visual validation.
 
 The root owns the Vitest 4 Storybook project and its Chromium browser provider;
-package-local Vitest configurations continue to own pure unit tests.
+package-local Vitest configurations continue to own pure unit tests. Playwright
+configuration is split by responsibility: the default config belongs to the
+installed Visual Delta suite, while `playwright.storybook.config.ts` owns the
+focused Storybook acceptance tests.
