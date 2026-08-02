@@ -7,16 +7,16 @@ preview, language, and UI behavior.
 
 ## Packages
 
-- `@mira-mde/extensions` - extension contract and resolver.
-- `@mira-mde/core` - framework-agnostic CodeMirror controller.
-- `@mira-mde/codemirror` - base CodeMirror editing setup.
-- `@mira-mde/codemirror-markdown` - markdown language and source decorations.
-- `@mira-mde/codemirror-rich` - live-preview mode hooks.
-- `@mira-mde/codemirror-tables` - table parsing and editor decorations.
-- `@mira-mde/preview` - Svelte markdown preview renderer.
+- `@lapismd/mira/extensions` - extension contract and resolver.
+- `@lapismd/mira/core` - framework-agnostic CodeMirror controller.
+- `@lapismd/mira/codemirror` - base CodeMirror editing setup.
+- `@lapismd/mira/codemirror` - markdown language and source decorations.
+- `@lapismd/mira/codemirror` - live-preview mode hooks.
+- `@lapismd/mira/tables` - table parsing and editor decorations.
+- `@lapismd/mira/preview` - Svelte markdown preview renderer.
 - `@mira-mde/plugin-mermaid` - Mermaid language and preview extension.
-- `@mira-mde/ui` - editor UI primitives and theme CSS.
-- `@mira-mde/svelte` - primary Svelte 5 editor component.
+- `@lapismd/mira/ui` - editor UI primitives and theme CSS.
+- `@lapismd/mira` - primary Svelte 5 editor component.
 - `@mira-mde/vanilla` - plain JavaScript mounting API.
 
 React, Vue, and Solid package folders are reserved for thin wrappers once the

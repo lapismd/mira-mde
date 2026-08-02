@@ -23,7 +23,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@mira-mde/svelte": "workspace:*"
+    "@lapismd/mira": "workspace:*"
   },
   "peerDependencies": {
     "svelte": "^5.0.0"

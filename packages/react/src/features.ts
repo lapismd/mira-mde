@@ -4,7 +4,7 @@ import {
   type MiraDefaultFeatureConfigs as BaseMiraDefaultFeatureConfigs,
   type MiraFeatureFlags as BaseMiraFeatureFlags,
 } from "@mira-mde/default-ui";
-import type { MiraExtension, MiraMode } from "@mira-mde/extensions";
+import type { MiraExtension, MiraMode } from "@lapismd/mira/extensions";
 import type {
   MiraDefaultEditMode,
   MiraDefaultFeatureConfigs,

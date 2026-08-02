@@ -120,8 +120,8 @@ Heading and block-reference embeds:
 
 | Package                    |  Surface   | Status |
 | :------------------------- | :--------: | -----: |
-| `@mira-mde/core`           | controller |  ready |
-| `@mira-mde/preview`        |  reading   |  ready |
+| `@lapismd/mira/core`           | controller |  ready |
+| `@lapismd/mira/preview`        |  reading   |  ready |
 | `@mira-mde/plugin-mermaid` |  diagrams  |  ready |
 
 MultiMarkdown spans:
@@ -169,9 +169,9 @@ Flowchart:
 
 ```mermaid
 flowchart LR
-  Core["@mira-mde/core"] --> Svelte["@mira-mde/svelte"]
-  Extensions["@mira-mde/extensions"] --> Svelte
-  Mermaid["@mira-mde/plugin-mermaid"] --> Preview["@mira-mde/preview"]
+  Core["@lapismd/mira/core"] --> Svelte["@lapismd/mira"]
+  Extensions["@lapismd/mira/extensions"] --> Svelte
+  Mermaid["@mira-mde/plugin-mermaid"] --> Preview["@lapismd/mira/preview"]
   Svelte --> Storybook["Storybook comprehensive demo"]
 ```
 

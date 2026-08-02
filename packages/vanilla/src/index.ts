@@ -1,5 +1,5 @@
 import { mount, unmount } from "svelte";
-import MiraMde, { type MiraMdeProps } from "@mira-mde/svelte";
+import MiraMde, { type MiraMdeProps } from "@lapismd/mira";
 
 export type MiraMdeVanillaInstance = {
   update: (props: Partial<MiraMdeProps>) => void;

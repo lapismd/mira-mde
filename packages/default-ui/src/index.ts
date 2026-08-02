@@ -1,5 +1,5 @@
 import { mount, unmount } from "svelte";
-import type { MiraMode } from "@mira-mde/extensions";
+import type { MiraMode } from "@lapismd/mira/extensions";
 import MiraDefaultMde from "./default-mde.svelte";
 import MiraDefaultToolbar from "./default-toolbar.svelte";
 import {

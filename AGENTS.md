@@ -147,15 +147,15 @@ For package- or app-scoped changes, always run the modified workspace's relevant
 checks and tests before handing work back. Start with:
 
 ```sh
-pnpm --filter @mira-mde/preview check
-pnpm --filter @mira-mde/preview test
+pnpm --filter @lapismd/mira/preview check
+pnpm --filter @lapismd/mira/preview test
 ```
 
 Also run the package build when the change affects exports, packaging, styles,
 Svelte components, framework wrappers, or build-time behavior:
 
 ```sh
-pnpm --filter @mira-mde/preview build
+pnpm --filter @lapismd/mira/preview build
 ```
 
 For changes that touch multiple packages/apps or shared repo configuration, run

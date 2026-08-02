@@ -1,6 +1,6 @@
 # Mermaid Plugin
 
-`@mira-mde/plugin-mermaid` owns Mermaid language support, deterministic render
+`@lapismd/mira-plugin-mermaid` owns Mermaid language support, deterministic render
 identity, reading/live-preview rendering, source fallback, and expanded diagram
 controls.
 
@@ -16,3 +16,6 @@ controls.
 
 Mermaid configuration is portable. Application-wide registration and persisted
 settings remain consumer responsibilities.
+The plugin integrates through supported `@lapismd/mira` CodeMirror, extension,
+and preview contracts; it does not depend on a private renderer or editor
+workspace.

@@ -8,30 +8,18 @@ importers:
 
   .:
     dependencies:
-      '@mira-mde/codemirror':
+      '@lapismd/mira':
         specifier: workspace:*
-        version: link:packages/codemirror
+        version: link:packages/mira
       '@mira-mde/default-ui':
         specifier: workspace:*
         version: link:packages/default-ui
-      '@mira-mde/extensions':
-        specifier: workspace:*
-        version: link:packages/extensions
       '@mira-mde/plugin-ai':
         specifier: workspace:*
         version: link:packages/plugin-ai
       '@mira-mde/plugin-mermaid':
         specifier: workspace:*
         version: link:packages/plugin-mermaid
-      '@mira-mde/preview':
-        specifier: workspace:*
-        version: link:packages/preview
-      '@mira-mde/svelte':
-        specifier: workspace:*
-        version: link:packages/svelte
-      '@mira-mde/ui':
-        specifier: workspace:*
-        version: link:packages/ui
     devDependencies:
       '@eslint/js':
         specifier: ^9.39.2
@@ -166,155 +154,57 @@ importers:
         specifier: ^4.1.10
         version: 4.1.10(@types/node@24.13.2)(@vitest/browser-playwright@4.1.10)(jsdom@29.1.1)(vite@7.3.6(@types/node@24.13.2)(lightningcss@1.32.0)(tsx@4.23.1)(yaml@2.9.0))
 
-  packages/codemirror:
+  packages/default-ui:
     dependencies:
+      '@lapismd/mira':
+        specifier: workspace:*
+        version: link:../mira
       '@lucide/svelte':
         specifier: ^0.525.0
         version: 0.525.0(svelte@5.56.4(@typescript-eslint/types@8.62.0))
+      '@mira-mde/plugin-mermaid':
+        specifier: workspace:*
+        version: link:../plugin-mermaid
     devDependencies:
-      '@codemirror/autocomplete':
-        specifier: ^6.18.7
-        version: 6.20.3
-      '@codemirror/commands':
-        specifier: ^6.10.0
-        version: 6.10.4
-      '@codemirror/language':
-        specifier: ^6.11.3
-        version: 6.12.4
-      '@codemirror/lint':
-        specifier: ^6.9.2
-        version: 6.9.7
-      '@codemirror/search':
-        specifier: ^6.5.11
-        version: 6.7.1
-      '@codemirror/state':
-        specifier: ^6.5.2
-        version: 6.7.0
-      '@codemirror/view':
-        specifier: ^6.38.8
-        version: 6.43.3
-      '@lezer/highlight':
-        specifier: ^1.2.3
-        version: 1.2.3
+      '@sveltejs/vite-plugin-svelte':
+        specifier: ^6.2.1
+        version: 6.2.4(svelte@5.56.4(@typescript-eslint/types@8.62.0))(vite@8.1.5(@types/node@24.13.2)(esbuild@0.28.1)(tsx@4.23.1)(yaml@2.9.0))
       svelte:
         specifier: ^5.46.1
         version: 5.56.4(@typescript-eslint/types@8.62.0)
+      vitest:
+        specifier: ^4.1.0
+        version: 4.1.9(@types/node@24.13.2)(@vitest/browser-playwright@4.1.10(playwright@1.61.1)(vite@7.3.6(@types/node@24.13.2)(lightningcss@1.32.0)(tsx@4.23.1)(yaml@2.9.0))(vitest@4.1.10))(jsdom@29.1.1)(vite@8.1.5(@types/node@24.13.2)(esbuild@0.28.1)(tsx@4.23.1)(yaml@2.9.0))
 
-  packages/codemirror-markdown:
-    dependencies:
-      '@adobe/remark-gridtables':
-        specifier: ^3.0.14
-        version: 3.0.20
-      '@mira-mde/extensions':
-        specifier: workspace:*
-        version: link:../extensions
-      rehype-parse:
-        specifier: ^9.0.1
-        version: 9.0.1
-      rehype-remark:
-        specifier: ^10.0.1
-        version: 10.0.1
-      remark-gfm:
-        specifier: ^4.0.1
-        version: 4.0.1
-      remark-stringify:
-        specifier: ^11.0.0
-        version: 11.0.0
-      unified:
-        specifier: ^11.0.5
-        version: 11.0.5
-    devDependencies:
-      '@codemirror/autocomplete':
-        specifier: ^6.18.7
-        version: 6.20.3
-      '@codemirror/lang-markdown':
-        specifier: ^6.3.4
-        version: 6.5.0
-      '@codemirror/lang-yaml':
-        specifier: ^6.1.2
-        version: 6.1.3
-      '@codemirror/language':
-        specifier: ^6.11.3
-        version: 6.12.4
-      '@codemirror/language-data':
-        specifier: ^6.5.2
-        version: 6.5.2
-      '@codemirror/legacy-modes':
-        specifier: ^6.5.3
-        version: 6.5.3
-      '@codemirror/state':
-        specifier: ^6.5.2
-        version: 6.7.0
-      '@codemirror/view':
-        specifier: ^6.38.8
-        version: 6.43.3
-      '@lezer/common':
-        specifier: ^1.5.2
-        version: 1.5.2
-      '@lezer/highlight':
-        specifier: ^1.2.3
-        version: 1.2.3
-      '@lezer/markdown':
-        specifier: ^1.4.3
-        version: 1.6.4
-
-  packages/codemirror-rich:
-    dependencies:
-      '@mira-mde/codemirror-tables':
-        specifier: workspace:*
-        version: link:../codemirror-tables
-      '@mira-mde/extensions':
-        specifier: workspace:*
-        version: link:../extensions
-      '@mira-mde/preview':
-        specifier: workspace:*
-        version: link:../preview
-    devDependencies:
-      '@codemirror/language':
-        specifier: ^6.11.3
-        version: 6.12.4
-      '@codemirror/state':
-        specifier: ^6.5.2
-        version: 6.7.0
-      '@codemirror/view':
-        specifier: ^6.38.8
-        version: 6.43.3
-      svelte:
-        specifier: ^5.46.1
-        version: 5.56.4(@typescript-eslint/types@8.62.0)
-
-  packages/codemirror-tables:
+  packages/mira:
     dependencies:
       '@adobe/mdast-util-gridtables':
         specifier: ^4.0.13
         version: 4.0.19
-      '@codemirror/commands':
-        specifier: ^6.10.1
-        version: 6.10.4
-      '@codemirror/lang-markdown':
-        specifier: ^6.3.4
-        version: 6.5.0
+      '@adobe/remark-gridtables':
+        specifier: ^3.0.14
+        version: 3.0.20
       '@dnd-kit/dom':
         specifier: ^0.4.0
         version: 0.4.0
       '@dnd-kit/svelte':
         specifier: ^0.4.0
         version: 0.4.0(svelte@5.56.4(@typescript-eslint/types@8.62.0))
+      '@fontsource/source-code-pro':
+        specifier: ^5.2.7
+        version: 5.2.7
       '@lucide/svelte':
         specifier: ^0.525.0
         version: 0.525.0(svelte@5.56.4(@typescript-eslint/types@8.62.0))
-      '@mira-mde/codemirror':
-        specifier: workspace:*
-        version: link:../codemirror
-      '@mira-mde/codemirror-markdown':
-        specifier: workspace:*
-        version: link:../codemirror-markdown
-      '@mira-mde/preview':
-        specifier: workspace:*
-        version: link:../preview
-      '@mira-mde/ui':
-        specifier: workspace:*
-        version: link:../ui
+      bits-ui:
+        specifier: 2.18.1
+        version: 2.18.1(@internationalized/date@3.12.2)(@sveltejs/kit@2.68.0(@sveltejs/vite-plugin-svelte@7.2.0(svelte@5.56.4(@typescript-eslint/types@8.62.0))(vite@8.1.5(@types/node@24.13.2)(esbuild@0.28.1)(tsx@4.23.1)(yaml@2.9.0)))(svelte@5.56.4(@typescript-eslint/types@8.62.0))(typescript@5.9.3)(vite@8.1.5(@types/node@24.13.2)(esbuild@0.28.1)(tsx@4.23.1)(yaml@2.9.0)))(svelte@5.56.4(@typescript-eslint/types@8.62.0))
+      clsx:
+        specifier: ^2.1.1
+        version: 2.1.1
+      hast-util-to-text:
+        specifier: ^4.0.2
+        version: 4.0.2
       lodash-es:
         specifier: ^4.17.21
         version: 4.18.1
@@ -330,123 +220,145 @@ importers:
       micromark-extension-gfm-table:
         specifier: ^2.1.1
         version: 2.1.1
+      micromark-factory-space:
+        specifier: ^2.0.1
+        version: 2.0.1
       micromark-util-character:
         specifier: ^2.1.1
         version: 2.1.1
       micromark-util-symbol:
         specifier: ^2.0.1
         version: 2.0.1
+      micromark-util-types:
+        specifier: ^2.0.2
+        version: 2.0.2
+      rehype-highlight:
+        specifier: ^7.0.2
+        version: 7.0.2
+      rehype-katex:
+        specifier: ^7.0.1
+        version: 7.0.1
+      rehype-parse:
+        specifier: ^9.0.1
+        version: 9.0.1
+      rehype-raw:
+        specifier: ^7.0.0
+        version: 7.0.0
+      rehype-remark:
+        specifier: ^10.0.1
+        version: 10.0.1
+      rehype-sanitize:
+        specifier: ^6.0.0
+        version: 6.0.0
       rehype-stringify:
         specifier: ^10.0.1
         version: 10.0.1
+      remark-directive:
+        specifier: ^4.0.0
+        version: 4.0.0
+      remark-emoji:
+        specifier: ^5.0.2
+        version: 5.0.2
+      remark-frontmatter:
+        specifier: ^5.0.0
+        version: 5.0.0
       remark-gfm:
         specifier: ^4.0.1
         version: 4.0.1
+      remark-math:
+        specifier: ^6.0.0
+        version: 6.0.0
       remark-parse:
         specifier: ^11.0.0
         version: 11.0.0
       remark-rehype:
         specifier: ^11.1.2
         version: 11.1.2
+      remark-stringify:
+        specifier: ^11.0.0
+        version: 11.0.0
+      tailwind-merge:
+        specifier: ^3.4.0
+        version: 3.6.0
+      tailwind-variants:
+        specifier: ^1.0.0
+        version: 1.0.0(tailwindcss@4.3.1)
       unified:
         specifier: ^11.0.5
         version: 11.0.5
       unist-util-visit:
         specifier: ^5.0.0
         version: 5.1.0
+      yaml:
+        specifier: ^2.8.1
+        version: 2.9.0
     devDependencies:
+      '@codemirror/autocomplete':
+        specifier: ^6.18.7
+        version: 6.20.3
+      '@codemirror/commands':
+        specifier: ^6.10.1
+        version: 6.10.4
+      '@codemirror/lang-markdown':
+        specifier: ^6.3.4
+        version: 6.5.0
+      '@codemirror/lang-yaml':
+        specifier: ^6.1.2
+        version: 6.1.3
       '@codemirror/language':
         specifier: ^6.11.3
         version: 6.12.4
+      '@codemirror/language-data':
+        specifier: ^6.5.2
+        version: 6.5.2
+      '@codemirror/legacy-modes':
+        specifier: ^6.5.3
+        version: 6.5.3
+      '@codemirror/lint':
+        specifier: ^6.9.2
+        version: 6.9.7
+      '@codemirror/search':
+        specifier: ^6.5.11
+        version: 6.7.1
       '@codemirror/state':
         specifier: ^6.5.2
         version: 6.7.0
       '@codemirror/view':
         specifier: ^6.38.8
         version: 6.43.3
+      '@lezer/common':
+        specifier: ^1.5.2
+        version: 1.5.2
+      '@lezer/highlight':
+        specifier: ^1.2.3
+        version: 1.2.3
+      '@lezer/markdown':
+        specifier: ^1.4.3
+        version: 1.6.4
+      '@types/hast':
+        specifier: ^3.0.4
+        version: 3.0.4
       '@types/lodash-es':
         specifier: ^4.17.12
         version: 4.17.12
       '@types/mdast':
         specifier: ^4.0.4
         version: 4.0.4
+      '@types/unist':
+        specifier: ^3.0.3
+        version: 3.0.3
+      katex:
+        specifier: ^0.16.22
+        version: 0.16.47
       svelte:
         specifier: ^5.46.1
         version: 5.56.4(@typescript-eslint/types@8.62.0)
-
-  packages/core:
-    dependencies:
-      '@mira-mde/extensions':
-        specifier: workspace:*
-        version: link:../extensions
-    devDependencies:
-      '@codemirror/state':
-        specifier: ^6.5.2
-        version: 6.7.0
-      '@codemirror/view':
-        specifier: ^6.38.8
-        version: 6.43.3
-
-  packages/default-ui:
-    dependencies:
-      '@lucide/svelte':
-        specifier: ^0.525.0
-        version: 0.525.0(svelte@5.56.4(@typescript-eslint/types@8.62.0))
-      '@mira-mde/core':
-        specifier: workspace:*
-        version: link:../core
-      '@mira-mde/extensions':
-        specifier: workspace:*
-        version: link:../extensions
-      '@mira-mde/plugin-mermaid':
-        specifier: workspace:*
-        version: link:../plugin-mermaid
-      '@mira-mde/svelte':
-        specifier: workspace:*
-        version: link:../svelte
-      '@mira-mde/theme-obsidian':
-        specifier: workspace:*
-        version: link:../theme-obsidian
-      '@mira-mde/ui':
-        specifier: workspace:*
-        version: link:../ui
-    devDependencies:
-      '@sveltejs/vite-plugin-svelte':
-        specifier: ^6.2.1
-        version: 6.2.4(svelte@5.56.4(@typescript-eslint/types@8.62.0))(vite@8.1.5(@types/node@24.13.2)(esbuild@0.28.1)(tsx@4.23.1)(yaml@2.9.0))
-      svelte:
-        specifier: ^5.46.1
-        version: 5.56.4(@typescript-eslint/types@8.62.0)
-      vitest:
-        specifier: ^4.1.0
-        version: 4.1.9(@types/node@24.13.2)(@vitest/browser-playwright@4.1.10(playwright@1.61.1)(vite@7.3.6(@types/node@24.13.2)(lightningcss@1.32.0)(tsx@4.23.1)(yaml@2.9.0))(vitest@4.1.10))(jsdom@29.1.1)(vite@8.1.5(@types/node@24.13.2)(esbuild@0.28.1)(tsx@4.23.1)(yaml@2.9.0))
-
-  packages/extensions:
-    devDependencies:
-      '@codemirror/language':
-        specifier: ^6.11.3
-        version: 6.12.4
-      '@codemirror/state':
-        specifier: ^6.5.2
-        version: 6.7.0
-      '@codemirror/view':
-        specifier: ^6.38.8
-        version: 6.43.3
-      svelte:
-        specifier: ^5.46.1
-        version: 5.56.4(@typescript-eslint/types@8.62.0)
-      unified:
-        specifier: ^11.0.5
-        version: 11.0.5
 
   packages/plugin-ai:
     dependencies:
-      '@mira-mde/codemirror-rich':
+      '@lapismd/mira':
         specifier: workspace:*
-        version: link:../codemirror-rich
-      '@mira-mde/extensions':
-        specifier: workspace:*
-        version: link:../extensions
+        version: link:../mira
     devDependencies:
       '@codemirror/state':
         specifier: ^6.5.2
@@ -457,18 +369,15 @@ importers:
 
   packages/plugin-mermaid:
     dependencies:
+      '@lapismd/mira':
+        specifier: workspace:*
+        version: link:../mira
       '@lucide/svelte':
         specifier: ^0.525.0
         version: 0.525.0(svelte@5.56.4(@typescript-eslint/types@8.62.0))
       '@mermaid-js/layout-elk':
         specifier: ^0.1.9
         version: 0.1.9(mermaid@11.16.0)
-      '@mira-mde/extensions':
-        specifier: workspace:*
-        version: link:../extensions
-      '@mira-mde/ui':
-        specifier: workspace:*
-        version: link:../ui
       codemirror-lang-mermaid:
         specifier: ^0.5.0
         version: 0.5.0
@@ -504,126 +413,17 @@ importers:
         specifier: ^11.0.5
         version: 11.0.5
 
-  packages/preview:
-    dependencies:
-      '@adobe/mdast-util-gridtables':
-        specifier: ^4.0.13
-        version: 4.0.19
-      '@adobe/remark-gridtables':
-        specifier: ^3.0.14
-        version: 3.0.20
-      '@lucide/svelte':
-        specifier: ^0.525.0
-        version: 0.525.0(svelte@5.56.4(@typescript-eslint/types@8.62.0))
-      '@mira-mde/extensions':
-        specifier: workspace:*
-        version: link:../extensions
-      hast-util-to-text:
-        specifier: ^4.0.2
-        version: 4.0.2
-      mdast-util-from-markdown:
-        specifier: ^2.0.2
-        version: 2.0.3
-      micromark-factory-space:
-        specifier: ^2.0.1
-        version: 2.0.1
-      micromark-util-character:
-        specifier: ^2.1.0
-        version: 2.1.1
-      micromark-util-symbol:
-        specifier: ^2.0.1
-        version: 2.0.1
-      micromark-util-types:
-        specifier: ^2.0.2
-        version: 2.0.2
-      rehype-highlight:
-        specifier: ^7.0.2
-        version: 7.0.2
-      rehype-katex:
-        specifier: ^7.0.1
-        version: 7.0.1
-      rehype-raw:
-        specifier: ^7.0.0
-        version: 7.0.0
-      rehype-sanitize:
-        specifier: ^6.0.0
-        version: 6.0.0
-      remark-directive:
-        specifier: ^4.0.0
-        version: 4.0.0
-      remark-emoji:
-        specifier: ^5.0.2
-        version: 5.0.2
-      remark-frontmatter:
-        specifier: ^5.0.0
-        version: 5.0.0
-      remark-gfm:
-        specifier: ^4.0.1
-        version: 4.0.1
-      remark-math:
-        specifier: ^6.0.0
-        version: 6.0.0
-      remark-parse:
-        specifier: ^11.0.0
-        version: 11.0.0
-      remark-rehype:
-        specifier: ^11.1.2
-        version: 11.1.2
-      unified:
-        specifier: ^11.0.5
-        version: 11.0.5
-      unist-util-visit:
-        specifier: ^5.0.0
-        version: 5.1.0
-      yaml:
-        specifier: ^2.8.1
-        version: 2.9.0
-    devDependencies:
-      '@types/hast':
-        specifier: ^3.0.4
-        version: 3.0.4
-      '@types/mdast':
-        specifier: ^4.0.4
-        version: 4.0.4
-      '@types/unist':
-        specifier: ^3.0.3
-        version: 3.0.3
-      katex:
-        specifier: ^0.16.22
-        version: 0.16.47
-      svelte:
-        specifier: ^5.46.1
-        version: 5.56.4(@typescript-eslint/types@8.62.0)
-
   packages/react:
     dependencies:
-      '@mira-mde/codemirror':
+      '@lapismd/mira':
         specifier: workspace:*
-        version: link:../codemirror
-      '@mira-mde/codemirror-markdown':
-        specifier: workspace:*
-        version: link:../codemirror-markdown
-      '@mira-mde/codemirror-rich':
-        specifier: workspace:*
-        version: link:../codemirror-rich
-      '@mira-mde/codemirror-tables':
-        specifier: workspace:*
-        version: link:../codemirror-tables
-      '@mira-mde/core':
-        specifier: workspace:*
-        version: link:../core
+        version: link:../mira
       '@mira-mde/default-ui':
         specifier: workspace:*
         version: link:../default-ui
-      '@mira-mde/extensions':
-        specifier: workspace:*
-        version: link:../extensions
       '@mira-mde/plugin-mermaid':
         specifier: workspace:*
         version: link:../plugin-mermaid
-      '@mira-mde/preview':
-        specifier: workspace:*
-        version: link:../preview
       lucide-react:
         specifier: ^0.525.0
         version: 0.525.0(react@19.2.7)
@@ -649,82 +449,11 @@ importers:
 
   packages/solid: {}
 
-  packages/svelte:
-    dependencies:
-      '@mira-mde/codemirror':
-        specifier: workspace:*
-        version: link:../codemirror
-      '@mira-mde/codemirror-markdown':
-        specifier: workspace:*
-        version: link:../codemirror-markdown
-      '@mira-mde/codemirror-rich':
-        specifier: workspace:*
-        version: link:../codemirror-rich
-      '@mira-mde/codemirror-tables':
-        specifier: workspace:*
-        version: link:../codemirror-tables
-      '@mira-mde/core':
-        specifier: workspace:*
-        version: link:../core
-      '@mira-mde/extensions':
-        specifier: workspace:*
-        version: link:../extensions
-      '@mira-mde/preview':
-        specifier: workspace:*
-        version: link:../preview
-      '@mira-mde/ui':
-        specifier: workspace:*
-        version: link:../ui
-    devDependencies:
-      '@codemirror/state':
-        specifier: ^6.5.2
-        version: 6.7.0
-      '@codemirror/view':
-        specifier: ^6.38.8
-        version: 6.43.3
-      svelte:
-        specifier: ^5.46.1
-        version: 5.56.4(@typescript-eslint/types@8.62.0)
-
-  packages/theme-obsidian:
-    dependencies:
-      '@fontsource/source-code-pro':
-        specifier: ^5.2.7
-        version: 5.2.7
-
-  packages/ui:
-    dependencies:
-      '@dnd-kit/dom':
-        specifier: ^0.4.0
-        version: 0.4.0
-      '@dnd-kit/svelte':
-        specifier: ^0.4.0
-        version: 0.4.0(svelte@5.56.4(@typescript-eslint/types@8.62.0))
-      '@lucide/svelte':
-        specifier: ^0.525.0
-        version: 0.525.0(svelte@5.56.4(@typescript-eslint/types@8.62.0))
-      bits-ui:
-        specifier: 2.18.1
-        version: 2.18.1(@internationalized/date@3.12.2)(@sveltejs/kit@2.68.0(@sveltejs/vite-plugin-svelte@7.2.0(svelte@5.56.4(@typescript-eslint/types@8.62.0))(vite@8.1.5(@types/node@24.13.2)(esbuild@0.28.1)(tsx@4.23.1)(yaml@2.9.0)))(svelte@5.56.4(@typescript-eslint/types@8.62.0))(typescript@5.9.3)(vite@8.1.5(@types/node@24.13.2)(esbuild@0.28.1)(tsx@4.23.1)(yaml@2.9.0)))(svelte@5.56.4(@typescript-eslint/types@8.62.0))
-      clsx:
-        specifier: ^2.1.1
-        version: 2.1.1
-      tailwind-merge:
-        specifier: ^3.4.0
-        version: 3.6.0
-      tailwind-variants:
-        specifier: ^1.0.0
-        version: 1.0.0(tailwindcss@4.3.1)
-    devDependencies:
-      svelte:
-        specifier: ^5.46.1
-        version: 5.56.4(@typescript-eslint/types@8.62.0)
-
   packages/vanilla:
     dependencies:
-      '@mira-mde/svelte':
+      '@lapismd/mira':
         specifier: workspace:*
-        version: link:../svelte
+        version: link:../mira
     devDependencies:
       svelte:
         specifier: ^5.46.1

@@ -1,12 +1,12 @@
 import { useEffect, useRef } from "react";
 import { mount, unmount } from "svelte";
-import { MarkdownOutline, MarkdownPreview } from "@mira-mde/preview";
+import { MarkdownOutline, MarkdownPreview } from "@lapismd/mira/preview";
 import type {
   MiraAssetResolver,
   MiraExtension,
   MiraFileAdapter,
   MiraLinkResolver,
-} from "@mira-mde/extensions";
+} from "@lapismd/mira/extensions";
 import type { MiraFrontmatterConfig } from "./types";
 import type { MiraOutlineVariant } from "./types";
 

@@ -28,8 +28,7 @@
   "dependencies": {
     "@lucide/svelte": "^0.525.0",
     "@mermaid-js/layout-elk": "^0.1.9",
-    "@mira-mde/extensions": "workspace:*",
-    "@mira-mde/ui": "workspace:*",
+    "@lapismd/mira": "workspace:*",
     "codemirror-lang-mermaid": "^0.5.0",
     "mermaid": "^11.12.1",
     "svg-pan-zoom": "^3.6.2",

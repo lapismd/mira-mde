@@ -9,11 +9,11 @@ import { validateSpecStructure } from "./check-spec-structure.mjs";
 function createFixture(overrides = {}) {
   const repoRoot = mkdtempSync(path.join(os.tmpdir(), "mira-spec-"));
   const files = {
-    "packages/plugin-ai/package.json": '{"name":"@mira-mde/plugin-ai"}\n',
+    "packages/plugin-ai/package.json": '{"name":"@lapismd/mira-plugin-ai"}\n',
     "spec/book.toml": `[book]\nsrc = "src"\n\n[build]\nbuild-dir = "book"\n`,
     "spec/src/SUMMARY.md": `# Summary\n\n- [System](index.md)\n- [AI](plugins/ai.md)\n- [Verification](verification.md)\n`,
     "spec/src/index.md": `# System\n\n| ID | Requirement |\n| -- | -- |\n| MIRA-TEST-001 | The system MUST remain specified. |\n`,
-    "spec/src/plugins/ai.md": `# AI\n\n\`@mira-mde/plugin-ai\`\n`,
+    "spec/src/plugins/ai.md": `# AI\n\n\`@lapismd/mira-plugin-ai\`\n`,
     "spec/src/verification.md": `# Verification\n\nMIRA-TEST-001\n`,
     ...overrides,
   };
@@ -63,8 +63,8 @@ test("rejects duplicate IDs, broken links, and unindexed chapters", () => {
 test("requires verification traceability and a chapter for every plugin", () => {
   withFixture(
     {
-      "packages/plugin-mermaid/package.json":
-        '{"name":"@mira-mde/plugin-mermaid"}\n',
+      "packages/mira-plugin-mermaid/package.json":
+        '{"name":"@lapismd/mira-plugin-mermaid"}\n',
       "spec/src/verification.md": "# Verification\n",
     },
     (result) => {

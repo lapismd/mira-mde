@@ -131,8 +131,8 @@ export const tablesMarkdown = String.raw`# Pipe tables
 
 | Package | Surface | Status |
 | :--- | :---: | ---: |
-| @mira-mde/preview | reading | 100 |
-| @mira-mde/svelte | editor | 100 |
+| @lapismd/mira/preview | reading | 100 |
+| @lapismd/mira | editor | 100 |
 | @mira-mde/default-ui | toolbar | 100 |
 
 Pipe tables support alignment markers and shared preview/live-preview styling.

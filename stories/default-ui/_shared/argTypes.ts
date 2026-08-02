@@ -40,7 +40,7 @@ export const defaultEditorArgs: DefaultEditorStoryProps = {
 /** Full public API snippet shown in docs instead of `<DefaultEditorStory />`. */
 export const defaultEditorDocsSource = `<script lang="ts">
   import { MiraDefaultMde } from "@mira-mde/default-ui/svelte";
-  import type { MiraMode } from "@mira-mde/extensions";
+  import type { MiraMode } from "@lapismd/mira/extensions";
 
   let value = $state("# Hello Mira");
   let mode = $state<MiraMode>("live-preview");

@@ -1,0 +1,25 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "allowArbitraryExtensions": true,
+    "baseUrl": ".",
+    "paths": {
+      "@lapismd/mira": ["src/index.ts"],
+      "@lapismd/mira/core": ["src/core/index.ts"],
+      "@lapismd/mira/extensions": ["src/extensions/index.ts"],
+      "@lapismd/mira/codemirror": ["src/codemirror.ts"],
+      "@lapismd/mira/preview": ["src/preview/index.ts"],
+      "@lapismd/mira/tables": ["src/tables/index.ts"],
+      "@lapismd/mira/ui": ["src/ui/index.ts"],
+      "@lapismd/mira/ui/table-dnd/sensors": [
+        "src/ui/table-dnd/table-dnd-sensors.ts"
+      ],
+      "@lapismd/mira/ui/table-dnd/utils": [
+        "src/ui/table-dnd/table-dnd-utils.ts"
+      ],
+      "@lapismd/mira/ui/*": ["src/ui/*/index.ts"]
+    },
+    "types": ["node", "svelte", "vitest/globals"]
+  },
+  "include": ["src/**/*.ts", "src/**/*.svelte"]
+}

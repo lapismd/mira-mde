@@ -5,7 +5,7 @@ import {
   markdownEditorDocsSource,
   markdownPreviewDocsSource,
 } from "../_shared/docs-source";
-import { defineMiraExtension } from "@mira-mde/extensions";
+import { defineMiraExtension } from "@lapismd/mira/extensions";
 import { listCalloutsMarkdown, listsMarkdown } from "../fixtures";
 
 const listCalloutCatalogExtension = defineMiraExtension({

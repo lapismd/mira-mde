@@ -27,7 +27,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { MiraMode } from "@mira-mde/extensions";
+import type { MiraMode } from "@lapismd/mira/extensions";
 import {
   isMiraEditMode,
   miraDefaultToolbarItemLabels,

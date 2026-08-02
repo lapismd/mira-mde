@@ -5,9 +5,9 @@
     type MiraFeatureFlags,
     type MiraOutlineVariant,
   } from "@mira-mde/default-ui/svelte";
-  import type { MiraMode, MiraTheme } from "@mira-mde/extensions";
+  import type { MiraMode, MiraTheme } from "@lapismd/mira/extensions";
   import { mermaidExtension } from "@mira-mde/plugin-mermaid";
-  import { MiraMde } from "@mira-mde/svelte";
+  import { MiraMde } from "@lapismd/mira";
   import { storyFileAdapter } from "../markdown/_shared/file-adapter";
 
   type EditorShell = "default" | "composable";

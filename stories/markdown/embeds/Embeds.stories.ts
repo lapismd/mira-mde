@@ -182,7 +182,7 @@ export const PortableSurfaces: Story = {
         language: "svelte",
         type: "code",
         code: `<script lang="ts">
-  import { FileEmbed, MarkdownEmbed, NoteLink } from "@mira-mde/preview";
+  import { FileEmbed, MarkdownEmbed, NoteLink } from "@lapismd/mira/preview";
 </script>
 
 <NoteLink id="Embedded Note" text="portable note" {fileAdapter} />

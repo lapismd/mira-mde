@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { MarkdownPreview, type FrontmatterConfig } from "@mira-mde/preview";
+  import { MarkdownPreview, type FrontmatterConfig } from "@lapismd/mira/preview";
   import { storyFileAdapter } from "../_shared/file-adapter";
   import { frontmatterMarkdown } from "../fixtures";
 

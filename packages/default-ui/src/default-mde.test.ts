@@ -1,6 +1,6 @@
 import { mount, tick, unmount } from "svelte";
 import { describe, expect, it, vi } from "vitest";
-import type { MiraExtensionRuntimeContext } from "@mira-mde/extensions";
+import type { MiraExtensionRuntimeContext } from "@lapismd/mira/extensions";
 import type { MiraDefaultMdeHandle } from "./types";
 import MiraDefaultMde from "./default-mde.svelte";
 

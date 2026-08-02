@@ -1,4 +1,4 @@
-import type { MiraEditorSelection } from "@mira-mde/core";
+import type { MiraEditorSelection } from "@lapismd/mira/core";
 import type {
   MiraAssetResolver,
   MiraCommand,
@@ -11,7 +11,7 @@ import type {
   MiraTheme,
   MiraThemeConfig,
   MiraTemplateSelection,
-} from "@mira-mde/extensions";
+} from "@lapismd/mira/extensions";
 import type {
   MiraDefaultSlashCommandConfig,
   MiraDefaultSlashCommandId,
@@ -19,7 +19,7 @@ import type {
 import type {
   FrontmatterConfig,
   MarkdownOutlineVariant,
-} from "@mira-mde/preview";
+} from "@lapismd/mira/preview";
 import type { ComponentType } from "react";
 
 export type MiraFrontmatterConfig = FrontmatterConfig;

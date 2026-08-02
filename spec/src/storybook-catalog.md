@@ -14,7 +14,7 @@ runtime dependency.
 | MIRA-CAT-004 | The comprehensive demo MUST provide fixed source, live-preview, preview, and split stories using identical Markdown and adapter data.                                          |
 | MIRA-CAT-005 | Every testable public story MUST render in the Storybook browser test project; meaningful stateful behavior MUST use a `play` interaction.                                     |
 | MIRA-CAT-006 | New visual stories MUST enter review as `visual-pending`; baseline mutation MUST use the installed Visual Delta suite and requires a separate authorized review.               |
-| MIRA-CAT-007 | Every shipped `@mira-mde/ui` primitive family MUST have representative rendered Storybook coverage with interaction or semantic assertions.                                    |
+| MIRA-CAT-007 | Every shipped `@lapismd/mira/ui` primitive family MUST have representative rendered Storybook coverage with interaction or semantic assertions.                                |
 | MIRA-CAT-008 | Public opt-in preview surfaces MUST have a discoverable focused story, and the comprehensive demo MUST expose the same option wherever it materially changes a supported view. |
 
 Ordinary README prose points to Storybook and the specification. It must not
@@ -29,6 +29,10 @@ component-family membership, and CSS-token assignments. Its internal
 APIs. Stories expose the registry through `parameters.mira.catalogId`,
 `parameters.mira.spec`, and `parameters.mira.tokens`; wrapper pages reference
 the underlying styled surface instead of duplicating token definitions.
+
+Catalog examples import consolidated runtime surfaces through the supported
+`@lapismd/mira` root and subpaths. They must not teach consumers former
+implementation-workspace imports or reach into `packages/mira/src/internal`.
 
 Every public or Storybook-visible styled surface has a concise catalog page.
 Compound primitives share family pages, and React and Vanilla wrappers point

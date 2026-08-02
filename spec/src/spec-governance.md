@@ -40,6 +40,11 @@ The protected governance set includes both the specification checkers and the
 catalog/token checker. Changes to either cannot weaken or bypass the contract
 without updating this chapter in the same logical change.
 
+Rename-aware working-copy validation evaluates both the removed and added path
+of a Jujutsu or Git rename. Consolidating a protected workspace therefore
+requires every chapter mapped to its former subsystem and its new public
+package destination; a move cannot bypass spec-first enforcement.
+
 The catalog checker scans shipped CSS, Svelte, TypeScript, and JavaScript style
 sources for public `--mira-*` references. Any internal layout-only variable
 must be explicitly allowlisted and regression-tested rather than silently

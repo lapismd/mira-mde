@@ -1,4 +1,4 @@
-import type { MiraEditorSelection } from "@mira-mde/core";
+import type { MiraEditorSelection } from "@lapismd/mira/core";
 import type {
   MiraAssetResolver,
   MiraCommand,
@@ -11,7 +11,7 @@ import type {
   MiraTheme,
   MiraThemeConfig,
   MiraTemplateSelection,
-} from "@mira-mde/extensions";
+} from "@lapismd/mira/extensions";
 import type {
   MiraDefaultFeatureConfigs,
   MiraDefaultToolbarAction,
@@ -20,16 +20,10 @@ import type {
   MiraDefaultEditMode,
   MiraFeatureFlags,
 } from "./features";
-import type {
-  MiraFrontmatterConfig,
-  MiraOutlineVariant,
-} from "@mira-mde/svelte";
+import type { MiraFrontmatterConfig, MiraOutlineVariant } from "@lapismd/mira";
 
 export type { MiraDefaultEditMode } from "./features";
-export type {
-  MiraFrontmatterConfig,
-  MiraOutlineVariant,
-} from "@mira-mde/svelte";
+export type { MiraFrontmatterConfig, MiraOutlineVariant } from "@lapismd/mira";
 
 export type MiraDefaultMdeProps = {
   value?: string;

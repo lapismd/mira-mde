@@ -2,7 +2,7 @@
 
 export function markdownPreviewDocsSource(fixtureExport: string): string {
   return `<script lang="ts">
-  import { MarkdownPreview } from "@mira-mde/preview";
+  import { MarkdownPreview } from "@lapismd/mira/preview";
   import { mermaidExtension } from "@mira-mde/plugin-mermaid";
   import { ${fixtureExport} } from "../fixtures";
   import { storyFileAdapter } from "../_shared/file-adapter";
@@ -22,7 +22,7 @@ export function markdownEditorDocsSource(
 ): string {
   return `<script lang="ts">
   import { MiraDefaultMde, MiraFeature } from "@mira-mde/default-ui/svelte";
-  import type { MiraMode } from "@mira-mde/extensions";
+  import type { MiraMode } from "@lapismd/mira/extensions";
   import { ${fixtureExport} } from "../fixtures";
   import { storyFileAdapter } from "../_shared/file-adapter";
 

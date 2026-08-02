@@ -23,9 +23,15 @@ subpaths; plugins, the default editor, and adapters depend only on those public
 entry points. Private placeholder adapters and source under `src/internal` are
 never shipped as independent products.
 
+The portable controller, extension SDK, CodeMirror layers, preview renderer,
+tables, UI primitives, theme, and composable Svelte surface are implemented in
+the single `packages/mira` workspace. Its internal source layout may remain
+modular, but downstream workspaces resolve it only through the supported
+`@lapismd/mira` export map.
+
 The root Storybook may compose every package for documentation and acceptance,
 but package source must not import Storybook-owned catalog data. Packages used
-directly by Storybook stories, including `@mira-mde/ui`, are explicit root
+directly by Storybook stories, including `@lapismd/mira/ui`, are explicit root
 workspace dependencies so clean Vite builds do not rely on transitive package
 resolution.
 
@@ -42,9 +48,10 @@ the static host and canonical container capture do not depend on stale local
 capture profile while accommodating the complete catalog bundle.
 
 The root owns the Vitest 4 Storybook project and its Chromium browser provider;
-package-local Vitest configurations continue to own pure unit tests, including
-an explicit core project so package test commands cannot inherit the root
-Storybook browser project. The Playwright configuration is split by
+package-local Vitest configurations continue to own pure unit tests. The
+consolidated Mira workspace owns the former subsystem suites so package test
+commands cannot inherit the root Storybook browser project. The Playwright
+configuration is split by
 responsibility: the default config belongs to the
 installed Visual Delta suite, while `playwright.storybook.config.ts` owns the
 focused Storybook acceptance tests. Visual Delta reuses its prewarmed, validated

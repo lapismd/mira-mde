@@ -1,4 +1,4 @@
-import type { MiraMode } from "@mira-mde/extensions";
+import type { MiraMode } from "@lapismd/mira/extensions";
 import type { MiraDefaultEditMode, MiraDefaultToolbarItem } from "./features";
 
 export type MiraViewModeMenuItem = {

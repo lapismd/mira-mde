@@ -18,6 +18,11 @@ customization and Obsidian-compatible aliases retained as a compatibility layer.
 Stylesheet order remains theme, UI, preview, Svelte/default UI, and framework
 wrapper composition as documented by the package entrypoints.
 
+Theme, UI, preview, and composable-editor CSS are physically owned by
+`@lapismd/mira` and exported through `/themes/obsidian.css`, the documented UI
+and preview style subpaths, and the aggregate `/styles.css`. Downstream editor
+and adapter packages layer their own shipped CSS over those public entrypoints.
+
 The Storybook catalog assigns every shipped `--mira-*` reference to a styled
 surface and records its purpose, default or fallback, inheritance behavior,
 and affected element or state. `pnpm catalog:check` compares those assignments

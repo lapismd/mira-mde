@@ -7,17 +7,15 @@ import {
 } from "@codemirror/view";
 import {
   collectMarkdownBlockRanges,
+  defineMiraExtension,
   markdownBlockAt,
   replaceMarkdownRange,
-} from "@mira-mde/codemirror-rich";
-import {
-  defineMiraExtension,
   type MiraBlockAction,
   type MiraExtension,
   type MiraMarkdownBlockRange,
   type MiraSlashCommand,
   type MiraTextRange,
-} from "@mira-mde/extensions";
+} from "@lapismd/mira/extensions";
 
 export type MiraAiOperation = "generate" | "edit";
 

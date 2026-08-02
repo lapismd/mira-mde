@@ -1,5 +1,5 @@
-@import "@mira-mde/theme-obsidian/styles.css";
-@import "@mira-mde/svelte/styles.css";
+@import "@lapismd/mira/themes/obsidian.css";
+@import "@lapismd/mira/styles.css";
 
 .mira-default-ui {
   background: var(--mira-background);

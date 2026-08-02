@@ -1,22 +1,11 @@
 import type { Extension } from "@codemirror/state";
 import {
-  createBaseCodeMirrorExtensions,
-  createSlashCommandExtensions,
-} from "@mira-mde/codemirror";
-import {
-  createMarkdownAuthoringExtensions,
-  createMarkdownCodeMirrorExtensions,
-} from "@mira-mde/codemirror-markdown";
-import { createRichEditorExtensions } from "@mira-mde/codemirror-rich";
-import { createTableExtensions } from "@mira-mde/codemirror-tables";
-import {
-  createImageDropPasteExtension,
+  createMiraCodeMirrorExtensions,
   createMiraEditorController,
   openImageFilePicker,
   type MiraEditorController,
-} from "@mira-mde/core";
+} from "@lapismd/mira/core";
 import {
-  createMiraCommandKeymap,
   executeMiraCommand,
   isMiraCommandEnabled,
   mountMiraExtensionStyles,
@@ -27,7 +16,7 @@ import {
   type MiraTemplateSelection,
   type MiraTheme,
   type MiraThemeConfig,
-} from "@mira-mde/extensions";
+} from "@lapismd/mira/extensions";
 import {
   forwardRef,
   useCallback,
@@ -193,71 +182,40 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
   );
 
   const buildCodeMirrorExtensions = useCallback((): Extension[] => {
-    const resolved = resolveMiraExtensions(extensions, {
+    return createMiraCodeMirrorExtensions({
       mode: modeRef.current,
       readonly: readonlyRef.current,
+      placeholder,
+      lineWrapping,
+      spellcheck,
+      blockControls,
+      indentGuides,
+      indentWithTabs,
+      indentWidth,
+      extensions,
       sourcePath,
-    });
-
-    return [
-      createBaseCodeMirrorExtensions({
-        indentWithTabs,
-        indentWidth,
-        lineWrapping,
-        placeholder,
-        readonly: readonlyRef.current,
-        spellcheck,
-      }),
-      createSlashCommandExtensions({
-        commands: resolved.slashCommands,
-      }),
-      createMiraCommandKeymap(resolved.commands, (view) =>
+      linkResolver,
+      assetResolver,
+      fileAdapter,
+      imageConfig,
+      authoring,
+      frontmatterOpen,
+      frontmatterConfig,
+      runtimeContext: (view) =>
         createExtensionRuntimeContext(controllerRef.current, view),
-      ),
-      createMarkdownCodeMirrorExtensions({
-        codeLanguages: resolved.codeLanguages,
-        sourceMode: modeRef.current === "source",
-      }),
-      createTableExtensions(),
-      createImageDropPasteExtension(imageConfig),
-      createMarkdownAuthoringExtensions({
-        config: authoring,
-        fileAdapter,
-        sourcePath,
-      }),
-      createRichEditorExtensions({
-        assetResolver,
-        blockActions: resolved.blockActions,
-        blockControls:
-          blockControls &&
-          modeRef.current !== "preview" &&
-          !readonlyRef.current,
-        extensions,
-        fileAdapter,
-        frontmatterConfig,
-        frontmatterOpen,
-        indentGuides,
-        linkResolver,
-        livePreview: modeRef.current === "live-preview",
-        onChange(replacement, from, to, nextValue) {
-          const controller = controllerRef.current;
-          if (controller) {
-            controller.view.dispatch({
-              changes: { from, insert: replacement, to },
-            });
-          } else {
-            commitValue(nextValue);
-          }
-        },
-        onFrontmatterChange: (...args) =>
-          onFrontmatterChangeRef.current?.(...args),
-        sourcePath,
-      } as Parameters<typeof createRichEditorExtensions>[0] & {
-        frontmatterConfig?: unknown;
-        fileAdapter?: unknown;
-      }),
-      resolved.codeMirror,
-    ].flat();
+      onChange(replacement, from, to, nextValue) {
+        const controller = controllerRef.current;
+        if (controller) {
+          controller.view.dispatch({
+            changes: { from, insert: replacement, to },
+          });
+        } else {
+          commitValue(nextValue);
+        }
+      },
+      onFrontmatterChange: (...args) =>
+        onFrontmatterChangeRef.current?.(...args),
+    });
   }, [
     assetResolver,
     authoring,

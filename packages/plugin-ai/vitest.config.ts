@@ -4,11 +4,8 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   resolve: {
     alias: {
-      "@mira-mde/codemirror-rich": fileURLToPath(
-        new URL("../codemirror-rich/src/block-ranges.ts", import.meta.url),
-      ),
-      "@mira-mde/extensions": fileURLToPath(
-        new URL("../extensions/src/index.ts", import.meta.url),
+      "@lapismd/mira/extensions": fileURLToPath(
+        new URL("../mira/src/extensions/index.ts", import.meta.url),
       ),
     },
     conditions: ["browser"],

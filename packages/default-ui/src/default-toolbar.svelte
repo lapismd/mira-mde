@@ -21,13 +21,13 @@
   import Table2Icon from "@lucide/svelte/icons/table-2";
   import TableCellsSplitIcon from "@lucide/svelte/icons/table-cells-split";
   import WorkflowIcon from "@lucide/svelte/icons/workflow";
-  import { Separator } from "@mira-mde/ui/separator";
-  import * as DropdownMenu from "@mira-mde/ui/dropdown-menu";
-  import * as Toolbar from "@mira-mde/ui/toolbar";
-  import * as Tooltip from "@mira-mde/ui/tooltip";
+  import { Separator } from "@lapismd/mira/ui/separator";
+  import * as DropdownMenu from "@lapismd/mira/ui/dropdown-menu";
+  import * as Toolbar from "@lapismd/mira/ui/toolbar";
+  import * as Tooltip from "@lapismd/mira/ui/tooltip";
   import type { Component } from "svelte";
-  import type { MiraEditorSelection } from "@mira-mde/core";
-  import type { MiraMode } from "@mira-mde/extensions";
+  import type { MiraEditorSelection } from "@lapismd/mira/core";
+  import type { MiraMode } from "@lapismd/mira/extensions";
   import {
     MiraFeature,
     defaultMiraEditMode,

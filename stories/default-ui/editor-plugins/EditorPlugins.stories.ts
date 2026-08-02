@@ -1,12 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/svelte-vite";
 import { expect, userEvent, within } from "storybook/test";
 import { catalogParameters } from "../../catalog/catalog.mjs";
-import { createSlashCommandExtensions } from "@mira-mde/codemirror";
+import { createSlashCommandExtensions } from "@lapismd/mira/codemirror";
 import {
   MiraFeature,
   type MiraDefaultToolbarDefinition,
 } from "@mira-mde/default-ui/svelte";
-import { createSlashSnippet, defineMiraExtension } from "@mira-mde/extensions";
+import { createSlashSnippet, defineMiraExtension } from "@lapismd/mira/extensions";
 import { aiExtension, createMiraAiToolbarAction } from "@mira-mde/plugin-ai";
 import ListPlusIcon from "@lucide/svelte/icons/list-plus";
 import SparklesIcon from "@lucide/svelte/icons/sparkles";

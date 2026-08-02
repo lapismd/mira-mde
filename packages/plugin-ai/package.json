@@ -24,8 +24,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@mira-mde/codemirror-rich": "workspace:*",
-    "@mira-mde/extensions": "workspace:*"
+    "@lapismd/mira": "workspace:*"
   },
   "peerDependencies": {
     "@codemirror/state": "^6.5.2",

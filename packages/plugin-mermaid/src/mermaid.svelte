@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Button, buttonVariants } from "@mira-mde/ui/button";
-  import { cn } from "@mira-mde/ui";
+  import { Button, buttonVariants } from "@lapismd/mira/ui/button";
+  import { cn } from "@lapismd/mira/ui";
   import { onMount, type Snippet } from "svelte";
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
   import ChevronLeft from "@lucide/svelte/icons/chevron-left";
@@ -12,7 +12,7 @@
   import MoveHorizontal from "@lucide/svelte/icons/move-horizontal";
   import CodeXml from "@lucide/svelte/icons/code-xml";
   import Check from "@lucide/svelte/icons/check";
-  import * as Dialog from "@mira-mde/ui/dialog";
+  import * as Dialog from "@lapismd/mira/ui/dialog";
   import Self from "./mermaid.svelte";
   import { PanZoomState } from "./pan-zoom";
   import { parseMermaidSource } from "./frontmatter";

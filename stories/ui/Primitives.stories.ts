@@ -24,7 +24,7 @@ const meta = {
     docs: {
       description: {
         component:
-          "Rendered verification for every shadcn-derived primitive family shipped by @mira-mde/ui. Each story references its catalog token contract and exercises meaningful behavior through play assertions.",
+          "Rendered verification for every shadcn-derived primitive family shipped by @lapismd/mira/ui. Each story references its catalog token contract and exercises meaningful behavior through play assertions.",
       },
     },
   },
@@ -261,7 +261,7 @@ export const Table: Story = {
     const table = canvas.getByRole("table", { name: "Package surface matrix" });
     await expect(table).toBeVisible();
     await expect(within(table).getAllByRole("row")).toHaveLength(5);
-    await expect(within(table).getByText("@mira-mde/preview")).toBeVisible();
+    await expect(within(table).getByText("@lapismd/mira/preview")).toBeVisible();
   },
 };
 

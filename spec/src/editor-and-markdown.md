@@ -32,3 +32,10 @@ adapters.
 
 Portable parser type declarations are included through normal module imports so
 the package remains compatible with the repository TypeScript and lint gates.
+
+The implementation is consolidated inside `@lapismd/mira`: controller and file
+contracts are exposed from `/core`, plugin contracts from `/extensions`,
+curated CodeMirror factories from `/codemirror`, rendering from `/preview`, and
+table surfaces from `/tables`. `createMiraCodeMirrorExtensions` is the shared
+composition boundary used by editor products and adapters; CodeMirror source
+beneath `src/internal` is not a consumer import path.

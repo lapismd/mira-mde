@@ -1,4 +1,4 @@
-import type { MiraFileAdapter, MiraFileRef } from "@mira-mde/extensions";
+import type { MiraFileAdapter, MiraFileRef } from "@lapismd/mira/extensions";
 
 type StoryFile = MiraFileRef & {
   assetUrl?: string;

@@ -412,8 +412,8 @@ export const catalogEntries = [
   {
     id: "mira-mde",
     name: "MiraMde",
-    packageName: "@mira-mde/svelte",
-    importPath: "@mira-mde/svelte",
+    packageName: "@lapismd/mira",
+    importPath: "@lapismd/mira",
     components: ["MiraMde"],
     description:
       "Composable Svelte editor with source, live-preview, reading, and split surfaces.",
@@ -436,8 +436,8 @@ export const catalogEntries = [
   {
     id: "preview",
     name: "Markdown preview surfaces",
-    packageName: "@mira-mde/preview",
-    importPath: "@mira-mde/preview",
+    packageName: "@lapismd/mira/preview",
+    importPath: "@lapismd/mira/preview",
     components: [
       "MarkdownPreview",
       "MarkdownOutline",
@@ -456,8 +456,8 @@ export const catalogEntries = [
   {
     id: "tables",
     name: "Editable table surfaces",
-    packageName: "@mira-mde/codemirror-tables",
-    importPath: "@mira-mde/codemirror-tables",
+    packageName: "@lapismd/mira/tables",
+    importPath: "@lapismd/mira/tables",
     components: [
       "EditorTable",
       "EditorColumn",
@@ -511,8 +511,8 @@ export const catalogEntries = [
   {
     id: "ui-core",
     name: "Core UI primitives",
-    packageName: "@mira-mde/ui",
-    importPath: "@mira-mde/ui",
+    packageName: "@lapismd/mira/ui",
+    importPath: "@lapismd/mira/ui",
     components: [
       "Button",
       "Separator",
@@ -529,8 +529,8 @@ export const catalogEntries = [
   {
     id: "ui-context-menu",
     name: "Context menu family",
-    packageName: "@mira-mde/ui",
-    importPath: "@mira-mde/ui/context-menu",
+    packageName: "@lapismd/mira/ui",
+    importPath: "@lapismd/mira/ui/context-menu",
     components: [
       "Root",
       "Trigger",
@@ -556,8 +556,8 @@ export const catalogEntries = [
   {
     id: "ui-dialog",
     name: "Dialog family",
-    packageName: "@mira-mde/ui",
-    importPath: "@mira-mde/ui/dialog",
+    packageName: "@lapismd/mira/ui",
+    importPath: "@lapismd/mira/ui/dialog",
     components: [
       "Root",
       "Trigger",
@@ -584,8 +584,8 @@ export const catalogEntries = [
   {
     id: "ui-dropdown-menu",
     name: "Dropdown menu family",
-    packageName: "@mira-mde/ui",
-    importPath: "@mira-mde/ui/dropdown-menu",
+    packageName: "@lapismd/mira/ui",
+    importPath: "@lapismd/mira/ui/dropdown-menu",
     components: [
       "Root",
       "Trigger",
@@ -611,8 +611,8 @@ export const catalogEntries = [
   {
     id: "ui-popover",
     name: "Popover family",
-    packageName: "@mira-mde/ui",
-    importPath: "@mira-mde/ui/popover",
+    packageName: "@lapismd/mira/ui",
+    importPath: "@lapismd/mira/ui/popover",
     components: ["Root", "Trigger", "Content", "Close"],
     description:
       "Shared portaled popover surface for rich controls. CodeMirror slash-command suggestions retain editor-coordinate positioning while sharing this typography, chrome, and token contract.",
@@ -628,8 +628,8 @@ export const catalogEntries = [
   {
     id: "ui-table",
     name: "Table primitive family",
-    packageName: "@mira-mde/ui",
-    importPath: "@mira-mde/ui/table",
+    packageName: "@lapismd/mira/ui",
+    importPath: "@lapismd/mira/ui/table",
     components: [
       "Root",
       "Header",
@@ -649,8 +649,8 @@ export const catalogEntries = [
   {
     id: "ui-toolbar",
     name: "Toolbar primitive family",
-    packageName: "@mira-mde/ui",
-    importPath: "@mira-mde/ui/toolbar",
+    packageName: "@lapismd/mira/ui",
+    importPath: "@lapismd/mira/ui/toolbar",
     components: ["Root", "Button", "Group", "GroupItem", "Link"],
     description: "Compact accessible toolbar composition and action controls.",
     spec: "default-ui-and-frameworks.md#requirements",
@@ -660,8 +660,8 @@ export const catalogEntries = [
   {
     id: "ui-tooltip",
     name: "Tooltip family",
-    packageName: "@mira-mde/ui",
-    importPath: "@mira-mde/ui/tooltip",
+    packageName: "@lapismd/mira/ui",
+    importPath: "@lapismd/mira/ui/tooltip",
     components: ["Root", "Trigger", "Content", "Provider", "Portal"],
     description:
       "Accessible tooltip trigger, floating content, provider, and portal family.",

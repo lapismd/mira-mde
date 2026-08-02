@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { FileEmbed, MarkdownEmbed, NoteLink } from "@mira-mde/preview";
-  import { defineMiraExtension } from "@mira-mde/extensions";
+  import { FileEmbed, MarkdownEmbed, NoteLink } from "@lapismd/mira/preview";
+  import { defineMiraExtension } from "@lapismd/mira/extensions";
   import { storyFileAdapter } from "../_shared/file-adapter";
 
   const diagnosticsExtension = defineMiraExtension({

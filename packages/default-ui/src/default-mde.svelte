@@ -10,14 +10,14 @@
   import SparklesIcon from "@lucide/svelte/icons/sparkles";
   import TableIcon from "@lucide/svelte/icons/table-2";
   import WandSparklesIcon from "@lucide/svelte/icons/wand-sparkles";
-  import { MiraMde, type MiraMdeHandle } from "@mira-mde/svelte";
-  import type { MiraEditorSelection } from "@mira-mde/core";
+  import { MiraMde, type MiraMdeHandle } from "@lapismd/mira";
+  import type { MiraEditorSelection } from "@lapismd/mira/core";
   import {
     resolveMiraExtensions,
     type MiraMode,
     type MiraTemplateSelection,
     type MiraToolbarIconName,
-  } from "@mira-mde/extensions";
+  } from "@lapismd/mira/extensions";
   import type { Component } from "svelte";
   import MiraDefaultToolbar from "./default-toolbar.svelte";
   import {

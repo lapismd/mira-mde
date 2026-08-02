@@ -12,7 +12,7 @@
     MiraMarkdownAuthoringConfig,
     MiraMode,
     MiraTheme,
-  } from "@mira-mde/extensions";
+  } from "@lapismd/mira/extensions";
   import { defaultUiSampleMarkdown } from "../fixtures";
 
   type Props = {

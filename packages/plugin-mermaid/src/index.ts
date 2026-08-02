@@ -2,7 +2,10 @@ import { LanguageDescription } from "@codemirror/language";
 import type { Element, Root, RootContent } from "hast";
 import type { Plugin } from "unified";
 import { visit } from "unist-util-visit";
-import { defineMiraExtension, type MiraExtension } from "@mira-mde/extensions";
+import {
+  defineMiraExtension,
+  type MiraExtension,
+} from "@lapismd/mira/extensions";
 import Mermaid from "./mermaid.svelte";
 import { createMermaidRenderId } from "./render-id";
 export { mermaidRender } from "./renderer";

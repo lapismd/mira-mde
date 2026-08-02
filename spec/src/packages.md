@@ -49,6 +49,12 @@ and MUST NOT appear in a package export map. Tests and Storybook may exercise
 internal behavior through public surfaces but MUST NOT teach consumers to
 import it directly.
 
+The runtime consolidation stage places all former controller, extension,
+CodeMirror, preview, table, UI, theme, and composable Svelte implementation in
+`packages/mira`. The package exposes only the curated entrypoints above; its
+downstream workspaces build against those entrypoints so emitted output cannot
+retain links to a removed implementation workspace.
+
 ## Canonical names
 
 The composable component is `Mira`; the batteries-included component and

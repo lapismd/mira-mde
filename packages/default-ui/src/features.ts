@@ -1,12 +1,12 @@
 import { mermaidExtension } from "@mira-mde/plugin-mermaid";
 import type { Component } from "svelte";
-import type { MiraEditorSelection } from "@mira-mde/core";
+import type { MiraEditorSelection } from "@lapismd/mira/core";
 import {
   createSlashSnippet,
   type MiraExtension,
   type MiraMode,
   type MiraSlashCommand,
-} from "@mira-mde/extensions";
+} from "@lapismd/mira/extensions";
 
 export type MiraDefaultEditMode = Extract<MiraMode, "live-preview" | "source">;
 

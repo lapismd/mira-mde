@@ -127,26 +127,28 @@ export function validateSpecStructure({ repoRoot = DEFAULT_REPO_ROOT } = {}) {
 
   const packagesDirectory = path.join(repoRoot, "packages");
   if (existsSync(packagesDirectory)) {
-    const pluginNames = readdirSync(packagesDirectory, { withFileTypes: true })
-      .filter(
-        (entry) => entry.isDirectory() && entry.name.startsWith("plugin-"),
-      )
-      .map((entry) => entry.name.slice("plugin-".length))
-      .sort();
-    for (const pluginName of pluginNames) {
+    const plugins = readdirSync(packagesDirectory, { withFileTypes: true })
+      .filter((entry) => entry.isDirectory())
+      .flatMap((entry) => {
+        const match = /^(?:mira-)?plugin-(.+)$/.exec(entry.name);
+        return match ? [{ directory: entry.name, name: match[1] }] : [];
+      })
+      .sort((left, right) => left.name.localeCompare(right.name));
+    for (const plugin of plugins) {
+      const pluginName = plugin.name;
       const chapter = `plugins/${pluginName}.md`;
       const chapterPath = path.join(sourceDirectory, chapter);
       if (!canonicalFiles.includes(chapter)) {
         errors.push(
-          `packages/plugin-${pluginName}: missing canonical ${chapter}`,
+          `packages/${plugin.directory}: missing canonical ${chapter}`,
         );
       } else if (
         !readFileSync(chapterPath, "utf8").includes(
-          `@mira-mde/plugin-${pluginName}`,
+          `@lapismd/mira-plugin-${pluginName}`,
         )
       ) {
         errors.push(
-          `spec/src/${chapter}: missing @mira-mde/plugin-${pluginName} identity`,
+          `spec/src/${chapter}: missing @lapismd/mira-plugin-${pluginName} identity`,
         );
       }
     }

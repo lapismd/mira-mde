@@ -1,6 +1,6 @@
 <script lang="ts">
-  import type { MiraFileAdapter, MiraFileRef } from "@mira-mde/extensions";
-  import { MarkdownPreview } from "@mira-mde/preview";
+  import type { MiraFileAdapter, MiraFileRef } from "@lapismd/mira/extensions";
+  import { MarkdownPreview } from "@lapismd/mira/preview";
 
   type StoryFile = MiraFileRef & {
     markdown?: string;

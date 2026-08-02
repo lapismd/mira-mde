@@ -40,14 +40,10 @@
     "test:visual:report": "playwright show-report"
   },
   "dependencies": {
-    "@mira-mde/codemirror": "workspace:*",
+    "@lapismd/mira": "workspace:*",
     "@mira-mde/default-ui": "workspace:*",
-    "@mira-mde/extensions": "workspace:*",
     "@mira-mde/plugin-ai": "workspace:*",
-    "@mira-mde/plugin-mermaid": "workspace:*",
-    "@mira-mde/preview": "workspace:*",
-    "@mira-mde/svelte": "workspace:*",
-    "@mira-mde/ui": "workspace:*"
+    "@mira-mde/plugin-mermaid": "workspace:*"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",

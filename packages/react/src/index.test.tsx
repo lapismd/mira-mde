@@ -5,7 +5,7 @@ import { Bold } from "lucide-react";
 import type {
   MiraExtensionRuntimeContext,
   MiraMode,
-} from "@mira-mde/extensions";
+} from "@lapismd/mira/extensions";
 import {
   MiraDefaultToolbar,
   MiraDefaultMde,

@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { MarkdownPreview } from "@mira-mde/preview";
+  import { MarkdownPreview } from "@lapismd/mira/preview";
   import { mermaidExtension } from "@mira-mde/plugin-mermaid";
-  import type { MiraExtension } from "@mira-mde/extensions";
+  import type { MiraExtension } from "@lapismd/mira/extensions";
   import { storyFileAdapter } from "./file-adapter";
 
   type Props = {

@@ -1,6 +1,6 @@
 # AI Plugin
 
-`@mira-mde/plugin-ai` contributes portable editor actions while leaving model
+`@lapismd/mira-plugin-ai` contributes portable editor actions while leaving model
 selection, credentials, networking, persistence, and policy to the consumer.
 
 ## Requirements
@@ -12,4 +12,7 @@ selection, credentials, networking, persistence, and policy to the consumer.
 | MIRA-AI-003 | AI actions MUST respect readonly and selection/block context supplied by the Mira extension runtime.                |
 | MIRA-AI-004 | Storybook MUST provide a deterministic stubbed AI story and interaction test with no network dependency.            |
 
-The plugin is an orchestration adapter, not an agent runtime or data store.
+The plugin is an orchestration adapter, not an agent runtime or data store. Its
+implementation consumes editor context and block-range helpers through the
+supported `@lapismd/mira/extensions` contract rather than importing CodeMirror
+implementation modules.

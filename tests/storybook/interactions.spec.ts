@@ -163,7 +163,7 @@ test("table chrome supports pointer reordering, mutation, and source reveal", as
 
   const widget = page
     .locator(".mira-rich-widget--table")
-    .filter({ hasText: "@mira-mde/core" })
+    .filter({ hasText: "@lapismd/mira/core" })
     .first();
   await scrollEditorUntilVisible(page, widget);
   const rows = widget.locator("tbody tr");
@@ -234,7 +234,7 @@ test("table chrome supports pointer reordering, mutation, and source reveal", as
   await expect(widget).toHaveCount(0);
   await expect(
     editorScroller(page).locator(":scope > .cm-content"),
-  ).toContainText("@mira-mde/core");
+  ).toContainText("@lapismd/mira/core");
 });
 
 test("live-preview code copy uses the browser clipboard", async ({ page }) => {

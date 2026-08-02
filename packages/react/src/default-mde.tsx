@@ -19,12 +19,12 @@ import {
   Table2,
   WandSparkles,
 } from "lucide-react";
-import type { MiraEditorSelection } from "@mira-mde/core";
+import type { MiraEditorSelection } from "@lapismd/mira/core";
 import {
   resolveMiraExtensions,
   type MiraMode,
   type MiraToolbarIconName,
-} from "@mira-mde/extensions";
+} from "@lapismd/mira/extensions";
 import { MiraDefaultToolbar } from "./default-toolbar";
 import {
   createMiraDefaultExtensions,

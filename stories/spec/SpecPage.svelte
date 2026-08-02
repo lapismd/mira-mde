@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { MarkdownPreview } from "@mira-mde/preview";
+  import { MarkdownPreview } from "@lapismd/mira/preview";
   import { mermaidExtension } from "@mira-mde/plugin-mermaid";
   import { specStoryHref } from "./spec-chapters";
 

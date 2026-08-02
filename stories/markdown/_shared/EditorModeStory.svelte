@@ -13,7 +13,7 @@
     MiraMarkdownAuthoringConfig,
     MiraMode,
     MiraTheme,
-  } from "@mira-mde/extensions";
+  } from "@lapismd/mira/extensions";
   import { storyFileAdapter } from "./file-adapter";
 
   type Props = {

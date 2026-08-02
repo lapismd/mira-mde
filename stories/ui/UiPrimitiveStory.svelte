@@ -23,7 +23,7 @@
     Toolbar,
     Tooltip,
     buttonVariants,
-  } from "@mira-mde/ui";
+  } from "@lapismd/mira/ui";
 
   export type UiPrimitiveKind =
     | "buttons"
@@ -99,7 +99,7 @@
 
 <section class="mira-ui-story" data-primitive={primitive}>
   <header class="mira-ui-story__header">
-    <p>@mira-mde/ui</p>
+    <p>@lapismd/mira/ui</p>
     <h2>{titles[primitive]}</h2>
   </header>
 
@@ -316,17 +316,17 @@
         </Table.Header>
         <Table.Body>
           <Table.Row>
-            <Table.Cell>@mira-mde/ui</Table.Cell>
+            <Table.Cell>@lapismd/mira/ui</Table.Cell>
             <Table.Cell>Primitives</Table.Cell>
             <Table.Cell>Shipped</Table.Cell>
           </Table.Row>
           <Table.Row>
-            <Table.Cell>@mira-mde/svelte</Table.Cell>
+            <Table.Cell>@lapismd/mira</Table.Cell>
             <Table.Cell>Editor</Table.Cell>
             <Table.Cell>Shipped</Table.Cell>
           </Table.Row>
           <Table.Row>
-            <Table.Cell>@mira-mde/preview</Table.Cell>
+            <Table.Cell>@lapismd/mira/preview</Table.Cell>
             <Table.Cell>Reading view</Table.Cell>
             <Table.Cell>Shipped</Table.Cell>
           </Table.Row>

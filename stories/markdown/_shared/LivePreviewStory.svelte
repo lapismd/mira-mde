@@ -1,6 +1,6 @@
 <script lang="ts">
   import EditorModeStory from "./EditorModeStory.svelte";
-  import type { MiraMode } from "@mira-mde/extensions";
+  import type { MiraMode } from "@lapismd/mira/extensions";
 
   type Props = {
     value: string;
