@@ -1,5 +1,6 @@
 {
   "browsers": ["chromium"],
+  "passThresholdPercent": 0.064,
   "workflow": {
     "autoAcceptLiveStoryComparisons": false,
     "visualTestFailureMode": "strict",

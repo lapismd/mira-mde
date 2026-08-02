@@ -148,7 +148,7 @@ export const ObsidianDark: Story = {
 export const PageInheritanceAndSystem: Story = {
   tags: ["visual-pending"],
   parameters: visual(
-    "/visual-baselines/stories/mira-editor/themes/page-inheritance-system-chromium.png",
+    "/visual-baselines/stories/mira-editor/themes/page-inheritance-and-system-chromium.png",
   ),
   args: {
     theme: "",
@@ -171,7 +171,7 @@ export const PageInheritanceAndSystem: Story = {
 export const CustomThemeExtendingMira: Story = {
   tags: ["visual-pending"],
   parameters: visual(
-    "/visual-baselines/stories/mira-editor/themes/custom-mira-chromium.png",
+    "/visual-baselines/stories/mira-editor/themes/custom-theme-extending-mira-chromium.png",
   ),
   args: { theme: "mira story-mira-brand", colorMode: "light" },
   play: async ({ canvasElement }) => {
@@ -190,7 +190,7 @@ export const CustomThemeExtendingMira: Story = {
 export const CustomThemeExtendingObsidian: Story = {
   tags: ["visual-pending"],
   parameters: visual(
-    "/visual-baselines/stories/mira-editor/themes/custom-obsidian-chromium.png",
+    "/visual-baselines/stories/mira-editor/themes/custom-theme-extending-obsidian-chromium.png",
   ),
   args: { theme: "obsidian story-obsidian-brand", colorMode: "dark" },
   play: async ({ canvasElement }) => {

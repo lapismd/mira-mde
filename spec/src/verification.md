@@ -58,7 +58,11 @@ and locally. All 122 indexed stories have committed baselines and explicit
 eight new appearance identities and the affected Callouts preview in the
 canonical nested-import layout; the four Mira/Obsidian light/dark captures have
 distinct hashes. Representative high-risk surfaces were spot-reviewed, and the
-complete set passed strict compare-only validation.
+complete set passed strict compare-only validation. The repository-wide visual
+pass threshold is fixed at `0.064%`. The threshold-hardening slice reviewed and
+regenerated the nine affected appearance/configuration baselines, corrected the
+three stale theme metadata URLs to their canonical nested-import identities, and
+then passed the complete strict compare-only suite at that threshold.
 Renamed Mira Editor identities replaced the orphaned Default UI paths during
 the same mutation step.
 
