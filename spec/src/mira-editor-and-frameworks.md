@@ -17,6 +17,7 @@ same controller and rendering contracts.
 | MIRA-UI-007 | Portaled menu and dialog primitives MUST preserve Lapis-compatible interface typography, aligned leading semantic-icon and checkmark columns, and distinct icon and text close controls.                                                             |
 | MIRA-UI-008 | `@lapismd/mira/ui` MUST export a shared Popover family with Storybook verification. CodeMirror slash-command suggestions MAY retain a coordinate-aware tooltip adapter but MUST share the Popover's tokens, typography, and floating-surface chrome. |
 | MIRA-UI-009 | The Mira, Mira Editor, React, and Vanilla outline option MUST compose the public Markdown outline without replacing preview scroll ownership. `floating` MUST be the default presentation and `sidebar` MUST preserve the persistent panel variant.  |
+| MIRA-UI-010 | Mira, Mira Editor, React, and Vanilla MUST expose the same open-ended theme string and independent color-mode contract without framework-specific ancestor observers.                                                                           |
 
 View controls belong at the end of the toolbar. Consumers own surrounding
 application shells, routes, persistence, and domain state.

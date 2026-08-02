@@ -15,6 +15,7 @@ install internal CodeMirror, renderer, UI, or theme workspaces separately.
 | MIRA-ARCH-010 | Public dependencies MUST flow from `mira` to plugins and `mira-editor`, then to React and Vanilla adapters; plugins MUST integrate through supported Mira entry points.                                                                         |
 | MIRA-ARCH-011 | Vue and Solid placeholders MUST remain private under `internal/adapters` until they implement and verify a public adapter contract.                                                                                                             |
 | MIRA-ARCH-012 | Package, symbol, DOM-hook, documentation, catalog, and Storybook identities MUST use the canonical Mira names without compatibility aliases for the pre-release `@mira-mde/*` surface.                                                          |
+| MIRA-ARCH-013 | `@lapismd/mira` MUST export the individual Mira and Obsidian theme stylesheets plus an aggregate stylesheet that loads every built-in palette.                                                                                                    |
 
 ## Public graph
 
@@ -42,7 +43,8 @@ Vanilla depend only on the public products they adapt.
 - `preview` exports Markdown preview, outline, embed, and renderer surfaces.
 - `tables` exports the supported Markdown and grid-table components.
 - `ui` and its documented component subpaths export the shared UI primitives.
-- `themes/obsidian.css` and `styles.css` provide explicit CSS entry points.
+- `themes/mira.css`, `themes/obsidian.css`, `themes.css`, and `styles.css`
+  provide explicit CSS entry points.
 
 Source beneath a package's `src/internal` directory is not a public entry point
 and MUST NOT appear in a package export map. Tests and Storybook may exercise

@@ -16,6 +16,7 @@ runtime dependency.
 | MIRA-CAT-006 | New visual stories MUST enter review as `visual-pending`; baseline mutation MUST use the installed Visual Delta suite and requires a separate authorized review.               |
 | MIRA-CAT-007 | Every shipped `@lapismd/mira/ui` primitive family MUST have representative rendered Storybook coverage with interaction or semantic assertions.                                |
 | MIRA-CAT-008 | Public opt-in preview surfaces MUST have a discoverable focused story, and the comprehensive demo MUST expose the same option wherever it materially changes a supported view. |
+| MIRA-CAT-009 | Storybook MUST expose independent built-in-palette and light/dark globals, render ordinary stories through inherited page appearance, and provide fixed built-in, system, custom-extension, and targeted-overlay verification stories. |
 
 Ordinary README prose points to Storybook and the specification. It must not
 become a parallel behavioral reference.
@@ -50,6 +51,12 @@ browser run cannot invalidate its story modules with a mid-suite Vite reload.
 Public stories run the accessibility addon as an enforced browser assertion.
 The non-content CodeMirror gutter remains the sole global exclusion; any new
 technical exclusion must be documented and scoped to the narrowest story.
+
+The preview document owns `data-mira-theme` and the shadcn-compatible
+`.light`/`.dark` color-mode signal. Storybook starts in deterministic light mode
+for visual capture even though a consumer page without an explicit mode uses
+the system preference. Fixed theme stories override globals locally and include
+computed-token assertions; ordinary stories inherit the toolbar globals.
 
 Visual capture, comparison, readiness, clipping, diff sidecars, and failure
 policy are owned by the installed Visual Delta Playwright suite. The default
