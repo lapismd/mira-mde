@@ -1428,69 +1428,133 @@ test("tables and admonition callouts render in preview and live-preview", async 
       .locator(".mira-rich-widget--table .markdown-widget-select-control")
       .first(),
   ).toBeVisible();
-  const handleAlignment = await liveTable.evaluate((element) => {
-    const rowGutter = element.querySelector<HTMLElement>(
-      '[data-markdown-table-chrome="row-gutter"]',
+  const scopedCell = liveTable
+    .locator("tbody tr")
+    .nth(1)
+    .locator("td:not(.markdown-table-chrome)")
+    .nth(1);
+  // Focus wins over hover for chrome; click so active row/col match this cell.
+  await scopedCell.click();
+  await scopedCell.hover();
+  await expect
+    .poll(() =>
+      liveTable.evaluate((element) => {
+        const rowGutters = [
+          ...element.querySelectorAll(
+            '[data-markdown-table-chrome="row-gutter"].is-chrome-active',
+          ),
+        ];
+        const colHeaders = [
+          ...element.querySelectorAll(
+            '[data-markdown-table-chrome="col-header"].is-chrome-active',
+          ),
+        ];
+        return { cols: colHeaders.length, rows: rowGutters.length };
+      }),
+    )
+    .toEqual({ cols: 1, rows: 1 });
+  const scopedChrome = await liveTable.evaluate((element) => {
+    const opacityOf = (node: Element | null) =>
+      node ? Number.parseFloat(getComputedStyle(node).opacity) : -1;
+    const rowGutters = [
+      ...element.querySelectorAll<HTMLElement>(
+        '[data-markdown-table-chrome="row-gutter"]',
+      ),
+    ];
+    const colHeaders = [
+      ...element.querySelectorAll<HTMLElement>(
+        '[data-markdown-table-chrome="col-header"]',
+      ),
+    ];
+    const activeRow = rowGutters.findIndex((node) =>
+      node.classList.contains("is-chrome-active"),
     );
-    const rowHandle = element.querySelector<HTMLElement>(
-      '[data-markdown-table-drag-handle="row"]',
+    const activeCol = colHeaders.findIndex((node) =>
+      node.classList.contains("is-chrome-active"),
     );
-    const colHeader = element.querySelector<HTMLElement>(
-      '[data-markdown-table-chrome="col-header"]',
-    );
-    const colHandle = element.querySelector<HTMLElement>(
-      '[data-markdown-table-drag-handle="col"]',
-    );
-    const center = (rect: DOMRect) => ({
-      x: rect.left + rect.width / 2,
-      y: rect.top + rect.height / 2,
-    });
-    const rowGutterRect = rowGutter!.getBoundingClientRect();
-    const rowHandleCenter = center(rowHandle!.getBoundingClientRect());
-    const colHeaderRect = colHeader!.getBoundingClientRect();
-    const colHandleCenter = center(colHandle!.getBoundingClientRect());
-
     return {
-      colBorderDelta: Math.abs(colHandleCenter.y - colHeaderRect.bottom),
-      colCenterDelta: Math.abs(
-        colHandleCenter.x - (colHeaderRect.left + colHeaderRect.width / 2),
+      activeCol,
+      activeRow,
+      activeColOpacity: opacityOf(colHeaders[activeCol] ?? null),
+      activeRowOpacity: opacityOf(rowGutters[activeRow] ?? null),
+      deleteOpacity: opacityOf(
+        element.querySelector('[data-markdown-table-chrome="delete-table"]'),
       ),
-      rowBorderDelta: Math.abs(rowHandleCenter.x - rowGutterRect.right),
-      rowCenterDelta: Math.abs(
-        rowHandleCenter.y - (rowGutterRect.top + rowGutterRect.height / 2),
-      ),
+      otherColOpacity: colHeaders
+        .filter((_, index) => index !== activeCol)
+        .map((node) => opacityOf(node)),
+      otherRowOpacity: rowGutters
+        .filter((_, index) => index !== activeRow)
+        .map((node) => opacityOf(node)),
     };
   });
+  expect(scopedChrome.activeRow).toBe(1);
+  expect(scopedChrome.activeCol).toBe(1);
+  expect(scopedChrome.activeRowOpacity).toBeGreaterThan(0.9);
+  expect(scopedChrome.activeColOpacity).toBeGreaterThan(0.9);
+  expect(scopedChrome.deleteOpacity).toBeLessThan(0.1);
+  for (const opacity of scopedChrome.otherRowOpacity) {
+    expect(opacity).toBeLessThan(0.1);
+  }
+  for (const opacity of scopedChrome.otherColOpacity) {
+    expect(opacity).toBeLessThan(0.1);
+  }
+  const activeRowGutter = liveTable
+    .locator('[data-markdown-table-chrome="row-gutter"]')
+    .nth(1);
+  const activeColHeader = liveTable
+    .locator('[data-markdown-table-chrome="col-header"]')
+    .nth(1);
+  const handleAlignment = await liveTable.evaluate(
+    (element, indices: { col: number; row: number }) => {
+      const rowGutter = element.querySelectorAll<HTMLElement>(
+        '[data-markdown-table-chrome="row-gutter"]',
+      )[indices.row];
+      const rowHandle = rowGutter?.querySelector<HTMLElement>(
+        '[data-markdown-table-drag-handle="row"]',
+      );
+      const colHeader = element.querySelectorAll<HTMLElement>(
+        '[data-markdown-table-chrome="col-header"]',
+      )[indices.col];
+      const colHandle = colHeader?.querySelector<HTMLElement>(
+        '[data-markdown-table-drag-handle="col"]',
+      );
+      const center = (rect: DOMRect) => ({
+        x: rect.left + rect.width / 2,
+        y: rect.top + rect.height / 2,
+      });
+      const rowGutterRect = rowGutter!.getBoundingClientRect();
+      const rowHandleCenter = center(rowHandle!.getBoundingClientRect());
+      const colHeaderRect = colHeader!.getBoundingClientRect();
+      const colHandleCenter = center(colHandle!.getBoundingClientRect());
+
+      return {
+        colBorderDelta: Math.abs(colHandleCenter.y - colHeaderRect.bottom),
+        colCenterDelta: Math.abs(
+          colHandleCenter.x - (colHeaderRect.left + colHeaderRect.width / 2),
+        ),
+        rowBorderDelta: Math.abs(rowHandleCenter.x - rowGutterRect.right),
+        rowCenterDelta: Math.abs(
+          rowHandleCenter.y - (rowGutterRect.top + rowGutterRect.height / 2),
+        ),
+      };
+    },
+    { col: 1, row: 1 },
+  );
   expect(handleAlignment.rowBorderDelta).toBeLessThan(2);
   expect(handleAlignment.rowCenterDelta).toBeLessThan(2);
   expect(handleAlignment.colBorderDelta).toBeLessThan(2);
   expect(handleAlignment.colCenterDelta).toBeLessThan(2);
   await expect(
-    page
-      .locator(
-        '.mira-rich-widget--table [data-markdown-table-drag-handle="row"]',
-      )
-      .first(),
+    activeRowGutter.locator('[data-markdown-table-drag-handle="row"]'),
   ).toBeVisible();
   await expect(
-    page
-      .locator(
-        '.mira-rich-widget--table [data-markdown-table-chrome="row-gutter"] [data-slot="dropdown-menu-trigger"]',
-      )
-      .first(),
+    activeRowGutter.locator('[data-slot="dropdown-menu-trigger"]'),
   ).toBeVisible();
-  await expect(
-    page
-      .locator(
-        '.mira-rich-widget--table [data-markdown-table-chrome="delete-table"]',
-      )
-      .first(),
-  ).toBeVisible();
-  const rowActions = page
-    .locator(
-      '.mira-rich-widget--table [data-markdown-table-chrome="row-gutter"] [data-slot="dropdown-menu-trigger"]',
-    )
-    .first();
+  await activeRowGutter.hover();
+  const rowActions = activeRowGutter.locator(
+    '[data-slot="dropdown-menu-trigger"]',
+  );
   await rowActions.click();
   const rowMenu = page.locator('[data-slot="dropdown-menu-content"]').last();
   await expect(
@@ -1500,26 +1564,16 @@ test("tables and admonition callouts render in preview and live-preview", async 
     3,
   );
   await rowActions.click();
-  await page.locator(".mira-rich-widget--table th").nth(1).hover();
+  await activeColHeader.hover();
   await expect(
-    page
-      .locator(
-        '.mira-rich-widget--table [data-markdown-table-drag-handle="col"]',
-      )
-      .first(),
+    activeColHeader.locator('[data-markdown-table-drag-handle="col"]'),
   ).toBeVisible();
   await expect(
-    page
-      .locator(
-        '.mira-rich-widget--table [data-markdown-table-chrome="col-header"] [data-slot="dropdown-menu-trigger"]',
-      )
-      .first(),
+    activeColHeader.locator('[data-slot="dropdown-menu-trigger"]'),
   ).toBeVisible();
-  const columnActions = page
-    .locator(
-      '.mira-rich-widget--table [data-markdown-table-chrome="col-header"] [data-slot="dropdown-menu-trigger"]',
-    )
-    .first();
+  const columnActions = activeColHeader.locator(
+    '[data-slot="dropdown-menu-trigger"]',
+  );
   await columnActions.click();
   const columnMenu = page.locator('[data-slot="dropdown-menu-content"]').last();
   await expect(
@@ -1531,7 +1585,9 @@ test("tables and admonition callouts render in preview and live-preview", async 
   await page.keyboard.press("Escape");
   const liveTableWidget = page.locator(".mira-rich-widget--table").first();
   const tableShapeBeforeActions = await tableWidgetShape(liveTableWidget);
-  await liveTableWidget.locator("tfoot tr").hover();
+  await liveTableWidget
+    .locator('[data-markdown-table-chrome="add-row"]')
+    .hover();
   await liveTableWidget
     .locator('[data-markdown-table-chrome="add-row"] button')
     .click();
@@ -1539,7 +1595,9 @@ test("tables and admonition callouts render in preview and live-preview", async 
     cols: tableShapeBeforeActions.cols,
     rows: tableShapeBeforeActions.rows + 1,
   });
-  await liveTableWidget.locator("tbody tr").first().hover();
+  await liveTableWidget
+    .locator('[data-markdown-table-chrome="add-col"]')
+    .hover();
   await liveTableWidget
     .locator('[data-markdown-table-chrome="add-col"] button')
     .click();
@@ -1574,19 +1632,65 @@ test("tables and admonition callouts render in preview and live-preview", async 
     .first();
   await scrollEditorUntilVisible(page, liveGridTable);
   await expect(liveGridTable).toBeVisible();
-  await liveGridTable.locator("tbody tr").first().hover();
+  const gridScopedCell = liveGridTable
+    .locator("tbody tr")
+    .first()
+    .locator("td:not(.markdown-table-chrome)")
+    .first();
+  await gridScopedCell.hover();
+  const gridScopedChrome = await liveGridTable.evaluate((element) => {
+    const opacityOf = (node: Element | null) =>
+      node ? Number.parseFloat(getComputedStyle(node).opacity) : -1;
+    const rowGutters = [
+      ...element.querySelectorAll<HTMLElement>(
+        '[data-markdown-table-chrome="row-gutter"]',
+      ),
+    ];
+    const colHeaders = [
+      ...element.querySelectorAll<HTMLElement>(
+        '[data-markdown-table-chrome="col-header"]',
+      ),
+    ];
+    const activeRow = rowGutters.findIndex((node) =>
+      node.classList.contains("is-chrome-active"),
+    );
+    const activeCol = colHeaders.findIndex((node) =>
+      node.classList.contains("is-chrome-active"),
+    );
+    return {
+      activeCol,
+      activeRow,
+      activeColOpacity: opacityOf(colHeaders[activeCol] ?? null),
+      activeRowOpacity: opacityOf(rowGutters[activeRow] ?? null),
+      otherColOpacity: colHeaders
+        .filter((_, index) => index !== activeCol)
+        .map((node) => opacityOf(node)),
+      otherRowOpacity: rowGutters
+        .filter((_, index) => index !== activeRow)
+        .map((node) => opacityOf(node)),
+    };
+  });
+  expect(gridScopedChrome.activeRow).toBe(0);
+  expect(gridScopedChrome.activeCol).toBe(0);
+  expect(gridScopedChrome.activeRowOpacity).toBeGreaterThan(0.9);
+  expect(gridScopedChrome.activeColOpacity).toBeGreaterThan(0.9);
+  for (const opacity of gridScopedChrome.otherRowOpacity) {
+    expect(opacity).toBeLessThan(0.1);
+  }
+  for (const opacity of gridScopedChrome.otherColOpacity) {
+    expect(opacity).toBeLessThan(0.1);
+  }
+  const gridActiveRowGutter = liveGridTable
+    .locator('[data-markdown-table-chrome="row-gutter"]')
+    .first();
   await expect(
-    page
-      .locator(
-        '.mira-rich-widget--gridtable [data-markdown-table-drag-handle="row"]',
-      )
-      .first(),
+    gridActiveRowGutter.locator('[data-markdown-table-drag-handle="row"]'),
   ).toBeVisible();
   const gridRowHandleAlignment = await liveGridTable.evaluate((element) => {
     const rowGutter = element.querySelector<HTMLElement>(
-      '[data-markdown-table-chrome="row-gutter"]',
+      '[data-markdown-table-chrome="row-gutter"].is-chrome-active',
     );
-    const rowHandle = element.querySelector<HTMLElement>(
+    const rowHandle = rowGutter?.querySelector<HTMLElement>(
       '[data-markdown-table-drag-handle="row"]',
     );
     const center = (rect: DOMRect) => ({
@@ -1605,33 +1709,62 @@ test("tables and admonition callouts render in preview and live-preview", async 
   });
   expect(gridRowHandleAlignment.rowBorderDelta).toBeLessThan(2);
   expect(gridRowHandleAlignment.rowCenterDelta).toBeLessThan(2);
-  await liveGridTable.locator("thead th").nth(1).hover();
+  const gridActiveColHeader = liveGridTable
+    .locator('[data-markdown-table-chrome="col-header"]')
+    .nth(1);
+  await gridActiveColHeader.hover();
+  await expect
+    .poll(() =>
+      liveGridTable.evaluate((element) => {
+        const activeRows = [
+          ...element.querySelectorAll(
+            '[data-markdown-table-chrome="row-gutter"].is-chrome-active',
+          ),
+        ].length;
+        const activeCols = [
+          ...element.querySelectorAll(
+            '[data-markdown-table-chrome="col-header"].is-chrome-active',
+          ),
+        ].length;
+        const colHeader = element.querySelectorAll<HTMLElement>(
+          '[data-markdown-table-chrome="col-header"]',
+        )[1];
+        return {
+          activeCols,
+          activeRows,
+          colOpacity: colHeader
+            ? Number.parseFloat(getComputedStyle(colHeader).opacity)
+            : -1,
+        };
+      }),
+    )
+    .toEqual({
+      activeCols: 1,
+      activeRows: 0,
+      colOpacity: expect.any(Number),
+    });
+  await expect
+    .poll(async () =>
+      Number.parseFloat(
+        await gridActiveColHeader.evaluate(
+          (element) => getComputedStyle(element).opacity,
+        ),
+      ),
+    )
+    .toBeGreaterThan(0.9);
   await expect(
-    page
-      .locator(
-        '.mira-rich-widget--gridtable [data-markdown-table-drag-handle="col"]',
-      )
-      .first(),
+    gridActiveColHeader.locator('[data-markdown-table-drag-handle="col"]'),
   ).toBeVisible();
   await expect(
-    page
-      .locator(
-        '.mira-rich-widget--gridtable [data-markdown-table-chrome="row-gutter"] [data-slot="dropdown-menu-trigger"]',
-      )
-      .first(),
-  ).toBeVisible();
-  await expect(
-    page
-      .locator(
-        '.mira-rich-widget--gridtable [data-markdown-table-chrome="col-header"] [data-slot="dropdown-menu-trigger"]',
-      )
-      .first(),
+    gridActiveColHeader.locator('[data-slot="dropdown-menu-trigger"]'),
   ).toBeVisible();
   const liveGridTableWidget = page
     .locator(".mira-rich-widget--gridtable")
     .first();
   const gridShapeBeforeActions = await tableWidgetShape(liveGridTableWidget);
-  await liveGridTableWidget.locator("tfoot tr").hover();
+  await liveGridTableWidget
+    .locator('[data-markdown-table-chrome="add-row"]')
+    .hover();
   await liveGridTableWidget
     .locator('[data-markdown-table-chrome="add-row"] button')
     .click();
@@ -1639,7 +1772,9 @@ test("tables and admonition callouts render in preview and live-preview", async 
     cols: gridShapeBeforeActions.cols,
     rows: gridShapeBeforeActions.rows + 1,
   });
-  await liveGridTableWidget.locator("tbody tr").first().hover();
+  await liveGridTableWidget
+    .locator('[data-markdown-table-chrome="add-col"]')
+    .hover();
   await liveGridTableWidget
     .locator('[data-markdown-table-chrome="add-col"] button')
     .click();

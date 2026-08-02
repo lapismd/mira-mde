@@ -14,6 +14,7 @@
 
   type Props = {
     index: number;
+    chromeActive?: boolean;
     dragSource: MarkdownTableDragSource | null;
     dragOverIndex: number | null;
     class?: string;
@@ -23,6 +24,7 @@
 
   let {
     index,
+    chromeActive = false,
     dragSource,
     dragOverIndex,
     class: className,
@@ -70,6 +72,7 @@
   data-markdown-table-col-index={index}
   class={cn(
     "markdown-table-chrome markdown-table-chrome--cell group relative h-5 border-b p-0 opacity-0 group-hover:opacity-100",
+    chromeActive && "is-chrome-active",
     className,
     dropIndicatorClasses(dragSource, dragOverIndex, -1, index),
     dragSource?.type === MARKDOWN_TABLE_COL_TYPE &&

@@ -18,6 +18,7 @@
   type Props = {
     rowIndex: number;
     colIndex: number;
+    chromeActive?: boolean;
     dragSource: MarkdownTableDragSource | null;
     dragOverIndex: number | null;
     onSelectRow: (event: Event) => void;
@@ -28,6 +29,7 @@
   let {
     rowIndex,
     colIndex,
+    chromeActive = false,
     dragSource,
     dragOverIndex,
     onSelectRow,
@@ -74,6 +76,7 @@
   bind:ref={cellRef}
   class={cn(
     "markdown-table-chrome markdown-table-chrome--gutter-cell relative w-[2rem] border-r p-0 opacity-0 group-hover:border-y group-hover:border-l group-hover:opacity-100",
+    chromeActive && "is-chrome-active",
     dropIndicatorClasses(dragSource, dragOverIndex, rowIndex, colIndex),
     dragSource?.type === MARKDOWN_TABLE_ROW_TYPE &&
       dragSource.index === rowIndex &&

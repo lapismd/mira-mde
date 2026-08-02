@@ -427,11 +427,58 @@
     opacity: 0;
   }
 
+  /* Per-row / per-col local group hover (not whole-table). */
   .cm-table-widget
     :is(.group:hover, .group:focus-within)
-    .group-hover\:opacity-100,
-  .cm-table-widget:hover .markdown-table-chrome,
-  .cm-table-widget:focus-within .markdown-table-chrome {
+    .group-hover\:opacity-100 {
+    opacity: 1;
+  }
+
+  /* Active cell’s row gutter + column header (and their nested chrome). */
+  .cm-table-widget .markdown-table-chrome.is-chrome-active,
+  .cm-table-widget .markdown-table-chrome.is-chrome-active .opacity-0,
+  .cm-table-widget .markdown-table-chrome.is-chrome-active .opacity-40,
+  .cm-table-widget
+    .markdown-table-chrome.is-chrome-active
+    .group-hover\:opacity-100 {
+    opacity: 1;
+  }
+
+  .cm-table-widget
+    .markdown-table-chrome.is-chrome-active
+    .group-hover\:inline-flex,
+  .cm-table-widget
+    .markdown-table-chrome.is-chrome-active.group-hover\:inline-flex {
+    display: inline-flex;
+  }
+
+  .cm-table-widget .markdown-table-chrome--gutter-cell.is-chrome-active {
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    border-color: var(--border);
+    border-left-style: solid;
+    border-left-width: 1px;
+    border-top-style: solid;
+    border-top-width: 1px;
+  }
+
+  /* Add/delete stay on their own control hover, not cell focus. */
+  .cm-table-widget
+    [data-markdown-table-chrome="delete-table"]:is(:hover, :focus-within),
+  .cm-table-widget
+    [data-markdown-table-chrome="add-row"]:is(:hover, :focus-within),
+  .cm-table-widget
+    [data-markdown-table-chrome="add-col"]:is(:hover, :focus-within),
+  .cm-table-widget
+    [data-markdown-table-chrome="add-col"]:is(:hover, :focus-within)
+    .markdown-table-chrome {
+    opacity: 1;
+  }
+
+  .cm-table-widget.is-table-chrome-dragging .is-drag-source,
+  .cm-table-widget.is-table-chrome-dragging
+    .is-drag-source
+    .markdown-table-chrome {
     opacity: 1;
   }
 }

@@ -51,6 +51,17 @@
     return node.getRows();
   });
   let coords: [number, number] = $state([-1, -1]);
+  let tableRoot = $state<HTMLElement | null>(null);
+  let hoverChrome: { row: number; col: number } | null = $state(null);
+  let focusChrome: { row: number; col: number } | null = $state(null);
+  const activeRow = $derived.by(() => {
+    const chrome = focusChrome ?? hoverChrome;
+    return chrome && chrome.row >= 0 ? chrome.row : null;
+  });
+  const activeCol = $derived.by(() => {
+    const chrome = focusChrome ?? hoverChrome;
+    return chrome && chrome.col >= 0 ? chrome.col : null;
+  });
 
   const handleMouseOver = debounce((evt: MouseEvent) => {
     onMouseUp(evt);
@@ -587,12 +598,73 @@
   }
 
   function onMouseOver(evt: MouseEvent) {
+    updateHoverChrome(evt);
     if (pos.isMouseDown) {
       pos.end = getCoords(evt);
       const cells = getCellsBetween(pos.start, pos.end);
       selected = getSelection(cells);
       evt.preventDefault();
     }
+  }
+
+  function updateHoverChrome(evt: Event) {
+    const [row, col] = getCoords(evt);
+    if (row >= 0 && col >= 0) {
+      hoverChrome = { row, col };
+      return;
+    }
+    const target = evt.target as Element | null;
+    const colHeader = target?.closest?.(
+      '[data-markdown-table-chrome="col-header"]',
+    ) as HTMLElement | null;
+    if (colHeader) {
+      const index = Number(
+        colHeader.dataset.markdownTableColIndex ??
+          colHeader.querySelector<HTMLElement>(
+            "[data-markdown-table-drag-index]",
+          )?.dataset.markdownTableDragIndex ??
+          -1,
+      );
+      if (Number.isFinite(index) && index >= 0) {
+        hoverChrome = { row: -1, col: index };
+      }
+      return;
+    }
+    const rowGutter = target?.closest?.(
+      '[data-markdown-table-chrome="row-gutter"]',
+    ) as HTMLElement | null;
+    if (rowGutter) {
+      const index = Number(
+        rowGutter.querySelector<HTMLElement>("[data-markdown-table-drag-index]")
+          ?.dataset.markdownTableDragIndex ?? -1,
+      );
+      if (Number.isFinite(index) && index >= 0) {
+        hoverChrome = { row: index, col: -1 };
+      }
+    }
+  }
+
+  function onTablePointerLeave(evt: PointerEvent) {
+    const related = evt.relatedTarget as Node | null;
+    if (tableRoot && related && tableRoot.contains(related)) {
+      return;
+    }
+    hoverChrome = null;
+  }
+
+  function onTableFocusIn(evt: FocusEvent) {
+    const [row, col] = getCoords(evt);
+    if (row >= 0 && col >= 0) {
+      focusChrome = { row, col };
+    }
+  }
+
+  function onTableFocusOut(evt: FocusEvent) {
+    const related = evt.relatedTarget as Node | null;
+    if (tableRoot && related && tableRoot.contains(related)) {
+      return;
+    }
+    focusChrome = null;
   }
 
   function getCoords(evt: Event): [number, number] {
@@ -774,22 +846,27 @@
 </script>
 
 <ContextMenu.Root>
-  <ContextMenu.Trigger class="group/trigger relative">
+  <ContextMenu.Trigger class="relative">
     {#key tableVersion}
       <Table.Root
+        bind:ref={tableRoot}
         class={cn(
           "cm-table-widget h-full w-fit",
           dragState.start !== -1 && "is-table-chrome-dragging",
         )}
         className="overflow-x-auto overflow-y-hidden"
+        onpointerover={updateHoverChrome}
+        onpointerleave={onTablePointerLeave}
+        onfocusin={onTableFocusIn}
+        onfocusout={onTableFocusOut}
       >
         <Table.Header>
           <Table.Row
-            class="group border-none hover:[&,&>svelte-css-wrapper]:[&>th,td]:bg-transparent"
+            class="border-none hover:[&,&>svelte-css-wrapper]:[&>th,td]:bg-transparent"
           >
-            <Table.Head class="h-5 border-none p-0">
+            <Table.Head class="group h-5 border-none p-0">
               <div
-                class="markdown-table-chrome absolute top-0 z-10 flex items-center opacity-0 group-hover/trigger:opacity-100"
+                class="markdown-table-chrome absolute top-0 z-10 flex items-center opacity-0"
                 data-markdown-table-chrome="delete-table"
               >
                 <Tooltip.Provider>
@@ -811,8 +888,12 @@
             </Table.Head>
             {#each { length: columnCount } as _, index}
               <Table.Head
-                class="markdown-table-chrome markdown-table-chrome--cell group relative h-5 border-b p-0 opacity-0 group-hover/trigger:opacity-100"
+                class={cn(
+                  "markdown-table-chrome markdown-table-chrome--cell group relative h-5 border-b p-0 opacity-0 group-hover:opacity-100",
+                  activeCol === index && "is-chrome-active",
+                )}
                 data-markdown-table-chrome="col-header"
+                data-markdown-table-col-index={index}
                 ondragenter={() => (dragState.end = index)}
               >
                 <Button
@@ -848,7 +929,7 @@
               class="markdown-table-chrome markdown-table-chrome--footer-cell group m-0 h-5 p-0 group-hover:border-x group-hover:border-b"
             >
               <div
-                class="markdown-table-chrome flex items-center opacity-0 group-hover:opacity-100"
+                class="markdown-table-chrome flex items-center opacity-0"
                 data-markdown-table-chrome="add-row"
               >
                 <Button
@@ -895,7 +976,10 @@
   {#each gridRows as row, rowIndex}
     <Table.Row class={cn("group border-none")}>
       <Component
-        class="markdown-table-chrome markdown-table-chrome--gutter-cell relative w-[2rem] border-r p-0 opacity-0 group-hover:border-y group-hover:border-l group-hover/trigger:opacity-100"
+        class={cn(
+          "markdown-table-chrome markdown-table-chrome--gutter-cell relative w-[2rem] border-r p-0 opacity-0 group-hover:border-y group-hover:border-l group-hover:opacity-100",
+          activeRow === rowIndex && "is-chrome-active",
+        )}
         data-markdown-table-chrome="row-gutter"
       >
         <Button
@@ -1027,7 +1111,7 @@
               variant: "ghost",
               size: "sm",
               class:
-                "markdown-table-chrome h-full w-5 cursor-e-resize rounded-none opacity-0 group-hover:opacity-100 [&_svg]:size-6",
+                "markdown-table-chrome h-full w-5 cursor-e-resize rounded-none opacity-0 [&_svg]:size-6",
             })}
             onclickcapture={insertColumnAtEnd}
           >

@@ -68,6 +68,16 @@
   });
   let coords: [number, number] = $state([-1, -1]);
   let tableRoot = $state<HTMLElement | null>(null);
+  let hoverChrome: { row: number; col: number } | null = $state(null);
+  let focusChrome: { row: number; col: number } | null = $state(null);
+  const activeRow = $derived.by(() => {
+    const chrome = focusChrome ?? hoverChrome;
+    return chrome && chrome.row >= 0 ? chrome.row : null;
+  });
+  const activeCol = $derived.by(() => {
+    const chrome = focusChrome ?? hoverChrome;
+    return chrome && chrome.col >= 0 ? chrome.col : null;
+  });
 
   const handleMouseOver = _.debounce((evt: MouseEvent) => {
     onMouseUp(evt);
@@ -436,11 +446,70 @@
   }
 
   function onMouseOver(evt: MouseEvent) {
+    updateHoverChrome(evt);
     if (pos.isMouseDown) {
       pos.end = getCoords(evt);
       selected = getCellsBetween(pos.start, pos.end);
       evt.preventDefault();
     }
+  }
+
+  function updateHoverChrome(evt: Event) {
+    const [row, col] = getCoords(evt);
+    if (row >= 0 && col >= 0) {
+      hoverChrome = { row, col };
+      return;
+    }
+    const target = evt.target as Element | null;
+    const colHeader = target?.closest?.(
+      '[data-markdown-table-chrome="col-header"]',
+    ) as HTMLElement | null;
+    if (colHeader) {
+      const index = Number(
+        colHeader.dataset.markdownTableColIndex ??
+          colHeader.dataset.markdownTableDragIndex ??
+          -1,
+      );
+      if (Number.isFinite(index) && index >= 0) {
+        hoverChrome = { row: -1, col: index };
+      }
+      return;
+    }
+    const rowGutter = target?.closest?.(
+      '[data-markdown-table-chrome="row-gutter"]',
+    ) as HTMLElement | null;
+    if (rowGutter) {
+      const handle = rowGutter.querySelector<HTMLElement>(
+        "[data-markdown-table-drag-index]",
+      );
+      const index = Number(handle?.dataset.markdownTableDragIndex ?? -1);
+      if (Number.isFinite(index) && index >= 0) {
+        hoverChrome = { row: index, col: -1 };
+      }
+    }
+  }
+
+  function onTablePointerLeave(evt: PointerEvent) {
+    const related = evt.relatedTarget as Node | null;
+    if (tableRoot && related && tableRoot.contains(related)) {
+      return;
+    }
+    hoverChrome = null;
+  }
+
+  function onTableFocusIn(evt: FocusEvent) {
+    const [row, col] = getCoords(evt);
+    if (row >= 0 && col >= 0) {
+      focusChrome = { row, col };
+    }
+  }
+
+  function onTableFocusOut(evt: FocusEvent) {
+    const related = evt.relatedTarget as Node | null;
+    if (tableRoot && related && tableRoot.contains(related)) {
+      return;
+    }
+    focusChrome = null;
   }
 
   function getCoords(evt: Event): [number, number] {
@@ -605,6 +674,10 @@
             dragSource && "is-table-chrome-dragging",
           )}
           className="overflow-x-auto overflow-y-hidden"
+          onpointerover={updateHoverChrome}
+          onpointerleave={onTablePointerLeave}
+          onfocusin={onTableFocusIn}
+          onfocusout={onTableFocusOut}
         >
           <colgroup>
             <col />
@@ -621,11 +694,11 @@
           </colgroup>
           <Table.Header>
             <Table.Row
-              class="group border-none hover:[&,&>svelte-css-wrapper]:[&>th,td]:bg-transparent"
+              class="border-none hover:[&,&>svelte-css-wrapper]:[&>th,td]:bg-transparent"
             >
-              <Table.Head class="h-5 border-none p-0">
+              <Table.Head class="group h-5 border-none p-0">
                 <div
-                  class="markdown-table-chrome absolute top-0 z-10 flex items-center opacity-0 group-hover:opacity-100"
+                  class="markdown-table-chrome absolute top-0 z-10 flex items-center opacity-0"
                   data-markdown-table-chrome="delete-table"
                 >
                   <Tooltip.Provider>
@@ -650,6 +723,7 @@
               {#each mdastNode.children[0].children as col, index}
                 <MarkdownTableColumnHead
                   {index}
+                  chromeActive={activeCol === index}
                   {dragSource}
                   {dragOverIndex}
                   onSelectColumn={(evt) => selectColumn(evt, index)}
@@ -666,6 +740,7 @@
                 <MarkdownTableRowGutterCell
                   {rowIndex}
                   colIndex={0}
+                  chromeActive={activeRow === rowIndex}
                   {dragSource}
                   {dragOverIndex}
                   onSelectRow={(evt) => selectRow(evt, rowIndex)}
@@ -714,7 +789,7 @@
                         variant: "ghost",
                         size: "sm",
                         class:
-                          "markdown-table-chrome h-full w-5 cursor-e-resize rounded-none opacity-0 group-hover:opacity-100 [&_svg]:size-6",
+                          "markdown-table-chrome h-full w-5 cursor-e-resize rounded-none opacity-0 [&_svg]:size-6",
                       })}
                       onclickcapture={insertColumnAtEnd}
                     >
@@ -748,7 +823,7 @@
                 class="markdown-table-chrome markdown-table-chrome--footer-cell group m-0 h-5 p-0 group-hover:border-x group-hover:border-b"
               >
                 <div
-                  class="markdown-table-chrome flex items-center opacity-0 group-hover:opacity-100"
+                  class="markdown-table-chrome flex items-center opacity-0"
                   data-markdown-table-chrome="add-row"
                 >
                   <Button
