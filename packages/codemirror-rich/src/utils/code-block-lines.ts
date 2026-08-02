@@ -7,23 +7,46 @@ import {
 import { Decoration, type DecorationSet, EditorView } from "@codemirror/view";
 import { sortRanges } from "./ranges";
 
-// Lapis source-mode codeBlockClassExtension classes. Live-preview adds
-// `cm-formatting-code` (+ start/end) via rich inline decorations only.
-const codeLine = Decoration.line({
-  class: "HyperMD-codeblock HyperMD-codeblock-bg",
-});
-const textCodeLine = Decoration.line({
-  class:
-    "HyperMD-codeblock HyperMD-codeblock-bg cm-formatting-code-language-text",
-});
+/**
+ * Fence chrome shared by source + live-preview (Lapis HyperMD classes plus
+ * `cm-formatting-code` / start / end). Widgets stay live-preview-only; these
+ * line classes keep background + rounded first/last lines with visible markers.
+ */
+function codeLineClasses(options: {
+  language: string;
+  isStart: boolean;
+  isEnd: boolean;
+}): string {
+  const classes = [
+    "HyperMD-codeblock",
+    "HyperMD-codeblock-bg",
+    "cm-formatting-code",
+  ];
+  if (options.language === "text") {
+    classes.push("cm-formatting-code-language-text");
+  }
+  if (options.isStart) {
+    classes.push("cm-formatting-code-start");
+  }
+  if (options.isEnd) {
+    classes.push("cm-formatting-code-end");
+  }
+  return classes.join(" ");
+}
 
 export function buildCodeBlockLineDecorations(
   state: EditorState,
 ): DecorationSet {
   const decorations: Range<Decoration>[] = [];
   let active:
-    | { character: "`" | "~"; length: number; language: string }
+    | {
+        character: "`" | "~";
+        length: number;
+        language: string;
+        startNumber: number;
+      }
     | undefined;
+
   for (let number = 1; number <= state.doc.lines; number += 1) {
     const line = state.doc.line(number);
     const wasActive = Boolean(active);
@@ -36,19 +59,28 @@ export function buildCodeBlockLineDecorations(
         character: opening[1][0] as "`" | "~",
         language: (opening[2] ?? "").toLocaleLowerCase(),
         length: opening[1].length,
+        startNumber: number,
       };
     }
 
-    decorations.push(
-      (active.language === "text" ? textCodeLine : codeLine).range(line.from),
-    );
     const closing = line.text.match(/^\s*(`{3,}|~{3,})\s*$/u)?.[1];
-    if (
+    const isClosing =
       wasActive &&
-      closing &&
-      closing[0] === active.character &&
-      closing.length >= active.length
-    ) {
+      Boolean(closing) &&
+      closing![0] === active.character &&
+      closing!.length >= active.length;
+
+    decorations.push(
+      Decoration.line({
+        class: codeLineClasses({
+          language: active.language,
+          isStart: number === active.startNumber,
+          isEnd: isClosing,
+        }),
+      }).range(line.from),
+    );
+
+    if (isClosing) {
       active = undefined;
     }
   }

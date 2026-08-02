@@ -123,6 +123,11 @@
   position: relative;
 }
 
+/* Lapis source HyperMD chrome + formatting-code background. */
+.markdown-editor-surface .cm-editor .HyperMD-codeblock.HyperMD-codeblock-bg {
+  background-color: color-mix(in oklab, var(--secondary) 60%, transparent);
+}
+
 .markdown-editor-surface .cm-formatting-code,
 .markdown-editor-surface .cm-editor .cm-activeLine.cm-line.cm-formatting-code {
   background-color: var(--markdown-code-background);

@@ -53,8 +53,10 @@ describe("createRichEditorExtensions", () => {
     expect(parent.querySelector(".cm-formatting-hidden")).toBeNull();
     expect(parent.querySelector(".cm-inline-code")).toBeNull();
     expect(parent.querySelector(".mira-rich-widget")).toBeNull();
-    expect(parent.querySelector(".cm-formatting-code")).toBeNull();
     expect(parent.querySelector(".cm-formatting-quote")).toBeNull();
+    // Source keeps fence chrome (bg + start/end radius) with visible markers.
+    expect(parent.querySelector(".cm-formatting-code-start")).not.toBeNull();
+    expect(parent.querySelector(".cm-formatting-code-end")).not.toBeNull();
     expect(parent.textContent).toContain("> quoted line");
     expect(parent.textContent).toContain("`inline code`");
     expect(parent.textContent).toContain("```js");

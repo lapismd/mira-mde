@@ -27,17 +27,18 @@ describe("code block line decorations", () => {
 
     expect(classes).toHaveLength(3);
     expect(classes).toEqual([
-      "HyperMD-codeblock HyperMD-codeblock-bg cm-formatting-code-language-text",
-      "HyperMD-codeblock HyperMD-codeblock-bg cm-formatting-code-language-text",
-      "HyperMD-codeblock HyperMD-codeblock-bg cm-formatting-code-language-text",
+      "HyperMD-codeblock HyperMD-codeblock-bg cm-formatting-code cm-formatting-code-language-text cm-formatting-code-start",
+      "HyperMD-codeblock HyperMD-codeblock-bg cm-formatting-code cm-formatting-code-language-text",
+      "HyperMD-codeblock HyperMD-codeblock-bg cm-formatting-code cm-formatting-code-language-text cm-formatting-code-end",
     ]);
   });
 
-  it("keeps other fenced languages on the normal HyperMD code line class", () => {
+  it("keeps other fenced languages with code chrome and start/end radius hooks", () => {
     const classes = lineClasses("```mermaid\nflowchart LR\n```");
-    expect(classes).not.toContain(
-      "HyperMD-codeblock HyperMD-codeblock-bg cm-formatting-code-language-text",
-    );
-    expect(classes[0]).toBe("HyperMD-codeblock HyperMD-codeblock-bg");
+    expect(classes).toEqual([
+      "HyperMD-codeblock HyperMD-codeblock-bg cm-formatting-code cm-formatting-code-start",
+      "HyperMD-codeblock HyperMD-codeblock-bg cm-formatting-code",
+      "HyperMD-codeblock HyperMD-codeblock-bg cm-formatting-code cm-formatting-code-end",
+    ]);
   });
 });

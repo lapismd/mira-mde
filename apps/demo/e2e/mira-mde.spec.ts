@@ -587,7 +587,6 @@ test("source mode keeps fence markers, backticks, and blockquote delimiters", as
   await expect(page.locator(".cm-inline-code")).toHaveCount(0);
   await expect(page.locator(".mira-rich-widget--fencedcode")).toHaveCount(0);
   await expect(page.locator(".mira-rich-widget--blockquote")).toHaveCount(0);
-  await expect(page.locator(".cm-formatting-code")).toHaveCount(0);
 
   // CM virtualizes lines — scroll into sections that contain delimiters.
   await scrollEditorUntilVisible(
@@ -606,6 +605,22 @@ test("source mode keeps fence markers, backticks, and blockquote delimiters", as
     { max: 10_000 },
   );
   await expect(page.locator(".cm-content")).toContainText("~~~mermaid");
+
+  // Source keeps Lapis fence chrome (background + rounded first/last line).
+  const fenceStart = page.locator(".cm-line.cm-formatting-code-start").first();
+  const fenceEnd = page.locator(".cm-line.cm-formatting-code-end").first();
+  await expect(fenceStart).toBeVisible();
+  await expect(fenceEnd).toBeVisible();
+  const fenceChrome = await fenceStart.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return {
+      background: style.backgroundColor,
+      radiusTop: Number.parseFloat(style.borderTopLeftRadius),
+    };
+  });
+  expect(fenceChrome.background).not.toBe("rgba(0, 0, 0, 0)");
+  expect(fenceChrome.background).not.toBe("transparent");
+  expect(fenceChrome.radiusTop).toBeGreaterThan(0);
 });
 
 test("task lists and live heading gutters match Lapis styling", async ({
