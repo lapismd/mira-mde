@@ -1,6 +1,6 @@
 [book]
-title = "Mira MDE System Specification"
-authors = ["Mira MDE contributors"]
+title = "Mira System Specification"
+authors = ["Mira contributors"]
 language = "en"
 src = "src"
 

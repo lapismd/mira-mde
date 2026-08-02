@@ -5,7 +5,7 @@ import {
   createMiraCommandKeymap,
   createMarkdownTemplate,
   createSlashSnippet,
-  defaultMiraListCallouts,
+  defaultMiraEditorListCallouts,
   defineMiraExtension,
   executeMiraCommand,
   isMiraCommandEnabled,
@@ -293,7 +293,7 @@ describe("portable list callout catalogs", () => {
       char: "^",
       color: "80, 70, 220",
     });
-    expect(defaultMiraListCallouts).toHaveLength(7);
+    expect(defaultMiraEditorListCallouts).toHaveLength(7);
   });
 });
 

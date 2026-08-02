@@ -1,0 +1,16 @@
+{
+  "name": "@mira-internal/vue",
+  "version": "0.0.0",
+  "private": true,
+  "license": "AGPL-3.0-or-later",
+  "type": "module",
+  "scripts": {
+    "build": "echo \"@mira-internal/vue is planned after the public API stabilizes\"",
+    "check": "pnpm check:format && pnpm check:svelte && pnpm check:types",
+    "check:format": "prettier --ignore-path ../../../.prettierignore . --check",
+    "check:types": "echo \"@mira-internal/vue is planned\"",
+    "check:svelte": "echo \"no svelte files\"",
+    "lint": "echo \"@mira-internal/vue is planned\"",
+    "test": "echo \"@mira-internal/vue is planned\""
+  }
+}

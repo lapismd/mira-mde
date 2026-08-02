@@ -17,14 +17,12 @@ test("publishes one docs mirror for every canonical specification chapter", asyn
   };
   const specDocs = Object.values(index.entries).filter(
     (entry) =>
-      entry.type === "docs" &&
-      entry.title.startsWith("Mira MDE/Specification/"),
+      entry.type === "docs" && entry.title.startsWith("Mira/Specification/"),
   );
-  expect(specDocs).toHaveLength(10);
+  expect(specDocs).toHaveLength(11);
 
   const catalogDocs = Object.values(index.entries).filter(
-    (entry) =>
-      entry.type === "docs" && entry.title.startsWith("Mira MDE/Catalog/"),
+    (entry) => entry.type === "docs" && entry.title.startsWith("Mira/Catalog/"),
   );
   expect(catalogDocs).toHaveLength(8);
 });
@@ -33,9 +31,11 @@ test("publishes catalog descriptions, spec links, and token metadata", async ({
   page,
 }) => {
   await page.goto(
-    "/iframe.html?id=mira-mde-catalog-editor-surfaces--docs&viewMode=docs",
+    "/iframe.html?id=mira-catalog-editor-surfaces--docs&viewMode=docs",
   );
-  await expect(page.getByRole("heading", { name: "MiraMde" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Mira", exact: true }),
+  ).toBeVisible();
   await expect(
     page.getByRole("link", { name: /governing specification/i }).first(),
   ).toBeVisible();
@@ -47,7 +47,7 @@ test("publishes catalog descriptions, spec links, and token metadata", async ({
   ).toBeVisible();
 
   await page.goto(
-    "/iframe.html?id=mira-mde-specification-architecture-and-boundaries--docs&viewMode=docs",
+    "/iframe.html?id=mira-specification-architecture-and-boundaries--docs&viewMode=docs",
   );
   await expect(
     page.getByRole("heading", { name: "Architecture and Boundaries" }),
@@ -62,19 +62,19 @@ for (const view of views) {
     );
     await expect(page.locator(".mira-comprehensive")).toBeVisible();
     await expect(
-      page.getByRole("heading", { name: "Mira MDE", exact: true }),
+      page.getByRole("heading", { name: "Mira", exact: true }),
     ).toBeVisible();
     const editorRoot = page.locator(
-      `.mira-mde[data-mode="${view.id === "reading-preview" ? "preview" : view.id}"]`,
+      `.mira[data-mode="${view.id === "reading-preview" ? "preview" : view.id}"]`,
     );
     await expect(editorRoot).toBeVisible();
     await expect(
       editorRoot.locator(
-        ":scope > .mira-mde__body > .mira-mde__pane--editor[data-visible='true']",
+        ":scope > .mira__body > .mira__pane--editor[data-visible='true']",
       ),
     ).toHaveCount(view.editor ? 1 : 0);
     await expect(
-      editorRoot.locator(":scope > .mira-mde__body > .mira-mde__pane--preview"),
+      editorRoot.locator(":scope > .mira__body > .mira__pane--preview"),
     ).toHaveCount(view.preview ? 1 : 0);
   });
 }

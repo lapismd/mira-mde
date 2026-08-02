@@ -1,5 +1,5 @@
 ---
-title: Mira MDE comprehensive playground
+title: Mira comprehensive playground
 status: portable-v1
 published: 2026-08-02
 featured: true
@@ -11,14 +11,14 @@ aliases:
   - Mira Markdown feature tour
 summary: Portable Markdown and editor feature coverage in one Storybook fixture.
 related:
-  package: "@mira-mde/default-ui"
+  package: "@lapismd/mira-editor"
   surface: live-preview
 ---
 
-# Mira MDE comprehensive playground
+# Mira comprehensive playground
 
 This Storybook-owned fixture exercises the portable Markdown, editor, preview,
-Mermaid, adapter, and default UI contracts against identical content in all four
+Mermaid, adapter, and Mira Editor contracts against identical content in all four
 supported views. It adapts the portable parts of Lapis's Markdown Feature Tour;
 vault, workspace, registry, persistence, and application navigation behavior are
 deliberately excluded.
@@ -118,11 +118,11 @@ Heading and block-reference embeds:
 
 ## Pipe and grid tables
 
-| Package                    |  Surface   | Status |
-| :------------------------- | :--------: | -----: |
+| Package                        |  Surface   | Status |
+| :----------------------------- | :--------: | -----: |
 | `@lapismd/mira/core`           | controller |  ready |
 | `@lapismd/mira/preview`        |  reading   |  ready |
-| `@mira-mde/plugin-mermaid` |  diagrams  |  ready |
+| `@lapismd/mira-plugin-mermaid` |  diagrams  |  ready |
 
 MultiMarkdown spans:
 
@@ -171,7 +171,7 @@ Flowchart:
 flowchart LR
   Core["@lapismd/mira/core"] --> Svelte["@lapismd/mira"]
   Extensions["@lapismd/mira/extensions"] --> Svelte
-  Mermaid["@mira-mde/plugin-mermaid"] --> Preview["@lapismd/mira/preview"]
+  Mermaid["@lapismd/mira-plugin-mermaid"] --> Preview["@lapismd/mira/preview"]
   Svelte --> Storybook["Storybook comprehensive demo"]
 ```
 
@@ -193,8 +193,8 @@ sequenceDiagram
 ## Code, math, and footnotes
 
 ```ts {2}
-import { MiraDefaultMde } from "@mira-mde/default-ui/svelte";
-import "@mira-mde/default-ui/styles.css";
+import { MiraEditor } from "@lapismd/mira-editor";
+import "@lapismd/mira-editor/styles.css";
 ```
 
 Inline bracket math also remains authored as \(a^2 + b^2 = c^2\).

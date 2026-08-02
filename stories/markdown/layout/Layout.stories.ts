@@ -20,7 +20,7 @@ const meta = {
       source: {
         language: "html",
         type: "code",
-        code: `<MiraDefaultMde
+        code: `<MiraEditor
   bind:value
   bind:mode
   sourcePath="showcase.md"

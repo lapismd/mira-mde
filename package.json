@@ -1,5 +1,5 @@
 {
-  "name": "mira-mde",
+  "name": "mira-workspace",
   "version": "0.0.0",
   "private": true,
   "license": "AGPL-3.0-or-later",
@@ -20,6 +20,8 @@
     "dev": "pnpm storybook",
     "fmt": "prettier . --write",
     "lint": "eslint .",
+    "packages:check": "node ./scripts/check-package-boundaries.mjs && node --test ./scripts/check-package-boundaries.spec.mjs",
+    "packages:pack": "pnpm build && node ./scripts/check-package-tarballs.mjs",
     "storybook": "WATCHPACK_POLLING=250 node scripts/storybook-run.mjs --no-open",
     "storybook:restart": "bash scripts/storybook-restart.sh",
     "storybook:check": "pnpm catalog:check && pnpm build-storybook && pnpm test:visual",
@@ -41,9 +43,11 @@
   },
   "dependencies": {
     "@lapismd/mira": "workspace:*",
-    "@mira-mde/default-ui": "workspace:*",
-    "@mira-mde/plugin-ai": "workspace:*",
-    "@mira-mde/plugin-mermaid": "workspace:*"
+    "@lapismd/mira-editor": "workspace:*",
+    "@lapismd/mira-plugin-ai": "workspace:*",
+    "@lapismd/mira-plugin-mermaid": "workspace:*",
+    "@lapismd/mira-react": "workspace:*",
+    "@lapismd/mira-vanilla": "workspace:*"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",

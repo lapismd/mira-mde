@@ -11,15 +11,21 @@ importers:
       '@lapismd/mira':
         specifier: workspace:*
         version: link:packages/mira
-      '@mira-mde/default-ui':
+      '@lapismd/mira-editor':
         specifier: workspace:*
-        version: link:packages/default-ui
-      '@mira-mde/plugin-ai':
+        version: link:packages/mira-editor
+      '@lapismd/mira-plugin-ai':
         specifier: workspace:*
-        version: link:packages/plugin-ai
-      '@mira-mde/plugin-mermaid':
+        version: link:packages/mira-plugin-ai
+      '@lapismd/mira-plugin-mermaid':
         specifier: workspace:*
-        version: link:packages/plugin-mermaid
+        version: link:packages/mira-plugin-mermaid
+      '@lapismd/mira-react':
+        specifier: workspace:*
+        version: link:packages/mira-react
+      '@lapismd/mira-vanilla':
+        specifier: workspace:*
+        version: link:packages/mira-vanilla
     devDependencies:
       '@eslint/js':
         specifier: ^9.39.2
@@ -154,27 +160,9 @@ importers:
         specifier: ^4.1.10
         version: 4.1.10(@types/node@24.13.2)(@vitest/browser-playwright@4.1.10)(jsdom@29.1.1)(vite@7.3.6(@types/node@24.13.2)(lightningcss@1.32.0)(tsx@4.23.1)(yaml@2.9.0))
 
-  packages/default-ui:
-    dependencies:
-      '@lapismd/mira':
-        specifier: workspace:*
-        version: link:../mira
-      '@lucide/svelte':
-        specifier: ^0.525.0
-        version: 0.525.0(svelte@5.56.4(@typescript-eslint/types@8.62.0))
-      '@mira-mde/plugin-mermaid':
-        specifier: workspace:*
-        version: link:../plugin-mermaid
-    devDependencies:
-      '@sveltejs/vite-plugin-svelte':
-        specifier: ^6.2.1
-        version: 6.2.4(svelte@5.56.4(@typescript-eslint/types@8.62.0))(vite@8.1.5(@types/node@24.13.2)(esbuild@0.28.1)(tsx@4.23.1)(yaml@2.9.0))
-      svelte:
-        specifier: ^5.46.1
-        version: 5.56.4(@typescript-eslint/types@8.62.0)
-      vitest:
-        specifier: ^4.1.0
-        version: 4.1.9(@types/node@24.13.2)(@vitest/browser-playwright@4.1.10(playwright@1.61.1)(vite@7.3.6(@types/node@24.13.2)(lightningcss@1.32.0)(tsx@4.23.1)(yaml@2.9.0))(vitest@4.1.10))(jsdom@29.1.1)(vite@8.1.5(@types/node@24.13.2)(esbuild@0.28.1)(tsx@4.23.1)(yaml@2.9.0))
+  internal/adapters/solid: {}
+
+  internal/adapters/vue: {}
 
   packages/mira:
     dependencies:
@@ -354,7 +342,29 @@ importers:
         specifier: ^5.46.1
         version: 5.56.4(@typescript-eslint/types@8.62.0)
 
-  packages/plugin-ai:
+  packages/mira-editor:
+    dependencies:
+      '@lapismd/mira':
+        specifier: workspace:*
+        version: link:../mira
+      '@lapismd/mira-plugin-mermaid':
+        specifier: workspace:*
+        version: link:../mira-plugin-mermaid
+      '@lucide/svelte':
+        specifier: ^0.525.0
+        version: 0.525.0(svelte@5.56.4(@typescript-eslint/types@8.62.0))
+    devDependencies:
+      '@sveltejs/vite-plugin-svelte':
+        specifier: ^6.2.1
+        version: 6.2.4(svelte@5.56.4(@typescript-eslint/types@8.62.0))(vite@8.1.5(@types/node@24.13.2)(esbuild@0.28.1)(tsx@4.23.1)(yaml@2.9.0))
+      svelte:
+        specifier: ^5.46.1
+        version: 5.56.4(@typescript-eslint/types@8.62.0)
+      vitest:
+        specifier: ^4.1.0
+        version: 4.1.10(@types/node@24.13.2)(@vitest/browser-playwright@4.1.10)(jsdom@29.1.1)(vite@8.1.5(@types/node@24.13.2)(esbuild@0.28.1)(tsx@4.23.1)(yaml@2.9.0))
+
+  packages/mira-plugin-ai:
     dependencies:
       '@lapismd/mira':
         specifier: workspace:*
@@ -367,7 +377,7 @@ importers:
         specifier: ^6.38.8
         version: 6.43.3
 
-  packages/plugin-mermaid:
+  packages/mira-plugin-mermaid:
     dependencies:
       '@lapismd/mira':
         specifier: workspace:*
@@ -413,17 +423,17 @@ importers:
         specifier: ^11.0.5
         version: 11.0.5
 
-  packages/react:
+  packages/mira-react:
     dependencies:
       '@lapismd/mira':
         specifier: workspace:*
         version: link:../mira
-      '@mira-mde/default-ui':
+      '@lapismd/mira-editor':
         specifier: workspace:*
-        version: link:../default-ui
-      '@mira-mde/plugin-mermaid':
+        version: link:../mira-editor
+      '@lapismd/mira-plugin-mermaid':
         specifier: workspace:*
-        version: link:../plugin-mermaid
+        version: link:../mira-plugin-mermaid
       lucide-react:
         specifier: ^0.525.0
         version: 0.525.0(react@19.2.7)
@@ -447,19 +457,18 @@ importers:
         specifier: ^5.46.1
         version: 5.56.4(@typescript-eslint/types@8.62.0)
 
-  packages/solid: {}
-
-  packages/vanilla:
+  packages/mira-vanilla:
     dependencies:
       '@lapismd/mira':
         specifier: workspace:*
         version: link:../mira
+      '@lapismd/mira-editor':
+        specifier: workspace:*
+        version: link:../mira-editor
     devDependencies:
       svelte:
         specifier: ^5.46.1
         version: 5.56.4(@typescript-eslint/types@8.62.0)
-
-  packages/vue: {}
 
 packages:
 
@@ -2201,22 +2210,8 @@ packages:
   '@vitest/expect@4.1.10':
     resolution: {integrity: sha512-YsCn+qAk1GWjQOWFEsEcL2gNQ0zmVmQu3T03qP6UyjhtmdtwtbuI+DASn/7iQB3HGTXkdBwGddzxPlmiql5vlA==}
 
-  '@vitest/expect@4.1.9':
-    resolution: {integrity: sha512-vl/rYsUKcBr3SnQn166+XR5ZQcgMx3DQhFWdfli/cWpLnLUmbxZvyrJZotLFUryib+LtArYMSTJ5RbQ57ZqrlA==}
-
   '@vitest/mocker@4.1.10':
     resolution: {integrity: sha512-v0xaezt+DKEmKfaxg133ldzADrwLGd7Ze1MfQQTYfvs8OqZIwbxyxaYURivwV7sWy5fqn3rH5uOrSp07bp44Ow==}
-    peerDependencies:
-      msw: ^2.4.9
-      vite: ^6.0.0 || ^7.0.0 || ^8.0.0
-    peerDependenciesMeta:
-      msw:
-        optional: true
-      vite:
-        optional: true
-
-  '@vitest/mocker@4.1.9':
-    resolution: {integrity: sha512-EVkXzBjrPGM+cK8/ANWgBrkUCfJfb38/EfTSO8h7pWvKkyPkpWxvR7BkD2MyItMF62C97zAEoqdpUixwR/e+Rw==}
     peerDependencies:
       msw: ^2.4.9
       vite: ^6.0.0 || ^7.0.0 || ^8.0.0
@@ -2232,20 +2227,11 @@ packages:
   '@vitest/pretty-format@4.1.10':
     resolution: {integrity: sha512-W1HsjSH4MXQ9YfmmhLAoIYf1HRfekQCGngeIgcei6MP5QQGWUe0gkopdZQaVCFO+JDJMrAJGwa5pRpNpvy4P8Q==}
 
-  '@vitest/pretty-format@4.1.9':
-    resolution: {integrity: sha512-s0iufns3iIFitdgm+YR7g1whCAaGtXz459VS9/PqyKDEEFgYIhsHOQmXgIgDuYCt7DeQmiZT0Qe2OA2p4ZPu5A==}
-
   '@vitest/runner@4.1.10':
     resolution: {integrity: sha512-IKI6kpIH+LmpROplyLwBBaCfMgOZOMsygVa6BARD6ahA04VRuJSa6OaVG7kRvSEMD870Vd91rSSw0eegtWyLGg==}
 
-  '@vitest/runner@4.1.9':
-    resolution: {integrity: sha512-KXLMDtc7oe70+3mJfGrPUWPesswH+3sTxAMAMl8DG7I8IUQT4XW718dY5ID3vPUcmlu27CcKfY4P3h3I29SLJg==}
-
   '@vitest/snapshot@4.1.10':
     resolution: {integrity: sha512-xRkfOT1qpTAi/Ti4Y1LtfRc3kEuqxGw59eN2jN9pRWMtS/XDevekhcFSqvQqjUNGksfjMJu3Y+oJ+4Ypn2OaJw==}
-
-  '@vitest/snapshot@4.1.9':
-    resolution: {integrity: sha512-Jc7RKGNBo8Z28WYIm0Niej4xdSPByRf6mU58VpHQkd6Zh05rlnA+twjbK5HyeIGHxrzsc3mJgS43uM0CZKzaIA==}
 
   '@vitest/spy@3.2.4':
     resolution: {integrity: sha512-vAfasCOe6AIK70iP5UD11Ac4siNUNJ9i/9PZ3NKx07sG6sUxeag1LWdNrMWeKKYBLlzuK+Gn65Yd5nyL6ds+nw==}
@@ -2253,17 +2239,11 @@ packages:
   '@vitest/spy@4.1.10':
     resolution: {integrity: sha512-PLf/Ugvoq5wO/b4rwYCR1h2PSIdXz7wnkQFMiUpLdtM7l6pqVFcQIBEHyT1+l+cj7mNwAfZHzqXqDyjvOuwbDw==}
 
-  '@vitest/spy@4.1.9':
-    resolution: {integrity: sha512-fHpsS6mIi+PiEW+vcRVOMkX1oSaPKne3VOclSFICPcGOmfKgXPU5iAah+wcNcj2xPrCCmfq99IDGf+EojhhvhA==}
-
   '@vitest/utils@3.2.4':
     resolution: {integrity: sha512-fB2V0JFrQSMsCo9HiSq3Ezpdv4iYaXRG1Sx8edX3MwxfyNn83mKiGzOcH+Fkxt4MHxr3y42fQi1oeAInqgX2QA==}
 
   '@vitest/utils@4.1.10':
     resolution: {integrity: sha512-fy9am/HWxbaGt/Sawrp90vt6Y6jQwf1RX77cz3uwoJwJVMli/e1IEwRPnMNJ7vKfPTwo0diXifkpPvwH9v7nGA==}
-
-  '@vitest/utils@4.1.9':
-    resolution: {integrity: sha512-A51o8ymO5PpqlWNnBP9ZHPXDIpuMtTLlGSjN7la4US+LJzoUMyhwjA5QXlm39JexgwHKW4Xjs8Z2d3dLCXOeuA==}
 
   '@webcontainer/env@1.1.1':
     resolution: {integrity: sha512-6aN99yL695Hi9SuIk1oC88l9o0gmxL1nGWWQ/kNy81HigJ0FoaoTXpytCj6ItzgyCEwA9kF1wixsTuv5cjsgng==}
@@ -4409,47 +4389,6 @@ packages:
       jsdom:
         optional: true
 
-  vitest@4.1.9:
-    resolution: {integrity: sha512-nE3/LEyc0z87uHYLZebqCUOaJr2hdtuPp7BQ4BosVFnfltxgAvMG08NyrSGlPpOUWvR27c5flSmYFTNr78L9GQ==}
-    engines: {node: ^20.0.0 || ^22.0.0 || >=24.0.0}
-    hasBin: true
-    peerDependencies:
-      '@edge-runtime/vm': '*'
-      '@opentelemetry/api': ^1.9.0
-      '@types/node': ^20.0.0 || ^22.0.0 || >=24.0.0
-      '@vitest/browser-playwright': 4.1.9
-      '@vitest/browser-preview': 4.1.9
-      '@vitest/browser-webdriverio': 4.1.9
-      '@vitest/coverage-istanbul': 4.1.9
-      '@vitest/coverage-v8': 4.1.9
-      '@vitest/ui': 4.1.9
-      happy-dom: '*'
-      jsdom: '*'
-      vite: ^6.0.0 || ^7.0.0 || ^8.0.0
-    peerDependenciesMeta:
-      '@edge-runtime/vm':
-        optional: true
-      '@opentelemetry/api':
-        optional: true
-      '@types/node':
-        optional: true
-      '@vitest/browser-playwright':
-        optional: true
-      '@vitest/browser-preview':
-        optional: true
-      '@vitest/browser-webdriverio':
-        optional: true
-      '@vitest/coverage-istanbul':
-        optional: true
-      '@vitest/coverage-v8':
-        optional: true
-      '@vitest/ui':
-        optional: true
-      happy-dom:
-        optional: true
-      jsdom:
-        optional: true
-
   w3c-keyname@2.2.8:
     resolution: {integrity: sha512-dpojBhNsCNN7T82Tm7k26A6G9ML3NkhDsnw9n/eoxSRlVBB4CEtIQ/KTCLI2Fwf3ataSXRhYFkQi3SlnFwPvPQ==}
 
@@ -6250,6 +6189,20 @@ snapshots:
       - utf-8-validate
       - vite
 
+  '@vitest/browser-playwright@4.1.10(playwright@1.61.1)(vite@8.1.5(@types/node@24.13.2)(esbuild@0.28.1)(tsx@4.23.1)(yaml@2.9.0))(vitest@4.1.10)':
+    dependencies:
+      '@vitest/browser': 4.1.10(vite@8.1.5(@types/node@24.13.2)(esbuild@0.28.1)(tsx@4.23.1)(yaml@2.9.0))(vitest@4.1.10)
+      '@vitest/mocker': 4.1.10(vite@8.1.5(@types/node@24.13.2)(esbuild@0.28.1)(tsx@4.23.1)(yaml@2.9.0))
+      playwright: 1.61.1
+      tinyrainbow: 3.1.0
+      vitest: 4.1.10(@types/node@24.13.2)(@vitest/browser-playwright@4.1.10)(jsdom@29.1.1)(vite@8.1.5(@types/node@24.13.2)(esbuild@0.28.1)(tsx@4.23.1)(yaml@2.9.0))
+    transitivePeerDependencies:
+      - bufferutil
+      - msw
+      - utf-8-validate
+      - vite
+    optional: true
+
   '@vitest/browser@4.1.10(vite@7.3.6(@types/node@24.13.2)(lightningcss@1.32.0)(tsx@4.23.1)(yaml@2.9.0))(vitest@4.1.10)':
     dependencies:
       '@blazediff/core': 1.9.1
@@ -6266,6 +6219,24 @@ snapshots:
       - msw
       - utf-8-validate
       - vite
+
+  '@vitest/browser@4.1.10(vite@8.1.5(@types/node@24.13.2)(esbuild@0.28.1)(tsx@4.23.1)(yaml@2.9.0))(vitest@4.1.10)':
+    dependencies:
+      '@blazediff/core': 1.9.1
+      '@vitest/mocker': 4.1.10(vite@8.1.5(@types/node@24.13.2)(esbuild@0.28.1)(tsx@4.23.1)(yaml@2.9.0))
+      '@vitest/utils': 4.1.10
+      magic-string: 0.30.21
+      pngjs: 7.0.0
+      sirv: 3.0.2
+      tinyrainbow: 3.1.0
+      vitest: 4.1.10(@types/node@24.13.2)(@vitest/browser-playwright@4.1.10)(jsdom@29.1.1)(vite@8.1.5(@types/node@24.13.2)(esbuild@0.28.1)(tsx@4.23.1)(yaml@2.9.0))
+      ws: 8.21.1
+    transitivePeerDependencies:
+      - bufferutil
+      - msw
+      - utf-8-validate
+      - vite
+    optional: true
 
   '@vitest/expect@3.2.4':
     dependencies:
@@ -6284,15 +6255,6 @@ snapshots:
       chai: 6.2.2
       tinyrainbow: 3.1.0
 
-  '@vitest/expect@4.1.9':
-    dependencies:
-      '@standard-schema/spec': 1.1.0
-      '@types/chai': 5.2.3
-      '@vitest/spy': 4.1.9
-      '@vitest/utils': 4.1.9
-      chai: 6.2.2
-      tinyrainbow: 3.1.0
-
   '@vitest/mocker@4.1.10(vite@7.3.6(@types/node@24.13.2)(lightningcss@1.32.0)(tsx@4.23.1)(yaml@2.9.0))':
     dependencies:
       '@vitest/spy': 4.1.10
@@ -6301,9 +6263,9 @@ snapshots:
     optionalDependencies:
       vite: 7.3.6(@types/node@24.13.2)(lightningcss@1.32.0)(tsx@4.23.1)(yaml@2.9.0)
 
-  '@vitest/mocker@4.1.9(vite@8.1.5(@types/node@24.13.2)(esbuild@0.28.1)(tsx@4.23.1)(yaml@2.9.0))':
+  '@vitest/mocker@4.1.10(vite@8.1.5(@types/node@24.13.2)(esbuild@0.28.1)(tsx@4.23.1)(yaml@2.9.0))':
     dependencies:
-      '@vitest/spy': 4.1.9
+      '@vitest/spy': 4.1.10
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
@@ -6317,18 +6279,9 @@ snapshots:
     dependencies:
       tinyrainbow: 3.1.0
 
-  '@vitest/pretty-format@4.1.9':
-    dependencies:
-      tinyrainbow: 3.1.0
-
   '@vitest/runner@4.1.10':
     dependencies:
       '@vitest/utils': 4.1.10
-      pathe: 2.0.3
-
-  '@vitest/runner@4.1.9':
-    dependencies:
-      '@vitest/utils': 4.1.9
       pathe: 2.0.3
 
   '@vitest/snapshot@4.1.10':
@@ -6338,20 +6291,11 @@ snapshots:
       magic-string: 0.30.21
       pathe: 2.0.3
 
-  '@vitest/snapshot@4.1.9':
-    dependencies:
-      '@vitest/pretty-format': 4.1.9
-      '@vitest/utils': 4.1.9
-      magic-string: 0.30.21
-      pathe: 2.0.3
-
   '@vitest/spy@3.2.4':
     dependencies:
       tinyspy: 4.0.4
 
   '@vitest/spy@4.1.10': {}
-
-  '@vitest/spy@4.1.9': {}
 
   '@vitest/utils@3.2.4':
     dependencies:
@@ -6362,12 +6306,6 @@ snapshots:
   '@vitest/utils@4.1.10':
     dependencies:
       '@vitest/pretty-format': 4.1.10
-      convert-source-map: 2.0.0
-      tinyrainbow: 3.1.0
-
-  '@vitest/utils@4.1.9':
-    dependencies:
-      '@vitest/pretty-format': 4.1.9
       convert-source-map: 2.0.0
       tinyrainbow: 3.1.0
 
@@ -8912,21 +8850,21 @@ snapshots:
     transitivePeerDependencies:
       - msw
 
-  vitest@4.1.9(@types/node@24.13.2)(@vitest/browser-playwright@4.1.10(playwright@1.61.1)(vite@7.3.6(@types/node@24.13.2)(lightningcss@1.32.0)(tsx@4.23.1)(yaml@2.9.0))(vitest@4.1.10))(jsdom@29.1.1)(vite@8.1.5(@types/node@24.13.2)(esbuild@0.28.1)(tsx@4.23.1)(yaml@2.9.0)):
+  vitest@4.1.10(@types/node@24.13.2)(@vitest/browser-playwright@4.1.10)(jsdom@29.1.1)(vite@8.1.5(@types/node@24.13.2)(esbuild@0.28.1)(tsx@4.23.1)(yaml@2.9.0)):
     dependencies:
-      '@vitest/expect': 4.1.9
-      '@vitest/mocker': 4.1.9(vite@8.1.5(@types/node@24.13.2)(esbuild@0.28.1)(tsx@4.23.1)(yaml@2.9.0))
-      '@vitest/pretty-format': 4.1.9
-      '@vitest/runner': 4.1.9
-      '@vitest/snapshot': 4.1.9
-      '@vitest/spy': 4.1.9
-      '@vitest/utils': 4.1.9
+      '@vitest/expect': 4.1.10
+      '@vitest/mocker': 4.1.10(vite@8.1.5(@types/node@24.13.2)(esbuild@0.28.1)(tsx@4.23.1)(yaml@2.9.0))
+      '@vitest/pretty-format': 4.1.10
+      '@vitest/runner': 4.1.10
+      '@vitest/snapshot': 4.1.10
+      '@vitest/spy': 4.1.10
+      '@vitest/utils': 4.1.10
       es-module-lexer: 2.1.0
       expect-type: 1.4.0
       magic-string: 0.30.21
       obug: 2.1.3
       pathe: 2.0.3
-      picomatch: 4.0.4
+      picomatch: 4.0.5
       std-env: 4.1.0
       tinybench: 2.9.0
       tinyexec: 1.2.4
@@ -8936,7 +8874,7 @@ snapshots:
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 24.13.2
-      '@vitest/browser-playwright': 4.1.10(playwright@1.61.1)(vite@7.3.6(@types/node@24.13.2)(lightningcss@1.32.0)(tsx@4.23.1)(yaml@2.9.0))(vitest@4.1.10)
+      '@vitest/browser-playwright': 4.1.10(playwright@1.61.1)(vite@8.1.5(@types/node@24.13.2)(esbuild@0.28.1)(tsx@4.23.1)(yaml@2.9.0))(vitest@4.1.10)
       jsdom: 29.1.1
     transitivePeerDependencies:
       - msw

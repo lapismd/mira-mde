@@ -39,3 +39,8 @@ curated CodeMirror factories from `/codemirror`, rendering from `/preview`, and
 table surfaces from `/tables`. `createMiraCodeMirrorExtensions` is the shared
 composition boundary used by editor products and adapters; CodeMirror source
 beneath `src/internal` is not a consumer import path.
+
+The public composable Svelte surface is named `Mira`, with `MiraProps` and
+`MiraHandle`; its semantic shell hooks begin with `.mira`. Removed `Mde` names
+and `.mira-mde*` hooks are neither exported nor retained as compatibility
+selectors.

@@ -15,7 +15,7 @@ customization and Obsidian-compatible aliases retained as a compatibility layer.
 | MIRA-CSS-005 | Obsidian-compatible variables MUST be documented separately as compatibility aliases and MUST NOT be presented as the preferred Mira token API.                                    |
 | MIRA-CSS-006 | A catalog checker MUST reject missing public-surface entries, unknown token names, and documented tokens unused by shipped CSS.                                                    |
 
-Stylesheet order remains theme, UI, preview, Svelte/default UI, and framework
+Stylesheet order remains theme, UI, preview, Svelte/Mira Editor, and framework
 wrapper composition as documented by the package entrypoints.
 
 Theme, UI, preview, and composable-editor CSS are physically owned by

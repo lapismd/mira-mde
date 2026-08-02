@@ -261,7 +261,9 @@ export const Table: Story = {
     const table = canvas.getByRole("table", { name: "Package surface matrix" });
     await expect(table).toBeVisible();
     await expect(within(table).getAllByRole("row")).toHaveLength(5);
-    await expect(within(table).getByText("@lapismd/mira/preview")).toBeVisible();
+    await expect(
+      within(table).getByText("@lapismd/mira/preview"),
+    ).toBeVisible();
   },
 };
 

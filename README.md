@@ -1,26 +1,41 @@
-# Mira MDE
+# Mira
 
 Standalone, package-oriented Markdown editor extracted from the Lapis Notes markdown
-plugin. Mira MDE is built around CodeMirror 6, Svelte 5, unified/remark/rehype,
+plugin. Mira is built around CodeMirror 6, Svelte 5, unified/remark/rehype,
 and an extension contract that lets feature packages contribute editor,
 preview, language, and UI behavior.
 
 ## Packages
 
-- `@lapismd/mira/extensions` - extension contract and resolver.
-- `@lapismd/mira/core` - framework-agnostic CodeMirror controller.
-- `@lapismd/mira/codemirror` - base CodeMirror editing setup.
-- `@lapismd/mira/codemirror` - markdown language and source decorations.
-- `@lapismd/mira/codemirror` - live-preview mode hooks.
-- `@lapismd/mira/tables` - table parsing and editor decorations.
-- `@lapismd/mira/preview` - Svelte markdown preview renderer.
-- `@mira-mde/plugin-mermaid` - Mermaid language and preview extension.
-- `@lapismd/mira/ui` - editor UI primitives and theme CSS.
-- `@lapismd/mira` - primary Svelte 5 editor component.
-- `@mira-mde/vanilla` - plain JavaScript mounting API.
+| Install                        | Use                                                                    |
+| ------------------------------ | ---------------------------------------------------------------------- |
+| `@lapismd/mira`                | Composable Svelte editor and supported advanced runtime subpaths.      |
+| `@lapismd/mira-editor`         | Batteries-included Svelte editor, toolbar, features, and default CSS.  |
+| `@lapismd/mira-plugin-ai`      | Optional consumer-configured AI actions.                               |
+| `@lapismd/mira-plugin-mermaid` | Mermaid language, rendering, and diagram controls.                     |
+| `@lapismd/mira-react`          | React components for `Mira`, `MiraEditor`, and `MiraEditorToolbar`.    |
+| `@lapismd/mira-vanilla`        | Plain JavaScript `createMira` and `createMiraEditor` mounting helpers. |
 
-React, Vue, and Solid package folders are reserved for thin wrappers once the
-core API stabilizes.
+All public packages are currently prepared at `0.0.1`; this repository does
+not publish them as part of normal validation. Vue and Solid remain private
+placeholders under `internal/adapters`.
+
+### Pre-release migration
+
+| Removed                                     | Replacement                            |
+| ------------------------------------------- | -------------------------------------- |
+| `@mira-mde/svelte` and runtime workspaces   | `@lapismd/mira` and supported subpaths |
+| `@mira-mde/default-ui`                      | `@lapismd/mira-editor`                 |
+| `@mira-mde/plugin-ai`                       | `@lapismd/mira-plugin-ai`              |
+| `@mira-mde/plugin-mermaid`                  | `@lapismd/mira-plugin-mermaid`         |
+| `@mira-mde/react`                           | `@lapismd/mira-react`                  |
+| `@mira-mde/vanilla`                         | `@lapismd/mira-vanilla`                |
+| `MiraMde` / `MiraDefaultMde`                | `Mira` / `MiraEditor`                  |
+| `MiraDefaultToolbar`                        | `MiraEditorToolbar`                    |
+| `createMiraMde` / `createMiraDefaultEditor` | `createMira` / `createMiraEditor`      |
+
+This is a hard pre-release migration. The removed names are not exported as
+deprecated aliases.
 
 ## Development
 
@@ -28,6 +43,7 @@ core API stabilizes.
 pnpm install
 pnpm dev                    # Storybook at http://localhost:7007
 pnpm spec:check             # normative contract and governance
+pnpm packages:check         # six-package boundary and leak checks
 pnpm check:all
 ```
 

@@ -8,7 +8,7 @@ import {
 
 test("requires the exact plugin chapter", () => {
   const missing = classifySpecFirstChanges([
-    "packages/plugin-ai/src/index.ts",
+    "packages/mira-plugin-ai/src/index.ts",
     "spec/src/plugins/mermaid.md",
   ]);
   assert.equal(missing.ok, false);
@@ -18,7 +18,7 @@ test("requires the exact plugin chapter", () => {
   ]);
 
   const covered = classifySpecFirstChanges([
-    "packages/plugin-ai/src/index.ts",
+    "packages/mira-plugin-ai/src/index.ts",
     "spec/src/plugins/ai.md",
     "spec/src/packages.md",
   ]);
@@ -27,20 +27,20 @@ test("requires the exact plugin chapter", () => {
 
 test("requires every chapter for a cross-boundary change", () => {
   const result = classifySpecFirstChanges([
-    "packages/core/src/index.ts",
-    "packages/default-ui/src/default-mde.svelte",
+    "packages/mira/src/core/index.ts",
+    "packages/mira-editor/src/mira-editor.svelte",
     "spec/src/editor-and-markdown.md",
     "spec/src/packages.md",
   ]);
   assert.equal(result.ok, false);
   assert.deepEqual(result.missingChapters, [
-    "spec/src/default-ui-and-frameworks.md",
+    "spec/src/mira-editor-and-frameworks.md",
   ]);
 });
 
 test("ignores tests, ordinary stories, fixtures, and generated output", () => {
   const result = classifySpecFirstChanges([
-    "packages/core/src/index.test.ts",
+    "packages/mira/src/core/index.test.ts",
     "stories/markdown/fixtures.ts",
     "stories/markdown/links/Links.stories.ts",
     "spec/book/index.html",
@@ -76,14 +76,16 @@ test("fails closed for unmapped production source", () => {
 
 test("parses unified diffs and both sides of a rename", () => {
   const changes =
-    parseUnifiedDiff(`diff --git a/packages/plugin-ai/src/index.ts b/tests/index.ts
+    parseUnifiedDiff(`diff --git a/packages/mira-plugin-ai/src/index.ts b/tests/index.ts
 similarity index 100%
-rename from packages/plugin-ai/src/index.ts
+rename from packages/mira-plugin-ai/src/index.ts
 rename to tests/index.ts
 `);
   const result = classifySpecFirstChanges(changes);
   assert.equal(result.ok, false);
-  assert.deepEqual(result.protectedFiles, ["packages/plugin-ai/src/index.ts"]);
+  assert.deepEqual(result.protectedFiles, [
+    "packages/mira-plugin-ai/src/index.ts",
+  ]);
 });
 
 test("rejects unparseable non-empty change output", () => {

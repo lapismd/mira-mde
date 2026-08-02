@@ -20,7 +20,7 @@ import type {
 export type MiraFrontmatterConfig = FrontmatterConfig;
 export type MiraOutlineVariant = MarkdownOutlineVariant;
 
-export type MiraMdeProps = {
+export type MiraProps = {
   value: string;
   mode?: MiraMode;
   extensions?: MiraExtension[];
@@ -54,7 +54,7 @@ export type MiraMdeProps = {
   onFrontmatterChange?: (nextYaml: string, nextValue: string) => void;
 };
 
-export type MiraMdeHandle = {
+export type MiraHandle = {
   executeCommand: (commandId: string) => boolean;
   focus: () => void;
   getCommands: () => readonly MiraCommand[];

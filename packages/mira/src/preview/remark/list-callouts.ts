@@ -2,7 +2,7 @@ import type { ListItem, Paragraph, Root, Text } from "mdast";
 import type { Plugin } from "unified";
 import { visit } from "unist-util-visit";
 import {
-  defaultMiraListCallouts,
+  defaultMiraEditorListCallouts,
   resolveMiraListCallouts,
   type MiraListCallout,
   type MiraResolvedListCallout,
@@ -15,7 +15,7 @@ export type RemarkListCalloutOptions = {
 };
 
 export const defaultListCallouts: readonly ListCallout[] =
-  defaultMiraListCallouts;
+  defaultMiraEditorListCallouts;
 
 export const listCalloutMap = new Map<string, ListCallout>(
   defaultListCallouts.map((callout) => [callout.char, callout]),

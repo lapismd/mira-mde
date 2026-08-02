@@ -8,9 +8,7 @@ async function gotoStory(page: Page, id: string) {
 }
 
 function editorScroller(page: Page) {
-  return page
-    .locator(".mira-mde__editor-host > .cm-editor > .cm-scroller")
-    .first();
+  return page.locator(".mira__editor-host > .cm-editor > .cm-scroller").first();
 }
 
 async function scrollEditorUntilVisible(
@@ -49,7 +47,7 @@ test("the CodeMirror scroller owns comprehensive live-preview overflow", async (
   await gotoStory(page, "demo-comprehensive--live-preview");
 
   const scroller = editorScroller(page);
-  const shell = page.locator(".mira-mde__editor-scroll").first();
+  const shell = page.locator(".mira__editor-scroll").first();
   const metrics = await scroller.evaluate((element) => ({
     clientHeight: element.clientHeight,
     overflowY: getComputedStyle(element).overflowY,
@@ -84,7 +82,7 @@ test("the comprehensive split story synchronizes both scroll owners", async ({
 
   const editor = editorScroller(page);
   const preview = page
-    .locator(".mira-mde__pane--preview .mira-markdown-preview")
+    .locator(".mira__pane--preview .mira-markdown-preview")
     .first();
   await expect(preview).toBeVisible();
   await expect(
@@ -113,7 +111,7 @@ test("the reading outline remains visible and navigates its preview scroller", a
 }) => {
   await gotoStory(page, "markdown-headings--outline-navigation");
 
-  const pane = page.locator(".mira-mde__pane--outline-floating");
+  const pane = page.locator(".mira__pane--outline-floating");
   const preview = pane.locator(".mira-markdown-preview");
   const outline = pane.getByRole("group", { name: "Document outline" });
   const marker = outline.getByRole("button", {

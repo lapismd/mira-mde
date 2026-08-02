@@ -1,6 +1,6 @@
-# Mira MDE System Specification
+# Mira System Specification
 
-This book is the normative contract for Mira MDE. It describes portable editor,
+This book is the normative contract for Mira. It describes portable editor,
 Markdown, plugin, styling, catalog, and verification behavior for humans and
 agents. Storybook is the only browsable documentation and demo host; it renders
 this source and owns example data, fixtures, component metadata, and interaction

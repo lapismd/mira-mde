@@ -1,0 +1,14 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import { SvelteDocsBridge } from "../catalog/SvelteDocsBridge";
+import SpecPage from "./SpecPage.svelte";
+import source from "../../spec/src/mira-editor-and-frameworks.md?raw";
+
+<Meta
+  title="Mira/Specification/Mira Editor and frameworks"
+  parameters={{ layout: "fullscreen" }}
+/>
+
+<SvelteDocsBridge
+  component={SpecPage}
+  props={{ source, sourcePath: "mira-editor-and-frameworks.md" }}
+/>

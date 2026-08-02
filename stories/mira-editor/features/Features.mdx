@@ -1,0 +1,56 @@
+import {
+  Meta,
+  Canvas,
+  Controls,
+  Primary,
+  Source,
+} from "@storybook/addon-docs/blocks";
+import * as FeaturesStories from "./Features.stories";
+
+<Meta of={FeaturesStories} />
+
+# Features
+
+Use `features` and `featureConfigs` on `MiraEditor` to enable or disable packaged capabilities. Edit the object Controls below to experiment.
+
+## Usage
+
+<Source
+  language="html"
+  code={`<MiraEditor
+  bind:value
+  features={{
+    toolbar: true,
+    mermaid: true,
+    tables: true,
+    "split-mode": false,
+  }}
+  featureConfigs={{
+    toolbar: { items: ["bold", "italic", "heading", "link"] },
+  }}
+/>`}
+/>
+
+<Primary />
+
+## Properties
+
+<Controls />
+
+## Examples
+
+### Without Toolbar
+
+<Canvas of={FeaturesStories.WithoutToolbar} meta={FeaturesStories} />
+
+### Without Widgets
+
+<Canvas of={FeaturesStories.WithoutWidgets} meta={FeaturesStories} />
+
+### Edit Modes Only
+
+<Canvas of={FeaturesStories.EditModesOnly} meta={FeaturesStories} />
+
+### Compact Toolbar
+
+<Canvas of={FeaturesStories.CompactToolbarItems} meta={FeaturesStories} />

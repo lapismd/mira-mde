@@ -1,5 +1,5 @@
 import type { Preview } from "@storybook/svelte-vite";
-import "@mira-mde/default-ui/styles.css";
+import "@lapismd/mira-editor/styles.css";
 import "../stories/markdown/_shared/storybook.css";
 import { installFocusPrototypeGuard } from "./focus-prototype-guard";
 

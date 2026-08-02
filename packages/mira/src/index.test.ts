@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import MiraMde from "./mira-mde.svelte";
+import Mira from "./mira.svelte";
 
-describe("MiraMde", () => {
+describe("Mira", () => {
   it("exports the Svelte component", () => {
-    expect(MiraMde).toBeTruthy();
+    expect(Mira).toBeTruthy();
   });
 });

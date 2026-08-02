@@ -1,10 +1,10 @@
-import MiraMde from "./mira-mde.svelte";
+import Mira from "./mira.svelte";
 
-export { MiraMde };
+export { Mira };
 export type {
   MiraFrontmatterConfig,
-  MiraMdeHandle,
-  MiraMdeProps,
+  MiraHandle,
+  MiraProps,
   MiraOutlineVariant,
 } from "./types";
-export default MiraMde;
+export default Mira;

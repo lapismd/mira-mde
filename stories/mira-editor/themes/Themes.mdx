@@ -1,0 +1,36 @@
+import {
+  Meta,
+  Canvas,
+  Controls,
+  Primary,
+  Source,
+} from "@storybook/addon-docs/blocks";
+import * as ThemesStories from "./Themes.stories";
+
+<Meta of={ThemesStories} />
+
+# Themes
+
+Pass `theme` to `MiraEditor` to select packaged theme tokens. Storybook’s toolbar theme toggle also flips document classes for light/dark chrome.
+
+Supported values: `light`, `dark`, `obsidian`, `system`, `inherit`.
+
+## Usage
+
+<Source language="html" code={`<MiraEditor bind:value theme="obsidian" />`} />
+
+<Primary />
+
+## Properties
+
+<Controls />
+
+## Examples
+
+### Dark
+
+<Canvas of={ThemesStories.Dark} meta={ThemesStories} />
+
+### Obsidian
+
+<Canvas of={ThemesStories.Obsidian} meta={ThemesStories} />

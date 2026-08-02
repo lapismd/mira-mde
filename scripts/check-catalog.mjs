@@ -12,18 +12,18 @@ export const INTERNAL_STYLE_TOKENS = new Set(["--mira-property-depth"]);
 
 export const PUBLIC_SURFACES = [
   {
-    entryId: "mira-mde",
-    files: ["packages/svelte/src/index.ts"],
-    exports: ["MiraMde"],
+    entryId: "mira",
+    files: ["packages/mira/src/index.ts"],
+    exports: ["Mira"],
   },
   {
-    entryId: "default-ui",
-    files: ["packages/default-ui/src/svelte.ts"],
-    exports: ["MiraDefaultMde", "MiraDefaultToolbar"],
+    entryId: "mira-editor",
+    files: ["packages/mira-editor/src/index.ts"],
+    exports: ["MiraEditor", "MiraEditorToolbar"],
   },
   {
     entryId: "preview",
-    files: ["packages/preview/src/index.ts"],
+    files: ["packages/mira/src/preview/index.ts"],
     exports: [
       "MarkdownPreview",
       "MarkdownOutline",
@@ -36,7 +36,7 @@ export const PUBLIC_SURFACES = [
   },
   {
     entryId: "tables",
-    files: ["packages/codemirror-tables/src/index.ts"],
+    files: ["packages/mira/src/tables/index.ts"],
     exports: [
       "EditorTable",
       "EditorColumn",
@@ -46,25 +46,25 @@ export const PUBLIC_SURFACES = [
   },
   {
     entryId: "ai",
-    files: ["packages/plugin-ai/src/index.ts"],
+    files: ["packages/mira-plugin-ai/src/index.ts"],
     exports: ["aiExtension", "createMiraAiToolbarAction"],
   },
   {
     entryId: "mermaid",
-    files: ["packages/plugin-mermaid/src/index.ts"],
+    files: ["packages/mira-plugin-mermaid/src/index.ts"],
     exports: ["Mermaid"],
   },
   {
     entryId: "ui-core",
     files: [
-      "packages/ui/src/index.ts",
-      "packages/ui/src/toggle-group/index.ts",
+      "packages/mira/src/ui/index.ts",
+      "packages/mira/src/ui/toggle-group/index.ts",
     ],
     exports: ["Button", "Separator", "ScrollArea", "Root", "Item"],
   },
   {
     entryId: "ui-context-menu",
-    files: ["packages/ui/src/context-menu/index.ts"],
+    files: ["packages/mira/src/ui/context-menu/index.ts"],
     exports: [
       "Root",
       "Trigger",
@@ -84,7 +84,7 @@ export const PUBLIC_SURFACES = [
   },
   {
     entryId: "ui-dialog",
-    files: ["packages/ui/src/dialog/index.ts"],
+    files: ["packages/mira/src/ui/dialog/index.ts"],
     exports: [
       "Root",
       "Trigger",
@@ -100,7 +100,7 @@ export const PUBLIC_SURFACES = [
   },
   {
     entryId: "ui-dropdown-menu",
-    files: ["packages/ui/src/dropdown-menu/index.ts"],
+    files: ["packages/mira/src/ui/dropdown-menu/index.ts"],
     exports: [
       "Root",
       "Trigger",
@@ -120,12 +120,12 @@ export const PUBLIC_SURFACES = [
   },
   {
     entryId: "ui-popover",
-    files: ["packages/ui/src/popover/index.ts"],
+    files: ["packages/mira/src/ui/popover/index.ts"],
     exports: ["Root", "Trigger", "Content", "Close"],
   },
   {
     entryId: "ui-table",
-    files: ["packages/ui/src/table/index.ts"],
+    files: ["packages/mira/src/ui/table/index.ts"],
     exports: [
       "Root",
       "Header",
@@ -139,23 +139,23 @@ export const PUBLIC_SURFACES = [
   },
   {
     entryId: "ui-toolbar",
-    files: ["packages/ui/src/toolbar/index.ts"],
+    files: ["packages/mira/src/ui/toolbar/index.ts"],
     exports: ["Root", "Button", "Group", "GroupItem", "Link"],
   },
   {
     entryId: "ui-tooltip",
-    files: ["packages/ui/src/tooltip/index.ts"],
+    files: ["packages/mira/src/ui/tooltip/index.ts"],
     exports: ["Root", "Trigger", "Content", "Provider", "Portal"],
   },
   {
     entryId: "react-wrapper",
-    files: ["packages/react/src/index.ts"],
-    exports: ["MiraMde", "MiraDefaultMde", "MiraDefaultToolbar"],
+    files: ["packages/mira-react/src/index.ts"],
+    exports: ["Mira", "MiraEditor", "MiraEditorToolbar"],
   },
   {
     entryId: "vanilla-wrapper",
-    files: ["packages/vanilla/src/index.ts"],
-    exports: ["createMiraMde", "MiraMde"],
+    files: ["packages/mira-vanilla/src/index.ts"],
+    exports: ["createMira", "createMiraEditor"],
   },
 ];
 

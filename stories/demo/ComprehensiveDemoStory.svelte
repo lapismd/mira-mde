@@ -1,13 +1,13 @@
 <script lang="ts">
   import {
-    MiraDefaultMde,
+    MiraEditor,
     MiraFeature,
     type MiraFeatureFlags,
     type MiraOutlineVariant,
-  } from "@mira-mde/default-ui/svelte";
+  } from "@lapismd/mira-editor";
   import type { MiraMode, MiraTheme } from "@lapismd/mira/extensions";
-  import { mermaidExtension } from "@mira-mde/plugin-mermaid";
-  import { MiraMde } from "@lapismd/mira";
+  import { mermaidExtension } from "@lapismd/mira-plugin-mermaid";
+  import { Mira } from "@lapismd/mira";
   import { storyFileAdapter } from "../markdown/_shared/file-adapter";
 
   type EditorShell = "default" | "composable";
@@ -50,7 +50,7 @@
 <div class={`mira-comprehensive mira-theme-${theme}`}>
   <header class="mira-comprehensive__header">
     <div>
-      <h1>Mira MDE</h1>
+      <h1>Mira</h1>
       <p>Comprehensive portable Markdown playground</p>
     </div>
     <dl aria-label="Playground state">
@@ -74,7 +74,7 @@
     style={`--mira-demo-height: ${height}`}
   >
     {#if editorShell === "default"}
-      <MiraDefaultMde
+      <MiraEditor
         bind:value
         bind:mode
         {theme}
@@ -89,7 +89,7 @@
         class="mira-comprehensive__editor"
       />
     {:else}
-      <MiraMde
+      <Mira
         bind:value
         bind:mode
         {theme}

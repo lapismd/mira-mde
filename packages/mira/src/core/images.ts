@@ -6,9 +6,9 @@ import type {
   MiraImageSyntax,
 } from "@lapismd/mira/extensions";
 
-export const defaultMiraImageMaxSizeBytes = 5 * 1024 * 1024;
+export const defaultMiraEditorImageMaxSizeBytes = 5 * 1024 * 1024;
 
-export const defaultMiraImageMimeTypes = [
+export const defaultMiraEditorImageMimeTypes = [
   "image/png",
   "image/jpeg",
   "image/gif",
@@ -32,8 +32,9 @@ export function resolveMiraImageConfig(
 ): ResolvedMiraImageConfig {
   return {
     imageUpload: config.imageUpload ?? readFileAsDataUrl,
-    imageMaxSizeBytes: config.imageMaxSizeBytes ?? defaultMiraImageMaxSizeBytes,
-    imageMimeTypes: config.imageMimeTypes ?? defaultMiraImageMimeTypes,
+    imageMaxSizeBytes:
+      config.imageMaxSizeBytes ?? defaultMiraEditorImageMaxSizeBytes,
+    imageMimeTypes: config.imageMimeTypes ?? defaultMiraEditorImageMimeTypes,
     imageSyntax: config.imageSyntax ?? "reference",
     onImageUploadError: config.onImageUploadError,
   };

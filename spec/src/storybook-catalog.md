@@ -36,7 +36,7 @@ implementation-workspace imports or reach into `packages/mira/src/internal`.
 
 Every public or Storybook-visible styled surface has a concise catalog page.
 Compound primitives share family pages, and React and Vanilla wrappers point
-to the Svelte/default UI surface they adapt.
+to the Svelte/Mira Editor surface they adapt.
 
 `pnpm test:storybook` runs the indexed CSF stories in a dedicated Vitest 4
 project using Chromium browser mode. Story `play` functions own portable,

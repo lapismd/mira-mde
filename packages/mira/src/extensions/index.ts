@@ -387,21 +387,22 @@ export type MiraListCalloutMarkerRenderer = (
   callout: MiraResolvedListCallout,
 ) => void | (() => void);
 
-export const defaultMiraListCallouts: readonly MiraResolvedListCallout[] = [
-  { color: "255, 214, 0", char: "&" },
-  { color: "255, 145, 0", char: "?" },
-  { color: "255, 23, 68", char: "!" },
-  { color: "124, 77, 255", char: "~" },
-  { color: "0, 184, 212", char: "@", icon: "book-open" },
-  { color: "0, 200, 83", char: "$" },
-  { color: "158, 158, 158", char: "%" },
-];
+export const defaultMiraEditorListCallouts: readonly MiraResolvedListCallout[] =
+  [
+    { color: "255, 214, 0", char: "&" },
+    { color: "255, 145, 0", char: "?" },
+    { color: "255, 23, 68", char: "!" },
+    { color: "124, 77, 255", char: "~" },
+    { color: "0, 184, 212", char: "@", icon: "book-open" },
+    { color: "0, 200, 83", char: "$" },
+    { color: "158, 158, 158", char: "%" },
+  ];
 
 export function resolveMiraListCallouts(
   contributions: readonly MiraListCallout[] = [],
 ): MiraResolvedListCallout[] {
   const callouts = new Map(
-    defaultMiraListCallouts.map(
+    defaultMiraEditorListCallouts.map(
       (callout) => [callout.char, { ...callout }] as const,
     ),
   );

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import compatibilityCss from "../../packages/preview/src/styles/tokens.css?raw";
+  import compatibilityCss from "../../packages/mira/src/preview/styles/tokens.css?raw";
   import { catalogEntries, catalogTokens, cssTokens } from "./catalog.mjs";
   import type { CatalogEntry, CssTokenDefinition } from "./types";
   import { specStoryHref } from "../spec/spec-chapters";

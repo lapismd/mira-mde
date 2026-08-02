@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Mermaid } from "@mira-mde/plugin-mermaid";
+  import { Mermaid } from "@lapismd/mira-plugin-mermaid";
 </script>
 
 <div class="mira-story-surface mira-mermaid-dialog-story">

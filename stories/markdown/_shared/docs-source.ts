@@ -3,7 +3,7 @@
 export function markdownPreviewDocsSource(fixtureExport: string): string {
   return `<script lang="ts">
   import { MarkdownPreview } from "@lapismd/mira/preview";
-  import { mermaidExtension } from "@mira-mde/plugin-mermaid";
+  import { mermaidExtension } from "@lapismd/mira-plugin-mermaid";
   import { ${fixtureExport} } from "../fixtures";
   import { storyFileAdapter } from "../_shared/file-adapter";
 </script>
@@ -21,7 +21,7 @@ export function markdownEditorDocsSource(
   mode: "live-preview" | "source",
 ): string {
   return `<script lang="ts">
-  import { MiraDefaultMde, MiraFeature } from "@mira-mde/default-ui/svelte";
+  import { MiraEditor, MiraFeature } from "@lapismd/mira-editor";
   import type { MiraMode } from "@lapismd/mira/extensions";
   import { ${fixtureExport} } from "../fixtures";
   import { storyFileAdapter } from "../_shared/file-adapter";
@@ -30,7 +30,7 @@ export function markdownEditorDocsSource(
   let mode = $state<MiraMode>("${mode}");
 </script>
 
-<MiraDefaultMde
+<MiraEditor
   bind:value
   bind:mode
   fileAdapter={storyFileAdapter}
@@ -47,13 +47,13 @@ export function markdownOutlineDocsSource(
   variant: "floating" | "sidebar" = "floating",
 ): string {
   return `<script lang="ts">
-  import { MiraDefaultMde } from "@mira-mde/default-ui/svelte";
+  import { MiraEditor } from "@lapismd/mira-editor";
   import { ${fixtureExport} } from "../fixtures";
 
   let value = $state(${fixtureExport});
 </script>
 
-<MiraDefaultMde
+<MiraEditor
   bind:value
   mode="preview"
   outline

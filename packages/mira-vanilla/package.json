@@ -1,0 +1,46 @@
+{
+  "name": "@lapismd/mira-vanilla",
+  "version": "0.0.1",
+  "description": "Plain JavaScript factories for the composable Mira and batteries-included Mira Editor surfaces.",
+  "author": "Steve Juma <help@lapis.md>",
+  "license": "AGPL-3.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lapismd/mira.git",
+    "directory": "packages/mira-vanilla"
+  },
+  "type": "module",
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --clean",
+    "check": "pnpm check:format && pnpm check:svelte && pnpm check:types",
+    "check:format": "prettier --ignore-path ../../.prettierignore . --check",
+    "check:types": "tsc -p tsconfig.json --noEmit",
+    "check:svelte": "echo \"no svelte files\"",
+    "lint": "eslint src --ext .ts",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@lapismd/mira": "workspace:*",
+    "@lapismd/mira-editor": "workspace:*"
+  },
+  "peerDependencies": {
+    "svelte": "^5.0.0"
+  },
+  "devDependencies": {
+    "svelte": "^5.46.1"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org"
+  }
+}

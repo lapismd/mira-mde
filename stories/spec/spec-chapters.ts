@@ -7,57 +7,57 @@ export type SpecChapter = {
 export const specChapters: SpecChapter[] = [
   {
     source: "index.md",
-    storyId: "mira-mde-specification-system-specification--docs",
+    storyId: "mira-specification-system-specification--docs",
     title: "System specification",
   },
   {
     source: "architecture.md",
-    storyId: "mira-mde-specification-architecture-and-boundaries--docs",
+    storyId: "mira-specification-architecture-and-boundaries--docs",
     title: "Architecture and boundaries",
   },
   {
     source: "packages.md",
-    storyId: "mira-mde-specification-public-packages-and-entry-points--docs",
+    storyId: "mira-specification-public-packages-and-entry-points--docs",
     title: "Public packages and entry points",
   },
   {
     source: "editor-and-markdown.md",
-    storyId: "mira-mde-specification-portable-markdown-and-editor--docs",
+    storyId: "mira-specification-portable-markdown-and-editor--docs",
     title: "Portable Markdown and editor",
   },
   {
-    source: "default-ui-and-frameworks.md",
-    storyId: "mira-mde-specification-default-ui-and-frameworks--docs",
-    title: "Default UI and frameworks",
+    source: "mira-editor-and-frameworks.md",
+    storyId: "mira-specification-mira-editor-and-frameworks--docs",
+    title: "Mira Editor and frameworks",
   },
   {
     source: "styling.md",
-    storyId: "mira-mde-specification-styling-and-css-tokens--docs",
+    storyId: "mira-specification-styling-and-css-tokens--docs",
     title: "Styling and CSS tokens",
   },
   {
     source: "plugins/ai.md",
-    storyId: "mira-mde-specification-ai-plugin--docs",
+    storyId: "mira-specification-ai-plugin--docs",
     title: "AI plugin",
   },
   {
     source: "plugins/mermaid.md",
-    storyId: "mira-mde-specification-mermaid-plugin--docs",
+    storyId: "mira-specification-mermaid-plugin--docs",
     title: "Mermaid plugin",
   },
   {
     source: "storybook-catalog.md",
-    storyId: "mira-mde-specification-storybook-catalog--docs",
+    storyId: "mira-specification-storybook-catalog--docs",
     title: "Storybook catalog",
   },
   {
     source: "spec-governance.md",
-    storyId: "mira-mde-specification-specification-governance--docs",
+    storyId: "mira-specification-specification-governance--docs",
     title: "Specification governance",
   },
   {
     source: "verification.md",
-    storyId: "mira-mde-specification-verification--docs",
+    storyId: "mira-specification-verification--docs",
     title: "Verification",
   },
 ];

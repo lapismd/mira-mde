@@ -55,6 +55,17 @@ CodeMirror, preview, table, UI, theme, and composable Svelte implementation in
 downstream workspaces build against those entrypoints so emitted output cannot
 retain links to a removed implementation workspace.
 
+The public product stage is complete: the six approved manifests are versioned
+`0.0.1`, use explicit public metadata and export maps, and pass their focused
+check, test, build, and package-boundary gates. The React package exports
+components only, while both imperative mounting factories are isolated in
+`@lapismd/mira-vanilla`.
+
+`pnpm packages:pack` packs and installs all six products together in a temporary
+consumer project. Its Svelte, React, and Vanilla compile fixtures validate type
+resolution, the public CSS entrypoints are resolved through package export
+maps, and extracted tarball text is scanned for private or legacy imports.
+
 ## Canonical names
 
 The composable component is `Mira`; the batteries-included component and

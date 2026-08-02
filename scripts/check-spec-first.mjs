@@ -41,20 +41,27 @@ const RULES = [
     chapters: ["spec/src/editor-and-markdown.md", "spec/src/packages.md"],
   },
   {
-    name: "Default UI",
+    name: "Mira Editor",
     pattern:
-      /^packages\/(?:mira-editor|default-ui|ui)\/(?:src\/|package\.json$)/,
-    chapters: ["spec/src/default-ui-and-frameworks.md", "spec/src/packages.md"],
+      /^packages\/(?:default-ui|mira-editor|ui)\/(?:src\/|package\.json$)/,
+    chapters: [
+      "spec/src/mira-editor-and-frameworks.md",
+      "spec/src/packages.md",
+    ],
   },
   {
     name: "Framework adapters",
     pattern:
       /^(?:packages\/(?:svelte|react|vanilla|mira-react|mira-vanilla)|internal\/adapters\/(?:vue|solid))\/(?:src\/|package\.json$)/,
-    chapters: ["spec/src/default-ui-and-frameworks.md", "spec/src/packages.md"],
+    chapters: [
+      "spec/src/mira-editor-and-frameworks.md",
+      "spec/src/packages.md",
+    ],
   },
   {
     name: "Theme",
-    pattern: /^packages\/theme-obsidian\/(?:src\/|styles\.css$|package\.json$)/,
+    pattern:
+      /^packages\/(?:theme-obsidian\/(?:src\/|styles\.css$|package\.json$)|(?:mira|mira-editor|mira-react)\/src\/.+\.css$)/,
     chapters: ["spec/src/packages.md", "spec/src/styling.md"],
   },
   {

@@ -5,11 +5,11 @@ repo unless a more specific `AGENTS.md` is added deeper in the tree.
 
 ## Project Shape
 
-- This is a pnpm monorepo for Mira MDE. Keep package boundaries intact.
+- This is a pnpm monorepo for Mira. Keep package boundaries intact.
 - Preserve public entry points unless the user explicitly asks for a breaking
-  change, including `MiraMde`, `MarkdownPreview`, `createRichEditorExtensions`,
-  `createTableExtensions`, `mermaidExtension`, `MiraDefaultMde`,
-  `MiraDefaultToolbar`, and framework wrappers.
+  change, including `Mira`, `MarkdownPreview`, `createRichEditorExtensions`,
+  `createTableExtensions`, `mermaidExtension`, `MiraEditor`,
+  `MiraEditorToolbar`, and framework wrappers.
 - Prefer existing Mira package APIs and extension patterns over adding new
   shared abstractions.
 - Portable markdown behavior should stay separate from Lapis app internals such
@@ -21,17 +21,17 @@ repo unless a more specific `AGENTS.md` is added deeper in the tree.
 - Exported package styling must work without requiring consumers to run
   Tailwind. Ship plain CSS and CSS variables through package `styles.css`
   exports.
-- Theme tokens live in `packages/theme-obsidian/styles.css`. Prefer `--mira-*`
-  tokens for new Mira-specific styles.
+- Theme tokens live in `packages/mira/src/themes/obsidian.css`. Prefer
+  `--mira-*` tokens for new Mira-specific styles.
 - Markdown and editor/browser-rendered surfaces live mainly in
-  `packages/preview/src/styles.css`. This file also bridges Mira tokens to the
+  `packages/mira/src/preview/styles.css`. This file also bridges Mira tokens to the
   Obsidian-compatible variables used by ported Lapis markdown styles.
-- UI primitive styling lives in `packages/ui/src/styles.css`.
+- UI primitive styling lives in `packages/mira/src/ui/styles.css`.
 - Keep the stylesheet import order intact:
-  - `packages/svelte/src/styles.css` imports UI styles, then preview styles.
-  - `packages/default-ui/src/styles.css` imports theme styles, then Svelte
-    styles.
-  - `packages/react/src/styles.css` imports default UI styles.
+  - `packages/mira/src/styles.css` imports UI styles, then preview styles.
+  - `packages/mira-editor/src/styles.css` imports Mira styles before its editor
+    shell styles.
+  - `packages/mira-react/src/styles.css` imports Mira Editor styles.
 - Do not check in generated Tailwind bundles as source. If Lapis styling is
   copied from Tailwind-authored code, convert only the needed rules to plain,
   maintainable CSS under stable class hooks.

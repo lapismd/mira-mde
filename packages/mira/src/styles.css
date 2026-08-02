@@ -1,7 +1,7 @@
 @import "./ui/styles.css";
 @import "./preview/styles.css";
 
-.mira-mde {
+.mira {
   background: var(--mira-background);
   border: 1px solid var(--mira-border);
   border-radius: var(--mira-radius);
@@ -15,7 +15,7 @@
   overflow: hidden;
 }
 
-.mira-mde__toolbar {
+.mira__toolbar {
   align-items: center;
   background: var(--mira-background);
   border-bottom: 1px solid var(--mira-border);
@@ -26,65 +26,65 @@
   padding: 0.45rem;
 }
 
-.mira-mde__toolbar-separator {
+.mira__toolbar-separator {
   align-self: stretch;
   min-height: 28px;
 }
 
-.mira-mde__actions {
+.mira__actions {
   align-items: center;
   display: flex;
   flex-wrap: wrap;
   gap: 0.25rem;
 }
 
-.mira-mde__body {
+.mira__body {
   display: grid;
   flex: 1;
   grid-template-columns: 1fr;
   min-height: 0;
 }
 
-.mira-mde[data-mode="split"] .mira-mde__body {
+.mira[data-mode="split"] .mira__body {
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
 }
 
-.mira-mde__pane {
+.mira__pane {
   min-height: 0;
   min-width: 0;
   overflow: hidden;
 }
 
-.mira-mde__pane--editor {
+.mira__pane--editor {
   background: var(--mira-editor-background);
 }
 
-.mira-mde__pane--editor[data-visible="false"] {
+.mira__pane--editor[data-visible="false"] {
   display: none;
 }
 
-.mira-mde__pane--preview {
+.mira__pane--preview {
   border-inline-start: 1px solid var(--mira-border);
 }
 
-.mira-mde:not([data-mode="split"]) .mira-mde__pane--preview {
+.mira:not([data-mode="split"]) .mira__pane--preview {
   border-inline-start: 0;
 }
 
-.mira-mde__pane--outline-floating {
+.mira__pane--outline-floating {
   position: relative;
 }
 
-.mira-mde__pane--outline-sidebar {
+.mira__pane--outline-sidebar {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(12rem, 16rem);
 }
 
-.mira-mde__pane--outline-sidebar > .mira-markdown-preview {
+.mira__pane--outline-sidebar > .mira-markdown-preview {
   min-width: 0;
 }
 
-.mira-mde__pane--outline-sidebar > .mira-markdown-outline {
+.mira__pane--outline-sidebar > .mira-markdown-outline {
   background: var(--mira-background);
   border-inline-start: 1px solid var(--mira-border);
   box-sizing: border-box;
@@ -99,7 +99,7 @@
  * width so the scrollbar sits on the pane edge; readable column width is
  * applied via scroller padding in the CodeMirror theme.
  */
-.mira-mde__editor-scroll {
+.mira__editor-scroll {
   box-sizing: border-box;
   height: 100%;
   min-height: 0;
@@ -107,7 +107,7 @@
   width: 100%;
 }
 
-.mira-mde__editor-host {
+.mira__editor-host {
   height: 100%;
   min-height: 0;
   overflow: hidden;
@@ -115,22 +115,22 @@
 }
 
 @media (max-width: 760px) {
-  .mira-mde[data-mode="split"] .mira-mde__body {
+  .mira[data-mode="split"] .mira__body {
     grid-template-columns: 1fr;
     grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
   }
 
-  .mira-mde__pane--preview {
+  .mira__pane--preview {
     border-inline-start: 0;
     border-top: 1px solid var(--mira-border);
   }
 
-  .mira-mde__pane--outline-sidebar {
+  .mira__pane--outline-sidebar {
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: minmax(0, 1fr) auto;
   }
 
-  .mira-mde__pane--outline-sidebar > .mira-markdown-outline {
+  .mira__pane--outline-sidebar > .mira-markdown-outline {
     border-inline-start: 0;
     border-top: 1px solid var(--mira-border);
     max-height: 8rem;

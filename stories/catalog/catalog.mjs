@@ -19,7 +19,7 @@ const semanticTokens = [
     "--mira-background",
     "Primary canvas color.",
     "#fbfbfc",
-    "Editor, preview, default UI, and primitives.",
+    "Editor, preview, Mira Editor, and primitives.",
   ),
   token(
     "--mira-foreground",
@@ -410,26 +410,26 @@ const markdownTokens = [
 /** @type {CatalogEntry[]} */
 export const catalogEntries = [
   {
-    id: "mira-mde",
-    name: "MiraMde",
+    id: "mira",
+    name: "Mira",
     packageName: "@lapismd/mira",
     importPath: "@lapismd/mira",
-    components: ["MiraMde"],
+    components: ["Mira"],
     description:
       "Composable Svelte editor with source, live-preview, reading, and split surfaces.",
-    spec: "default-ui-and-frameworks.md#requirements",
+    spec: "editor-and-markdown.md#requirements",
     tokens: editorTokens,
     publicSurface: true,
   },
   {
-    id: "default-ui",
-    name: "Default UI",
-    packageName: "@mira-mde/default-ui",
-    importPath: "@mira-mde/default-ui/svelte",
-    components: ["MiraDefaultMde", "MiraDefaultToolbar"],
+    id: "mira-editor",
+    name: "Mira Editor",
+    packageName: "@lapismd/mira-editor",
+    importPath: "@lapismd/mira-editor",
+    components: ["MiraEditor", "MiraEditorToolbar"],
     description:
       "Batteries-included editor shell and its independently composable toolbar.",
-    spec: "default-ui-and-frameworks.md#requirements",
+    spec: "mira-editor-and-frameworks.md#requirements",
     tokens: editorTokens,
     publicSurface: true,
   },
@@ -473,8 +473,8 @@ export const catalogEntries = [
   {
     id: "ai",
     name: "AI plugin",
-    packageName: "@mira-mde/plugin-ai",
-    importPath: "@mira-mde/plugin-ai",
+    packageName: "@lapismd/mira-plugin-ai",
+    importPath: "@lapismd/mira-plugin-ai",
     components: ["aiExtension", "createMiraAiToolbarAction"],
     description:
       "Consumer-wired AI actions with slash, block, and toolbar entry points plus an accessible prompt and review popover.",
@@ -492,8 +492,8 @@ export const catalogEntries = [
   {
     id: "mermaid",
     name: "Mermaid",
-    packageName: "@mira-mde/plugin-mermaid",
-    importPath: "@mira-mde/plugin-mermaid",
+    packageName: "@lapismd/mira-plugin-mermaid",
+    importPath: "@lapismd/mira-plugin-mermaid",
     components: ["Mermaid"],
     description:
       "Rendered Mermaid diagram with inline controls, source fallback, and expanded dialog.",
@@ -522,7 +522,7 @@ export const catalogEntries = [
     ],
     description:
       "Shared actions, separators, scrolling, toggles, and drag grip primitives.",
-    spec: "default-ui-and-frameworks.md#requirements",
+    spec: "mira-editor-and-frameworks.md#requirements",
     tokens: commonTokens,
     publicSurface: true,
   },
@@ -549,7 +549,7 @@ export const catalogEntries = [
     ],
     description:
       "Compound contextual action menu, selection items, groups, labels, and submenus.",
-    spec: "default-ui-and-frameworks.md#requirements",
+    spec: "mira-editor-and-frameworks.md#requirements",
     tokens: [...commonTokens, "--mira-popover", "--mira-popover-foreground"],
     publicSurface: true,
   },
@@ -572,7 +572,7 @@ export const catalogEntries = [
     ],
     description:
       "Compound modal dialog surface, overlay, semantic content, and controls.",
-    spec: "default-ui-and-frameworks.md#requirements",
+    spec: "mira-editor-and-frameworks.md#requirements",
     tokens: [
       ...commonTokens,
       "--mira-popover",
@@ -604,7 +604,7 @@ export const catalogEntries = [
     ],
     description:
       "Compound toolbar/menu action surface with selectable items and submenus.",
-    spec: "default-ui-and-frameworks.md#requirements",
+    spec: "mira-editor-and-frameworks.md#requirements",
     tokens: [...commonTokens, "--mira-popover", "--mira-popover-foreground"],
     publicSurface: true,
   },
@@ -616,7 +616,7 @@ export const catalogEntries = [
     components: ["Root", "Trigger", "Content", "Close"],
     description:
       "Shared portaled popover surface for rich controls. CodeMirror slash-command suggestions retain editor-coordinate positioning while sharing this typography, chrome, and token contract.",
-    spec: "default-ui-and-frameworks.md#requirements",
+    spec: "mira-editor-and-frameworks.md#requirements",
     tokens: [
       ...commonTokens,
       "--mira-popover",
@@ -653,7 +653,7 @@ export const catalogEntries = [
     importPath: "@lapismd/mira/ui/toolbar",
     components: ["Root", "Button", "Group", "GroupItem", "Link"],
     description: "Compact accessible toolbar composition and action controls.",
-    spec: "default-ui-and-frameworks.md#requirements",
+    spec: "mira-editor-and-frameworks.md#requirements",
     tokens: commonTokens,
     publicSurface: true,
   },
@@ -665,34 +665,34 @@ export const catalogEntries = [
     components: ["Root", "Trigger", "Content", "Provider", "Portal"],
     description:
       "Accessible tooltip trigger, floating content, provider, and portal family.",
-    spec: "default-ui-and-frameworks.md#requirements",
+    spec: "mira-editor-and-frameworks.md#requirements",
     tokens: [...commonTokens, "--mira-popover", "--mira-popover-foreground"],
     publicSurface: true,
   },
   {
     id: "react-wrapper",
     name: "React wrappers",
-    packageName: "@mira-mde/react",
-    importPath: "@mira-mde/react",
-    components: ["MiraMde", "MiraDefaultMde", "MiraDefaultToolbar"],
+    packageName: "@lapismd/mira-react",
+    importPath: "@lapismd/mira-react",
+    components: ["Mira", "MiraEditor", "MiraEditorToolbar"],
     description:
-      "Thin React adapters over the same styled Svelte editor and default UI surfaces.",
-    spec: "default-ui-and-frameworks.md#requirements",
+      "Thin React adapters over the same styled Svelte editor and Mira Editor surfaces.",
+    spec: "mira-editor-and-frameworks.md#requirements",
     tokens: [],
-    tokensFrom: "default-ui",
+    tokensFrom: "mira-editor",
     publicSurface: true,
   },
   {
     id: "vanilla-wrapper",
     name: "Vanilla mount API",
-    packageName: "@mira-mde/vanilla",
-    importPath: "@mira-mde/vanilla",
-    components: ["createMiraMde", "MiraMde"],
+    packageName: "@lapismd/mira-vanilla",
+    importPath: "@lapismd/mira-vanilla",
+    components: ["createMira", "createMiraEditor"],
     description:
-      "Framework-neutral mounting adapters that reuse MiraMde and the default UI styling.",
-    spec: "default-ui-and-frameworks.md#requirements",
+      "Framework-neutral mounting adapters that reuse Mira and the Mira Editor styling.",
+    spec: "mira-editor-and-frameworks.md#requirements",
     tokens: [],
-    tokensFrom: "mira-mde",
+    tokensFrom: "mira-editor",
     publicSurface: true,
   },
   {
@@ -718,7 +718,7 @@ export const catalogEntries = [
       "Storybook-only full-page shell around the comprehensive portable fixture.",
     spec: "storybook-catalog.md#host-and-fixture-ownership",
     tokens: [],
-    tokensFrom: "default-ui",
+    tokensFrom: "mira-editor",
     publicSurface: false,
   },
   {

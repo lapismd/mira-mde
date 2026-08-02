@@ -24,21 +24,31 @@ prose.
 
 ## Change map
 
-| Protected area                                                                  | Required chapter                              |
-| ------------------------------------------------------------------------------- | --------------------------------------------- |
-| Mira controller, extension, CodeMirror, preview, and table source               | `editor-and-markdown.md`, `packages.md`       |
-| Mira Editor and UI source                                                       | `default-ui-and-frameworks.md`, `packages.md` |
-| Framework adapters                                                              | `default-ui-and-frameworks.md`, `packages.md` |
-| Theme and shipped public CSS                                                    | `styling.md`, `packages.md`                   |
-| AI plugin                                                                       | `plugins/ai.md`, `packages.md`                |
-| Mermaid plugin                                                                  | `plugins/mermaid.md`, `packages.md`           |
-| Storybook infrastructure and catalog metadata                                   | `storybook-catalog.md`                        |
-| Root architecture, workspace, build, package manifests, and dependency topology | `architecture.md`, `packages.md`              |
-| Governance scripts, spec configuration, and CI workflows                        | `spec-governance.md`                          |
+| Protected area                                                                  | Required chapter                               |
+| ------------------------------------------------------------------------------- | ---------------------------------------------- |
+| Mira controller, extension, CodeMirror, preview, and table source               | `editor-and-markdown.md`, `packages.md`        |
+| Mira Editor and UI source                                                       | `mira-editor-and-frameworks.md`, `packages.md` |
+| Framework adapters                                                              | `mira-editor-and-frameworks.md`, `packages.md` |
+| Theme and shipped public CSS                                                    | `styling.md`, `packages.md`                    |
+| AI plugin                                                                       | `plugins/ai.md`, `packages.md`                 |
+| Mermaid plugin                                                                  | `plugins/mermaid.md`, `packages.md`            |
+| Storybook infrastructure and catalog metadata                                   | `storybook-catalog.md`                         |
+| Root architecture, workspace, build, package manifests, and dependency topology | `architecture.md`, `packages.md`               |
+| Governance scripts, spec configuration, and CI workflows                        | `spec-governance.md`                           |
 
 The protected governance set includes both the specification checkers and the
 catalog/token checker. Changes to either cannot weaken or bypass the contract
 without updating this chapter in the same logical change.
+
+`pnpm packages:check` verifies the exact six publishable manifests, dependency
+direction, required `0.0.1` metadata, private adapter identities, curated export
+maps, and public source/build output. It rejects legacy package imports,
+internal adapter or runtime imports, removed public symbols, and removed CSS
+hooks.
+
+`pnpm packages:pack` is the corresponding built-artifact gate. It installs the
+six tarballs as consumers see them, compiles adapter-specific fixtures, resolves
+CSS exports, and rejects legacy or internal imports in packed output.
 
 Rename-aware working-copy validation evaluates both the removed and added path
 of a Jujutsu or Git rename. Consolidating a protected workspace therefore

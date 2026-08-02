@@ -95,7 +95,7 @@ export const Playground: Story = {
   },
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);
-    const editor = canvasElement.querySelector<HTMLElement>(".mira-mde");
+    const editor = canvasElement.querySelector<HTMLElement>(".mira");
     if (!editor) throw new Error("Comprehensive editor did not render");
 
     await step("switch between full editor views", async () => {

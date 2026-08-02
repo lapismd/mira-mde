@@ -1,6 +1,6 @@
 <script lang="ts">
   import { MarkdownPreview } from "@lapismd/mira/preview";
-  import { mermaidExtension } from "@mira-mde/plugin-mermaid";
+  import { mermaidExtension } from "@lapismd/mira-plugin-mermaid";
   import { specStoryHref } from "./spec-chapters";
 
   type Props = {

@@ -36,8 +36,9 @@ workspace dependencies so clean Vite builds do not rely on transitive package
 resolution.
 
 The former `apps/demo` and `apps/docs` workspaces are retired. The root package
-owns Storybook development, static builds, and browser acceptance; the workspace
-contains publishable package families only.
+owns Storybook development, static builds, and browser acceptance. The
+`packages` directory contains exactly six public products; unimplemented Vue
+and Solid placeholders remain private under `internal/adapters`.
 
 Root quality gates compose the specification, catalog, package, Storybook, and
 browser checks. In particular, `storybook:check` validates catalog metadata and

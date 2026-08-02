@@ -81,8 +81,8 @@ export function createMarkdownCodeMirrorExtensions(
     markdownSourceDecorations(),
     EditorView.editorAttributes.of({
       class: options.sourceMode
-        ? "mira-mde-markdown-source markdown-source-view"
-        : "mira-mde-markdown-source",
+        ? "mira-markdown-source markdown-source-view"
+        : "mira-markdown-source",
     }),
   ];
 }

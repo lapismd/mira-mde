@@ -49,8 +49,8 @@
   padding-bottom: 0;
 }
 
-.mira-mde .markdown-preview-surface,
-.mira-mde .markdown-editor-surface {
+.mira .markdown-preview-surface,
+.mira .markdown-editor-surface {
   font-family: var(--mira-font-sans);
   font-size: var(--mira-font-size);
 }

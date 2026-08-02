@@ -16,3 +16,7 @@ The plugin is an orchestration adapter, not an agent runtime or data store. Its
 implementation consumes editor context and block-range helpers through the
 supported `@lapismd/mira/extensions` contract rather than importing CodeMirror
 implementation modules.
+
+The package is shipped only as `@lapismd/mira-plugin-ai` at `0.0.1`. Its source,
+manifest, packed output, Storybook examples, and tests must not retain the
+pre-release package identity.

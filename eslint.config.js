@@ -36,7 +36,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ["packages/codemirror-tables/src/**/*.{js,ts}"],
+    files: ["packages/mira/src/tables/**/*.{js,ts}"],
     rules: {
       "@typescript-eslint/ban-ts-comment": "off",
     },

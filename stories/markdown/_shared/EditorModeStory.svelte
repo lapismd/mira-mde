@@ -1,12 +1,12 @@
 <script lang="ts">
   import {
-    MiraDefaultMde,
+    MiraEditor,
     MiraFeature,
-    type MiraDefaultFeatureConfigs,
-    type MiraDefaultMdeProps,
-    type MiraDefaultToolbarDefinition,
+    type MiraEditorFeatureConfigs,
+    type MiraEditorProps,
+    type MiraEditorToolbarDefinition,
     type MiraFeatureFlags,
-  } from "@mira-mde/default-ui/svelte";
+  } from "@lapismd/mira-editor";
   import type {
     MiraExtension,
     MiraImageConfig,
@@ -28,16 +28,16 @@
     indentWithTabs?: boolean;
     indentWidth?: number;
     outline?: boolean;
-    outlineVariant?: MiraDefaultMdeProps["outlineVariant"];
+    outlineVariant?: MiraEditorProps["outlineVariant"];
     emoji?: boolean;
     frontmatterOpen?: boolean;
-    htmlPolicy?: MiraDefaultMdeProps["htmlPolicy"];
+    htmlPolicy?: MiraEditorProps["htmlPolicy"];
     features?: MiraFeatureFlags;
-    featureConfigs?: MiraDefaultFeatureConfigs;
+    featureConfigs?: MiraEditorFeatureConfigs;
     extensions?: MiraExtension[];
     imageConfig?: MiraImageConfig;
     authoring?: MiraMarkdownAuthoringConfig;
-    toolbars?: MiraDefaultToolbarDefinition[];
+    toolbars?: MiraEditorToolbarDefinition[];
     height?: string;
     width?: string;
   };
@@ -80,7 +80,7 @@
   class="mira-story-surface mira-story-surface--editor"
   style={`--mira-story-editor-height: ${height}; max-width: 100%; width: ${width};`}
 >
-  <MiraDefaultMde
+  <MiraEditor
     bind:value
     bind:mode
     {theme}

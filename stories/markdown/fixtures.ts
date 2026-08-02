@@ -133,7 +133,7 @@ export const tablesMarkdown = String.raw`# Pipe tables
 | :--- | :---: | ---: |
 | @lapismd/mira/preview | reading | 100 |
 | @lapismd/mira | editor | 100 |
-| @mira-mde/default-ui | toolbar | 100 |
+| @lapismd/mira-editor | toolbar | 100 |
 
 Pipe tables support alignment markers and shared preview/live-preview styling.
 `;

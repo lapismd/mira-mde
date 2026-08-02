@@ -1,5 +1,5 @@
 /*
- * Inset the story canvas so component borders (e.g. MiraDefaultMde) aren't
+ * Inset the story canvas so component borders (e.g. MiraEditor) aren't
  * clipped against the preview pane edge.
  *
  * Portaled overlays (dropdown/context menus, tooltips) mount on body, so keep
@@ -40,9 +40,9 @@ body {
   overflow: hidden;
 }
 
-.mira-story-surface--editor .mira-default-mde,
-.mira-story-surface--editor .mira-default-ui,
-.mira-story-surface--editor .mira-mde {
+.mira-story-surface--editor .mira-editor,
+.mira-story-surface--editor .mira-editor,
+.mira-story-surface--editor .mira {
   box-sizing: border-box;
   height: 100%;
   max-height: 100%;

@@ -216,9 +216,9 @@ export function createRichEditorExtensions(
     livePreview
       ? EditorView.editorAttributes.compute(["doc", "selection"], (state) => ({
           class: [
-            "mira-mde-live-preview-mode markdown-live-preview-mode markdown-live-preview-view cm-live-preview",
+            "mira-live-preview-mode markdown-live-preview-mode markdown-live-preview-view cm-live-preview",
             hasRenderedInitialFrontmatterCursor(state)
-              ? "mira-mde-live-preview-hide-cursor"
+              ? "mira-live-preview-hide-cursor"
               : "",
           ]
             .filter(Boolean)

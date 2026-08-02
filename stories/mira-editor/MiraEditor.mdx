@@ -1,0 +1,61 @@
+import {
+  Meta,
+  Canvas,
+  Controls,
+  Primary,
+  Source,
+} from "@storybook/addon-docs/blocks";
+import * as MiraEditorStories from "./MiraEditor.stories";
+import * as ModesStories from "./modes/Modes.stories";
+import * as ThemesStories from "./themes/Themes.stories";
+import * as ConfigurationStories from "./configuration/Configuration.stories";
+import * as FeaturesStories from "./features/Features.stories";
+
+<Meta of={MiraEditorStories} />
+
+# MiraEditor
+
+Default Mira editor shell from `@lapismd/mira-editor`. Compose modes, themes, feature flags, and editor settings through props.
+
+## Usage
+
+<Source
+  language="html"
+  code={`<script lang="ts">
+  import { MiraEditor } from "@lapismd/mira-editor";
+  import "@lapismd/mira-editor/styles.css";
+</script>
+
+<MiraEditor
+  bind:value
+  mode="live-preview"
+  theme="light"
+  features={{ mermaid: true, tables: true }}
+/>`}
+/>
+
+<Primary />
+
+## Properties
+
+Use the Controls panel to explore public configuration props (mode, theme, indentation, reading options, and feature maps).
+
+<Controls />
+
+## Examples
+
+### Modes
+
+<Canvas of={ModesStories.LivePreview} meta={ModesStories} />
+
+### Themes
+
+<Canvas of={ThemesStories.Light} meta={ThemesStories} />
+
+### Configuration
+
+<Canvas of={ConfigurationStories.Defaults} meta={ConfigurationStories} />
+
+### Features
+
+<Canvas of={FeaturesStories.Defaults} meta={FeaturesStories} />

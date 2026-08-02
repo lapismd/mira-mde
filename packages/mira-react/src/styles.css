@@ -1,0 +1,68 @@
+@import "@lapismd/mira-editor/styles.css";
+
+.mira-react-dropdown {
+  display: inline-flex;
+  position: relative;
+}
+
+.mira-react-dropdown__content {
+  left: 0;
+  position: absolute;
+  top: calc(100% + 0.25rem);
+}
+
+.mira-react-dropdown__content--end {
+  left: auto;
+  right: 0;
+}
+
+.mira-react-menu-button {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  text-align: inherit;
+  width: 100%;
+}
+
+.mira-react-menu-button:hover {
+  background: var(--background-modifier-hover, var(--mira-accent-soft));
+}
+
+.mira-react-preview-host,
+.mira-react-preview-host__preview,
+.mira-react-preview-host__preview > .mira-markdown-preview {
+  height: 100%;
+}
+
+.mira-react-preview-host--outline-sidebar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(12rem, 16rem);
+}
+
+.mira-react-preview-host--outline-sidebar > .mira-react-preview-host__preview {
+  min-width: 0;
+}
+
+.mira-react-preview-host--outline-sidebar > .mira-react-preview-host__outline {
+  background: var(--mira-background);
+  border-inline-start: 1px solid var(--mira-border);
+  box-sizing: border-box;
+  min-width: 0;
+  overflow: auto;
+  padding: 1rem;
+}
+
+@media (max-width: 760px) {
+  .mira-react-preview-host--outline-sidebar {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
+
+  .mira-react-preview-host--outline-sidebar
+    > .mira-react-preview-host__outline {
+    border-inline-start: 0;
+    border-top: 1px solid var(--mira-border);
+    max-height: 8rem;
+  }
+}

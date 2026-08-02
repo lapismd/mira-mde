@@ -19,3 +19,7 @@ settings remain consumer responsibilities.
 The plugin integrates through supported `@lapismd/mira` CodeMirror, extension,
 and preview contracts; it does not depend on a private renderer or editor
 workspace.
+
+The package is shipped only as `@lapismd/mira-plugin-mermaid` at `0.0.1`. Its
+source, manifest, packed output, Storybook examples, and tests must not retain
+the pre-release package identity.
