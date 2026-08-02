@@ -170,8 +170,10 @@ export const miraEditorTheme = EditorView.theme({
     minWidth: "20px",
     whiteSpace: "nowrap",
   },
+  // Default off; set --mira-active-line-background (e.g. to --mira-accent-soft)
+  // to restore the highlight. Classes still apply for quote/fold chrome.
   ".cm-activeLine, .cm-activeLineGutter": {
-    backgroundColor: "var(--mira-accent-soft)",
+    backgroundColor: "var(--mira-active-line-background, transparent)",
   },
   ".cm-selectionBackground, &.cm-focused .cm-selectionBackground": {
     backgroundColor: "var(--mira-selection)",

@@ -14,6 +14,9 @@
   --mira-accent: #0f766e;
   --mira-accent-foreground: #ffffff;
   --mira-accent-soft: color-mix(in oklab, var(--mira-accent) 11%, transparent);
+  /* Active line/gutter highlight; transparent by default. Set to
+     var(--mira-accent-soft) (or any color) to restore highlighting. */
+  --mira-active-line-background: transparent;
   --mira-selection: color-mix(in oklab, var(--mira-accent) 25%, transparent);
   --mira-popover: #ffffff;
   --mira-popover-foreground: var(--mira-foreground);
@@ -94,6 +97,7 @@
   --mira-accent: #2dd4bf;
   --mira-accent-foreground: #042f2e;
   --mira-accent-soft: color-mix(in oklab, var(--mira-accent) 13%, transparent);
+  --mira-active-line-background: transparent;
   --mira-selection: color-mix(in oklab, var(--mira-accent) 30%, transparent);
   --mira-popover: #202228;
   --mira-popover-foreground: var(--mira-foreground);
@@ -151,6 +155,7 @@
       var(--mira-accent) 13%,
       transparent
     );
+    --mira-active-line-background: transparent;
     --mira-selection: color-mix(in oklab, var(--mira-accent) 30%, transparent);
     --mira-popover: #202228;
     --mira-popover-foreground: var(--mira-foreground);
