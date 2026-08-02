@@ -71,8 +71,21 @@
   border-inline-start: 0;
 }
 
+.mira-mde__editor-scroll {
+  box-sizing: border-box;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  width: 100%;
+}
+
+.mira-mde__editor-scroll > .cm-sizer {
+  min-height: 100%;
+}
+
 .mira-mde__editor-host {
   height: 100%;
+  min-height: 100%;
 }
 
 @media (max-width: 760px) {

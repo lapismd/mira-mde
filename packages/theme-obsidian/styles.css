@@ -78,8 +78,8 @@
   --mira-checkbox-color: var(--mira-accent);
   --mira-checkbox-border: var(--mira-border-strong);
   --mira-checkbox-border-hover: var(--mira-muted-foreground);
-  --mira-editor-padding: 20px;
-  --mira-preview-padding: 24px;
+  --mira-editor-padding: 2rem;
+  --mira-preview-padding: 2rem;
   --mira-radius: 6px;
 }
 

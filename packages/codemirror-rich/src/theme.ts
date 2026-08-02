@@ -91,6 +91,10 @@ export const miraRichEditorTheme = EditorView.theme({
     overflow: "visible",
     position: "relative",
   },
+  ".mira-rich-widget--block": {
+    maxWidth: "100%",
+    width: "100%",
+  },
   ".mira-rich-widget__source-toggle": {
     alignItems: "center",
     background: "var(--mira-popover)",

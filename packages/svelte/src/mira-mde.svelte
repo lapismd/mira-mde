@@ -671,7 +671,11 @@
       data-visible={showEditor}
       aria-hidden={showEditor ? "false" : "true"}
     >
-      <div bind:this={editorHost} class="mira-mde__editor-host"></div>
+      <div class="mira-mde__editor-scroll">
+        <div class="cm-sizer">
+          <div bind:this={editorHost} class="mira-mde__editor-host"></div>
+        </div>
+      </div>
     </section>
 
     {#if showPreview}

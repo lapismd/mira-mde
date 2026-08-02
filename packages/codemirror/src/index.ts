@@ -128,6 +128,8 @@ export const miraEditorTheme = EditorView.theme({
   ".cm-scroller": {
     fontFamily: "var(--mira-font-mono)",
     lineHeight: "var(--mira-line-height)",
+    padding: "var(--file-margins, var(--mira-editor-padding))",
+    scrollbarGutter: "stable",
   },
   ".cm-line, .cm-gutterElement": {
     "--cm-base-block-content-height": "var(--mira-line-height)",
@@ -140,7 +142,8 @@ export const miraEditorTheme = EditorView.theme({
   },
   ".cm-content": {
     minHeight: "100%",
-    padding: "var(--mira-editor-padding)",
+    padding: "0",
+    width: "100%",
   },
   ".cm-gutters": {
     backgroundColor: "var(--mira-editor-background)",

@@ -16,10 +16,19 @@
   --mira-preview-bottom-padding: 0;
 }
 
-.markdown-preview-surface > .cm-sizer {
+/* Lapis note column: centered readable width for reading + editor. */
+.cm-sizer {
+  align-items: stretch;
   display: flex;
-  flex: 1 1 auto;
   flex-direction: column;
+  margin-inline: auto;
+  max-width: var(--file-line-width);
+  min-height: 100%;
+  width: 100%;
+}
+
+.markdown-preview-surface > .cm-sizer {
+  flex: 1 1 auto;
   gap: var(--size-4-5);
   min-height: 0;
 }
@@ -29,7 +38,7 @@
 }
 
 .markdown-preview-surface .markdown-view__document {
-  max-width: var(--file-line-width);
+  max-width: none;
   padding-bottom: var(--mira-preview-bottom-padding);
   width: 100%;
 }

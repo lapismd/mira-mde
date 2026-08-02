@@ -8,11 +8,11 @@ import { Decoration, type DecorationSet, EditorView } from "@codemirror/view";
 import { sortRanges } from "./ranges";
 
 const codeLine = Decoration.line({
-  class: "HyperMD-codeblock HyperMD-codeblock-bg",
+  class: "HyperMD-codeblock HyperMD-codeblock-bg cm-formatting-code",
 });
 const textCodeLine = Decoration.line({
   class:
-    "HyperMD-codeblock HyperMD-codeblock-bg cm-formatting-code-language-text",
+    "HyperMD-codeblock HyperMD-codeblock-bg cm-formatting-code cm-formatting-code-language-text",
 });
 
 export function buildCodeBlockLineDecorations(

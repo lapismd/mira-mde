@@ -118,6 +118,11 @@
   padding: 0.15em 0.3em;
 }
 
+.markdown-editor-surface .cm-editor .cm-formatting-code {
+  padding-inline-start: 24px;
+  position: relative;
+}
+
 .markdown-editor-surface .cm-formatting-code,
 .markdown-editor-surface .cm-editor .cm-activeLine.cm-line.cm-formatting-code {
   background-color: var(--markdown-code-background);

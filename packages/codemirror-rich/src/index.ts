@@ -457,7 +457,8 @@ function buildInlinePreviewDecorations(
               view.state,
             )
           : [];
-      if (!fencedCodeLineClass) {
+      // Lapis: hide formatting marks only in live preview; source keeps delimiters.
+      if (replaceWidgets && !fencedCodeLineClass) {
         decorateHiddenFormatting(line.text, line.from, ranges, {
           excludedRanges: [
             ...inlineMathRanges,

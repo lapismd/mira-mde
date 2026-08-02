@@ -4,10 +4,13 @@
   overflow-x: hidden;
 }
 
-/* Hide formatting marks in live preview and source (inline marks run in both). */
-.markdown-live-preview-mode .cm-formatting-hidden,
-.markdown-source-mode .cm-formatting-hidden,
-.markdown-source-view .cm-formatting-hidden {
+/* Hide formatting marks only in live preview (Lapis parity; source keeps delimiters). */
+.markdown-live-preview-mode
+  .cm-editor.markdown-live-preview-view
+  .cm-formatting-hidden,
+.markdown-view__editor--live-preview
+  .cm-editor.markdown-live-preview-view
+  .cm-formatting-hidden {
   display: none;
 }
 
