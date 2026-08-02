@@ -87,6 +87,9 @@ test("the comprehensive split story synchronizes both scroll owners", async ({
     .locator(".mira-mde__pane--preview .mira-markdown-preview")
     .first();
   await expect(preview).toBeVisible();
+  await expect(
+    page.getByRole("group", { name: "Document outline" }),
+  ).toBeVisible();
 
   await editor.evaluate((element) => {
     element.scrollTop = 1_600;
@@ -103,6 +106,54 @@ test("the comprehensive split story synchronizes both scroll owners", async ({
   await expect
     .poll(() => editor.evaluate((element) => element.scrollTop))
     .toBeGreaterThan(1_600);
+});
+
+test("the reading outline remains visible and navigates its preview scroller", async ({
+  page,
+}) => {
+  await gotoStory(page, "markdown-headings--outline-navigation");
+
+  const pane = page.locator(".mira-mde__pane--outline-floating");
+  const preview = pane.locator(".mira-markdown-preview");
+  const outline = pane.getByRole("group", { name: "Document outline" });
+  const marker = outline.getByRole("button", {
+    name: "Open outline and scroll to Heading 4",
+  });
+  const target = preview.getByRole("heading", { name: "Heading 4" });
+
+  await expect(pane).toBeVisible();
+  await expect(preview).toBeVisible();
+  await expect(outline).toBeVisible();
+  await expect(target).toHaveAttribute("id", "heading-4");
+
+  const collapsedLayout = await pane.evaluate((element) => {
+    const outlineElement = element.querySelector(".mira-markdown-outline");
+    const paneRect = element.getBoundingClientRect();
+    const outlineRect = outlineElement?.getBoundingClientRect();
+    return {
+      outlinePosition: outlineElement
+        ? getComputedStyle(outlineElement).position
+        : null,
+      outlineInsidePane:
+        Boolean(outlineRect) &&
+        outlineRect!.top >= paneRect.top &&
+        outlineRect!.bottom <= paneRect.bottom &&
+        outlineRect!.right <= paneRect.right &&
+        outlineRect!.right >= paneRect.right - 32,
+    };
+  });
+  expect(collapsedLayout.outlinePosition).toBe("absolute");
+  expect(collapsedLayout.outlineInsidePane).toBe(true);
+
+  await marker.click();
+  const panel = outline.getByRole("navigation", { name: "Table of contents" });
+  await expect(panel).toBeVisible();
+  await expect(panel.getByText("On this page")).toBeVisible();
+  await expect(marker).toHaveAttribute("aria-current", "true");
+  await expect
+    .poll(() => preview.evaluate((element) => element.scrollTop))
+    .toBeGreaterThan(0);
+  await expect(target).toBeFocused();
 });
 
 test("table chrome supports pointer reordering, mutation, and source reveal", async ({

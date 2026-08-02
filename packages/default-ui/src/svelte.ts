@@ -40,6 +40,7 @@ export type {
 export type {
   MiraDefaultMdeHandle,
   MiraDefaultMdeProps,
+  MiraOutlineVariant,
   MiraDefaultToolbarProps,
   MiraFrontmatterConfig,
 } from "./types";

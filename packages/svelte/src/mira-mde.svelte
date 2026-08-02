@@ -69,6 +69,7 @@
     htmlPolicy = "trusted",
     emoji = false,
     outline = false,
+    outlineVariant = "floating",
     onChange,
     onFrontmatterChange,
   }: MiraMdeProps = $props();
@@ -679,7 +680,9 @@
     {#if showPreview}
       <section
         bind:this={previewPane}
-        class="mira-mde__pane mira-mde__pane--preview"
+        class={`mira-mde__pane mira-mde__pane--preview ${
+          outline ? `mira-mde__pane--outline-${outlineVariant}` : ""
+        }`.trim()}
       >
         <MarkdownPreview
           {...{ frontmatterConfig } as any}
@@ -703,7 +706,12 @@
           {onFrontmatterChange}
         />
         {#if outline}
-          <MarkdownOutline {value} {headingIdPrefix} />
+          <MarkdownOutline
+            {value}
+            {headingIdPrefix}
+            variant={outlineVariant}
+            root={previewPane}
+          />
         {/if}
       </section>
     {/if}

@@ -48,6 +48,7 @@ export type {
   MiraFrontmatterConfig,
   MiraMdeHandle,
   MiraMdeProps,
+  MiraOutlineVariant,
   MiraReactIcon,
   ResolvedMiraDefaultFeatures,
 } from "./types";

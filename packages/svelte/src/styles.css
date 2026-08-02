@@ -71,6 +71,28 @@
   border-inline-start: 0;
 }
 
+.mira-mde__pane--outline-floating {
+  position: relative;
+}
+
+.mira-mde__pane--outline-sidebar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(12rem, 16rem);
+}
+
+.mira-mde__pane--outline-sidebar > .mira-markdown-preview {
+  min-width: 0;
+}
+
+.mira-mde__pane--outline-sidebar > .mira-markdown-outline {
+  background: var(--mira-background);
+  border-inline-start: 1px solid var(--mira-border);
+  box-sizing: border-box;
+  min-width: 0;
+  overflow: auto;
+  padding: 1rem;
+}
+
 /*
  * Keep the CM scroller as the only vertical scroll owner (split sync +
  * existing e2e helpers target `.cm-scroller`). The host stays full-pane
@@ -101,5 +123,16 @@
   .mira-mde__pane--preview {
     border-inline-start: 0;
     border-top: 1px solid var(--mira-border);
+  }
+
+  .mira-mde__pane--outline-sidebar {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
+
+  .mira-mde__pane--outline-sidebar > .mira-markdown-outline {
+    border-inline-start: 0;
+    border-top: 1px solid var(--mira-border);
+    max-height: 8rem;
   }
 }

@@ -16,10 +16,14 @@ import type {
   MiraDefaultSlashCommandConfig,
   MiraDefaultSlashCommandId,
 } from "@mira-mde/default-ui";
-import type { FrontmatterConfig } from "@mira-mde/preview";
+import type {
+  FrontmatterConfig,
+  MarkdownOutlineVariant,
+} from "@mira-mde/preview";
 import type { ComponentType } from "react";
 
 export type MiraFrontmatterConfig = FrontmatterConfig;
+export type MiraOutlineVariant = MarkdownOutlineVariant;
 
 export type MiraReactIcon = ComponentType<{
   "aria-hidden"?: boolean | "true" | "false";
@@ -76,6 +80,7 @@ export type MiraMdeProps = {
   htmlPolicy?: "trusted" | "safe";
   emoji?: boolean;
   outline?: boolean;
+  outlineVariant?: MiraOutlineVariant;
   onChange?: (value: string) => void;
   onModeChange?: (mode: MiraMode) => void;
   onReadonlyChange?: (readonly: boolean) => void;

@@ -12,6 +12,7 @@ export type DefaultEditorStoryProps = {
   indentWithTabs?: boolean;
   indentWidth?: number;
   outline?: boolean;
+  outlineVariant?: "floating" | "sidebar";
   emoji?: boolean;
   frontmatterOpen?: boolean;
   htmlPolicy?: "trusted" | "safe";
@@ -29,6 +30,7 @@ export const defaultEditorArgs: DefaultEditorStoryProps = {
   indentWithTabs: false,
   indentWidth: 2,
   outline: false,
+  outlineVariant: "floating",
   emoji: false,
   frontmatterOpen: true,
   htmlPolicy: "trusted",
@@ -117,8 +119,17 @@ export const defaultEditorArgTypes = {
   },
   outline: {
     control: "boolean",
-    description: "Show the document outline beside the editor.",
+    description: "Show the document outline in reading and split views.",
     table: { category: "Reading" },
+  },
+  outlineVariant: {
+    control: "inline-radio",
+    options: ["floating", "sidebar"],
+    description: "Use the floating marker rail or persistent side panel.",
+    table: {
+      category: "Reading",
+      type: { summary: '"floating" | "sidebar"' },
+    },
   },
   emoji: {
     control: "boolean",

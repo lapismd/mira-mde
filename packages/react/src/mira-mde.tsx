@@ -62,6 +62,7 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
     htmlPolicy = "trusted",
     emoji = false,
     outline = false,
+    outlineVariant = "floating",
     blockControls = false,
     indentGuides = true,
     indentWithTabs = true,
@@ -541,7 +542,12 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
 
         {showPreview ? (
           <section
-            className="mira-mde__pane mira-mde__pane--preview"
+            className={cx(
+              "mira-mde__pane mira-mde__pane--preview",
+              outline && outlineVariant === "floating"
+                ? "mira-mde__pane--outline-floating"
+                : undefined,
+            )}
             ref={previewPaneRef}
           >
             <MarkdownPreviewHost
@@ -555,6 +561,7 @@ export const MiraMde = forwardRef<MiraMdeHandle, MiraMdeProps>(function MiraMde(
               htmlPolicy={htmlPolicy}
               emoji={emoji}
               outline={outline}
+              outlineVariant={outlineVariant}
               linkResolver={linkResolver}
               onChange={handlePreviewChange}
               onFrontmatterChange={onFrontmatterChange}

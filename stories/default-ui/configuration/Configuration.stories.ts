@@ -96,6 +96,7 @@ export const ReadingOptionsSettings: Story = {
   },
   name: "Reading Options",
   args: {
+    mode: "preview",
     outline: true,
     emoji: true,
     frontmatterOpen: false,

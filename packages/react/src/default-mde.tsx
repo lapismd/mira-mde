@@ -84,6 +84,7 @@ export const MiraDefaultMde = forwardRef<
     htmlPolicy = "trusted",
     emoji = false,
     outline = false,
+    outlineVariant = "floating",
     indentGuides: indentGuidesProp,
     indentWithTabs: indentWithTabsProp,
     indentWidth: indentWidthProp,
@@ -418,6 +419,7 @@ export const MiraDefaultMde = forwardRef<
           htmlPolicy={htmlPolicy}
           emoji={emoji}
           outline={outline}
+          outlineVariant={outlineVariant}
           indentGuides={indentGuides}
           indentWidth={indentWidth}
           indentWithTabs={indentWithTabs}

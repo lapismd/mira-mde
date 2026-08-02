@@ -41,3 +41,22 @@ export function markdownEditorDocsSource(
   }}
 />`;
 }
+
+export function markdownOutlineDocsSource(
+  fixtureExport: string,
+  variant: "floating" | "sidebar" = "floating",
+): string {
+  return `<script lang="ts">
+  import { MiraDefaultMde } from "@mira-mde/default-ui/svelte";
+  import { ${fixtureExport} } from "../fixtures";
+
+  let value = $state(${fixtureExport});
+</script>
+
+<MiraDefaultMde
+  bind:value
+  mode="preview"
+  outline
+  outlineVariant="${variant}"
+/>`;
+}

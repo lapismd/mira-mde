@@ -13,6 +13,7 @@ export {
   MarkdownPreview,
   NoteLink,
 };
+export type { MarkdownOutlineItem, MarkdownOutlineVariant } from "./outline";
 export { default as Renderer } from "./renderer/renderer.svelte";
 export * from "./code-language";
 export type * from "./renderer/types";

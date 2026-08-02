@@ -1,5 +1,6 @@
 .mira-markdown-outline {
   color: var(--mira-muted-foreground);
+  font-family: var(--mira-font-sans);
   font-size: 0.875rem;
   line-height: 1.4;
 }
@@ -10,12 +11,12 @@
   padding: 0;
 }
 
-.mira-markdown-outline li {
+.mira-markdown-outline--sidebar li {
   margin: 0;
   padding: 0 0 0 calc((var(--mira-outline-level, 1) - 1) * 0.875rem);
 }
 
-.mira-markdown-outline a {
+.mira-markdown-outline--sidebar a {
   color: inherit;
   display: block;
   overflow: hidden;
@@ -25,7 +26,194 @@
   white-space: nowrap;
 }
 
-.mira-markdown-outline a:hover,
-.mira-markdown-outline a:focus {
+.mira-markdown-outline--sidebar a:hover,
+.mira-markdown-outline--sidebar a:focus {
   color: var(--mira-foreground);
+}
+
+.mira-markdown-outline--floating {
+  height: min(68%, 24rem);
+  min-height: 5rem;
+  pointer-events: auto;
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1.45rem;
+  z-index: 10;
+}
+
+.mira-markdown-outline--floating.is-open {
+  width: 15.9rem;
+}
+
+.mira-markdown-outline__rail {
+  align-items: flex-end;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  justify-content: center;
+  max-height: 100%;
+  opacity: 0.72;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  transition:
+    opacity 140ms ease,
+    transform 140ms ease;
+  width: 1.45rem;
+}
+
+.mira-markdown-outline__rail-marker {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  display: flex;
+  flex: 0 0 0.36rem;
+  height: 0.36rem;
+  justify-content: flex-end;
+  padding: 0;
+  width: 1.45rem;
+}
+
+.mira-markdown-outline__rail > li {
+  display: flex;
+  margin: 0;
+  padding: 0;
+}
+
+.mira-markdown-outline__rail-line {
+  background: color-mix(in srgb, var(--mira-muted-foreground) 62%, transparent);
+  border-radius: 999px;
+  flex: 0 0 auto;
+  height: 0.16rem;
+  width: 1.24rem;
+}
+
+.mira-markdown-outline__rail-marker[data-level="2"]
+  .mira-markdown-outline__rail-line {
+  width: 1.08rem;
+}
+
+.mira-markdown-outline__rail-marker[data-level="3"]
+  .mira-markdown-outline__rail-line {
+  width: 0.92rem;
+}
+
+.mira-markdown-outline__rail-marker[data-level="4"]
+  .mira-markdown-outline__rail-line,
+.mira-markdown-outline__rail-marker[data-level="5"]
+  .mira-markdown-outline__rail-line,
+.mira-markdown-outline__rail-marker[data-level="6"]
+  .mira-markdown-outline__rail-line {
+  width: 0.76rem;
+}
+
+.mira-markdown-outline__rail:hover,
+.mira-markdown-outline__rail:focus-within,
+.mira-markdown-outline--floating.is-open .mira-markdown-outline__rail {
+  opacity: 1;
+  outline: 0;
+  transform: translateY(-50%) translateX(-0.08rem);
+}
+
+.mira-markdown-outline__rail-marker:focus-visible {
+  outline: 0;
+}
+
+.mira-markdown-outline__rail-marker:hover .mira-markdown-outline__rail-line,
+.mira-markdown-outline__rail-marker:focus-visible
+  .mira-markdown-outline__rail-line,
+.mira-markdown-outline__rail-line.is-active {
+  background: var(--mira-link);
+  height: 0.22rem;
+  width: 1.42rem;
+}
+
+.mira-markdown-outline__panel {
+  background: color-mix(in srgb, var(--mira-popover) 96%, transparent);
+  border: 1px solid color-mix(in srgb, var(--mira-border) 86%, transparent);
+  border-radius: 0.65rem;
+  box-shadow: var(--mira-widget-shadow);
+  box-sizing: border-box;
+  color: var(--mira-popover-foreground);
+  max-height: min(60vh, 24rem);
+  overflow: auto;
+  padding: 0.55rem;
+  position: absolute;
+  right: 1.9rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14rem;
+}
+
+.mira-markdown-outline__title {
+  color: var(--mira-muted-foreground);
+  font-size: 0.68rem;
+  font-weight: 850;
+  margin: 0 0 0.35rem;
+}
+
+.mira-markdown-outline__panel ol {
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
+}
+
+.mira-markdown-outline__item {
+  background: transparent;
+  border: 0;
+  border-radius: 0.35rem;
+  color: inherit;
+  cursor: pointer;
+  display: block;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+  padding: 0.38rem 0.42rem;
+  text-align: left;
+  width: 100%;
+}
+
+.mira-markdown-outline__item[data-level="2"] {
+  padding-inline-start: 1.1rem;
+}
+
+.mira-markdown-outline__item[data-level="3"] {
+  padding-inline-start: 1.78rem;
+}
+
+.mira-markdown-outline__item[data-level="4"],
+.mira-markdown-outline__item[data-level="5"],
+.mira-markdown-outline__item[data-level="6"] {
+  padding-inline-start: 2.46rem;
+}
+
+.mira-markdown-outline__item:hover,
+.mira-markdown-outline__item:focus-visible,
+.mira-markdown-outline__item.is-active {
+  background: color-mix(in srgb, var(--mira-link) 10%, transparent);
+  color: var(--mira-foreground);
+  outline: 0;
+}
+
+@media (max-width: 700px) {
+  .mira-markdown-outline--floating {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mira-markdown-outline__rail {
+    transition: none;
+  }
 }

@@ -193,6 +193,7 @@ export type {
   MiraDefaultEditMode,
   MiraDefaultMdeHandle,
   MiraDefaultMdeProps,
+  MiraOutlineVariant,
   MiraDefaultToolbarProps,
   MiraFrontmatterConfig,
 } from "./types";

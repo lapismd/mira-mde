@@ -1,3 +1,11 @@
+export type MarkdownOutlineVariant = "floating" | "sidebar";
+
+export type MarkdownOutlineItem = {
+  id: string;
+  text: string;
+  level: number;
+};
+
 export function slugHeadingText(value: string): string {
   return (
     value

@@ -65,6 +65,7 @@
     htmlPolicy = "trusted",
     emoji = false,
     outline = false,
+    outlineVariant = "floating",
     onChange,
     onModeChange,
     onReadonlyChange,
@@ -346,6 +347,7 @@
       {htmlPolicy}
       {emoji}
       {outline}
+      {outlineVariant}
       onChange={handleChange}
       {onFrontmatterChange}
     />

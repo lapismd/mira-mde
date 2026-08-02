@@ -27,6 +27,25 @@ Each markdown feature is shown in reading preview (`MarkdownPreview`), live prev
 
 <Controls />
 
+## Outline Navigation
+
+The default outline uses a floating heading-marker rail. Hovering, focusing, or
+clicking it opens the titled navigation panel; choosing an item focuses and
+scrolls the matching rendered heading.
+
+<Canvas of={HeadingsStories.OutlineNavigation} meta={HeadingsStories} />
+
+<Source of={HeadingsStories.OutlineNavigation} language="html" />
+
+## Persistent Sidebar Variant
+
+The original always-visible side panel remains available through
+`outlineVariant="sidebar"`.
+
+<Canvas of={HeadingsStories.OutlineSidebar} meta={HeadingsStories} />
+
+<Source of={HeadingsStories.OutlineSidebar} language="html" />
+
 ## Live Preview
 
 <Canvas of={HeadingsStories.LivePreview} meta={HeadingsStories} />

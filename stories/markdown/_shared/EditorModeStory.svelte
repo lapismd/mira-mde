@@ -28,6 +28,7 @@
     indentWithTabs?: boolean;
     indentWidth?: number;
     outline?: boolean;
+    outlineVariant?: MiraDefaultMdeProps["outlineVariant"];
     emoji?: boolean;
     frontmatterOpen?: boolean;
     htmlPolicy?: MiraDefaultMdeProps["htmlPolicy"];
@@ -53,6 +54,7 @@
     indentWithTabs = false,
     indentWidth = 2,
     outline = false,
+    outlineVariant = "floating",
     emoji = false,
     frontmatterOpen = true,
     htmlPolicy = "trusted",
@@ -90,6 +92,7 @@
     {indentWithTabs}
     {indentWidth}
     {outline}
+    {outlineVariant}
     {emoji}
     {frontmatterOpen}
     {htmlPolicy}

@@ -14,6 +14,8 @@ const meta = {
     theme: "light",
     editorShell: "default",
     mermaidEnabled: true,
+    outline: true,
+    outlineVariant: "floating",
     indentGuides: true,
     indentWithTabs: true,
     indentWidth: 4,
@@ -38,6 +40,17 @@ const meta = {
     },
     mermaidEnabled: {
       control: "boolean",
+      table: { category: "Features" },
+    },
+    outline: {
+      control: "boolean",
+      description: "Show heading navigation beside reading and split views.",
+      table: { category: "Features" },
+    },
+    outlineVariant: {
+      control: "inline-radio",
+      options: ["floating", "sidebar"],
+      description: "Use the floating marker rail or persistent side panel.",
       table: { category: "Features" },
     },
     indentGuides: {
@@ -93,6 +106,9 @@ export const Playground: Story = {
         canvas.getByRole("button", { name: "Reading view" }),
       );
       await expect(editor).toHaveAttribute("data-mode", "preview");
+      await expect(
+        canvas.getByRole("group", { name: "Document outline" }),
+      ).toBeVisible();
 
       await userEvent.click(canvas.getByRole("button", { name: "Edit" }));
       await expect(editor).toHaveAttribute("data-mode", "live-preview");

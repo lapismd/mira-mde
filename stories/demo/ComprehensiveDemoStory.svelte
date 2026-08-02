@@ -3,6 +3,7 @@
     MiraDefaultMde,
     MiraFeature,
     type MiraFeatureFlags,
+    type MiraOutlineVariant,
   } from "@mira-mde/default-ui/svelte";
   import type { MiraMode, MiraTheme } from "@mira-mde/extensions";
   import { mermaidExtension } from "@mira-mde/plugin-mermaid";
@@ -17,6 +18,8 @@
     theme?: MiraTheme;
     editorShell?: EditorShell;
     mermaidEnabled?: boolean;
+    outline?: boolean;
+    outlineVariant?: MiraOutlineVariant;
     indentGuides?: boolean;
     indentWithTabs?: boolean;
     indentWidth?: number;
@@ -29,6 +32,8 @@
     theme = "light",
     editorShell = "default",
     mermaidEnabled = true,
+    outline = true,
+    outlineVariant = "floating",
     indentGuides = true,
     indentWithTabs = true,
     indentWidth = 4,
@@ -75,6 +80,8 @@
         {theme}
         sourcePath="comprehensive-demo.md"
         fileAdapter={storyFileAdapter}
+        {outline}
+        {outlineVariant}
         {features}
         {indentGuides}
         {indentWithTabs}
@@ -88,6 +95,8 @@
         {theme}
         sourcePath="comprehensive-demo.md"
         fileAdapter={storyFileAdapter}
+        {outline}
+        {outlineVariant}
         {extensions}
         {indentGuides}
         {indentWithTabs}

@@ -5,5 +5,6 @@ export type {
   MiraFrontmatterConfig,
   MiraMdeHandle,
   MiraMdeProps,
+  MiraOutlineVariant,
 } from "./types";
 export default MiraMde;

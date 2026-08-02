@@ -20,10 +20,16 @@ import type {
   MiraDefaultEditMode,
   MiraFeatureFlags,
 } from "./features";
-import type { MiraFrontmatterConfig } from "@mira-mde/svelte";
+import type {
+  MiraFrontmatterConfig,
+  MiraOutlineVariant,
+} from "@mira-mde/svelte";
 
 export type { MiraDefaultEditMode } from "./features";
-export type { MiraFrontmatterConfig } from "@mira-mde/svelte";
+export type {
+  MiraFrontmatterConfig,
+  MiraOutlineVariant,
+} from "@mira-mde/svelte";
 
 export type MiraDefaultMdeProps = {
   value?: string;
@@ -58,6 +64,7 @@ export type MiraDefaultMdeProps = {
   htmlPolicy?: "trusted" | "safe";
   emoji?: boolean;
   outline?: boolean;
+  outlineVariant?: MiraOutlineVariant;
   onChange?: (value: string) => void;
   onModeChange?: (mode: MiraMode) => void;
   onReadonlyChange?: (readonly: boolean) => void;

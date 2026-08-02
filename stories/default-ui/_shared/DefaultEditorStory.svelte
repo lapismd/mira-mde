@@ -38,6 +38,8 @@
     indentWidth?: number;
     /** Show the document outline beside the editor. */
     outline?: boolean;
+    /** Choose the floating marker rail or persistent sidebar outline. */
+    outlineVariant?: MiraDefaultMdeProps["outlineVariant"];
     /** Enable emoji shortcode rendering. */
     emoji?: boolean;
     /** Initial expanded state for frontmatter. */
@@ -71,6 +73,7 @@
     indentWithTabs = false,
     indentWidth = 2,
     outline = false,
+    outlineVariant = "floating",
     emoji = false,
     frontmatterOpen = true,
     htmlPolicy = "trusted",
@@ -96,6 +99,7 @@
   {indentWithTabs}
   {indentWidth}
   {outline}
+  {outlineVariant}
   {emoji}
   {frontmatterOpen}
   {htmlPolicy}

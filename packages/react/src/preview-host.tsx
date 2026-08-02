@@ -8,6 +8,7 @@ import type {
   MiraLinkResolver,
 } from "@mira-mde/extensions";
 import type { MiraFrontmatterConfig } from "./types";
+import type { MiraOutlineVariant } from "./types";
 
 export type MarkdownPreviewHostProps = {
   value: string;
@@ -23,6 +24,7 @@ export type MarkdownPreviewHostProps = {
   htmlPolicy?: "trusted" | "safe";
   emoji?: boolean;
   outline?: boolean;
+  outlineVariant?: MiraOutlineVariant;
   onChange?: (replacement: string, from: number, to: number) => void;
   onFrontmatterChange?: (nextYaml: string, nextValue: string) => void;
 };
@@ -38,6 +40,7 @@ export function MarkdownPreviewHost({
   htmlPolicy = "trusted",
   emoji = false,
   outline = false,
+  outlineVariant = "floating",
   linkResolver,
   onChange,
   onFrontmatterChange,
@@ -102,6 +105,8 @@ export function MarkdownPreviewHost({
       target: outlineRef.current,
       props: {
         headingIdPrefix,
+        root: hostRef.current,
+        variant: outlineVariant,
         value,
       },
     });
@@ -109,12 +114,18 @@ export function MarkdownPreviewHost({
     return () => {
       unmount(component as never);
     };
-  }, [headingIdPrefix, outline, value]);
+  }, [headingIdPrefix, outline, outlineVariant, value]);
 
   return (
-    <div className="mira-react-preview-host">
-      <div ref={hostRef} />
-      {outline ? <div ref={outlineRef} /> : null}
+    <div
+      className={`mira-react-preview-host ${
+        outline ? `mira-react-preview-host--outline-${outlineVariant}` : ""
+      }`.trim()}
+    >
+      <div className="mira-react-preview-host__preview" ref={hostRef} />
+      {outline ? (
+        <div className="mira-react-preview-host__outline" ref={outlineRef} />
+      ) : null}
     </div>
   );
 }

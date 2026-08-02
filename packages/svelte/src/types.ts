@@ -12,9 +12,13 @@ import type {
   MiraTemplateSelection,
 } from "@mira-mde/extensions";
 import type { MiraEditorSelection } from "@mira-mde/core";
-import type { FrontmatterConfig } from "@mira-mde/preview";
+import type {
+  FrontmatterConfig,
+  MarkdownOutlineVariant,
+} from "@mira-mde/preview";
 
 export type MiraFrontmatterConfig = FrontmatterConfig;
+export type MiraOutlineVariant = MarkdownOutlineVariant;
 
 export type MiraMdeProps = {
   value: string;
@@ -45,6 +49,7 @@ export type MiraMdeProps = {
   htmlPolicy?: "trusted" | "safe";
   emoji?: boolean;
   outline?: boolean;
+  outlineVariant?: MiraOutlineVariant;
   onChange?: (value: string) => void;
   onFrontmatterChange?: (nextYaml: string, nextValue: string) => void;
 };

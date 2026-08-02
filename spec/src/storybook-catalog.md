@@ -6,15 +6,16 @@ runtime dependency.
 
 ## Requirements
 
-| ID           | Requirement                                                                                                                                                      |
-| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| MIRA-CAT-001 | Storybook MUST render every canonical spec chapter from raw `spec/src` Markdown and link internal chapter references to their Storybook mirrors.                 |
-| MIRA-CAT-002 | Plugin and public component pages MUST provide a concise description and a link to the governing spec chapter or anchor.                                         |
-| MIRA-CAT-003 | Focused fixtures and the comprehensive demo document MUST live under the Storybook catalog with no manually synchronized copies.                                 |
-| MIRA-CAT-004 | The comprehensive demo MUST provide fixed source, live-preview, preview, and split stories using identical Markdown and adapter data.                            |
-| MIRA-CAT-005 | Every testable public story MUST render in the Storybook browser test project; meaningful stateful behavior MUST use a `play` interaction.                       |
-| MIRA-CAT-006 | New visual stories MUST enter review as `visual-pending`; baseline mutation MUST use the installed Visual Delta suite and requires a separate authorized review. |
-| MIRA-CAT-007 | Every shipped `@mira-mde/ui` primitive family MUST have representative rendered Storybook coverage with interaction or semantic assertions.                      |
+| ID           | Requirement                                                                                                                                                                    |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| MIRA-CAT-001 | Storybook MUST render every canonical spec chapter from raw `spec/src` Markdown and link internal chapter references to their Storybook mirrors.                               |
+| MIRA-CAT-002 | Plugin and public component pages MUST provide a concise description and a link to the governing spec chapter or anchor.                                                       |
+| MIRA-CAT-003 | Focused fixtures and the comprehensive demo document MUST live under the Storybook catalog with no manually synchronized copies.                                               |
+| MIRA-CAT-004 | The comprehensive demo MUST provide fixed source, live-preview, preview, and split stories using identical Markdown and adapter data.                                          |
+| MIRA-CAT-005 | Every testable public story MUST render in the Storybook browser test project; meaningful stateful behavior MUST use a `play` interaction.                                     |
+| MIRA-CAT-006 | New visual stories MUST enter review as `visual-pending`; baseline mutation MUST use the installed Visual Delta suite and requires a separate authorized review.               |
+| MIRA-CAT-007 | Every shipped `@mira-mde/ui` primitive family MUST have representative rendered Storybook coverage with interaction or semantic assertions.                                    |
+| MIRA-CAT-008 | Public opt-in preview surfaces MUST have a discoverable focused story, and the comprehensive demo MUST expose the same option wherever it materially changes a supported view. |
 
 Ordinary README prose points to Storybook and the specification. It must not
 become a parallel behavioral reference.
@@ -54,9 +55,10 @@ capture uses the addon's pinned profile and `nested-import` baseline layout.
 The add-on writes each committed baseline URL into the owning story's
 `parameters.visualDelta` metadata and marks regenerated stories
 `visual-pending`; Storybook MUST NOT infer a second URL scheme at preview time.
-The current catalog contains 115 indexed stories: 105 have plugin-owned metadata
-and committed baseline images, while ten UI-primitive verification stories are
-`visual-pending` until a separately authorized baseline mutation. The visual
+The current catalog contains 117 indexed stories: 105 have plugin-owned metadata
+and committed baseline images, while ten UI-primitive verification stories and
+the two focused Markdown outline variants are `visual-pending` until a
+separately authorized baseline mutation. The visual
 gate intentionally exposes missing baselines for new pending stories rather than
 silently treating them as approved. Once baselines exist, `pnpm test:visual`
 invokes the affected preflight in the add-on's clean Docker stage; its
