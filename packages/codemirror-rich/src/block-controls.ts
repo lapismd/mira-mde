@@ -1117,7 +1117,9 @@ const blockControlsTheme = EditorView.theme({
     width: "1.25rem",
   },
   ".mira-block-controls-gutter .cm-gutterElement": {
-    alignItems: "center",
+    // Match line-number gutters: keep the grip on the first visual line
+    // when a markdown block wraps to multiple lines.
+    alignItems: "flex-start",
     display: "flex",
     justifyContent: "center",
     minWidth: "1.25rem",

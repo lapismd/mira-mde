@@ -34,6 +34,32 @@ describe("block controls", () => {
     parent.remove();
   });
 
+  it("top-aligns block handles in the gutter like line numbers", async () => {
+    const parent = document.createElement("div");
+    document.body.append(parent);
+    const view = new EditorView({
+      doc: "Alpha\n\nBeta",
+      extensions: [
+        createRichEditorExtensions({
+          blockControls: true,
+          livePreview: false,
+        }),
+      ],
+      parent,
+    });
+
+    await nextFrame();
+
+    const gutterElement = parent.querySelector(
+      ".mira-block-controls-gutter .cm-gutterElement",
+    );
+    expect(gutterElement).not.toBeNull();
+    expect(getComputedStyle(gutterElement!).alignItems).toBe("flex-start");
+
+    view.destroy();
+    parent.remove();
+  });
+
   it("keeps the active block handle visible without hover", async () => {
     const parent = document.createElement("div");
     document.body.append(parent);
