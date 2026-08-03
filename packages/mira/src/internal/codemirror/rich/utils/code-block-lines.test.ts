@@ -1,3 +1,5 @@
+import { ensureSyntaxTree } from "@codemirror/language";
+import { markdown } from "@codemirror/lang-markdown";
 import { EditorState } from "@codemirror/state";
 import { describe, expect, it } from "vitest";
 import {
@@ -56,4 +58,50 @@ describe("code block line decorations", () => {
     expect(isFencedCodeLine(state, 3)).toBe(true);
     expect(isFencedCodeLine(state, 4)).toBe(false);
   });
+
+  it("marks an indented code block as one continuous block", () => {
+    const source = [
+      "4. Preformatted text in a list item:",
+      "",
+      "        First preformatted line",
+      "        Second preformatted line",
+    ].join("\n");
+    const state = EditorState.create({
+      doc: source,
+      extensions: [markdown()],
+    });
+    const classes = lineClassesWithState(state);
+
+    expect(classes).toEqual([
+      "HyperMD-codeblock HyperMD-codeblock-bg cm-indented-codeblock cm-indented-codeblock-start",
+      "HyperMD-codeblock HyperMD-codeblock-bg cm-indented-codeblock cm-indented-codeblock-end",
+    ]);
+  });
+
+  it("gives a one-line indented code block both edge hooks", () => {
+    const state = EditorState.create({
+      doc: "    one line of preformatted code",
+      extensions: [markdown()],
+    });
+
+    expect(lineClassesWithState(state)).toEqual([
+      "HyperMD-codeblock HyperMD-codeblock-bg cm-indented-codeblock cm-indented-codeblock-start cm-indented-codeblock-end",
+    ]);
+  });
 });
+
+function lineClassesWithState(state: EditorState): string[] {
+  const classes: string[] = [];
+  const tree = ensureSyntaxTree(state, state.doc.length, 100);
+  expect(tree).not.toBeNull();
+  buildCodeBlockLineDecorations(state, tree!).between(
+    0,
+    state.doc.length,
+    (_from, _to, decoration) => {
+      if (decoration.spec.class) {
+        classes.push(decoration.spec.class);
+      }
+    },
+  );
+  return classes;
+}

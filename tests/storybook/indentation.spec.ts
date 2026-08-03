@@ -77,6 +77,22 @@ type LineMetrics = {
   variant: string | null;
 };
 
+type CodeBlockChromeMetrics = {
+  background: string;
+  borderBottom: number;
+  borderLeft: number;
+  borderRight: number;
+  borderTop: number;
+  height: number;
+  inlineBackground: string | null;
+  inlineBorderWidth: number | null;
+  inlinePadding: number | null;
+  paddingBottom: number;
+  paddingRight: number;
+  paddingTop: number;
+  radius: number;
+};
+
 async function lineMetrics(line: Locator): Promise<LineMetrics> {
   return line.evaluate((element) => {
     function firstTextRects(root: HTMLElement): DOMRect[] {
@@ -163,6 +179,35 @@ async function lineMetrics(line: Locator): Promise<LineMetrics> {
       rowLefts: contentRects.map((rect) => rect.left),
       textIndent: Number.parseFloat(style.textIndent),
       variant: element.dataset["indentVariant"] ?? null,
+    };
+  });
+}
+
+async function codeBlockChromeMetrics(
+  block: Locator,
+): Promise<CodeBlockChromeMetrics> {
+  return block.evaluate((element) => {
+    const style = getComputedStyle(element);
+    const inline = element.querySelector<HTMLElement>(".cm-inline-code");
+    const inlineStyle = inline ? getComputedStyle(inline) : null;
+    return {
+      background: style.backgroundColor,
+      borderBottom: Number.parseFloat(style.borderBottomWidth),
+      borderLeft: Number.parseFloat(style.borderLeftWidth),
+      borderRight: Number.parseFloat(style.borderRightWidth),
+      borderTop: Number.parseFloat(style.borderTopWidth),
+      height: element.getBoundingClientRect().height,
+      inlineBackground: inlineStyle?.backgroundColor ?? null,
+      inlineBorderWidth: inlineStyle
+        ? Number.parseFloat(inlineStyle.borderTopWidth)
+        : null,
+      inlinePadding: inlineStyle
+        ? Number.parseFloat(inlineStyle.paddingTop)
+        : null,
+      paddingBottom: Number.parseFloat(style.paddingBottom),
+      paddingRight: Number.parseFloat(style.paddingRight),
+      paddingTop: Number.parseFloat(style.paddingTop),
+      radius: Number.parseFloat(style.borderTopLeftRadius),
     };
   });
 }
@@ -541,6 +586,7 @@ test("keeps preformatted list indentation stable across caret states", async ({
   ]) {
     await gotoStory(page, id);
     const line = lineContaining(page, "Eight-space preformatted content");
+    await expect(line).toHaveClass(/cm-indented-codeblock/u);
     const inactive = await lineMetrics(line);
     expect(inactive.anchorFrom).toBeNull();
     expect(inactive.hasIndentWidget).toBe(true);
@@ -561,6 +607,7 @@ test("keeps preformatted list indentation stable across caret states", async ({
       { offset: 9, hasWidget: true },
     ]) {
       await placeCaretAtLineOffset(page, line, state.offset);
+      await expect(line).toHaveClass(/cm-indented-codeblock/u);
       const metrics = await lineMetrics(line);
       expect(metrics.hasIndentWidget).toBe(state.hasWidget);
       expectSameContentColumn(
@@ -571,6 +618,61 @@ test("keeps preformatted list indentation stable across caret states", async ({
       expectStableRowLefts(metrics);
     }
   }
+});
+
+test("renders indented preformatted content as one code block across editor modes", async ({
+  page,
+}) => {
+  let liveChrome: CodeBlockChromeMetrics | undefined;
+
+  for (const id of [
+    "markdown-indentation--continuation-paragraphs-source",
+    "markdown-indentation--continuation-paragraphs-live-preview",
+  ]) {
+    await gotoStory(page, id);
+    const line = lineContaining(page, "Eight-space preformatted content");
+    await expect(line).toHaveClass(/cm-indented-codeblock-start/u);
+    await expect(line).toHaveClass(/cm-indented-codeblock-end/u);
+
+    const chrome = await codeBlockChromeMetrics(line);
+    expect(chrome.background).not.toBe("rgba(0, 0, 0, 0)");
+    expect(chrome.borderTop).toBeGreaterThan(1.5);
+    expect(chrome.borderRight).toBeGreaterThan(1.5);
+    expect(chrome.borderBottom).toBeGreaterThan(1.5);
+    expect(chrome.borderLeft).toBeGreaterThan(1.5);
+    expect(chrome.radius).toBeGreaterThan(0);
+    expect(chrome.paddingTop).toBeGreaterThanOrEqual(15);
+    expect(chrome.paddingRight).toBeGreaterThanOrEqual(15);
+    expect(chrome.paddingBottom).toBeGreaterThanOrEqual(15);
+    expect(chrome.height).toBeGreaterThan(90);
+    if (id.endsWith("live-preview")) {
+      expect(chrome.inlineBackground).toBe("rgba(0, 0, 0, 0)");
+      expect(chrome.inlineBorderWidth).toBe(0);
+      expect(chrome.inlinePadding).toBe(0);
+      liveChrome = chrome;
+    } else {
+      expect(chrome.inlineBackground).toBeNull();
+    }
+  }
+
+  expect(liveChrome).toBeDefined();
+  await page.getByRole("button", { name: "Reading view" }).click();
+  await settleLayout(page);
+  const readingBlock = page
+    .locator(".markdown-rendered .mira-code-block")
+    .filter({ hasText: "Eight-space preformatted content" });
+  await expect(readingBlock).toBeVisible();
+  const readingChrome = await codeBlockChromeMetrics(readingBlock);
+
+  expect(readingChrome.background).toBe(liveChrome?.background);
+  expect(readingChrome.borderTop).toBeCloseTo(liveChrome!.borderTop, 1);
+  expect(readingChrome.borderRight).toBeCloseTo(liveChrome!.borderRight, 1);
+  expect(readingChrome.borderBottom).toBeCloseTo(liveChrome!.borderBottom, 1);
+  expect(readingChrome.borderLeft).toBeCloseTo(liveChrome!.borderLeft, 1);
+  expect(readingChrome.radius).toBeCloseTo(liveChrome!.radius, 1);
+  expect(readingChrome.paddingTop).toBeCloseTo(liveChrome!.paddingTop, 1);
+  expect(readingChrome.paddingRight).toBeCloseTo(liveChrome!.paddingRight, 1);
+  expect(readingChrome.paddingBottom).toBeCloseTo(liveChrome!.paddingBottom, 1);
 });
 
 test("attaches the indented blockquote widget without a whitespace source row", async ({

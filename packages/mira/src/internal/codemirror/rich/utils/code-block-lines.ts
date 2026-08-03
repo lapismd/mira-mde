@@ -1,10 +1,17 @@
+import { syntaxTree } from "@codemirror/language";
 import {
-  StateField,
   type EditorState,
   type Extension,
   type Range,
 } from "@codemirror/state";
-import { Decoration, type DecorationSet, EditorView } from "@codemirror/view";
+import {
+  Decoration,
+  type DecorationSet,
+  type EditorView,
+  type PluginValue,
+  ViewPlugin,
+  type ViewUpdate,
+} from "@codemirror/view";
 import { sortRanges } from "./ranges";
 
 /**
@@ -32,6 +39,21 @@ function codeLineClasses(options: {
     classes.push("cm-formatting-code-end");
   }
   return classes.join(" ");
+}
+
+function indentedCodeLineClasses(options: {
+  isStart: boolean;
+  isEnd: boolean;
+}): string {
+  return [
+    "HyperMD-codeblock",
+    "HyperMD-codeblock-bg",
+    "cm-indented-codeblock",
+    options.isStart ? "cm-indented-codeblock-start" : "",
+    options.isEnd ? "cm-indented-codeblock-end" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 }
 
 type ActiveFence = {
@@ -94,6 +116,7 @@ export function isFencedCodeLine(
 
 export function buildCodeBlockLineDecorations(
   state: EditorState,
+  tree: ReturnType<typeof syntaxTree> = syntaxTree(state),
 ): DecorationSet {
   const decorations: Range<Decoration>[] = [];
   let active: ActiveFence | undefined;
@@ -126,17 +149,61 @@ export function buildCodeBlockLineDecorations(
     }
   }
 
+  const decoratedIndentedLines = new Set<number>();
+  tree.iterate({
+    from: 0,
+    to: state.doc.length,
+    enter(node) {
+      if (node.name !== "CodeBlock" || node.from >= node.to) {
+        return;
+      }
+
+      const start = state.doc.lineAt(node.from);
+      const end = state.doc.lineAt(Math.max(node.from, node.to - 1));
+      for (
+        let lineNumber = start.number;
+        lineNumber <= end.number;
+        lineNumber += 1
+      ) {
+        if (decoratedIndentedLines.has(lineNumber)) {
+          continue;
+        }
+        decoratedIndentedLines.add(lineNumber);
+        const line = state.doc.line(lineNumber);
+        decorations.push(
+          Decoration.line({
+            class: indentedCodeLineClasses({
+              isStart: lineNumber === start.number,
+              isEnd: lineNumber === end.number,
+            }),
+          }).range(line.from),
+        );
+      }
+    },
+  });
+
   return Decoration.set(sortRanges(decorations));
 }
 
 export function codeBlockLineDecorations(): Extension {
-  return StateField.define<DecorationSet>({
-    create: buildCodeBlockLineDecorations,
-    update(value, transaction) {
-      return transaction.docChanged
-        ? buildCodeBlockLineDecorations(transaction.state)
-        : value.map(transaction.changes);
+  return ViewPlugin.fromClass(
+    class implements PluginValue {
+      decorations: DecorationSet;
+
+      constructor(view: EditorView) {
+        this.decorations = buildCodeBlockLineDecorations(view.state);
+      }
+
+      update(update: ViewUpdate): void {
+        if (
+          update.docChanged ||
+          update.viewportChanged ||
+          syntaxTree(update.startState) !== syntaxTree(update.state)
+        ) {
+          this.decorations = buildCodeBlockLineDecorations(update.state);
+        }
+      }
     },
-    provide: (field) => EditorView.decorations.from(field),
-  });
+    { decorations: (plugin) => plugin.decorations },
+  );
 }

@@ -45,9 +45,9 @@ set and MUST NOT appear in packed consumer dependency graphs.
   plugin-author helpers.
 - `codemirror` exports the supported low-level extension factories, including
   `measuredIndentExtension` and `syncMeasuredIndentStyles`; internal layout
-  repairs MUST preserve those exports. Indentation-guide and continuation
-  geometry remains internal to those factories and MUST NOT require a new
-  consumer API.
+  repairs MUST preserve those exports. Indentation-guide, continuation, and
+  syntax-tree-derived indented-code line geometry remains internal to those
+  factories and MUST NOT require a new consumer API.
 - `preview` exports Markdown preview, outline, embed, and renderer surfaces.
 - `tables` exports the supported Markdown and grid-table components.
 - `ui` and its documented component subpaths export the shared UI primitives.

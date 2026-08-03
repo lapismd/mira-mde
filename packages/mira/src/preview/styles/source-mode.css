@@ -284,6 +284,45 @@
   border-radius: 0 0 var(--radius-m) var(--radius-m);
 }
 
+/* Indented Markdown code is a block even though its CodeText token is inline. */
+.markdown-editor-surface .cm-editor .cm-line.cm-indented-codeblock,
+.markdown-editor-surface
+  .cm-editor
+  .cm-activeLine.cm-line.cm-indented-codeblock {
+  background-color: color-mix(in oklab, var(--secondary) 60%, transparent);
+  border-inline: 2px solid var(--secondary);
+  box-sizing: border-box;
+  padding-inline-end: 1rem;
+}
+
+.markdown-editor-surface .cm-editor .cm-line.cm-indented-codeblock-start {
+  border-block-start: 2px solid var(--secondary);
+  border-radius: var(--radius-s) var(--radius-s) 0 0;
+  padding-block-start: 1rem;
+}
+
+.markdown-editor-surface .cm-editor .cm-line.cm-indented-codeblock-end {
+  border-block-end: 2px solid var(--secondary);
+  border-radius: 0 0 var(--radius-s) var(--radius-s);
+  padding-block-end: 1rem;
+}
+
+.markdown-editor-surface
+  .cm-editor
+  .cm-line.cm-indented-codeblock-start.cm-indented-codeblock-end {
+  border-radius: var(--radius-s);
+}
+
+.markdown-editor-surface
+  .cm-editor
+  .cm-line.cm-indented-codeblock
+  .cm-inline-code {
+  background-color: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+}
+
 .markdown-editor-surface .cm-comment,
 .markdown-editor-surface .cm-meta {
   color: var(--markdown-code-comment);

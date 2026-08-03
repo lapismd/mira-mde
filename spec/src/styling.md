@@ -59,6 +59,12 @@ unordered marker spans hide their authored glyph and paint the same tokenized
 bullet shape used by reading mode; focusing the marker removes that presentation
 so the original `-`, `*`, or `+` stays editable.
 
+Source and live-preview indented code blocks use syntax-tree-derived line hooks
+owned by Mira's CodeMirror extension. Shipped CSS MUST join those lines into one
+block surface with reading-mode background, border, radius, and padding values;
+any nested inline-code token chrome MUST be neutralized without hiding or
+replacing the authored indentation.
+
 Color tokens may use `light-dark()` directly. Channel-list tokens such as the
 callout RGB values and compound tokens such as widget shadows retain their
 documented value grammar instead: built-in palettes select their light and dark

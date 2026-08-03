@@ -81,12 +81,18 @@ collapsed to `115.24px`; revealing the raw two-space prefix moved that content
 to `132.03px`. The repair is complete when default source and live-preview
 continuations align with their parent content within `1.5px`, caret movement
 does not change that column, and eight-space preformatted list content retains
-two non-zero indent segments. The full-height guide follow-up additionally
+two non-zero indent segments. Before the code-block follow-up, that preformatted
+line rendered as a `67.20px` indentation widget followed by a text-only inline
+code chip, leaving the line without reading-mode block chrome. The repaired
+source and live-preview line use one continuous block surface with the same
+background, approximately `2px` border, `4px` radius, and `16px` block padding
+as reading mode while keeping the authored indentation editable. The
+full-height guide follow-up additionally
 requires each enabled wrapped-line guide pseudo-element to match its CodeMirror
 line box within `2px`. Live-preview acceptance also requires inactive dash and
 asterisk markers to expose the styled-bullet hook and non-zero rendered bullet,
 then reveal the authored marker when the caret enters its prefix. Implementation
-is complete: focused Chromium acceptance passes all 12 indentation cases
+is complete: focused Chromium acceptance passes all 13 indentation cases
 (including the unchanged expected failure for
 the unrelated blockquote whitespace row), the caret-geometry case passes 16
 repeated runs, and wrapped-row plus full-height-guide coverage passes 8 repeated
@@ -97,10 +103,11 @@ measured inactive dash and asterisk live-preview bullets at approximately
 their reading-mode bullets. The focused unit suite passes 13 tests, the Mira
 package check, test, and build gates pass, and `pnpm spec:check`,
 `pnpm catalog:check`, and `pnpm check:all` pass.
-The final `pnpm storybook:check` static build also passes. Its compare-only
-visual stage reports 19 review-required snapshot deltas (13 in the repaired
-indentation and list surfaces, plus 6 shared editor-surface snapshots); no
-visual baselines were created or refreshed for this repair.
+The catalog and static-build portions of the final `pnpm storybook:check` pass.
+Its compare-only visual stage exits non-green with 19 review-required snapshot
+deltas (13 in the repaired indentation and list surfaces, plus 6 shared
+editor-surface snapshots); no visual baselines were created or refreshed for
+this repair.
 
 The add-on's Docker stage excludes both `storybook-static` and its affected
 cache. The `test:visual` gate therefore uses the affected preflight to build in
