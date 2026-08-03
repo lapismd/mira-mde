@@ -38,10 +38,13 @@ resolution.
 Storybook infrastructure dependencies are root-only development tools and MUST
 NOT leak into a public package manifest or emitted package output. The reviewed
 Visual Delta release is upgraded independently from Mira's six-package runtime
-graph and remains subject to the catalog's build and compare-only gates. Its
-published package MUST own the clean-stage worker fallback and generated-cache
-exclusions required by those gates; Mira does not maintain a downstream pnpm
-patch for behavior available in the reviewed upstream release.
+graph and remains subject to the catalog's build and compare-only gates. A
+temporary root-only `link:` dependency MAY consume its sibling source checkout
+while integration repairs are in progress, but MUST NOT enter any public
+package graph. The Visual Delta package MUST own clean-stage worker fallback,
+generated-cache exclusions, fresh-workspace dependency relinking, and linked
+source build identity required by those gates; Mira does not maintain a
+downstream pnpm patch for behavior available in the reviewed upstream source.
 
 Storybook's palette addon and manager color-mode control are host-only tooling.
 They update the preview document's public theme attribute and shadcn-compatible

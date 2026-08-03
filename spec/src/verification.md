@@ -119,15 +119,16 @@ Stories retain `visual-pending` until human acceptance is recorded separately;
 this review state does not mean their committed baseline or deterministic
 comparison is missing.
 
-The Visual Delta suite is reviewed at `0.0.5`. It retains the canonical capture
-runner used by both Storybook's Diff Browser action and the CLI, so a host-local
-browser cannot be mislabeled as the Linux/ARM64 baseline target. The published
-tarball retains the `0.0.4` guards that build a source worker only when
+The Visual Delta suite is reviewed at `0.0.5` and temporarily installed from
+the sibling source checkout while the remaining integration issues are being
+resolved. It retains the canonical capture runner used by both Storybook's Diff
+Browser action and the CLI, so a host-local browser cannot be mislabeled as the
+Linux/ARM64 baseline target. The package retains the `0.0.4` guards that build a source worker only when
 `tsconfig.node-build.json` exists, use its executable shipped `dist` worker
 otherwise, and exclude `.turbo` from both clean-workspace staging and post-run
 artifact inventory. The package carries focused regression tests for both
-behaviors, so Mira continues to consume the published package without its former
-`0.0.3` pnpm patch. Version `0.0.5` replaces the physical-path-sensitive,
+behaviors, so Mira consumes the linked source without its former `0.0.3` pnpm
+patch. Version `0.0.5` replaces the physical-path-sensitive,
 repeated-story version 2 affected cache with compact logical version 3 state,
 enables affected planning when the host option is omitted, and guardedly
 revalidates eligible version 2 passes. It also caches verified canonical static
@@ -138,6 +139,29 @@ the Playwright worker for every story. Mira declares its established
 `nested-import` baseline path mode on root visual CLI scripts rather than
 inheriting the release's flat `story-id` default. The upgrade remains
 compare-only and does not authorize baseline image changes.
+
+The linked source additionally recreates workspace-local pnpm links in every
+fresh canonical staging directory even after its dependency volume is warm. It
+stages the external Visual Delta checkout at the consumer's resolved `link:`
+target with a separate Linux dependency volume, so canonical capture neither
+skips package-local links nor imports macOS `node_modules`. Focused runner tests
+cover both the warm relink command and isolated linked-source staging. The
+staged copy is disposable and writable so pnpm can materialize the shipped CLI
+bin without mutating the host checkout. A content-only fingerprint of the
+linked manifest, lockfile, and source enters the canonical static-build key,
+preventing a source edit from restoring stale output.
+
+Linked-source validation passes all 17 strict doctor checks, including a fresh
+Storybook build and the full Linux/ARM64 runner probe, with no warnings or
+errors. A fresh canonical Chromium run selects the exact ten Indentation
+stories and all ten Playwright captures pass; strict policy then exits non-zero
+only because those `visual-pending` stories intentionally have no approved
+baselines. All ten actual images and result sidecars are returned as artifacts,
+and no baseline is created or refreshed. A second fresh-workspace run recreates
+package-local links in `1.2s`, restores the verified canonical Storybook build,
+and passes its selected continuation story. The linked add-on itself passes
+`pnpm spec:check`, type checking, all 528 unit tests, and its Node build. No
+baseline mutation is authorized by this temporary development link.
 
 Upgrade validation resolves the unpatched published tarball and verifies the
 packaging guards, cache-v3 migration, canonical build cache, single-pass
