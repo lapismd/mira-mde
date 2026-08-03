@@ -68,12 +68,12 @@ Renamed Mira Editor identities replaced the orphaned Default UI paths during
 the same mutation step.
 
 The focused indentation coverage slice raises the catalog to 132 indexed
-stories. The 122 prior stories remain baseline-covered; the ten new list,
-continuation, nested-quote, active-prefix, and indent-width stories are
-`visual-pending` without baseline metadata until a separate authorized review.
-Their Storybook play functions require every regression target to remain inside
-the initial editor viewport, and focused Chromium acceptance owns the browser
-geometry assertions.
+stories. All 132 are now baseline-covered. The ten new list, continuation,
+nested-quote, active-prefix, and indent-width stories have canonical
+Linux/ARM64 Chromium PNGs and explicit baseline metadata, while remaining
+`visual-pending` until human review. Their Storybook play functions require
+every regression target to remain inside the initial editor viewport, and
+focused Chromium acceptance owns the browser geometry assertions.
 
 The continuation-alignment repair records an inactive-widget regression where
 the parent bullet content began at `130.24px` while ordinary continuation text
@@ -154,14 +154,17 @@ preventing a source edit from restoring stale output.
 Linked-source validation passes all 17 strict doctor checks, including a fresh
 Storybook build and the full Linux/ARM64 runner probe, with no warnings or
 errors. A fresh canonical Chromium run selects the exact ten Indentation
-stories and all ten Playwright captures pass; strict policy then exits non-zero
-only because those `visual-pending` stories intentionally have no approved
-baselines. All ten actual images and result sidecars are returned as artifacts,
-and no baseline is created or refreshed. A second fresh-workspace run recreates
-package-local links in `1.2s`, restores the verified canonical Storybook build,
-and passes its selected continuation story. The linked add-on itself passes
-`pnpm spec:check`, type checking, all 528 unit tests, and its Node build. No
-baseline mutation is authorized by this temporary development link.
+stories and all ten Playwright captures pass; strict policy initially exited
+non-zero because those `visual-pending` stories intentionally had no approved
+baselines. The subsequently authorized create-missing action forwarded Mira's
+resolved nested-import baseline identity, selected only those ten missing
+captures, wrote all ten exact PNGs, and passed an updates-disabled replay before
+applying their story metadata. The existing 122 baselines were neither captured
+nor rewritten, and the new stories remain pending human review. A second
+fresh-workspace run recreates package-local links in `1.2s`, restores the
+verified canonical Storybook build, and passes its selected continuation story.
+The linked add-on itself passes `pnpm spec:check`, type checking, its complete
+unit suite, and its Node build.
 
 Upgrade validation resolves the unpatched published tarball and verifies the
 packaging guards, cache-v3 migration, canonical build cache, single-pass

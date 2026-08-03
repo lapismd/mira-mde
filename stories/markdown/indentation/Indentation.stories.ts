@@ -106,8 +106,18 @@ const activeTargets = [
 ];
 
 export const WrappedListItemsSource: Story = {
+  tags: ["visual-pending"],
   name: "Wrapped List Items — Source",
   parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/markdown/indentation/wrapped-list-items-source-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
     docs: {
       source: {
         language: "html",
@@ -122,9 +132,19 @@ export const WrappedListItemsSource: Story = {
 };
 
 export const WrappedListItemsLivePreview: Story = {
+  tags: ["visual-pending"],
   name: "Wrapped List Items — Live Preview",
   args: { mode: "live-preview" },
   parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/markdown/indentation/wrapped-list-items-live-preview-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
     docs: {
       source: {
         language: "html",
@@ -142,6 +162,7 @@ export const WrappedListItemsLivePreview: Story = {
 };
 
 export const ContinuationParagraphsSource: Story = {
+  tags: ["visual-pending"],
   name: "Continuation Paragraphs — Source",
   args: {
     value: continuationParagraphsMarkdown,
@@ -153,6 +174,15 @@ export const ContinuationParagraphsSource: Story = {
     },
   },
   parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/markdown/indentation/continuation-paragraphs-source-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
     docs: {
       source: {
         language: "html",
@@ -170,6 +200,7 @@ export const ContinuationParagraphsSource: Story = {
 };
 
 export const ContinuationParagraphsLivePreview: Story = {
+  tags: ["visual-pending"],
   name: "Continuation Paragraphs — Live Preview",
   args: {
     value: continuationParagraphsMarkdown,
@@ -181,6 +212,15 @@ export const ContinuationParagraphsLivePreview: Story = {
     },
   },
   parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/markdown/indentation/continuation-paragraphs-live-preview-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
     docs: {
       source: {
         language: "html",
@@ -198,6 +238,7 @@ export const ContinuationParagraphsLivePreview: Story = {
 };
 
 export const NestedListsAndQuotesSource: Story = {
+  tags: ["visual-pending"],
   name: "Nested Lists and Quotes — Source",
   args: {
     value: nestedListsAndQuotesMarkdown,
@@ -205,6 +246,15 @@ export const NestedListsAndQuotesSource: Story = {
     height: "40rem",
   },
   parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/markdown/indentation/nested-lists-and-quotes-source-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
     docs: {
       source: {
         language: "html",
@@ -222,6 +272,7 @@ export const NestedListsAndQuotesSource: Story = {
 };
 
 export const NestedListsAndQuotesLivePreview: Story = {
+  tags: ["visual-pending"],
   name: "Nested Lists and Quotes — Live Preview",
   args: {
     value: nestedListsAndQuotesLiveMarkdown,
@@ -229,6 +280,15 @@ export const NestedListsAndQuotesLivePreview: Story = {
     height: "40rem",
   },
   parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/markdown/indentation/nested-lists-and-quotes-live-preview-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
     docs: {
       source: {
         language: "html",
@@ -246,6 +306,7 @@ export const NestedListsAndQuotesLivePreview: Story = {
 };
 
 export const NestedListsAndQuotesReading: Story = {
+  tags: ["visual-pending"],
   name: "Nested Lists and Quotes — Reading",
   args: {
     value: nestedListsAndQuotesMarkdown,
@@ -253,6 +314,15 @@ export const NestedListsAndQuotesReading: Story = {
     height: "40rem",
   },
   parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/markdown/indentation/nested-lists-and-quotes-reading-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
     docs: {
       source: {
         language: "html",
@@ -267,6 +337,7 @@ export const NestedListsAndQuotesReading: Story = {
 };
 
 export const ActivePrefixesSource: Story = {
+  tags: ["visual-pending"],
   name: "Active Prefixes — Source",
   args: {
     value: activePrefixesMarkdown,
@@ -278,6 +349,15 @@ export const ActivePrefixesSource: Story = {
     },
   },
   parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/markdown/indentation/active-prefixes-source-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
     docs: {
       source: {
         language: "html",
@@ -292,6 +372,7 @@ export const ActivePrefixesSource: Story = {
 };
 
 export const ActivePrefixesLivePreview: Story = {
+  tags: ["visual-pending"],
   name: "Active Prefixes — Live Preview",
   args: {
     value: activePrefixesMarkdown,
@@ -303,6 +384,15 @@ export const ActivePrefixesLivePreview: Story = {
     },
   },
   parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/markdown/indentation/active-prefixes-live-preview-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
     docs: {
       source: {
         language: "html",
@@ -320,6 +410,7 @@ export const ActivePrefixesLivePreview: Story = {
 };
 
 export const ConfigurableIndentWidth: Story = {
+  tags: ["visual-pending"],
   name: "Configurable Indent Width",
   args: {
     value: configurableIndentWidthMarkdown,
@@ -328,6 +419,15 @@ export const ConfigurableIndentWidth: Story = {
     indentWidth: 4,
   },
   parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/markdown/indentation/configurable-indent-width-chromium.png",
+      ],
+      opacity: 0.5,
+      colorInversion: false,
+      align: "canvas",
+      placement: "right",
+    },
     docs: {
       source: {
         language: "html",
