@@ -11,7 +11,8 @@ test-results
 storybook-static
 storybook-static-check
 spec/book
-.cache/visual-delta/
+.visual-delta/artifacts/
+.visual-delta/cache/
 tests/visual/storybook.spec.ts-snapshots/**/*.json
 tests/visual/storybook.spec.ts-snapshots/**/*.actual.png
 tests/visual/storybook.spec.ts-snapshots/**/*.diff.png

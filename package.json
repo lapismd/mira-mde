@@ -10,7 +10,7 @@
   },
   "scripts": {
     "build": "turbo run build",
-    "build-storybook": "pnpm build && node -e \"require('node:fs').mkdirSync('.cache/visual-delta',{recursive:true})\" && NODE_OPTIONS=--max-old-space-size=4096 storybook build --stats-json .cache/visual-delta",
+    "build-storybook": "pnpm build && node -e \"require('node:fs').mkdirSync('.visual-delta/cache',{recursive:true})\" && NODE_OPTIONS=--max-old-space-size=4096 storybook build --stats-json .visual-delta/cache",
     "catalog:check": "node ./scripts/check-catalog.mjs && node --test ./scripts/check-catalog.spec.mjs",
     "check": "pnpm check:format && turbo run check",
     "check:all": "pnpm check && pnpm lint && pnpm test && pnpm build",
@@ -35,9 +35,9 @@
     "test": "turbo run test",
     "test:e2e": "playwright test -c playwright.storybook.config.ts",
     "test:storybook": "vitest run --project storybook",
-    "test:visual": "visual-delta test --affected",
-    "test:visual:affected": "visual-delta test --affected",
-    "test:visual:update": "visual-delta update",
+    "test:visual": "visual-delta test --affected --baseline-path-mode nested-import",
+    "test:visual:affected": "visual-delta test --affected --baseline-path-mode nested-import",
+    "test:visual:update": "visual-delta update --baseline-path-mode nested-import",
     "visual-delta": "visual-delta",
     "test:visual:report": "playwright show-report"
   },
@@ -51,7 +51,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
-    "@lapismd/storybook-addon-visual-delta": "^0.0.3",
+    "@lapismd/storybook-addon-visual-delta": "^0.0.4",
     "@lucide/svelte": "^0.525.0",
     "@playwright/test": "^1.61.1",
     "@storybook/addon-a11y": "^10.5.2",

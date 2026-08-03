@@ -38,7 +38,10 @@ resolution.
 Storybook infrastructure dependencies are root-only development tools and MUST
 NOT leak into a public package manifest or emitted package output. The reviewed
 Visual Delta release is upgraded independently from Mira's six-package runtime
-graph and remains subject to the catalog's build and compare-only gates.
+graph and remains subject to the catalog's build and compare-only gates. Its
+published package MUST own the clean-stage worker fallback and generated-cache
+exclusions required by those gates; Mira does not maintain a downstream pnpm
+patch for behavior available in the reviewed upstream release.
 
 Storybook's palette addon and manager color-mode control are host-only tooling.
 They update the preview document's public theme attribute and shadcn-compatible
@@ -78,5 +81,7 @@ The canonical Docker runner stages a clean workspace without
 `storybook-static` or affected-state cache. `pnpm test:visual` therefore uses
 the add-on's affected preflight: the missing cache requires a full-suite
 fallback, builds Storybook inside the pinned environment, and then performs a
-read-only comparison of every indexed story. The add-on's direct `test --all`
+read-only comparison of every indexed story. Root visual commands explicitly
+select `nested-import` baseline paths so their CLI behavior matches the
+Storybook host and portable Playwright suite. The add-on's direct `test --all`
 path is not used because it assumes an already-staged static build.

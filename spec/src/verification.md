@@ -118,16 +118,34 @@ outline variants are now baseline-covered. Stories retain `visual-pending`
 until human acceptance is recorded separately; this review state does not mean
 their committed baseline or deterministic comparison is missing.
 
-The Visual Delta suite is reviewed at `0.0.3`. This release routes Storybook's
-Diff Browser action through the same canonical capture runner used by the CLI,
-so a host-local browser cannot be mislabeled as the Linux/ARM64 baseline target.
-The published tarball includes source files but omits its source-build tsconfig,
-and its compare-only artifact scan includes newly generated `.turbo` manifests
-as though they were Visual Delta sidecars. Mira therefore applies a narrow pnpm
-patch that uses the shipped `dist` worker unless the tsconfig exists and excludes
-Turbo's disposable build cache from capture staging and artifact validation.
-Remove the patch when an upstream release includes both guards. The upgrade is
+The Visual Delta suite is reviewed at `0.0.4`. It retains the canonical capture
+runner used by both Storybook's Diff Browser action and the CLI, so a host-local
+browser cannot be mislabeled as the Linux/ARM64 baseline target. The published
+tarball now guards source-worker builds on the presence of
+`tsconfig.node-build.json`, uses its executable shipped `dist` worker otherwise,
+and excludes `.turbo` from both clean-workspace staging and post-run artifact
+inventory. The package carries focused regression tests for both behaviors, so
+Mira removes its equivalent `0.0.3` pnpm patch and consumes `0.0.4` directly.
+The `0.0.4` doctor migration quarantines obsolete comparison evidence, moves
+preview statistics and affected state to `.visual-delta/cache`, and keeps that
+cache independent from `.visual-delta/artifacts`. Mira also declares its
+established `nested-import` baseline path mode on root visual CLI scripts rather
+than inheriting the release's flat `story-id` default. The upgrade remains
 compare-only and does not authorize baseline image changes.
+
+Upgrade validation resolves the unpatched published tarball and verifies both
+guards in its shipped source before installation. `visual-delta doctor --fix`
+quarantines nine obsolete comparison files and the two legacy cache files;
+after the root cache/script migration, strict doctor reports 15 passes, no
+warnings, and no errors. A clean Linux/ARM64 Chromium comparison for
+`markdown-headings--preview` passes against its nested committed baseline and
+completes post-run artifact validation without a Turbo manifest error. The full
+affected fallback was stopped after its first eight pre-existing review-required
+deltas and replaced with that focused acceptance; no baselines were written or
+refreshed. The optional remote runner availability probe remains unable to
+inspect the pinned GHCR digest because the registry returns `403`, while the
+same locally present image passes the container execution probe and focused
+canonical comparison.
 
 The UI primitive review also verifies that portaled dropdown and context menus
 use the Lapis-compatible 14/20 interface type scale with leading semantic action
