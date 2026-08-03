@@ -74,6 +74,15 @@ Their Storybook play functions require every regression target to remain inside
 the initial editor viewport, and focused Chromium acceptance owns the browser
 geometry assertions.
 
+The continuation-alignment repair records an inactive-widget regression where
+the parent bullet content began at `130.24px` while ordinary continuation text
+collapsed to `115.24px`; revealing the raw two-space prefix moved that content
+to `132.03px`. The repair is complete when default source and live-preview
+continuations align with their parent content within `1.5px`, caret movement
+does not change that column, and eight-space preformatted list content retains
+two non-zero indent segments. Focused unit, Storybook Chromium, package, and
+repository validation results are recorded with the implementing change.
+
 The add-on's Docker stage excludes both `storybook-static` and its affected
 cache. The `test:visual` gate therefore uses the affected preflight to build in
 the pinned stage and deterministically fall back to the full catalog; the direct
