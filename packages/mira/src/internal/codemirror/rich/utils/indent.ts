@@ -17,6 +17,13 @@ type IndentSegment = {
   guide: boolean;
 };
 
+type PlainIndentAnchor = {
+  fallbackPaddingAdjustment?: string;
+  fallbackPaddingColumns: number;
+  guideOffset?: string;
+  lineFrom: number;
+};
+
 type MiraLineIndentLayout = {
   contentFrom: number;
   depth: number;
@@ -195,26 +202,45 @@ export function getIndentLineLayout(
 }
 
 function fallbackLength(columns: number, adjustment?: string): string {
-  return adjustment ? `calc(${columns}ch + ${adjustment})` : `${columns}ch`;
+  if (columns <= 0 && !adjustment) {
+    return "";
+  }
+  return adjustment
+    ? `calc(${Math.max(columns, 0)}ch + ${adjustment})`
+    : `${columns}ch`;
 }
 
-function buildIndentStyle(layout: MiraLineIndentLayout): string {
+function unorderedMarkerAdjustment(markerColumns: number): string {
+  return `var(--hmd-unordered-list-marker-slot-width, ${Math.max(markerColumns, 0)}ch) - ${Math.max(markerColumns, 0)}ch`;
+}
+
+function buildIndentStyle(
+  layout: MiraLineIndentLayout,
+  anchor: PlainIndentAnchor | null,
+): string {
   const markerColumns =
     layout.markerFrom === undefined || layout.markerTo === undefined
       ? 0
       : layout.markerTo - layout.markerFrom;
-  const markerAdjustment =
+  const listMarkerAdjustment =
     layout.listKind === "ul"
-      ? `var(--hmd-unordered-list-marker-slot-width, ${markerColumns}ch) - ${markerColumns}ch`
+      ? unorderedMarkerAdjustment(markerColumns)
       : undefined;
-  const fallback = fallbackLength(layout.fallbackColumns, markerAdjustment);
+  const paddingFallback = fallbackLength(
+    anchor?.fallbackPaddingColumns ?? layout.fallbackColumns,
+    anchor?.fallbackPaddingAdjustment ?? listMarkerAdjustment,
+  );
+  const prefixFallback = fallbackLength(
+    layout.fallbackColumns,
+    listMarkerAdjustment,
+  );
   return [
     layout.guideCount > 0 ? `--indent-guide-count: ${layout.guideCount};` : "",
-    layout.listKind === "ul"
-      ? "--hmd-indent-guide-offset: var(--hmd-unordered-list-marker-guide-offset, 0px);"
+    anchor?.guideOffset || layout.listKind === "ul"
+      ? `--hmd-indent-guide-offset: ${anchor?.guideOffset ?? "var(--hmd-unordered-list-marker-guide-offset, 0px)"};`
       : "",
-    `--hmd-indent-padding-fallback: ${fallback};`,
-    `--hmd-indent-prefix-fallback: ${fallback};`,
+    paddingFallback ? `--hmd-indent-padding-fallback: ${paddingFallback};` : "",
+    prefixFallback ? `--hmd-indent-prefix-fallback: ${prefixFallback};` : "",
   ]
     .filter(Boolean)
     .join(" ");
@@ -308,13 +334,9 @@ export function indentGuideDecorations(
               }
 
               const indentTo = line.from + layout.indentText.length;
-              const anchorFrom =
+              const anchor =
                 layout.kind === "plain"
-                  ? findPlainIndentAnchor(
-                      view,
-                      line.number,
-                      layout.indentColumns,
-                    )
+                  ? findPlainIndentAnchor(view, line, layout.indentColumns)
                   : null;
               const quoteChrome =
                 livePreview &&
@@ -330,10 +352,12 @@ export function indentGuideDecorations(
                     ...(layout.listKind
                       ? { "data-list-kind": layout.listKind }
                       : {}),
-                    ...(anchorFrom !== null
-                      ? { "data-indent-anchor-line-from": `${anchorFrom}` }
+                    ...(anchor
+                      ? {
+                          "data-indent-anchor-line-from": `${anchor.lineFrom}`,
+                        }
                       : {}),
-                    style: buildIndentStyle(layout),
+                    style: buildIndentStyle(layout, anchor),
                   },
                   class: [
                     "indented-wrapped-line",
@@ -345,18 +369,10 @@ export function indentGuideDecorations(
                     layout.listKind || layout.kind === "plain"
                       ? `HyperMD-list-line-${layout.depth}`
                       : "",
-                    "cm-formatting",
-                    layout.listKind || layout.kind === "plain"
-                      ? "cm-formatting-list"
-                      : "",
-                    layout.listKind === "ol"
-                      ? "cm-formatting-list-ol"
-                      : layout.listKind === "ul" || layout.kind === "plain"
-                        ? "cm-formatting-list-ul"
-                        : "",
-                    layout.listKind || layout.kind === "plain"
-                      ? `cm-list-${layout.depth}`
-                      : "",
+                    !layout.listKind ? "cm-formatting" : "",
+                    layout.kind === "plain" ? "cm-formatting-list" : "",
+                    layout.kind === "plain" ? "cm-formatting-list-ul" : "",
+                    layout.kind === "plain" ? `cm-list-${layout.depth}` : "",
                   ]
                     .filter(Boolean)
                     .join(" "),
@@ -472,29 +488,97 @@ function isMarkdownIndentLine(
   return layout.listKind ? list : quote;
 }
 
+export function shouldAnchorPlainIndentToListItem(
+  indentColumns: number,
+  parentContentColumns: number,
+): boolean {
+  return indentColumns < parentContentColumns + INDENT_UNIT;
+}
+
+function getMarkerEnd(
+  lineText: string,
+  lineFrom: number,
+  markerFrom: number,
+  markerTo: number,
+): number {
+  const markerOffset = markerFrom - lineFrom;
+  const spaceOffset = lineText.indexOf(" ", markerOffset);
+  return spaceOffset === -1 ? markerTo : lineFrom + spaceOffset + 1;
+}
+
+function getListPrefixEndFromText(
+  remainder: string,
+  markerEnd: number,
+): number {
+  const task = remainder.match(/^(\[[^\]]\]\s+)/u)?.[0] ?? "";
+  return markerEnd + task.length;
+}
+
 function findPlainIndentAnchor(
   view: EditorView,
-  lineNumber: number,
+  line: Line,
   indentColumns: number,
-): number | null {
+): PlainIndentAnchor | null {
+  const tree = syntaxTree(view.state);
+  const node = tree.resolve(line.from, 1);
+
   for (
-    let candidateNumber = lineNumber - 1;
-    candidateNumber >= Math.max(1, lineNumber - 50);
-    candidateNumber -= 1
+    let current: typeof node | null = node;
+    current;
+    current = current.parent
   ) {
-    const candidate = view.state.doc.line(candidateNumber);
-    if (!candidate.text.trim()) {
+    if (current.name !== "ListItem") {
       continue;
     }
-    const layout = getIndentLineLayout(candidate.text);
-    if (layout?.listKind) {
-      return indentColumns < layout.fallbackColumns + INDENT_UNIT
-        ? candidate.from
-        : null;
+
+    const list = current.parent;
+    if (!list || (list.name !== "BulletList" && list.name !== "OrderedList")) {
+      continue;
     }
-    if (!layout || layout.kind === "quote") {
+
+    const listMark = current.getChild("ListMark");
+    if (!listMark) {
       return null;
     }
+
+    const anchorLine = view.state.doc.lineAt(listMark.from);
+    if (anchorLine.from === line.from) {
+      return null;
+    }
+
+    const markerEnd = getMarkerEnd(
+      anchorLine.text,
+      anchorLine.from,
+      listMark.from,
+      listMark.to,
+    );
+    const prefixEnd = getListPrefixEndFromText(
+      view.state.sliceDoc(markerEnd, anchorLine.to),
+      markerEnd,
+    );
+    const fallbackPaddingColumns = toMarkdownColumns(
+      view.state.sliceDoc(anchorLine.from, prefixEnd),
+    );
+    if (
+      !shouldAnchorPlainIndentToListItem(indentColumns, fallbackPaddingColumns)
+    ) {
+      return null;
+    }
+
+    if (list.name === "BulletList") {
+      const markerColumns = toMarkdownColumns(
+        view.state.sliceDoc(listMark.from, markerEnd),
+      );
+      return {
+        fallbackPaddingAdjustment: unorderedMarkerAdjustment(markerColumns),
+        fallbackPaddingColumns,
+        guideOffset: "var(--hmd-unordered-list-marker-guide-offset, 0px)",
+        lineFrom: anchorLine.from,
+      };
+    }
+
+    return { fallbackPaddingColumns, lineFrom: anchorLine.from };
   }
+
   return null;
 }

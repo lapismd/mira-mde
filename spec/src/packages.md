@@ -43,7 +43,9 @@ set and MUST NOT appear in packed consumer dependency graphs.
 - `core` exports controller APIs and the shared CodeMirror composition factory.
 - `extensions` exports extension contracts, commands, resolvers, and
   plugin-author helpers.
-- `codemirror` exports the supported low-level extension factories.
+- `codemirror` exports the supported low-level extension factories, including
+  `measuredIndentExtension` and `syncMeasuredIndentStyles`; internal layout
+  repairs MUST preserve those exports.
 - `preview` exports Markdown preview, outline, embed, and renderer surfaces.
 - `tables` exports the supported Markdown and grid-table components.
 - `ui` and its documented component subpaths export the shared UI primitives.

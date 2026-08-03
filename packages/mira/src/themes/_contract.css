@@ -10,6 +10,9 @@
     "Source Code Pro", ui-monospace, SFMono-Regular, Consolas, monospace;
   --mira-font-size: 14px;
   --mira-line-height: 1.6;
+  --mira-indent-size: 4;
+  --mira-indent-unit: 0.5625em;
+  --mira-list-indent: calc(var(--mira-indent-unit) * var(--mira-indent-size));
   --mira-h1-line-height: 1.2;
   --mira-h2-line-height: 1.2;
   --mira-h3-line-height: 1.3;

@@ -38,9 +38,17 @@
   );
 }
 
+.markdown-editor-surface .cm-editor .cm-line > * {
+  text-indent: 0;
+}
+
 .markdown-editor-surface .cm-editor .cm-hmd-list-indent {
   display: inline-block;
   white-space: pre;
+}
+
+.markdown-editor-surface .cm-editor .cm-indent {
+  min-width: var(--list-indent);
 }
 
 .markdown-editor-surface .cm-editor .cm-plain-indent-line,

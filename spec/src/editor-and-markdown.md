@@ -30,6 +30,11 @@ The Lapis Markdown Feature Tour and CodeMirror Layout Showcase are reference
 fixtures. Mira owns adapted Storybook copies with consumer-neutral paths and
 adapters.
 
+List continuation layout follows Lapis's syntax-tree ownership and measured
+prefix contract: inactive replacement widgets and editable raw prefixes share
+one content column, while preformatted list content keeps its additional
+indentation.
+
 Callout and task-state rendering consumes public RGB-channel tokens inside
 `rgb()` and `rgba()` declarations. Those tokens therefore remain raw channel
 triplets in every color mode; mode selection changes the channel value without

@@ -19,6 +19,7 @@ customization and Obsidian-compatible aliases retained as a compatibility layer.
 | MIRA-CSS-009 | Mira MUST ship distinct `mira` and `obsidian` light/dark palettes through individual CSS exports and an aggregate theme export; absent selectors MUST fall back to Mira with system color mode.                                            |
 | MIRA-CSS-010 | Consumer theme tokens loaded after Mira MUST be able to extend a built-in palette by overriding only selected `--mira-*` variables, including on portaled editor overlays.                                                                 |
 | MIRA-CSS-011 | Public theme tokens MUST retain their documented CSS value grammar and resolve to valid declarations in inherited, explicit, and system color modes; color-only functions MUST NOT wrap channel lists, shadows, or other non-color values. |
+| MIRA-CSS-012 | Mira MUST expose `--mira-indent-size`, `--mira-indent-unit`, and `--mira-list-indent` defaults and bridge them to the Obsidian-compatible indentation variables used by shipped CodeMirror list and continuation widgets.                  |
 
 Stylesheet order remains theme, UI, preview, Svelte/Mira Editor, and framework
 wrapper composition as documented by the package entrypoints.
@@ -44,6 +45,10 @@ does not register themes, inject consumer CSS, or observe ancestor mutations;
 normal custom-property inheritance makes page changes live. Explicit component
 appearance is copied to its portaled overlay roots so targeted editors keep the
 same tokens outside their DOM subtree.
+
+The default indentation contract uses four columns at `0.5625em` per column.
+`--mira-list-indent` composes those values, while the preview bridge exposes
+the compatible `--indent-size`, `--indent-unit`, and `--list-indent` aliases.
 
 Color tokens may use `light-dark()` directly. Channel-list tokens such as the
 callout RGB values and compound tokens such as widget shadows retain their

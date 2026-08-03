@@ -31,6 +31,10 @@ APIs. Stories expose the registry through `parameters.mira.catalogId`,
 `parameters.mira.spec`, and `parameters.mira.tokens`; wrapper pages reference
 the underlying styled surface instead of duplicating token definitions.
 
+The editor token table includes Mira's indentation size, unit, and composed
+list-indent tokens so continuation-widget geometry remains part of the public
+shipped-CSS contract.
+
 Catalog examples import consolidated runtime surfaces through the supported
 `@lapismd/mira` root and subpaths. They must not teach consumers former
 implementation-workspace imports or reach into `packages/mira/src/internal`.

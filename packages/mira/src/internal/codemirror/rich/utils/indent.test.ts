@@ -1,11 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { EditorView } from "@codemirror/view";
+import { createMarkdownCodeMirrorExtensions } from "../../markdown";
 import {
   getIndentLineLayout,
   getLineIndentInfo,
   indentGuideDecorations,
   normalizeIndentText,
   selectionTouchesIndent,
+  shouldAnchorPlainIndentToListItem,
   splitIndentSegments,
   toMarkdownColumns,
 } from "./indent";
@@ -32,6 +34,8 @@ describe("indent helpers", () => {
     });
     expect(selectionTouchesIndent(2, 2, 0, 4)).toBe(true);
     expect(selectionTouchesIndent(5, 5, 0, 4)).toBe(false);
+    expect(shouldAnchorPlainIndentToListItem(2, 2)).toBe(true);
+    expect(shouldAnchorPlainIndentToListItem(8, 3)).toBe(false);
   });
 
   it("derives authored prefixes for top-level, quoted, and plain lines", () => {
@@ -101,6 +105,67 @@ describe("indent helpers", () => {
       (line.textContent || "").includes("outside continuation"),
     );
     expect(outside?.classList.contains("indented-wrapped-line")).toBe(true);
+
+    view.destroy();
+    parent.remove();
+  });
+
+  it("anchors list continuations through syntax-tree ownership", async () => {
+    const parent = document.createElement("div");
+    document.body.append(parent);
+    const view = new EditorView({
+      doc: [
+        "- Bullet item",
+        " This single-space continuation",
+        "  This two-space continuation",
+        "",
+        "2. Multiple paragraphs:",
+        "    First ordered continuation",
+        "",
+        "    Second ordered continuation",
+        "",
+        "4. Preformatted content:",
+        "",
+        "        Eight-space preformatted content",
+      ].join("\n"),
+      extensions: [
+        createMarkdownCodeMirrorExtensions(),
+        indentGuideDecorations({ livePreview: false }),
+      ],
+      parent,
+    });
+    await new Promise((resolve) => requestAnimationFrame(() => resolve(null)));
+
+    const lineContaining = (snippet: string) =>
+      [...parent.querySelectorAll<HTMLElement>(".cm-line")].find((line) =>
+        (line.textContent || "").includes(snippet),
+      );
+    const bullet = lineContaining("Bullet item");
+    const ordered = lineContaining("Multiple paragraphs");
+    const single = lineContaining("single-space continuation");
+    const two = lineContaining("two-space continuation");
+    const first = lineContaining("First ordered continuation");
+    const second = lineContaining("Second ordered continuation");
+    const preformatted = lineContaining("Eight-space preformatted content");
+
+    expect(bullet?.dataset["indentAnchorLineFrom"]).toBeUndefined();
+    expect(bullet?.classList.contains("cm-formatting-list-ul")).toBe(false);
+    expect(bullet?.querySelector(".cm-formatting-list-ul")).not.toBeNull();
+    expect(single?.dataset["indentAnchorLineFrom"]).toBe(
+      `${view.state.doc.line(1).from}`,
+    );
+    expect(two?.dataset["indentAnchorLineFrom"]).toBe(
+      `${view.state.doc.line(1).from}`,
+    );
+    expect(first?.dataset["indentAnchorLineFrom"]).toBe(
+      `${view.state.doc.line(5).from}`,
+    );
+    expect(second?.dataset["indentAnchorLineFrom"]).toBe(
+      `${view.state.doc.line(5).from}`,
+    );
+    expect(ordered?.classList.contains("cm-formatting-list-ol")).toBe(false);
+    expect(preformatted?.dataset["indentAnchorLineFrom"]).toBeUndefined();
+    expect(preformatted?.querySelectorAll(".cm-indent-guide")).toHaveLength(2);
 
     view.destroy();
     parent.remove();

@@ -256,6 +256,9 @@
   --list-marker-color-hover: var(--mira-foreground);
   --list-bullet-size: 0.35em;
   --list-bullet-radius: 999px;
+  --indent-size: var(--mira-indent-size);
+  --indent-unit: var(--mira-indent-unit);
+  --list-indent: var(--mira-list-indent);
   --indentation-guide-color: var(--mira-border);
   --indentation-guide-color-active: var(--mira-border-strong);
   --indentation-guide-width: 1px;

@@ -1,80 +1,30 @@
+/**
+ * Hangs indented CodeMirror lines at the rendered width of their authored
+ * prefix. Structural decorations provide deterministic fallbacks; this plugin
+ * refines them with measured pixels after layout.
+ *
+ * Stable widget widths and currently visible raw-prefix widths are measured
+ * separately so revealing a prefix for editing cannot move its content column.
+ */
+import type { Extension } from "@codemirror/state";
 import {
-  StateEffect,
-  StateField,
-  type Extension,
-  type Range,
-} from "@codemirror/state";
-import {
-  Decoration,
-  type DecorationSet,
   EditorView,
   type PluginValue,
   ViewPlugin,
   type ViewUpdate,
 } from "@codemirror/view";
 
-const measuredPaddingProperty = "--hmd-indent-padding-measured";
-const measuredPrefixProperty = "--hmd-indent-prefix-measured";
-
 type IndentMeasurement = {
   paddingPx: number;
   prefixPx: number;
 };
 
-const setMeasuredIndent =
-  StateEffect.define<ReadonlyMap<number, IndentMeasurement>>();
+type RawPrefixBox = {
+  width: number;
+};
 
-function measuredIndentDecorations(
-  measurements: ReadonlyMap<number, IndentMeasurement>,
-): DecorationSet {
-  const ranges: Range<Decoration>[] = [];
-  for (const [from, measurement] of measurements) {
-    ranges.push(
-      Decoration.line({
-        attributes: {
-          style: [
-            `${measuredPaddingProperty}: ${measurement.paddingPx}px;`,
-            `${measuredPrefixProperty}: ${measurement.prefixPx}px;`,
-          ].join(" "),
-        },
-      }).range(from),
-    );
-  }
-  return Decoration.set(ranges.sort((left, right) => left.from - right.from));
-}
-
-const measuredIndentField = StateField.define<DecorationSet>({
-  create: () => Decoration.none,
-  update(value, transaction) {
-    for (const effect of transaction.effects) {
-      if (effect.is(setMeasuredIndent)) {
-        return measuredIndentDecorations(effect.value);
-      }
-    }
-    return transaction.docChanged ? value.map(transaction.changes) : value;
-  },
-  provide: (field) => EditorView.decorations.from(field),
-});
-
-function measurementsEqual(
-  left: ReadonlyMap<number, IndentMeasurement>,
-  right: ReadonlyMap<number, IndentMeasurement>,
-): boolean {
-  if (left.size !== right.size) {
-    return false;
-  }
-  for (const [from, measurement] of left) {
-    const other = right.get(from);
-    if (
-      !other ||
-      Math.abs(other.paddingPx - measurement.paddingPx) > 0.25 ||
-      Math.abs(other.prefixPx - measurement.prefixPx) > 0.25
-    ) {
-      return false;
-    }
-  }
-  return true;
-}
+const measuredPaddingProperty = "--hmd-indent-padding-measured";
+const measuredPrefixProperty = "--hmd-indent-prefix-measured";
 
 function setStylePropertyIfChanged(
   line: HTMLElement,
@@ -124,18 +74,36 @@ export function syncMeasuredIndentStyles(
 }
 
 function quotePrefixLength(line: string): number {
-  return line.match(/^\s*(?:>\s*)+/u)?.[0].length ?? 0;
+  return line.match(/^\s*>+\s*/u)?.[0].length ?? 0;
 }
 
-function measureWidget(line: HTMLElement): number | null {
-  const widget = line.querySelector<HTMLElement>(
-    ".cm-plain-indent-widget, .cm-hmd-list-indent",
+function measureLeadingRawPrefixBox(
+  line: HTMLElement,
+  prefix: string,
+): RawPrefixBox | null {
+  const rawPrefix = Array.from(line.childNodes).find(
+    (node): node is Text =>
+      node.nodeType === Node.TEXT_NODE &&
+      typeof node.textContent === "string" &&
+      node.textContent.startsWith(prefix),
   );
-  const width = widget?.getBoundingClientRect().width;
-  return width && Number.isFinite(width) && width > 0 ? width : null;
+  if (!rawPrefix) {
+    return null;
+  }
+
+  const range = document.createRange();
+  range.setStart(rawPrefix, 0);
+  range.setEnd(rawPrefix, Math.min(prefix.length, rawPrefix.length));
+  const rect =
+    Array.from(range.getClientRects()).find(
+      (candidate) => candidate.width > 0 || candidate.height > 0,
+    ) ?? range.getBoundingClientRect();
+  return Number.isFinite(rect.width) && rect.width > 0
+    ? { width: rect.width }
+    : null;
 }
 
-function measureMarker(line: HTMLElement): number {
+function measureMarkerWidth(line: HTMLElement): number {
   const marker = line.querySelector<HTMLElement>(
     ".cm-formatting-list-ul, .cm-formatting-list-ol",
   );
@@ -143,19 +111,95 @@ function measureMarker(line: HTMLElement): number {
   return width && Number.isFinite(width) && width > 0 ? width : 0;
 }
 
-function measureFirstContentOffset(line: HTMLElement): number | null {
-  const lineRect = line.getBoundingClientRect();
+function measureQuotePrefixWidth(
+  view: EditorView,
+  from: number,
+): number | null {
+  const length = quotePrefixLength(view.state.doc.lineAt(from).text);
+  if (length <= 0) {
+    return null;
+  }
+
+  const start = view.coordsAtPos(from);
+  const end = view.coordsAtPos(from + length);
+  if (!start || !end) {
+    return null;
+  }
+  const measured = end.left - start.left;
+  return Number.isFinite(measured) && measured > 0 ? measured : null;
+}
+
+function measureOwnPrefixWidth(
+  view: EditorView,
+  line: HTMLElement,
+  from: number,
+  prefix: string,
+): number | null {
+  const widget = line.querySelector<HTMLElement>(
+    ".cm-plain-indent-widget, .cm-hmd-list-indent",
+  );
+  if (widget) {
+    const segmentWidth = Array.from(
+      widget.querySelectorAll<HTMLElement>(".cm-indent"),
+    ).reduce((total, segment) => {
+      const width = segment.getBoundingClientRect().width;
+      return total + (Number.isFinite(width) && width > 0 ? width : 0);
+    }, 0);
+    if (segmentWidth > 0) {
+      return segmentWidth;
+    }
+
+    const widgetWidth = widget.getBoundingClientRect().width;
+    if (Number.isFinite(widgetWidth) && widgetWidth > 0) {
+      return widgetWidth;
+    }
+  }
+
+  const rawWidth = measureLeadingRawPrefixBox(line, prefix)?.width;
+  if (rawWidth !== undefined) {
+    return rawWidth;
+  }
+
+  const start = view.coordsAtPos(from);
+  const end = view.coordsAtPos(from + prefix.length);
+  if (start && end) {
+    const measured = end.left - start.left;
+    if (Number.isFinite(measured) && measured > 0) {
+      return measured;
+    }
+  }
+
+  return null;
+}
+
+function measuredWidth(
+  cache: Map<string, number>,
+  seen: Set<string>,
+  view: EditorView,
+  line: HTMLElement,
+  from: number,
+  prefix: string,
+  cacheKey: string,
+): number | null {
+  let width = cache.get(cacheKey) ?? null;
+  if (width === null && !seen.has(cacheKey)) {
+    seen.add(cacheKey);
+    width = measureOwnPrefixWidth(view, line, from, prefix);
+  }
+  return width;
+}
+
+function firstContentTextNode(line: HTMLElement): Text | null {
   const walker = document.createTreeWalker(line, NodeFilter.SHOW_TEXT);
   while (walker.nextNode()) {
     const node = walker.currentNode;
     if (!(node instanceof Text)) {
       continue;
     }
-    if (
-      node.parentElement?.closest(
-        ".cm-hmd-list-indent, .cm-plain-indent-widget, .cm-formatting-list-ul, .cm-formatting-list-ol, .cm-blockquote-border, .cm-formatting-quote",
-      )
-    ) {
+    const skipped = node.parentElement?.closest(
+      ".cm-hmd-list-indent, .cm-plain-indent-widget, .cm-formatting-list-ul, .cm-formatting-list-ol, .cm-blockquote-border, .cm-formatting-quote",
+    );
+    if (skipped && skipped !== line) {
       continue;
     }
 
@@ -165,6 +209,41 @@ function measureFirstContentOffset(line: HTMLElement): number | null {
     if (index < 0) {
       continue;
     }
+    return node;
+  }
+  return null;
+}
+
+function measureLeadingContentChrome(line: HTMLElement): number {
+  const node = firstContentTextNode(line);
+  let chrome = 0;
+  for (
+    let element = node?.parentElement ?? null;
+    element && element !== line;
+    element = element.parentElement
+  ) {
+    const style = getComputedStyle(element);
+    for (const value of [
+      style.paddingInlineStart,
+      style.borderInlineStartWidth,
+      style.marginInlineStart,
+    ]) {
+      const width = Number.parseFloat(value);
+      if (Number.isFinite(width)) {
+        chrome += width;
+      }
+    }
+  }
+  return chrome;
+}
+
+function measureFirstContentOffset(line: HTMLElement): number | null {
+  const lineRect = line.getBoundingClientRect();
+  const node = firstContentTextNode(line);
+  if (node) {
+    const index = Array.from(node.textContent ?? "").findIndex((character) =>
+      /\S/u.test(character),
+    );
     const range = document.createRange();
     range.setStart(node, index);
     range.setEnd(node, Math.min(index + 1, node.length));
@@ -181,7 +260,6 @@ function measureFirstContentOffset(line: HTMLElement): number | null {
 
 class MeasuredIndentPlugin implements PluginValue {
   private readonly cache = new Map<string, number>();
-  private lastMeasurements = new Map<number, IndentMeasurement>();
   private scheduled = false;
   private retryFrames = 0;
   private destroyed = false;
@@ -192,16 +270,15 @@ class MeasuredIndentPlugin implements PluginValue {
   }
 
   update(update: ViewUpdate): void {
+    let needsMeasure = false;
     if (update.geometryChanged) {
       this.cache.clear();
+      needsMeasure = true;
     }
-    if (
-      update.geometryChanged ||
-      update.docChanged ||
-      update.viewportChanged ||
-      update.focusChanged ||
-      !update.startState.selection.eq(update.state.selection)
-    ) {
+    needsMeasure ||= update.docChanged || update.viewportChanged;
+    needsMeasure ||= update.focusChanged;
+    needsMeasure ||= !update.startState.selection.eq(update.state.selection);
+    if (needsMeasure) {
       this.schedule(update.view);
     }
   }
@@ -210,101 +287,142 @@ class MeasuredIndentPlugin implements PluginValue {
     if (this.scheduled) {
       return true;
     }
+    if (!view.inView) {
+      return false;
+    }
     this.scheduled = true;
-    requestAnimationFrame(() => {
-      this.scheduled = false;
-      if (!this.destroyed) {
-        this.measure(view);
-      }
+
+    view.requestMeasure({
+      read: () => {
+        if (!view.inView) {
+          return { measurements: [] };
+        }
+
+        const lines = view.contentDOM.querySelectorAll<HTMLElement>(
+          ".cm-line[data-indent-prefix]",
+        );
+        const seen = new Set<string>();
+        const measurements: Array<{
+          cacheKey: string;
+          from: number;
+          paddingPx: number | null;
+          prefixPx: number | null;
+          stableIndentPx: number | null;
+        }> = [];
+
+        for (const line of lines) {
+          const from = Number.parseInt(line.dataset["lineFrom"] ?? "", 10);
+          if (!Number.isFinite(from)) {
+            continue;
+          }
+          const prefix = line.dataset["indentPrefix"] ?? "";
+          const variant = line.dataset["indentVariant"] ?? "unknown";
+          const listKind = line.dataset["listKind"] ?? "";
+          const cacheKey = `${variant}\u0000${listKind}\u0000${prefix}`;
+          const isList = line.hasAttribute("data-list-kind");
+          const hasPrefix = prefix.length > 0;
+          const stableIndentPx = hasPrefix
+            ? measuredWidth(
+                this.cache,
+                seen,
+                view,
+                line,
+                from,
+                prefix,
+                cacheKey,
+              )
+            : isList
+              ? 0
+              : null;
+          const rawPrefixWidth = hasPrefix
+            ? measureLeadingRawPrefixBox(line, prefix)?.width
+            : undefined;
+          const hasIndentWidget = Boolean(
+            line.querySelector(".cm-plain-indent-widget, .cm-hmd-list-indent"),
+          );
+          const visibleIndentPx = hasPrefix
+            ? (rawPrefixWidth ??
+              (hasIndentWidget && stableIndentPx !== null
+                ? stableIndentPx + measureLeadingContentChrome(line)
+                : measureOwnPrefixWidth(view, line, from, prefix)))
+            : isList
+              ? 0
+              : null;
+          const markerWidth = measureMarkerWidth(line);
+          const lineText = view.state.doc.lineAt(from).text;
+          const hasQuote = quotePrefixLength(lineText) > 0;
+          const isQuoteList = variant === "quote-list" || (isList && hasQuote);
+          const quoteWidth =
+            variant === "quote" || isQuoteList
+              ? measureQuotePrefixWidth(view, from)
+              : null;
+
+          let prefixPx = visibleIndentPx;
+          if (isList && prefixPx !== null) {
+            prefixPx += markerWidth;
+          }
+          if (quoteWidth !== null) {
+            prefixPx = isQuoteList ? quoteWidth + markerWidth : quoteWidth;
+          }
+
+          let paddingPx = stableIndentPx;
+          if (isList && paddingPx !== null) {
+            paddingPx += markerWidth;
+          }
+          if (quoteWidth !== null) {
+            paddingPx = isQuoteList ? quoteWidth + markerWidth : quoteWidth;
+          }
+
+          const anchorFrom = Number.parseInt(
+            line.dataset["indentAnchorLineFrom"] ?? "",
+            10,
+          );
+          if (Number.isFinite(anchorFrom)) {
+            const anchor = view.contentDOM.querySelector<HTMLElement>(
+              `.cm-line[data-line-from="${anchorFrom}"]`,
+            );
+            const anchorOffset = anchor
+              ? measureFirstContentOffset(anchor)
+              : null;
+            if (anchorOffset !== null && anchorOffset > 0) {
+              paddingPx = anchorOffset;
+            }
+          }
+
+          measurements.push({
+            cacheKey,
+            from,
+            paddingPx,
+            prefixPx,
+            stableIndentPx,
+          });
+        }
+
+        return { measurements };
+      },
+      write: ({ measurements }) => {
+        this.scheduled = false;
+        const byFrom = new Map<number, IndentMeasurement>();
+        for (const measurement of measurements) {
+          const { cacheKey, from, paddingPx, prefixPx, stableIndentPx } =
+            measurement;
+          if (paddingPx === null || prefixPx === null) {
+            continue;
+          }
+          byFrom.set(from, { paddingPx, prefixPx });
+          const previous = this.cache.get(cacheKey);
+          if (
+            stableIndentPx !== null &&
+            (previous === undefined ||
+              Math.abs(previous - stableIndentPx) > 0.5)
+          ) {
+            this.cache.set(cacheKey, stableIndentPx);
+          }
+        }
+        syncMeasuredIndentStyles(view.contentDOM, byFrom);
+      },
     });
     return true;
-  }
-
-  private measure(view: EditorView): void {
-    const measurements = new Map<number, IndentMeasurement>();
-    const lines = view.contentDOM.querySelectorAll<HTMLElement>(
-      ".cm-line[data-indent-prefix]",
-    );
-    for (const line of lines) {
-      const from = Number.parseInt(line.dataset["lineFrom"] ?? "", 10);
-      if (!Number.isFinite(from)) {
-        continue;
-      }
-      const prefix = line.dataset["indentPrefix"] ?? "";
-      const variant = line.dataset["indentVariant"] ?? "unknown";
-      const listKind = line.dataset["listKind"] ?? "";
-      const cacheKey = `${variant}\u0000${listKind}\u0000${prefix}`;
-      const isList = line.hasAttribute("data-list-kind");
-      const lineText = view.state.doc.lineAt(from).text;
-      const quoteLength = quotePrefixLength(lineText);
-      const fallbackColumns = Number.parseFloat(
-        line.dataset["indentFallbackColumns"] ?? "",
-      );
-      const fallbackPx = Number.isFinite(fallbackColumns)
-        ? fallbackColumns * view.defaultCharacterWidth
-        : null;
-      const indentWidth =
-        this.cache.get(cacheKey) ??
-        measureWidget(line) ??
-        (prefix.length > 0
-          ? prefix.length * view.defaultCharacterWidth
-          : null) ??
-        (prefix.length === 0 ? 0 : null);
-      const markerWidth = isList ? measureMarker(line) : 0;
-      const quoteWidth =
-        variant === "quote" || variant === "quote-list"
-          ? quoteLength * view.defaultCharacterWidth
-          : null;
-      let prefixPx = indentWidth;
-      let paddingPx = indentWidth;
-      if (isList && prefixPx !== null) {
-        prefixPx += markerWidth;
-        paddingPx = prefixPx;
-      }
-      if (quoteWidth !== null) {
-        prefixPx =
-          variant === "quote-list" ? quoteWidth + markerWidth : quoteWidth;
-        paddingPx = prefixPx;
-      }
-      prefixPx ??= fallbackPx;
-      paddingPx ??= fallbackPx;
-      if (prefixPx === 0 && fallbackPx && fallbackPx > 0) {
-        prefixPx = fallbackPx;
-      }
-      if (paddingPx === 0 && fallbackPx && fallbackPx > 0) {
-        paddingPx = fallbackPx;
-      }
-
-      const anchorFrom = Number.parseInt(
-        line.dataset["indentAnchorLineFrom"] ?? "",
-        10,
-      );
-      if (Number.isFinite(anchorFrom)) {
-        const anchor = view.contentDOM.querySelector<HTMLElement>(
-          `.cm-line[data-line-from="${anchorFrom}"]`,
-        );
-        const anchorOffset = anchor ? measureFirstContentOffset(anchor) : null;
-        if (anchorOffset !== null && anchorOffset > 0) {
-          paddingPx = anchorOffset;
-        }
-      }
-      if (prefixPx === null || paddingPx === null) {
-        continue;
-      }
-
-      measurements.set(from, { paddingPx, prefixPx });
-      if (
-        indentWidth !== null &&
-        (!this.cache.has(cacheKey) ||
-          Math.abs((this.cache.get(cacheKey) ?? 0) - indentWidth) > 0.5)
-      ) {
-        this.cache.set(cacheKey, indentWidth);
-      }
-    }
-    if (!measurementsEqual(this.lastMeasurements, measurements)) {
-      this.lastMeasurements = measurements;
-      view.dispatch({ effects: setMeasuredIndent.of(measurements) });
-    }
   }
 
   private retryStartup(view: EditorView): void {
@@ -327,7 +445,6 @@ class MeasuredIndentPlugin implements PluginValue {
 
 export function measuredIndentExtension(): Extension {
   return [
-    measuredIndentField,
     ViewPlugin.fromClass(MeasuredIndentPlugin),
     EditorView.editorAttributes.of({ class: "cm-measured-indent" }),
   ];
