@@ -1,0 +1,101 @@
+import { Meta, Canvas, Primary, Source } from "@storybook/addon-docs/blocks";
+import * as IndentationStories from "./Indentation.stories";
+
+<Meta of={IndentationStories} />
+
+# Indentation parity
+
+These focused fixtures adapt the observable list, continuation, and blockquote
+regressions from Lapis. Each target remains inside the initial editor viewport,
+so Storybook interaction and visual runs exercise the relevant geometry instead
+of leaving it below an inner scroll boundary.
+
+## Coverage matrix
+
+| Lapis scenario family                 | Mira stories                                               | Evidence                                                                                         |
+| ------------------------------------- | ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| Ordered and unordered marker wrapping | Wrapped List Items, source and live preview                | Marker/content spans and first/subsequent row alignment                                          |
+| Plain and list continuations          | Continuation Paragraphs, source and live preview           | One-, two-, four-, and tab-authored prefixes; blank-separated paragraphs; preformatted exception |
+| Nested lists and indentation guides   | Nested Lists and Quotes, source, live preview, and reading | Space/tab depth, guide count, and semantic reading hierarchy                                     |
+| Quoted structures                     | Nested Lists and Quotes, source, live preview, and reading | Plain/nested quotes, quoted list/checklist, and blockquote inside a list item                    |
+| Raw-prefix editing stability          | Active Prefixes, source and live preview                   | Caret entry plus focus/blur geometry stability                                                   |
+| Configurable indentation              | Configurable Indent Width                                  | Toolbar change from four to eight columns updates CodeMirror layout                              |
+
+## Recorded parity gaps
+
+The focused Chromium lane retains two exact Lapis assertions as expected
+failures: a two-space continuation currently starts one marker slot left of its
+parent bullet text, and an inactive indented blockquote widget retains a
+whitespace-only CodeMirror row before the widget. The stories keep both states
+visible for their separate runtime repair and later baseline review.
+
+## Wrapped list items
+
+<Primary />
+
+<Canvas
+  of={IndentationStories.WrappedListItemsLivePreview}
+  meta={IndentationStories}
+/>
+
+## Continuation paragraphs
+
+<Canvas
+  of={IndentationStories.ContinuationParagraphsSource}
+  meta={IndentationStories}
+/>
+
+<Canvas
+  of={IndentationStories.ContinuationParagraphsLivePreview}
+  meta={IndentationStories}
+/>
+
+## Nested lists and blockquotes
+
+<Canvas
+  of={IndentationStories.NestedListsAndQuotesSource}
+  meta={IndentationStories}
+/>
+
+<Canvas
+  of={IndentationStories.NestedListsAndQuotesLivePreview}
+  meta={IndentationStories}
+/>
+
+<Canvas
+  of={IndentationStories.NestedListsAndQuotesReading}
+  meta={IndentationStories}
+/>
+
+## Active raw prefixes
+
+<Canvas
+  of={IndentationStories.ActivePrefixesSource}
+  meta={IndentationStories}
+/>
+
+<Canvas
+  of={IndentationStories.ActivePrefixesLivePreview}
+  meta={IndentationStories}
+/>
+
+## Configurable indent width
+
+<Canvas
+  of={IndentationStories.ConfigurableIndentWidth}
+  meta={IndentationStories}
+/>
+
+## Public API
+
+<Source
+  language="html"
+  code={`<MiraEditor
+  bind:value
+  bind:mode
+  lineWrapping
+  indentGuides
+  indentWithTabs
+  indentWidth={4}
+/>`}
+/>

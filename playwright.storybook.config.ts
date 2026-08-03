@@ -3,6 +3,9 @@ import { defineConfig, devices } from "@playwright/test";
 export default defineConfig({
   testDir: "tests/storybook",
   timeout: 30_000,
+  // Keep Storybook's on-demand compilation within the concurrency that the
+  // catalog exercised before the focused indentation suite was added.
+  workers: 3,
   expect: {
     timeout: 10_000,
   },

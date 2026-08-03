@@ -66,6 +66,14 @@ then passed the complete strict compare-only suite at that threshold.
 Renamed Mira Editor identities replaced the orphaned Default UI paths during
 the same mutation step.
 
+The focused indentation coverage slice raises the catalog to 132 indexed
+stories. The 122 prior stories remain baseline-covered; the ten new list,
+continuation, nested-quote, active-prefix, and indent-width stories are
+`visual-pending` without baseline metadata until a separate authorized review.
+Their Storybook play functions require every regression target to remain inside
+the initial editor viewport, and focused Chromium acceptance owns the browser
+geometry assertions.
+
 The add-on's Docker stage excludes both `storybook-static` and its affected
 cache. The `test:visual` gate therefore uses the affected preflight to build in
 the pinned stage and deterministically fall back to the full catalog; the direct

@@ -76,11 +76,12 @@ explicitly reviewed baseline refresh rather than a looser local override.
 The add-on writes each committed baseline URL into the owning story's
 `parameters.visualDelta` metadata and marks regenerated stories
 `visual-pending`; Storybook MUST NOT infer a second URL scheme at preview time.
-The current catalog contains 122 indexed stories, all with plugin-owned metadata
-and committed baseline images. Stories retain `visual-pending` until human
-acceptance is recorded separately. The visual gate intentionally exposes
-missing baselines for new pending stories rather than silently treating them as
-approved. Once baselines exist, `pnpm test:visual`
+The current catalog contains 132 indexed stories. The existing 122 stories have
+plugin-owned metadata and committed baseline images; ten focused indentation
+stories remain `visual-pending` without baseline mutation until their separate
+human review. The visual gate intentionally exposes missing baselines for new
+pending stories rather than silently treating them as approved. Once baselines
+exist, `pnpm test:visual`
 invokes the affected preflight in the add-on's clean Docker stage; its
 deliberately missing cache produces a full-suite fallback before compare-only
 validation.
