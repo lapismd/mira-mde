@@ -5,6 +5,37 @@ async function gotoStory(page: Page, id: string): Promise<void> {
   await expect(page.locator("#storybook-root")).toBeVisible();
   await expect(page.locator("[data-indentation-story]")).toBeVisible();
   await settleLayout(page);
+  const measuredLines = page.locator(
+    '.cm-editor:visible .cm-line[data-list-kind], .cm-editor:visible .cm-line[data-indent-prefix]:not([data-indent-prefix=""])',
+  );
+  if ((await measuredLines.count()) > 0) {
+    await expect
+      .poll(async () => {
+        const readMeasurements = () =>
+          measuredLines.evaluateAll((lines) =>
+            lines.map((line) =>
+              line instanceof HTMLElement
+                ? [
+                    line.style
+                      .getPropertyValue("--hmd-indent-padding-measured")
+                      .trim(),
+                    line.style
+                      .getPropertyValue("--hmd-indent-prefix-measured")
+                      .trim(),
+                  ]
+                : ["", ""],
+            ),
+          );
+        const before = await readMeasurements();
+        await settleLayout(page);
+        const after = await readMeasurements();
+        return (
+          after.every(([padding, prefix]) => Boolean(padding && prefix)) &&
+          JSON.stringify(before) === JSON.stringify(after)
+        );
+      })
+      .toBe(true);
+  }
 }
 
 async function settleLayout(page: Page): Promise<void> {
@@ -30,6 +61,9 @@ type LineMetrics = {
   firstGlyphLeft: number | null;
   guideCount: number;
   hasIndentWidget: boolean;
+  indentSegmentWidths: number[];
+  lineLeft: number;
+  listIndentWidth: number;
   markerRight: number | null;
   paddingInlineStart: number;
   rowLefts: number[];
@@ -82,6 +116,15 @@ async function lineMetrics(line: Locator): Promise<LineMetrics> {
     const marker = element.querySelector<HTMLElement>(
       ".cm-formatting-list-ul, .cm-formatting-list-ol",
     );
+    const widget = element.querySelector<HTMLElement>(
+      ".cm-hmd-list-indent, .cm-plain-indent-widget",
+    );
+    const probe = document.createElement("span");
+    probe.style.cssText =
+      "height: 0; position: absolute; visibility: hidden; width: var(--list-indent);";
+    element.append(probe);
+    const listIndentWidth = probe.getBoundingClientRect().width;
+    probe.remove();
     const contentRects = firstTextRects(content);
     const style = getComputedStyle(element);
 
@@ -91,9 +134,13 @@ async function lineMetrics(line: Locator): Promise<LineMetrics> {
       depth: element.dataset["listDepth"] ?? null,
       firstGlyphLeft: contentRects[0]?.left ?? null,
       guideCount: element.querySelectorAll(".cm-indent-guide").length,
-      hasIndentWidget: Boolean(
-        element.querySelector(".cm-hmd-list-indent, .cm-plain-indent-widget"),
+      hasIndentWidget: Boolean(widget),
+      indentSegmentWidths: Array.from(
+        element.querySelectorAll<HTMLElement>(".cm-indent"),
+        (segment) => segment.getBoundingClientRect().width,
       ),
+      lineLeft: element.getBoundingClientRect().left,
+      listIndentWidth,
       markerRight: marker?.getBoundingClientRect().right ?? null,
       paddingInlineStart: Number.parseFloat(style.paddingInlineStart),
       rowLefts: contentRects.map((rect) => rect.left),
@@ -108,6 +155,57 @@ function expectStableRowLefts(metrics: LineMetrics): void {
   expect(
     Math.max(...metrics.rowLefts) - Math.min(...metrics.rowLefts),
   ).toBeLessThan(1.5);
+}
+
+async function placeCaretAtLineOffset(
+  page: Page,
+  line: Locator,
+  offset: number,
+): Promise<void> {
+  await line.click({ position: { x: 1, y: 5 } });
+  await page.keyboard.press("Home");
+  await page.keyboard.press("Home");
+  for (let index = 0; index < offset; index += 1) {
+    await page.keyboard.press("ArrowRight");
+  }
+  await settleLayout(page);
+}
+
+function expectSameContentColumn(
+  actual: LineMetrics,
+  expected: LineMetrics,
+  context?: string,
+): void {
+  expect(actual.firstGlyphLeft).not.toBeNull();
+  expect(expected.firstGlyphLeft).not.toBeNull();
+  expect(
+    Math.abs(actual.firstGlyphLeft! - expected.firstGlyphLeft!),
+    context,
+  ).toBeLessThan(1.5);
+}
+
+async function expectContentColumnToSettle(
+  line: Locator,
+  expected: LineMetrics,
+  context: string,
+): Promise<void> {
+  await expect
+    .poll(
+      async () => {
+        const actual = await lineMetrics(line);
+        if (
+          actual.firstGlyphLeft === null ||
+          expected.firstGlyphLeft === null
+        ) {
+          return Number.POSITIVE_INFINITY;
+        }
+        return Math.abs(actual.firstGlyphLeft - expected.firstGlyphLeft);
+      },
+      { message: context },
+    )
+    .toBeLessThan(1.5);
+  await settleLayout(line.page());
+  expectSameContentColumn(await lineMetrics(line), expected, context);
 }
 
 test("keeps wrapped ordered and unordered item rows aligned in both editor modes", async ({
@@ -245,23 +343,137 @@ test("renders the indented live-preview blockquote in its focused story", async 
   expect(metrics.text).toContain("rendered block attached");
 });
 
-test("aligns a continuation paragraph with its parent bullet text", async ({
+test("aligns inactive continuation paragraphs with their parent content", async ({
   page,
 }) => {
-  test.fail(
-    true,
-    "Mira currently leaves the continuation one marker slot left of the parent item text.",
-  );
-  await gotoStory(page, "markdown-indentation--continuation-paragraphs-source");
-  const bullet = await lineMetrics(lineContaining(page, "Bullet item"));
-  const continuation = await lineMetrics(
-    lineContaining(page, "This two-space continuation"),
-  );
-  expect(continuation.firstGlyphLeft).not.toBeNull();
-  expect(bullet.firstGlyphLeft).not.toBeNull();
-  expect(
-    Math.abs(continuation.firstGlyphLeft! - bullet.firstGlyphLeft!),
-  ).toBeLessThan(1.5);
+  for (const id of [
+    "markdown-indentation--continuation-paragraphs-source",
+    "markdown-indentation--continuation-paragraphs-live-preview",
+  ]) {
+    await gotoStory(page, id);
+    for (const group of [
+      {
+        parent: "Bullet item",
+        children: [
+          "This single-space continuation",
+          "This two-space continuation",
+        ],
+      },
+      {
+        parent: "Multiple paragraphs in a list item",
+        children: [
+          "Four-space continuation text",
+          "This blank-separated continuation",
+        ],
+      },
+    ]) {
+      const parent = await lineMetrics(lineContaining(page, group.parent));
+      expect(parent.firstGlyphLeft).not.toBeNull();
+      for (const snippet of group.children) {
+        const continuation = await lineMetrics(lineContaining(page, snippet));
+        expect(continuation.anchorFrom).not.toBeNull();
+        expect(continuation.hasIndentWidget).toBe(true);
+        expect(continuation.indentSegmentWidths.length).toBeGreaterThan(0);
+        for (const width of continuation.indentSegmentWidths) {
+          expect(width).toBeGreaterThan(0);
+        }
+        expect(continuation.firstGlyphLeft).not.toBeNull();
+        expect(
+          Math.abs(continuation.firstGlyphLeft! - parent.firstGlyphLeft!),
+        ).toBeLessThan(1.5);
+        expectStableRowLefts(continuation);
+      }
+    }
+  }
+});
+
+test("keeps continuation geometry stable while its prefix becomes editable", async ({
+  page,
+}) => {
+  for (const id of [
+    "markdown-indentation--continuation-paragraphs-source",
+    "markdown-indentation--continuation-paragraphs-live-preview",
+  ]) {
+    await gotoStory(page, id);
+    const parent = await lineMetrics(lineContaining(page, "Bullet item"));
+    const continuationLine = lineContaining(
+      page,
+      "This two-space continuation",
+    );
+    const inactive = await lineMetrics(continuationLine);
+    expect(inactive.hasIndentWidget).toBe(true);
+    expectSameContentColumn(inactive, parent);
+
+    for (const state of [
+      { offset: 0, hasWidget: false },
+      { offset: 1, hasWidget: false },
+      { offset: 3, hasWidget: true },
+    ]) {
+      await placeCaretAtLineOffset(page, continuationLine, state.offset);
+      const metrics = await lineMetrics(continuationLine);
+      expect(metrics.hasIndentWidget).toBe(state.hasWidget);
+      expectSameContentColumn(
+        metrics,
+        inactive,
+        `${id} at offset ${state.offset}`,
+      );
+      expectStableRowLefts(metrics);
+    }
+
+    await page.locator("[data-indentation-story]").focus();
+    await expectContentColumnToSettle(
+      continuationLine,
+      inactive,
+      `${id} after blur`,
+    );
+    await page.locator(".cm-content").focus();
+    await expectContentColumnToSettle(
+      continuationLine,
+      inactive,
+      `${id} after refocus`,
+    );
+  }
+});
+
+test("keeps preformatted list indentation stable across caret states", async ({
+  page,
+}) => {
+  for (const id of [
+    "markdown-indentation--continuation-paragraphs-source",
+    "markdown-indentation--continuation-paragraphs-live-preview",
+  ]) {
+    await gotoStory(page, id);
+    const line = lineContaining(page, "Eight-space preformatted content");
+    const inactive = await lineMetrics(line);
+    expect(inactive.anchorFrom).toBeNull();
+    expect(inactive.hasIndentWidget).toBe(true);
+    expect(inactive.indentSegmentWidths).toHaveLength(2);
+    for (const width of inactive.indentSegmentWidths) {
+      expect(width).toBeGreaterThanOrEqual(inactive.listIndentWidth - 1);
+    }
+    expect(inactive.firstGlyphLeft! - inactive.lineLeft).toBeGreaterThan(
+      inactive.listIndentWidth * 2 - 2,
+    );
+    expect(inactive.firstGlyphLeft! - inactive.lineLeft).toBeLessThan(
+      inactive.listIndentWidth * 2 + 12,
+    );
+
+    for (const state of [
+      { offset: 0, hasWidget: false },
+      { offset: 4, hasWidget: false },
+      { offset: 9, hasWidget: true },
+    ]) {
+      await placeCaretAtLineOffset(page, line, state.offset);
+      const metrics = await lineMetrics(line);
+      expect(metrics.hasIndentWidget).toBe(state.hasWidget);
+      expectSameContentColumn(
+        metrics,
+        inactive,
+        `${id} at offset ${state.offset}`,
+      );
+      expectStableRowLefts(metrics);
+    }
+  }
 });
 
 test("attaches the indented blockquote widget without a whitespace source row", async ({

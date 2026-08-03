@@ -143,6 +143,10 @@ export const ContinuationParagraphsSource: Story = {
     value: continuationParagraphsMarkdown,
     mode: "source",
     height: "40rem",
+    initialSelection: {
+      anchor: { line: 0, ch: 0 },
+      head: { line: 0, ch: 0 },
+    },
   },
   parameters: {
     docs: {
@@ -167,6 +171,10 @@ export const ContinuationParagraphsLivePreview: Story = {
     value: continuationParagraphsMarkdown,
     mode: "live-preview",
     height: "40rem",
+    initialSelection: {
+      anchor: { line: 0, ch: 0 },
+      head: { line: 0, ch: 0 },
+    },
   },
   parameters: {
     docs: {

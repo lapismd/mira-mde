@@ -12,6 +12,7 @@ export const continuationParagraphsMarkdown = [
   "- Bullet item",
   " This single-space continuation keeps its authored prefix and wraps from the first visible content column.",
   "  This two-space continuation aligns with the parent bullet text while wrapping across multiple visual rows.",
+  "",
   "2. Multiple paragraphs in a list item:",
   "    Four-space continuation text remains attached to the ordered item and keeps a full-height indentation guide while it wraps.",
   "",
