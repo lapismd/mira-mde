@@ -12,6 +12,7 @@ export default tseslint.config(
       "**/.svelte-kit/**",
       "spec/book/**",
       "storybook-static/**",
+      ".visual-delta/cache/**",
       "node_modules/**",
     ],
   },

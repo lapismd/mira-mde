@@ -35,8 +35,10 @@ Vanilla depend only on the public products they adapt.
 Repository-only tools such as `@lapismd/storybook-addon-visual-delta` belong in
 the private root manifest. They are not part of the six-package public release
 set and MUST NOT appear in packed consumer dependency graphs. The root consumes
-the reviewed published release directly rather than carrying package patches
-for fixes already included upstream.
+the reviewed `0.0.5` published release directly rather than carrying package
+patches for fixes already included upstream. That release owns the compact,
+path-independent affected state and canonical Storybook build reuse used by
+this repository; Mira does not duplicate those fixes in a downstream patch.
 
 ## Supported `@lapismd/mira` entry points
 

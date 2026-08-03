@@ -77,11 +77,14 @@ race the canonical capture host. Baseline URLs are written directly into each
 story's `parameters.visualDelta` metadata by the add-on; no parallel path mapper
 or preview-time fallback is maintained.
 
-The canonical Docker runner stages a clean workspace without
-`storybook-static` or affected-state cache. `pnpm test:visual` therefore uses
-the add-on's affected preflight: the missing cache requires a full-suite
-fallback, builds Storybook inside the pinned environment, and then performs a
-read-only comparison of every indexed story. Root visual commands explicitly
-select `nested-import` baseline paths so their CLI behavior matches the
-Storybook host and portable Playwright suite. The add-on's direct `test --all`
-path is not used because it assumes an already-staged static build.
+The canonical Docker runner stages a clean workspace without trusting authored
+`storybook-static` or build-tool caches, but transports the package-owned
+affected state and preview graph needed to preserve valid passing evidence. It
+may restore an atomic, checksum-verified static Storybook and Linux build cache
+from `.visual-delta/cache/canonical-build`; stale or incomplete evidence
+triggers one rebuild inside the pinned environment. `pnpm test:visual` uses the
+add-on's conservative affected preflight and performs read-only comparisons of
+the selected stories, falling back to the full eligible catalog when graph or
+cache evidence is unreliable. Root visual commands explicitly select
+`nested-import` baseline paths so their CLI behavior matches the Storybook host
+and portable Playwright suite.

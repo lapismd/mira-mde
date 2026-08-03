@@ -85,10 +85,13 @@ plugin-owned metadata and committed baseline images; ten focused indentation
 stories remain `visual-pending` without baseline mutation until their separate
 human review. The visual gate intentionally exposes missing baselines for new
 pending stories rather than silently treating them as approved. Once baselines
-exist, `pnpm test:visual`
-invokes the affected preflight in the add-on's clean Docker stage; its
-deliberately missing cache produces a full-suite fallback before compare-only
-validation.
+exist, `pnpm test:visual` invokes the affected preflight in the add-on's clean
+Docker stage. Valid path-independent passing evidence reduces the scope;
+missing, stale, or unreliable evidence conservatively selects the full eligible
+catalog. The runner reuses a verified canonical static build when its logical
+inputs match, and strict visual mismatches or missing baselines are collected
+across the selected scope without restarting the Playwright worker after every
+expected policy failure.
 
 ## Host and fixture ownership
 

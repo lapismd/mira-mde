@@ -109,43 +109,52 @@ deltas (13 in the repaired indentation and list surfaces, plus 6 shared
 editor-surface snapshots); no visual baselines were created or refreshed for
 this repair.
 
-The add-on's Docker stage excludes both `storybook-static` and its affected
-cache. The `test:visual` gate therefore uses the affected preflight to build in
-the pinned stage and deterministically fall back to the full catalog; the direct
-`test --all` route would otherwise select zero stories before waiting on a
-missing static host. The ten UI-primitive stories and two focused Markdown
-outline variants are now baseline-covered. Stories retain `visual-pending`
-until human acceptance is recorded separately; this review state does not mean
-their committed baseline or deterministic comparison is missing.
+The add-on's Docker stage does not trust authored `storybook-static` output,
+but it transports the affected cache and preview graph and may restore a
+checksum-verified canonical static build. The `test:visual` gate therefore uses
+the affected preflight to reuse valid passing evidence and falls back to the
+full catalog only when the graph or cache is unreliable. The ten UI-primitive
+stories and two focused Markdown outline variants are now baseline-covered.
+Stories retain `visual-pending` until human acceptance is recorded separately;
+this review state does not mean their committed baseline or deterministic
+comparison is missing.
 
-The Visual Delta suite is reviewed at `0.0.4`. It retains the canonical capture
+The Visual Delta suite is reviewed at `0.0.5`. It retains the canonical capture
 runner used by both Storybook's Diff Browser action and the CLI, so a host-local
 browser cannot be mislabeled as the Linux/ARM64 baseline target. The published
-tarball now guards source-worker builds on the presence of
-`tsconfig.node-build.json`, uses its executable shipped `dist` worker otherwise,
-and excludes `.turbo` from both clean-workspace staging and post-run artifact
-inventory. The package carries focused regression tests for both behaviors, so
-Mira removes its equivalent `0.0.3` pnpm patch and consumes `0.0.4` directly.
-The `0.0.4` doctor migration quarantines obsolete comparison evidence, moves
-preview statistics and affected state to `.visual-delta/cache`, and keeps that
-cache independent from `.visual-delta/artifacts`. Mira also declares its
-established `nested-import` baseline path mode on root visual CLI scripts rather
-than inheriting the release's flat `story-id` default. The upgrade remains
+tarball retains the `0.0.4` guards that build a source worker only when
+`tsconfig.node-build.json` exists, use its executable shipped `dist` worker
+otherwise, and exclude `.turbo` from both clean-workspace staging and post-run
+artifact inventory. The package carries focused regression tests for both
+behaviors, so Mira continues to consume the published package without its former
+`0.0.3` pnpm patch. Version `0.0.5` replaces the physical-path-sensitive,
+repeated-story version 2 affected cache with compact logical version 3 state,
+enables affected planning when the host option is omitted, and guardedly
+revalidates eligible version 2 passes. It also caches verified canonical static
+builds, calculates exact scopes without traversing the full catalog, avoids
+duplicate host and Docker planning/build passes, reuses valid actual targets
+independently, and collects expected strict-policy failures without restarting
+the Playwright worker for every story. Mira declares its established
+`nested-import` baseline path mode on root visual CLI scripts rather than
+inheriting the release's flat `story-id` default. The upgrade remains
 compare-only and does not authorize baseline image changes.
 
-Upgrade validation resolves the unpatched published tarball and verifies both
-guards in its shipped source before installation. `visual-delta doctor --fix`
-quarantines nine obsolete comparison files and the two legacy cache files;
-after the root cache/script migration, strict doctor reports 15 passes, no
-warnings, and no errors. A clean Linux/ARM64 Chromium comparison for
-`markdown-headings--preview` passes against its nested committed baseline and
-completes post-run artifact validation without a Turbo manifest error. The full
-affected fallback was stopped after its first eight pre-existing review-required
-deltas and replaced with that focused acceptance; no baselines were written or
-refreshed. The optional remote runner availability probe remains unable to
-inspect the pinned GHCR digest because the registry returns `403`, while the
-same locally present image passes the container execution probe and focused
-canonical comparison.
+Upgrade validation resolves the unpatched published tarball and verifies the
+packaging guards, cache-v3 migration, canonical build cache, single-pass
+orchestration, and deferred policy-failure coverage in its shipped source before
+installation. The authoritative downstream doctor rebuild passes 16 checks with
+no warnings or errors, and its full canonical-runner probe passes. The affected
+dry-run plans all 132 stories in `2.30s`; the full-suite selection is the
+expected one-time conservative result of changing the root manifest. A focused
+heading comparison passes after a `119.29s` cold canonical build, passes in
+`11.08s` while restoring that verified build, and then passes in `2.93s` by
+reusing its canonical actual. The migrated version 3 affected state is
+path-independent, records two passing target fingerprints, and is `705151`
+bytes. One intervening actual-reuse attempt reached the same `3.14s` fast path
+but returned a transient macOS `ENOTEMPTY` while removing its temporary staging
+directory; the immediate repeat passed without a downstream patch. The
+dependency update also passes `pnpm spec:check`, `pnpm catalog:check`, and
+`pnpm check:all`; no visual baseline is created or refreshed by the upgrade.
 
 The UI primitive review also verifies that portaled dropdown and context menus
 use the Lapis-compatible 14/20 interface type scale with leading semantic action
