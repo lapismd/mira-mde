@@ -81,8 +81,11 @@ collapsed to `115.24px`; revealing the raw two-space prefix moved that content
 to `132.03px`. The repair is complete when default source and live-preview
 continuations align with their parent content within `1.5px`, caret movement
 does not change that column, and eight-space preformatted list content retains
-two non-zero indent segments. Focused unit, Storybook Chromium, package, and
-repository validation results are recorded with the implementing change.
+two non-zero indent segments. The full-height guide follow-up additionally
+requires each enabled wrapped-line guide pseudo-element to match its CodeMirror
+line box within `2px`; implementation and focused Chromium validation are in
+progress. Focused unit, Storybook Chromium, package, and repository validation
+results are recorded with the implementing change.
 
 The add-on's Docker stage excludes both `storybook-static` and its affected
 cache. The `test:visual` gate therefore uses the affected preflight to build in
