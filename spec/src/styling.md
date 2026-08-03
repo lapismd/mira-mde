@@ -49,6 +49,15 @@ same tokens outside their DOM subtree.
 The default indentation contract uses four columns at `0.5625em` per column.
 `--mira-list-indent` composes those values, while the preview bridge exposes
 the compatible `--indent-size`, `--indent-unit`, and `--list-indent` aliases.
+Every rendered indent-widget segment has a `--list-indent` minimum width;
+structural fallback styles use that same width when the widget is present and
+the authored character width while its raw prefix is editable. Enabled guides
+use a line-owned pseudo-element whose height follows the full wrapped
+CodeMirror line box. Consumer overrides of the bridged variables continue to
+control both widget width and guide spacing. In live preview, inactive
+unordered marker spans hide their authored glyph and paint the same tokenized
+bullet shape used by reading mode; focusing the marker removes that presentation
+so the original `-`, `*`, or `+` stays editable.
 
 Color tokens may use `light-dark()` directly. Channel-list tokens such as the
 callout RGB values and compound tokens such as widget shadows retain their

@@ -1,4 +1,4 @@
-import { syntaxTree } from "@codemirror/language";
+import { ensureSyntaxTree, syntaxTree } from "@codemirror/language";
 import { type Extension, type Line, type Range } from "@codemirror/state";
 import {
   Decoration,
@@ -130,6 +130,16 @@ export function selectionTouchesIndent(
   return selectionFrom < indentTo && selectionTo > indentFrom;
 }
 
+export function shouldRenderStyledUnorderedMarker(
+  livePreview: boolean,
+  cursorFrom: number,
+  markerFrom: number,
+): boolean {
+  return (
+    livePreview && cursorFrom !== markerFrom && cursorFrom !== markerFrom + 1
+  );
+}
+
 export function getIndentLineLayout(
   lineText: string,
 ): MiraLineIndentLayout | null {
@@ -214,16 +224,43 @@ function unorderedMarkerAdjustment(markerColumns: number): string {
   return `var(--hmd-unordered-list-marker-slot-width, ${Math.max(markerColumns, 0)}ch) - ${Math.max(markerColumns, 0)}ch`;
 }
 
+function widgetFallbackLength(
+  layout: MiraLineIndentLayout,
+  adjustment?: string,
+): string {
+  const segmentCount = splitIndentSegments(layout.indentText).length;
+  if (segmentCount === 0) {
+    return fallbackLength(layout.fallbackColumns, adjustment);
+  }
+
+  const parts = Array.from(
+    { length: segmentCount },
+    () => "var(--list-indent)",
+  );
+  const suffixColumns = Math.max(
+    layout.fallbackColumns - layout.indentColumns,
+    0,
+  );
+  if (suffixColumns > 0) {
+    parts.push(`${suffixColumns}ch`);
+  }
+  if (adjustment) {
+    parts.push(adjustment);
+  }
+  return parts.length === 1 ? parts[0]! : `calc(${parts.join(" + ")})`;
+}
+
 function buildIndentStyle(
   layout: MiraLineIndentLayout,
   anchor: PlainIndentAnchor | null,
+  usesUnorderedMarkerSlot: boolean,
 ): string {
   const markerColumns =
     layout.markerFrom === undefined || layout.markerTo === undefined
       ? 0
       : layout.markerTo - layout.markerFrom;
   const listMarkerAdjustment =
-    layout.listKind === "ul"
+    layout.listKind === "ul" && usesUnorderedMarkerSlot
       ? unorderedMarkerAdjustment(markerColumns)
       : undefined;
   const paddingFallback = fallbackLength(
@@ -234,6 +271,10 @@ function buildIndentStyle(
     layout.fallbackColumns,
     listMarkerAdjustment,
   );
+  const widgetPrefixFallback = widgetFallbackLength(
+    layout,
+    listMarkerAdjustment,
+  );
   return [
     layout.guideCount > 0 ? `--indent-guide-count: ${layout.guideCount};` : "",
     anchor?.guideOffset || layout.listKind === "ul"
@@ -241,6 +282,9 @@ function buildIndentStyle(
       : "",
     paddingFallback ? `--hmd-indent-padding-fallback: ${paddingFallback};` : "",
     prefixFallback ? `--hmd-indent-prefix-fallback: ${prefixFallback};` : "",
+    widgetPrefixFallback
+      ? `--hmd-indent-widget-prefix-fallback: ${widgetPrefixFallback};`
+      : "",
   ]
     .filter(Boolean)
     .join(" ");
@@ -336,7 +380,12 @@ export function indentGuideDecorations(
               const indentTo = line.from + layout.indentText.length;
               const anchor =
                 layout.kind === "plain"
-                  ? findPlainIndentAnchor(view, line, layout.indentColumns)
+                  ? findPlainIndentAnchor(
+                      view,
+                      line,
+                      layout.indentColumns,
+                      livePreview,
+                    )
                   : null;
               const quoteChrome =
                 livePreview &&
@@ -357,7 +406,7 @@ export function indentGuideDecorations(
                           "data-indent-anchor-line-from": `${anchor.lineFrom}`,
                         }
                       : {}),
-                    style: buildIndentStyle(layout, anchor),
+                    style: buildIndentStyle(layout, anchor, livePreview),
                   },
                   class: [
                     "indented-wrapped-line",
@@ -402,6 +451,14 @@ export function indentGuideDecorations(
                 layout.markerFrom !== undefined &&
                 layout.markerTo !== undefined
               ) {
+                const markerFrom = line.from + layout.markerFrom;
+                const styledUnorderedMarker =
+                  layout.listKind === "ul" &&
+                  shouldRenderStyledUnorderedMarker(
+                    livePreview,
+                    cursor.from,
+                    markerFrom,
+                  );
                 decorations.push(
                   Decoration.mark({
                     class: [
@@ -411,11 +468,11 @@ export function indentGuideDecorations(
                         ? "cm-formatting-list-ol"
                         : "cm-formatting-list-ul",
                       `cm-list-${layout.depth}`,
-                    ].join(" "),
-                  }).range(
-                    line.from + layout.markerFrom,
-                    line.from + layout.markerTo,
-                  ),
+                      styledUnorderedMarker ? "cm-formatting-list-bullet" : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" "),
+                  }).range(markerFrom, line.from + layout.markerTo),
                 );
               }
 
@@ -477,7 +534,9 @@ function isMarkdownIndentLine(
 
   let list = false;
   let quote = false;
-  syntaxTree(view.state).iterate({
+  const tree =
+    ensureSyntaxTree(view.state, line.to, 25) ?? syntaxTree(view.state);
+  tree.iterate({
     from: line.from,
     to: line.to,
     enter(node) {
@@ -518,8 +577,10 @@ function findPlainIndentAnchor(
   view: EditorView,
   line: Line,
   indentColumns: number,
+  usesUnorderedMarkerSlot: boolean,
 ): PlainIndentAnchor | null {
-  const tree = syntaxTree(view.state);
+  const tree =
+    ensureSyntaxTree(view.state, line.to, 25) ?? syntaxTree(view.state);
   const node = tree.resolve(line.from, 1);
 
   for (
@@ -565,7 +626,7 @@ function findPlainIndentAnchor(
       return null;
     }
 
-    if (list.name === "BulletList") {
+    if (list.name === "BulletList" && usesUnorderedMarkerSlot) {
       const markerColumns = toMarkdownColumns(
         view.state.sliceDoc(listMark.from, markerEnd),
       );

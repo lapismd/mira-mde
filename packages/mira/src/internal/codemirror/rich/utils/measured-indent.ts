@@ -13,10 +13,11 @@ import {
   ViewPlugin,
   type ViewUpdate,
 } from "@codemirror/view";
+import { selectionTouchesIndent } from "./indent";
 
 type IndentMeasurement = {
-  paddingPx: number;
-  prefixPx: number;
+  paddingPx: number | null;
+  prefixPx: number | null;
 };
 
 type RawPrefixBox = {
@@ -60,16 +61,24 @@ export function syncMeasuredIndentStyles(
       continue;
     }
 
-    setStylePropertyIfChanged(
-      line,
-      measuredPaddingProperty,
-      `${measurement.paddingPx}px`,
-    );
-    setStylePropertyIfChanged(
-      line,
-      measuredPrefixProperty,
-      `${measurement.prefixPx}px`,
-    );
+    if (measurement.paddingPx === null) {
+      removeStylePropertyIfPresent(line, measuredPaddingProperty);
+    } else {
+      setStylePropertyIfChanged(
+        line,
+        measuredPaddingProperty,
+        `${measurement.paddingPx}px`,
+      );
+    }
+    if (measurement.prefixPx === null) {
+      removeStylePropertyIfPresent(line, measuredPrefixProperty);
+    } else {
+      setStylePropertyIfChanged(
+        line,
+        measuredPrefixProperty,
+        `${measurement.prefixPx}px`,
+      );
+    }
   }
 }
 
@@ -129,32 +138,34 @@ function measureQuotePrefixWidth(
   return Number.isFinite(measured) && measured > 0 ? measured : null;
 }
 
-function measureOwnPrefixWidth(
+function measureStableWidgetWidth(line: HTMLElement): number | null {
+  const widget = line.querySelector<HTMLElement>(
+    ".cm-plain-indent-widget, .cm-hmd-list-indent",
+  );
+  if (!widget) {
+    return null;
+  }
+
+  const segmentWidth = Array.from(
+    widget.querySelectorAll<HTMLElement>(".cm-indent"),
+  ).reduce((total, segment) => {
+    const width = segment.getBoundingClientRect().width;
+    return total + (Number.isFinite(width) && width > 0 ? width : 0);
+  }, 0);
+  if (segmentWidth > 0) {
+    return segmentWidth;
+  }
+
+  const widgetWidth = widget.getBoundingClientRect().width;
+  return Number.isFinite(widgetWidth) && widgetWidth > 0 ? widgetWidth : null;
+}
+
+function measureRawPrefixWidth(
   view: EditorView,
   line: HTMLElement,
   from: number,
   prefix: string,
 ): number | null {
-  const widget = line.querySelector<HTMLElement>(
-    ".cm-plain-indent-widget, .cm-hmd-list-indent",
-  );
-  if (widget) {
-    const segmentWidth = Array.from(
-      widget.querySelectorAll<HTMLElement>(".cm-indent"),
-    ).reduce((total, segment) => {
-      const width = segment.getBoundingClientRect().width;
-      return total + (Number.isFinite(width) && width > 0 ? width : 0);
-    }, 0);
-    if (segmentWidth > 0) {
-      return segmentWidth;
-    }
-
-    const widgetWidth = widget.getBoundingClientRect().width;
-    if (Number.isFinite(widgetWidth) && widgetWidth > 0) {
-      return widgetWidth;
-    }
-  }
-
   const rawWidth = measureLeadingRawPrefixBox(line, prefix)?.width;
   if (rawWidth !== undefined) {
     return rawWidth;
@@ -174,19 +185,12 @@ function measureOwnPrefixWidth(
 
 function measuredWidth(
   cache: Map<string, number>,
-  seen: Set<string>,
-  view: EditorView,
   line: HTMLElement,
-  from: number,
-  prefix: string,
   cacheKey: string,
+  canMeasureWidget: boolean,
 ): number | null {
-  let width = cache.get(cacheKey) ?? null;
-  if (width === null && !seen.has(cacheKey)) {
-    seen.add(cacheKey);
-    width = measureOwnPrefixWidth(view, line, from, prefix);
-  }
-  return width;
+  const measured = canMeasureWidget ? measureStableWidgetWidth(line) : null;
+  return measured ?? cache.get(cacheKey) ?? null;
 }
 
 function firstContentTextNode(line: HTMLElement): Text | null {
@@ -270,14 +274,16 @@ class MeasuredIndentPlugin implements PluginValue {
   }
 
   update(update: ViewUpdate): void {
-    let needsMeasure = false;
-    if (update.geometryChanged) {
-      this.cache.clear();
-      needsMeasure = true;
-    }
+    let needsMeasure = update.geometryChanged;
+    const selectionChanged = !update.startState.selection.eq(
+      update.state.selection,
+    );
+    // A geometry update can be the second half of CodeMirror revealing a raw
+    // prefix. Keep the last widget-backed width until a laid-out widget can
+    // replace it; clearing the cache here creates a one-frame 2ch/4ch jump.
     needsMeasure ||= update.docChanged || update.viewportChanged;
     needsMeasure ||= update.focusChanged;
-    needsMeasure ||= !update.startState.selection.eq(update.state.selection);
+    needsMeasure ||= selectionChanged;
     if (needsMeasure) {
       this.schedule(update.view);
     }
@@ -294,14 +300,19 @@ class MeasuredIndentPlugin implements PluginValue {
 
     view.requestMeasure({
       read: () => {
+        const selection = view.state.selection.main;
         if (!view.inView) {
-          return { measurements: [] };
+          return {
+            inactive: true,
+            measurements: [],
+            selectionFrom: selection.from,
+            selectionTo: selection.to,
+          };
         }
 
         const lines = view.contentDOM.querySelectorAll<HTMLElement>(
           ".cm-line[data-indent-prefix]",
         );
-        const seen = new Set<string>();
         const measurements: Array<{
           cacheKey: string;
           from: number;
@@ -321,30 +332,35 @@ class MeasuredIndentPlugin implements PluginValue {
           const cacheKey = `${variant}\u0000${listKind}\u0000${prefix}`;
           const isList = line.hasAttribute("data-list-kind");
           const hasPrefix = prefix.length > 0;
+          const hasIndentWidget = Boolean(
+            line.querySelector(".cm-plain-indent-widget, .cm-hmd-list-indent"),
+          );
+          const selection = view.state.selection.main;
+          const expectsIndentWidget =
+            hasPrefix &&
+            !selectionTouchesIndent(
+              selection.from,
+              selection.to,
+              from,
+              from + prefix.length,
+            );
           const stableIndentPx = hasPrefix
-            ? measuredWidth(
-                this.cache,
-                seen,
-                view,
-                line,
-                from,
-                prefix,
-                cacheKey,
-              )
+            ? measuredWidth(this.cache, line, cacheKey, hasIndentWidget)
             : isList
               ? 0
               : null;
           const rawPrefixWidth = hasPrefix
             ? measureLeadingRawPrefixBox(line, prefix)?.width
             : undefined;
-          const hasIndentWidget = Boolean(
-            line.querySelector(".cm-plain-indent-widget, .cm-hmd-list-indent"),
-          );
           const visibleIndentPx = hasPrefix
-            ? (rawPrefixWidth ??
-              (hasIndentWidget && stableIndentPx !== null
-                ? stableIndentPx + measureLeadingContentChrome(line)
-                : measureOwnPrefixWidth(view, line, from, prefix)))
+            ? expectsIndentWidget
+              ? stableIndentPx === null
+                ? null
+                : stableIndentPx + measureLeadingContentChrome(line)
+              : (rawPrefixWidth ??
+                (hasIndentWidget
+                  ? null
+                  : measureRawPrefixWidth(view, line, from, prefix)))
             : isList
               ? 0
               : null;
@@ -386,6 +402,11 @@ class MeasuredIndentPlugin implements PluginValue {
               : null;
             if (anchorOffset !== null && anchorOffset > 0) {
               paddingPx = anchorOffset;
+            } else {
+              // Keep the structural parent-prefix fallback until its content
+              // span is measurable. Using this continuation's own full widget
+              // width here would move the default render for one paint frame.
+              paddingPx = null;
             }
           }
 
@@ -398,18 +419,33 @@ class MeasuredIndentPlugin implements PluginValue {
           });
         }
 
-        return { measurements };
+        return {
+          inactive: false,
+          measurements,
+          selectionFrom: selection.from,
+          selectionTo: selection.to,
+        };
       },
-      write: ({ measurements }) => {
+      write: ({ inactive, measurements, selectionFrom, selectionTo }) => {
         this.scheduled = false;
+        // CodeMirror can move an otherwise visible editor out of its measured
+        // viewport between scheduling and reading. That is not evidence that
+        // its valid line measurements became stale.
+        if (inactive) {
+          return;
+        }
+        const selection = view.state.selection.main;
+        if (selection.from !== selectionFrom || selection.to !== selectionTo) {
+          this.schedule(view);
+          return;
+        }
         const byFrom = new Map<number, IndentMeasurement>();
         for (const measurement of measurements) {
           const { cacheKey, from, paddingPx, prefixPx, stableIndentPx } =
             measurement;
-          if (paddingPx === null || prefixPx === null) {
-            continue;
+          if (paddingPx !== null || prefixPx !== null) {
+            byFrom.set(from, { paddingPx, prefixPx });
           }
-          byFrom.set(from, { paddingPx, prefixPx });
           const previous = this.cache.get(cacheKey);
           if (
             stableIndentPx !== null &&

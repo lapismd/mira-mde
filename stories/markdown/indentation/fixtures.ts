@@ -6,6 +6,8 @@ export const wrappedListItemsMarkdown = [
   "1000. Navigate to the workspace location and keep this ordered item long enough to wrap across several visual rows while its continuation rows stay aligned with the item body.",
   "",
   "- Keep this unordered item long enough to wrap across several visual rows while its marker remains clear of the label and every continuation row hangs beneath the item body.",
+  "",
+  "* Keep this asterisk-authored item long enough to wrap across several visual rows while live preview normalizes its inactive marker to the rendered bullet presentation.",
 ].join("\n");
 
 export const continuationParagraphsMarkdown = [

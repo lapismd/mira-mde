@@ -40,4 +40,22 @@ describe("measured indent styles", () => {
       "",
     );
   });
+
+  it("keeps a measured widget width when the parent padding falls back", () => {
+    const root = document.createElement("div");
+    const line = appendLine(root, 10);
+    line.style.setProperty("--hmd-indent-padding-measured", "24px");
+
+    syncMeasuredIndentStyles(
+      root,
+      new Map([[10, { paddingPx: null, prefixPx: 32 }]]),
+    );
+
+    expect(line.style.getPropertyValue("--hmd-indent-padding-measured")).toBe(
+      "",
+    );
+    expect(line.style.getPropertyValue("--hmd-indent-prefix-measured")).toBe(
+      "32px",
+    );
+  });
 });

@@ -93,6 +93,23 @@ describe("createRichEditorExtensions", () => {
     parent.remove();
   });
 
+  it("marks editors that render full-height indentation guides", () => {
+    const parent = document.createElement("div");
+    document.body.append(parent);
+    const view = new EditorView({
+      doc: "    Wrapped continuation",
+      extensions: createRichEditorExtensions({ indentGuides: true }),
+      parent,
+    });
+
+    expect(view.dom.classList.contains("cm-show-indentation-guides")).toBe(
+      true,
+    );
+
+    view.destroy();
+    parent.remove();
+  });
+
   it("uses list-callout contributions from Mira extensions", async () => {
     const parent = document.createElement("div");
     document.body.append(parent);

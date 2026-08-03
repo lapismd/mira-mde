@@ -83,9 +83,24 @@ continuations align with their parent content within `1.5px`, caret movement
 does not change that column, and eight-space preformatted list content retains
 two non-zero indent segments. The full-height guide follow-up additionally
 requires each enabled wrapped-line guide pseudo-element to match its CodeMirror
-line box within `2px`; implementation and focused Chromium validation are in
-progress. Focused unit, Storybook Chromium, package, and repository validation
-results are recorded with the implementing change.
+line box within `2px`. Live-preview acceptance also requires inactive dash and
+asterisk markers to expose the styled-bullet hook and non-zero rendered bullet,
+then reveal the authored marker when the caret enters its prefix. Implementation
+is complete: focused Chromium acceptance passes all 12 indentation cases
+(including the unchanged expected failure for
+the unrelated blockquote whitespace row), the caret-geometry case passes 16
+repeated runs, and wrapped-row plus full-height-guide coverage passes 8 repeated
+runs per case. Direct browser inspection measured the source and live-preview
+guide at `67.203px` against a `67.203px` wrapped line box. The same inspection
+measured inactive dash and asterisk live-preview bullets at approximately
+`4.9px` square with the same `rgb(99, 101, 111)` fill and token-resolved size as
+their reading-mode bullets. The focused unit suite passes 13 tests, the Mira
+package check, test, and build gates pass, and `pnpm spec:check`,
+`pnpm catalog:check`, and `pnpm check:all` pass.
+The final `pnpm storybook:check` static build also passes. Its compare-only
+visual stage reports 19 review-required snapshot deltas (13 in the repaired
+indentation and list surfaces, plus 6 shared editor-surface snapshots); no
+visual baselines were created or refreshed for this repair.
 
 The add-on's Docker stage excludes both `storybook-static` and its affected
 cache. The `test:visual` gate therefore uses the affected preflight to build in

@@ -23,6 +23,48 @@
   padding-inline-start: var(--hmd-unordered-list-marker-padding-inline-start);
 }
 
+.markdown-live-preview-mode
+  .cm-editor
+  .cm-formatting-list-bullet
+  > span.cm-meta {
+  color: transparent;
+  display: inline-block;
+  position: relative;
+}
+
+.markdown-live-preview-mode
+  .cm-editor
+  .cm-formatting-list-bullet
+  > span.cm-meta::after {
+  background-color: var(--list-marker-color);
+  border-radius: var(--list-bullet-radius);
+  content: "";
+  height: var(--list-bullet-size);
+  inset-inline-start: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  transition:
+    background-color 150ms ease,
+    box-shadow 150ms ease,
+    transform 150ms ease;
+  width: var(--list-bullet-size);
+}
+
+.markdown-live-preview-mode
+  .cm-editor
+  .cm-line:hover
+  .cm-formatting-list-bullet
+  > span.cm-meta::after,
+.markdown-live-preview-mode
+  .cm-editor
+  .cm-activeLine
+  .cm-formatting-list-bullet
+  > span.cm-meta::after {
+  background-color: var(--markdown-list-marker-color-hover);
+  box-shadow: 0 0 0 4px var(--background-modifier-hover);
+}
+
 .markdown-editor-surface .cm-editor .HyperMD-list-line {
   white-space: pre-wrap;
 }
@@ -35,6 +77,21 @@
   text-indent: calc(
     0px -
       var(--hmd-indent-prefix-measured, var(--hmd-indent-prefix-fallback, 0px))
+  );
+}
+
+.markdown-editor-surface
+  .cm-editor
+  .indented-wrapped-line:has(.cm-hmd-list-indent) {
+  text-indent: calc(
+    0px -
+      var(
+        --hmd-indent-prefix-measured,
+        var(
+          --hmd-indent-widget-prefix-fallback,
+          var(--hmd-indent-prefix-fallback, 0px)
+        )
+      )
   );
 }
 
@@ -62,6 +119,73 @@
   display: inline-block;
   position: relative;
   white-space: pre;
+}
+
+.markdown-editor-surface
+  .cm-editor.cm-show-indentation-guides
+  .indented-wrapped-line {
+  position: relative;
+}
+
+.markdown-editor-surface
+  .cm-editor.cm-show-indentation-guides
+  .indented-wrapped-line::before {
+  background-image: repeating-linear-gradient(
+    to right,
+    var(--markdown-indentation-guide-color, var(--indentation-guide-color)) 0,
+    var(--markdown-indentation-guide-color, var(--indentation-guide-color))
+      var(--markdown-indentation-guide-width, var(--indentation-guide-width)),
+    transparent
+      var(--markdown-indentation-guide-width, var(--indentation-guide-width)),
+    transparent calc(var(--indent-size, 4) * 1ch)
+  );
+  background-repeat: repeat-x;
+  background-size: calc(var(--indent-size, 4) * 1ch) 100%;
+  bottom: 0;
+  content: "";
+  inset-inline-start: var(--hmd-indent-guide-offset, 0px);
+  pointer-events: none;
+  position: absolute;
+  top: 0;
+  width: calc(var(--indent-guide-count, 0) * var(--indent-size, 4) * 1ch);
+}
+
+.markdown-editor-surface
+  .cm-editor.cm-show-indentation-guides
+  .cm-activeLine.indented-wrapped-line::before {
+  background-image: repeating-linear-gradient(
+    to right,
+    var(
+        --markdown-indentation-guide-color-active,
+        var(--indentation-guide-color-active)
+      )
+      0,
+    var(
+        --markdown-indentation-guide-color-active,
+        var(--indentation-guide-color-active)
+      )
+      var(
+        --markdown-indentation-guide-width-active,
+        var(--indentation-guide-width-active)
+      ),
+    transparent
+      var(
+        --markdown-indentation-guide-width-active,
+        var(--indentation-guide-width-active)
+      ),
+    transparent calc(var(--indent-size, 4) * 1ch)
+  );
+}
+
+.markdown-editor-surface
+  .cm-editor.cm-show-indentation-guides
+  .cm-hmd-list-indent
+  .cm-indent-guide::before,
+.markdown-editor-surface
+  .cm-editor.cm-show-indentation-guides
+  .cm-plain-indent-widget
+  .cm-indent-guide::before {
+  display: none;
 }
 
 .markdown-editor-surface

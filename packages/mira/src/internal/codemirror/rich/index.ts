@@ -203,7 +203,13 @@ export function createRichEditorExtensions(
     headingGutterExtension(),
     headingLineDecorations(),
     resolvedOptions.indentGuides !== false
-      ? [indentGuideDecorations({ livePreview }), measuredIndentExtension()]
+      ? [
+          EditorView.editorAttributes.of({
+            class: "cm-show-indentation-guides",
+          }),
+          indentGuideDecorations({ livePreview }),
+          measuredIndentExtension(),
+        ]
       : [],
     // Lapis only mounts richEditor() for live-preview. Source keeps delimiters
     // (`>`, backticks, fences) with HyperMD line classes only.

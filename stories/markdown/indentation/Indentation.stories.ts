@@ -81,7 +81,11 @@ async function expectTargetsVisible(
   });
 }
 
-const wrappedTargets = ["1000. Navigate", "Keep this unordered item"];
+const wrappedTargets = [
+  "1000. Navigate",
+  "Keep this unordered item",
+  "Keep this asterisk-authored item",
+];
 const continuationTargets = [
   "This single-space continuation",
   "This blank-separated continuation",

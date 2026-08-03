@@ -7,6 +7,7 @@ import {
   indentGuideDecorations,
   normalizeIndentText,
   selectionTouchesIndent,
+  shouldRenderStyledUnorderedMarker,
   shouldAnchorPlainIndentToListItem,
   splitIndentSegments,
   toMarkdownColumns,
@@ -34,8 +35,51 @@ describe("indent helpers", () => {
     });
     expect(selectionTouchesIndent(2, 2, 0, 4)).toBe(true);
     expect(selectionTouchesIndent(5, 5, 0, 4)).toBe(false);
+    expect(shouldRenderStyledUnorderedMarker(true, 12, 10)).toBe(true);
+    expect(shouldRenderStyledUnorderedMarker(false, 12, 10)).toBe(false);
+    expect(shouldRenderStyledUnorderedMarker(true, 10, 10)).toBe(false);
+    expect(shouldRenderStyledUnorderedMarker(true, 11, 10)).toBe(false);
     expect(shouldAnchorPlainIndentToListItem(2, 2)).toBe(true);
     expect(shouldAnchorPlainIndentToListItem(8, 3)).toBe(false);
+  });
+
+  it("styles inactive dash and asterisk markers only in live preview", async () => {
+    const parent = document.createElement("div");
+    document.body.append(parent);
+    const view = new EditorView({
+      doc: ["# List markers", "", "- Dash item", "* Asterisk item"].join("\n"),
+      extensions: [
+        createMarkdownCodeMirrorExtensions(),
+        indentGuideDecorations({ livePreview: true }),
+      ],
+      parent,
+    });
+    await new Promise((resolve) => requestAnimationFrame(() => resolve(null)));
+
+    const markerFor = (snippet: string) =>
+      [...parent.querySelectorAll<HTMLElement>(".cm-line")]
+        .find((line) => (line.textContent || "").includes(snippet))
+        ?.querySelector<HTMLElement>(".cm-formatting-list-ul");
+
+    expect(markerFor("Dash item")?.textContent).toBe("- ");
+    expect(markerFor("Dash item")?.classList).toContain(
+      "cm-formatting-list-bullet",
+    );
+    expect(markerFor("Asterisk item")?.textContent).toBe("* ");
+    expect(markerFor("Asterisk item")?.classList).toContain(
+      "cm-formatting-list-bullet",
+    );
+
+    view.dispatch({ selection: { anchor: view.state.doc.line(3).from } });
+    expect(markerFor("Dash item")?.classList).not.toContain(
+      "cm-formatting-list-bullet",
+    );
+    expect(markerFor("Asterisk item")?.classList).toContain(
+      "cm-formatting-list-bullet",
+    );
+
+    view.destroy();
+    parent.remove();
   });
 
   it("derives authored prefixes for top-level, quoted, and plain lines", () => {
@@ -157,6 +201,12 @@ describe("indent helpers", () => {
     expect(two?.dataset["indentAnchorLineFrom"]).toBe(
       `${view.state.doc.line(1).from}`,
     );
+    expect(two?.getAttribute("style")).toContain(
+      "--hmd-indent-widget-prefix-fallback: var(--list-indent)",
+    );
+    expect(two?.getAttribute("style")).toContain(
+      "--hmd-indent-padding-fallback: 2ch",
+    );
     expect(first?.dataset["indentAnchorLineFrom"]).toBe(
       `${view.state.doc.line(5).from}`,
     );
@@ -166,6 +216,9 @@ describe("indent helpers", () => {
     expect(ordered?.classList.contains("cm-formatting-list-ol")).toBe(false);
     expect(preformatted?.dataset["indentAnchorLineFrom"]).toBeUndefined();
     expect(preformatted?.querySelectorAll(".cm-indent-guide")).toHaveLength(2);
+    expect(preformatted?.getAttribute("style")).toContain(
+      "--hmd-indent-widget-prefix-fallback: calc(var(--list-indent) + var(--list-indent))",
+    );
 
     view.destroy();
     parent.remove();

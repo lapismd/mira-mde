@@ -60,11 +60,17 @@ type LineMetrics = {
   depth: string | null;
   firstGlyphLeft: number | null;
   guideCount: number;
+  guideDisplay: string;
+  guideHeight: number;
+  guideImage: string;
   hasIndentWidget: boolean;
   indentSegmentWidths: number[];
   lineLeft: number;
+  lineHeight: number;
   listIndentWidth: number;
   markerRight: number | null;
+  measuredPadding: string;
+  measuredPrefix: string;
   paddingInlineStart: number;
   rowLefts: number[];
   textIndent: number;
@@ -127,6 +133,7 @@ async function lineMetrics(line: Locator): Promise<LineMetrics> {
     probe.remove();
     const contentRects = firstTextRects(content);
     const style = getComputedStyle(element);
+    const guideStyle = getComputedStyle(element, "::before");
 
     return {
       anchorFrom: element.dataset["indentAnchorLineFrom"] ?? null,
@@ -134,14 +141,24 @@ async function lineMetrics(line: Locator): Promise<LineMetrics> {
       depth: element.dataset["listDepth"] ?? null,
       firstGlyphLeft: contentRects[0]?.left ?? null,
       guideCount: element.querySelectorAll(".cm-indent-guide").length,
+      guideDisplay: guideStyle.display,
+      guideHeight: Number.parseFloat(guideStyle.height),
+      guideImage: guideStyle.backgroundImage,
       hasIndentWidget: Boolean(widget),
       indentSegmentWidths: Array.from(
         element.querySelectorAll<HTMLElement>(".cm-indent"),
         (segment) => segment.getBoundingClientRect().width,
       ),
       lineLeft: element.getBoundingClientRect().left,
+      lineHeight: element.getBoundingClientRect().height,
       listIndentWidth,
       markerRight: marker?.getBoundingClientRect().right ?? null,
+      measuredPadding: element.style.getPropertyValue(
+        "--hmd-indent-padding-measured",
+      ),
+      measuredPrefix: element.style.getPropertyValue(
+        "--hmd-indent-prefix-measured",
+      ),
       paddingInlineStart: Number.parseFloat(style.paddingInlineStart),
       rowLefts: contentRects.map((rect) => rect.left),
       textIndent: Number.parseFloat(style.textIndent),
@@ -178,10 +195,10 @@ function expectSameContentColumn(
 ): void {
   expect(actual.firstGlyphLeft).not.toBeNull();
   expect(expected.firstGlyphLeft).not.toBeNull();
-  expect(
-    Math.abs(actual.firstGlyphLeft! - expected.firstGlyphLeft!),
-    context,
-  ).toBeLessThan(1.5);
+  const delta = Math.abs(actual.firstGlyphLeft! - expected.firstGlyphLeft!);
+  if (delta >= 1.5) {
+    throw new Error(`${context ?? "content column"}: delta=${delta}`);
+  }
 }
 
 async function expectContentColumnToSettle(
@@ -205,7 +222,20 @@ async function expectContentColumnToSettle(
     )
     .toBeLessThan(1.5);
   await settleLayout(line.page());
-  expectSameContentColumn(await lineMetrics(line), expected, context);
+  const settled = await lineMetrics(line);
+  expectSameContentColumn(
+    settled,
+    expected,
+    `${context}: ${JSON.stringify({
+      paddingInlineStart: settled.paddingInlineStart,
+      textIndent: settled.textIndent,
+      firstGlyphLeft: settled.firstGlyphLeft,
+      hasIndentWidget: settled.hasIndentWidget,
+      indentSegmentWidths: settled.indentSegmentWidths,
+      measuredPadding: settled.measuredPadding,
+      measuredPrefix: settled.measuredPrefix,
+    })}`,
+  );
 }
 
 test("keeps wrapped ordered and unordered item rows aligned in both editor modes", async ({
@@ -232,6 +262,54 @@ test("keeps wrapped ordered and unordered item rows aligned in both editor modes
       );
     }
   }
+});
+
+test("renders inactive dash and asterisk markers as live-preview bullets", async ({
+  page,
+}) => {
+  await gotoStory(
+    page,
+    "markdown-indentation--wrapped-list-items-live-preview",
+  );
+
+  for (const snippet of [
+    "Keep this unordered item",
+    "Keep this asterisk-authored item",
+  ]) {
+    const line = lineContaining(page, snippet);
+    const marker = line.locator(".cm-formatting-list-ul:has(> span.cm-meta)");
+    await expect(marker).toHaveClass(/cm-formatting-list-bullet/u);
+    const markerMetrics = await marker.evaluate((element) => {
+      const source = element.querySelector<HTMLElement>("span.cm-meta");
+      if (!source) return null;
+      const sourceStyle = getComputedStyle(source);
+      const bulletStyle = getComputedStyle(source, "::after");
+      return {
+        bulletBackground: bulletStyle.backgroundColor,
+        bulletContent: bulletStyle.content,
+        bulletHeight: Number.parseFloat(bulletStyle.height),
+        bulletWidth: Number.parseFloat(bulletStyle.width),
+        sourceColor: sourceStyle.color,
+      };
+    });
+    expect(markerMetrics).not.toBeNull();
+    expect(markerMetrics?.bulletContent).toBe('""');
+    expect(markerMetrics?.bulletBackground).not.toBe("rgba(0, 0, 0, 0)");
+    expect(markerMetrics?.bulletHeight).toBeGreaterThan(0);
+    expect(markerMetrics?.bulletWidth).toBeGreaterThan(0);
+    expect(markerMetrics?.sourceColor).toBe("rgba(0, 0, 0, 0)");
+  }
+
+  const dashLine = lineContaining(page, "Keep this unordered item");
+  const dashMarker = dashLine.locator(
+    ".cm-formatting-list-ul:has(> span.cm-meta)",
+  );
+  await placeCaretAtLineOffset(page, dashLine, 0);
+  await expect(dashMarker).not.toHaveClass(/cm-formatting-list-bullet/u);
+  await expect(dashMarker.locator("span.cm-meta")).toHaveText("-");
+
+  await placeCaretAtLineOffset(page, dashLine, 2);
+  await expect(dashMarker).toHaveClass(/cm-formatting-list-bullet/u);
 });
 
 test("covers authored continuation prefixes and the preformatted exception", async ({
@@ -387,6 +465,25 @@ test("aligns inactive continuation paragraphs with their parent content", async 
   }
 });
 
+test("extends indentation guides across wrapped continuation line boxes", async ({
+  page,
+}) => {
+  for (const id of [
+    "markdown-indentation--continuation-paragraphs-source",
+    "markdown-indentation--continuation-paragraphs-live-preview",
+  ]) {
+    await gotoStory(page, id);
+    const metrics = await lineMetrics(
+      lineContaining(page, "Four-space continuation text"),
+    );
+    expect(metrics.lineHeight).toBeGreaterThan(40);
+    expect(metrics.guideCount).toBe(1);
+    expect(metrics.guideDisplay).not.toBe("none");
+    expect(metrics.guideImage).not.toBe("none");
+    expect(Math.abs(metrics.guideHeight - metrics.lineHeight)).toBeLessThan(2);
+  }
+});
+
 test("keeps continuation geometry stable while its prefix becomes editable", async ({
   page,
 }) => {
@@ -415,7 +512,7 @@ test("keeps continuation geometry stable while its prefix becomes editable", asy
       expectSameContentColumn(
         metrics,
         inactive,
-        `${id} at offset ${state.offset}`,
+        `${id} at offset ${state.offset}: ${JSON.stringify({ inactive, metrics })}`,
       );
       expectStableRowLefts(metrics);
     }
