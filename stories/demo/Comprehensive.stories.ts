@@ -88,7 +88,12 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {
-  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
+  tags: [
+    "visual-approved",
+    "!visual-pending",
+    "!visual-ready",
+    "!visual-failed",
+  ],
   parameters: {
     visualDelta: {
       images: ["/visual-baselines/stories/demo/playground-chromium.png"],
@@ -133,7 +138,12 @@ export const Playground: Story = {
 };
 
 export const LivePreview: Story = {
-  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
+  tags: [
+    "visual-approved",
+    "!visual-pending",
+    "!visual-ready",
+    "!visual-failed",
+  ],
   parameters: {
     visualDelta: {
       images: ["/visual-baselines/stories/demo/live-preview-chromium.png"],
@@ -148,7 +158,12 @@ export const LivePreview: Story = {
 };
 
 export const Source: Story = {
-  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
+  tags: [
+    "visual-approved",
+    "!visual-pending",
+    "!visual-ready",
+    "!visual-failed",
+  ],
   parameters: {
     visualDelta: {
       images: ["/visual-baselines/stories/demo/source-chromium.png"],
@@ -162,7 +177,12 @@ export const Source: Story = {
 };
 
 export const ReadingPreview: Story = {
-  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
+  tags: [
+    "visual-approved",
+    "!visual-pending",
+    "!visual-ready",
+    "!visual-failed",
+  ],
   parameters: {
     visualDelta: {
       images: ["/visual-baselines/stories/demo/reading-preview-chromium.png"],
@@ -177,7 +197,12 @@ export const ReadingPreview: Story = {
 };
 
 export const Split: Story = {
-  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
+  tags: [
+    "visual-approved",
+    "!visual-pending",
+    "!visual-ready",
+    "!visual-failed",
+  ],
   parameters: {
     visualDelta: {
       images: ["/visual-baselines/stories/demo/split-chromium.png"],
@@ -191,7 +216,12 @@ export const Split: Story = {
 };
 
 export const Composable: Story = {
-  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
+  tags: [
+    "visual-approved",
+    "!visual-pending",
+    "!visual-ready",
+    "!visual-failed",
+  ],
   parameters: {
     visualDelta: {
       images: ["/visual-baselines/stories/demo/composable-chromium.png"],

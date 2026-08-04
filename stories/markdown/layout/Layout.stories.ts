@@ -36,7 +36,12 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const LivePreview: Story = {
-  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
+  tags: [
+    "visual-approved",
+    "!visual-pending",
+    "!visual-ready",
+    "!visual-failed",
+  ],
   parameters: {
     visualDelta: {
       images: [
@@ -53,7 +58,12 @@ export const LivePreview: Story = {
 };
 
 export const Source: Story = {
-  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
+  tags: [
+    "visual-approved",
+    "!visual-pending",
+    "!visual-ready",
+    "!visual-failed",
+  ],
   parameters: {
     visualDelta: {
       images: ["/visual-baselines/stories/markdown/layout/source-chromium.png"],
@@ -67,7 +77,12 @@ export const Source: Story = {
 };
 
 export const Preview: Story = {
-  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
+  tags: [
+    "visual-approved",
+    "!visual-pending",
+    "!visual-ready",
+    "!visual-failed",
+  ],
   parameters: {
     visualDelta: {
       images: [
@@ -83,7 +98,12 @@ export const Preview: Story = {
 };
 
 export const Split: Story = {
-  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
+  tags: [
+    "visual-approved",
+    "!visual-pending",
+    "!visual-ready",
+    "!visual-failed",
+  ],
   parameters: {
     visualDelta: {
       images: ["/visual-baselines/stories/markdown/layout/split-chromium.png"],
@@ -97,7 +117,12 @@ export const Split: Story = {
 };
 
 export const NarrowSource: Story = {
-  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
+  tags: [
+    "visual-approved",
+    "!visual-pending",
+    "!visual-ready",
+    "!visual-failed",
+  ],
   parameters: {
     visualDelta: {
       images: [
@@ -114,7 +139,12 @@ export const NarrowSource: Story = {
 };
 
 export const WideSource: Story = {
-  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
+  tags: [
+    "visual-approved",
+    "!visual-pending",
+    "!visual-ready",
+    "!visual-failed",
+  ],
   parameters: {
     visualDelta: {
       images: [
