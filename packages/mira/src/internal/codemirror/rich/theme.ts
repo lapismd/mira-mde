@@ -95,8 +95,12 @@ export const miraRichEditorTheme = EditorView.theme({
     position: "relative",
   },
   ".mira-rich-widget--block": {
+    cursor: "default",
     maxWidth: "100%",
+    overflowWrap: "normal",
+    whiteSpace: "normal",
     width: "100%",
+    wordBreak: "normal",
   },
   ".mira-rich-widget__source-toggle": {
     alignItems: "center",

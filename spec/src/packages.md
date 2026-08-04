@@ -62,7 +62,10 @@ entry point.
   `measuredIndentExtension` and `syncMeasuredIndentStyles`; internal layout
   repairs MUST preserve those exports. Indentation-guide, continuation, and
   syntax-tree-derived indented-code line geometry remains internal to those
-  factories and MUST NOT require a new consumer API.
+  factories and MUST NOT require a new consumer API. Internal rendered block
+  widget styles MUST also normalize CodeMirror's source whitespace behavior so
+  embedded Markdown retains the same block spacing as the public preview
+  renderer without exposing another styling API.
 - `preview` exports Markdown preview, outline, embed, and renderer surfaces.
 - `tables` exports the supported Markdown and grid-table components.
 - `ui` and its documented component subpaths export the shared UI primitives.

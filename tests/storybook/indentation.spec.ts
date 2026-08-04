@@ -443,6 +443,70 @@ test("preserves nested list depth and quoted checklist structure across surfaces
   await expect(reading.locator('input[type="checkbox"]').first()).toBeVisible();
 });
 
+test("matches live-preview blockquote child spacing to reading mode", async ({
+  page,
+}) => {
+  const readQuoteMetrics = async (blockquote: Locator) =>
+    blockquote.evaluate((element) => {
+      const paragraph = element.querySelector<HTMLElement>(":scope > p");
+      const list = element.querySelector<HTMLElement>(":scope > ul");
+      const listItem = list?.querySelector<HTMLElement>(":scope > li");
+      const nestedList = listItem?.querySelector<HTMLElement>(":scope > ul");
+      const nestedQuote = element.querySelector<HTMLElement>(
+        ":scope > blockquote",
+      );
+      if (!paragraph || !list || !listItem || !nestedList || !nestedQuote) {
+        throw new Error("Expected complete nested blockquote fixture");
+      }
+      const quoteRect = element.getBoundingClientRect();
+      const paragraphRect = paragraph.getBoundingClientRect();
+      const listRect = list.getBoundingClientRect();
+      const listItemRect = listItem.getBoundingClientRect();
+      return {
+        height: quoteRect.height,
+        listTopInset: listItemRect.top - listRect.top,
+        nestedListHeight: nestedList.getBoundingClientRect().height,
+        paragraphToListGap: listRect.top - paragraphRect.bottom,
+        topInset: paragraphRect.top - quoteRect.top,
+        whiteSpace: getComputedStyle(element).whiteSpace,
+      };
+    });
+
+  await gotoStory(
+    page,
+    "markdown-indentation--nested-lists-and-quotes-live-preview",
+  );
+  const liveQuote = page
+    .locator(".mira-rich-widget--blockquote blockquote")
+    .first();
+  await expect(liveQuote).toBeVisible();
+  await expect(liveQuote.locator(":scope > blockquote")).toHaveCount(1);
+  const live = await readQuoteMetrics(liveQuote);
+
+  await gotoStory(
+    page,
+    "markdown-indentation--nested-lists-and-quotes-reading",
+  );
+  const readingQuote = page
+    .locator(".markdown-reading-view blockquote")
+    .first();
+  await expect(readingQuote).toBeVisible();
+  const reading = await readQuoteMetrics(readingQuote);
+
+  expect(live.whiteSpace).toBe("normal");
+  expect(Math.abs(live.topInset - reading.topInset)).toBeLessThanOrEqual(1.5);
+  expect(
+    Math.abs(live.listTopInset - reading.listTopInset),
+  ).toBeLessThanOrEqual(1.5);
+  expect(
+    Math.abs(live.paragraphToListGap - reading.paragraphToListGap),
+  ).toBeLessThanOrEqual(1.5);
+  expect(
+    Math.abs(live.nestedListHeight - reading.nestedListHeight),
+  ).toBeLessThanOrEqual(1.5);
+  expect(Math.abs(live.height - reading.height)).toBeLessThanOrEqual(2);
+});
+
 test("renders the indented live-preview blockquote in its focused story", async ({
   page,
 }) => {

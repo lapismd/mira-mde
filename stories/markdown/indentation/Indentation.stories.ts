@@ -94,6 +94,7 @@ const continuationTargets = [
 const nestedCoreTargets = [
   "Space-authored ordered grandchild",
   "Quoted checklist child",
+  "Nested quote keeps a second quote guide",
 ];
 const nestedTargets = [
   ...nestedCoreTargets,

@@ -40,9 +40,8 @@ const nestedListsAndQuotesCore = [
   "> > Nested quote keeps a second quote guide.",
 ];
 
-export const nestedListsAndQuotesLiveMarkdown = nestedListsAndQuotesCore
-  .slice(0, -1)
-  .join("\n");
+export const nestedListsAndQuotesLiveMarkdown =
+  nestedListsAndQuotesCore.join("\n");
 
 export const nestedListsAndQuotesMarkdown = [
   ...nestedListsAndQuotesCore,

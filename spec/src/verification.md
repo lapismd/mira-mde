@@ -109,6 +109,20 @@ deltas (13 in the repaired indentation and list surfaces, plus 6 shared
 editor-surface snapshots); no visual baselines were created or refreshed for
 this repair.
 
+The nested-quote whitespace follow-up reproduced a live-preview block widget
+inheriting CodeMirror's `white-space: break-spaces`: its outer quote measured
+`341.17px` high against `194.17px` in reading mode, the paragraph-to-list gap
+expanded from `16px` to `53px`, and the nested list expanded from `23.09px` to
+`65.09px`. The repair resets rendered block widgets to normal whitespace,
+keeps explicit paragraph and code whitespace rules intact, restores the nested
+quote to the focused live-preview fixture, and verifies its internal spacing
+against the reading surface without updating visual baselines. After the
+Storybook restart, live preview measured `194.17px` high with `normal`
+whitespace, `0px` top/list insets, a `16px` paragraph-to-list gap, and a
+`23.09px` nested list, matching the reading-mode measurements. All 14 focused
+Chromium indentation cases pass, including the intentionally retained expected
+failure marker for the unrelated whitespace-only CodeMirror row.
+
 The add-on's Docker stage does not trust authored `storybook-static` output,
 but it transports the affected cache and preview graph and may restore a
 checksum-verified canonical static build. The `test:visual` gate therefore uses

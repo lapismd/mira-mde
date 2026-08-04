@@ -93,6 +93,26 @@ describe("createRichEditorExtensions", () => {
     parent.remove();
   });
 
+  it("resets source whitespace on rendered block widgets", () => {
+    const parent = document.createElement("div");
+    document.body.append(parent);
+    const view = new EditorView({
+      doc: "After",
+      extensions: createRichEditorExtensions({ livePreview: true }),
+      parent,
+    });
+    const widget = document.createElement("div");
+    widget.className =
+      "mira-rich-widget mira-rich-widget--block mira-rich-widget--blockquote";
+    view.contentDOM.append(widget);
+
+    expect(getComputedStyle(view.contentDOM).whiteSpace).not.toBe("normal");
+    expect(getComputedStyle(widget).whiteSpace).toBe("normal");
+
+    view.destroy();
+    parent.remove();
+  });
+
   it("marks editors that render full-height indentation guides", () => {
     const parent = document.createElement("div");
     document.body.append(parent);
