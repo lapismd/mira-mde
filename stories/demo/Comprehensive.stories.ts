@@ -88,7 +88,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {
-  tags: ["visual-approved"],
+  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
   parameters: {
     visualDelta: {
       images: ["/visual-baselines/stories/demo/playground-chromium.png"],
