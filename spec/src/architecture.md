@@ -46,6 +46,13 @@ generated-cache exclusions, fresh-workspace dependency relinking, and linked
 source build identity required by those gates; Mira does not maintain a
 downstream pnpm patch for behavior available in the reviewed upstream source.
 
+The root keeps the `storybook`, accessibility, docs, themes, Vitest, and Svelte
+Vite packages on one reviewed patch line; the current set is `10.5.6`.
+Storybook MCP, Svelte CSF, icons, and third-party addons retain their own release
+lines and are not version-coupled to the core patch. A Storybook patch change
+MUST pass the root quality gates and a complete static Storybook build without
+rewriting visual baselines.
+
 Storybook's palette addon and manager color-mode control are host-only tooling.
 They update the preview document's public theme attribute and shadcn-compatible
 mode classes; runtime packages remain unaware of Storybook. Fixed appearance

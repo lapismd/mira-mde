@@ -183,6 +183,23 @@ directory; the immediate repeat passed without a downstream patch. The
 dependency update also passes `pnpm spec:check`, `pnpm catalog:check`, and
 `pnpm check:all`; no visual baseline is created or refreshed by the upgrade.
 
+The Storybook patch refresh aligns `storybook`, addon-a11y, addon-docs,
+addon-themes, addon-vitest, and svelte-vite at `10.5.6`, while retaining the
+independent MCP, Svelte CSF, icons, and third-party addon versions. Acceptance
+passes `pnpm spec:check`, `pnpm catalog:check`, `pnpm check:all`, the complete
+Storybook `10.5.6` static build, and all 27 focused Playwright browser tests,
+including the unchanged expected-failure contract. The Vitest Storybook
+project now reaches all 132 stories: 130 pass, while the two continuation
+paragraph stories expose their existing no-scroll acceptance defect because a
+target ending at `672.14px` exceeds the story's `640px` editor viewport. A
+`10.5.3` control workspace cannot reach those assertions because that version
+fails during Storybook/Vitest module setup; the continuation story source is
+unchanged by this dependency slice. The compare-only visual runner captures all
+132 stories, then correctly fails its artifact-safety guard after Playwright
+modifies `stories/demo/source-chromium.png` in the protected baseline tree. The
+generated mutation was restored byte-for-byte from the parent revision, so the
+upgrade creates or refreshes no visual baseline.
+
 The UI primitive review also verifies that portaled dropdown and context menus
 use the Lapis-compatible 14/20 interface type scale with leading semantic action
 icons, and that a dialog's footer close action cannot inherit the absolute

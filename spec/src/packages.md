@@ -46,6 +46,11 @@ those fixes in a downstream patch.
 The link MUST remain repository-only and MUST NOT enter any public package's
 manifest or packed dependency graph.
 
+The private root toolchain aligns the six core Storybook packages at `10.5.6`.
+That alignment is repository infrastructure only: it MUST NOT add Storybook to
+any public package manifest, export map, packed dependency graph, or runtime
+entry point.
+
 ## Supported `@lapismd/mira` entry points
 
 - The package root exports `Mira`, `MiraProps`, and `MiraHandle` and defaults to
