@@ -30,7 +30,7 @@ type Story = StoryObj<typeof meta>;
 
 /** Interactive playground — Controls drive the public configuration props. */
 export const Playground: Story = {
-  tags: ["visual-ready"],
+  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
   parameters: {
     visualDelta: {
       images: ["/visual-baselines/stories/mira-editor/playground-chromium.png"],

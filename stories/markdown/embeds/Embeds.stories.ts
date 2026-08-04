@@ -35,7 +35,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Preview: Story = {
-  tags: ["visual-ready"],
+  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
   parameters: {
     visualDelta: {
       images: [
@@ -50,7 +50,7 @@ export const Preview: Story = {
 };
 
 export const LivePreview: Story = {
-  tags: ["visual-ready"],
+  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
   name: "Live Preview",
   render: (args) => ({
     Component: EditorModeStory,
@@ -80,7 +80,7 @@ export const LivePreview: Story = {
 };
 
 export const SourceMode: Story = {
-  tags: ["visual-ready"],
+  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
   name: "Source Mode",
   render: (args) => ({
     Component: EditorModeStory,
@@ -125,7 +125,7 @@ export const AdapterInvalidation: Story = {
   render: () => ({
     Component: AdapterInvalidationStory,
   }),
-  tags: ["visual-ready"],
+  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement);
 
@@ -166,7 +166,7 @@ export const PortableSurfaces: Story = {
   render: () => ({
     Component: PortableSurfacesStory,
   }),
-  tags: ["visual-ready"],
+  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
   parameters: {
     visualDelta: {
       images: [

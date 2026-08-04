@@ -106,7 +106,7 @@ const activeTargets = [
 ];
 
 export const WrappedListItemsSource: Story = {
-  tags: ["visual-ready", "!visual-pending", "!visual-approved", "!visual-failed"],
+  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
   name: "Wrapped List Items — Source",
   parameters: {
     visualDelta: {
@@ -132,7 +132,7 @@ export const WrappedListItemsSource: Story = {
 };
 
 export const WrappedListItemsLivePreview: Story = {
-  tags: ["visual-ready", "!visual-pending", "!visual-approved", "!visual-failed"],
+  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
   name: "Wrapped List Items — Live Preview",
   args: { mode: "live-preview" },
   parameters: {
@@ -162,7 +162,7 @@ export const WrappedListItemsLivePreview: Story = {
 };
 
 export const ContinuationParagraphsSource: Story = {
-  tags: ["visual-ready", "!visual-pending", "!visual-approved", "!visual-failed"],
+  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
   name: "Continuation Paragraphs — Source",
   args: {
     value: continuationParagraphsMarkdown,
@@ -200,7 +200,7 @@ export const ContinuationParagraphsSource: Story = {
 };
 
 export const ContinuationParagraphsLivePreview: Story = {
-  tags: ["visual-ready", "!visual-pending", "!visual-approved", "!visual-failed"],
+  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
   name: "Continuation Paragraphs — Live Preview",
   args: {
     value: continuationParagraphsMarkdown,
@@ -238,7 +238,7 @@ export const ContinuationParagraphsLivePreview: Story = {
 };
 
 export const NestedListsAndQuotesSource: Story = {
-  tags: ["visual-ready", "!visual-pending", "!visual-approved", "!visual-failed"],
+  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
   name: "Nested Lists and Quotes — Source",
   args: {
     value: nestedListsAndQuotesMarkdown,
@@ -272,7 +272,7 @@ export const NestedListsAndQuotesSource: Story = {
 };
 
 export const NestedListsAndQuotesLivePreview: Story = {
-  tags: ["visual-ready", "!visual-pending", "!visual-approved", "!visual-failed"],
+  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
   name: "Nested Lists and Quotes — Live Preview",
   args: {
     value: nestedListsAndQuotesLiveMarkdown,
@@ -306,7 +306,7 @@ export const NestedListsAndQuotesLivePreview: Story = {
 };
 
 export const NestedListsAndQuotesReading: Story = {
-  tags: ["visual-ready", "!visual-pending", "!visual-approved", "!visual-failed"],
+  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
   name: "Nested Lists and Quotes — Reading",
   args: {
     value: nestedListsAndQuotesMarkdown,
@@ -337,7 +337,7 @@ export const NestedListsAndQuotesReading: Story = {
 };
 
 export const ActivePrefixesSource: Story = {
-  tags: ["visual-ready", "!visual-pending", "!visual-approved", "!visual-failed"],
+  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
   name: "Active Prefixes — Source",
   args: {
     value: activePrefixesMarkdown,
@@ -372,7 +372,7 @@ export const ActivePrefixesSource: Story = {
 };
 
 export const ActivePrefixesLivePreview: Story = {
-  tags: ["visual-ready", "!visual-pending", "!visual-approved", "!visual-failed"],
+  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
   name: "Active Prefixes — Live Preview",
   args: {
     value: activePrefixesMarkdown,
@@ -410,7 +410,7 @@ export const ActivePrefixesLivePreview: Story = {
 };
 
 export const ConfigurableIndentWidth: Story = {
-  tags: ["visual-ready", "!visual-pending", "!visual-approved", "!visual-failed"],
+  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
   name: "Configurable Indent Width",
   args: {
     value: configurableIndentWidthMarkdown,

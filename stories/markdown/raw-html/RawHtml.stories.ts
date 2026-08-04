@@ -31,7 +31,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Preview: Story = {
-  tags: ["visual-ready"],
+  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
   parameters: {
     visualDelta: {
       images: [

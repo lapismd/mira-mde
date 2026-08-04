@@ -133,7 +133,7 @@ export const Playground: Story = {
 };
 
 export const LivePreview: Story = {
-  tags: ["visual-approved"],
+  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
   parameters: {
     visualDelta: {
       images: ["/visual-baselines/stories/demo/live-preview-chromium.png"],
@@ -162,7 +162,7 @@ export const Source: Story = {
 };
 
 export const ReadingPreview: Story = {
-  tags: ["visual-ready", "!visual-pending", "!visual-approved", "!visual-failed"],
+  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
   parameters: {
     visualDelta: {
       images: ["/visual-baselines/stories/demo/reading-preview-chromium.png"],
@@ -191,7 +191,7 @@ export const Split: Story = {
 };
 
 export const Composable: Story = {
-  tags: ["visual-ready", "!visual-pending", "!visual-approved", "!visual-failed"],
+  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
   parameters: {
     visualDelta: {
       images: ["/visual-baselines/stories/demo/composable-chromium.png"],

@@ -34,7 +34,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const ButtonsAndSeparators: Story = {
-  tags: ["visual-ready"],
+  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
   parameters: parameters(
     "ui-core",
     "Button variants, icon composition, disabled state, and the shared separator surface.",
@@ -50,7 +50,7 @@ export const ButtonsAndSeparators: Story = {
 };
 
 export const ToggleGroup: Story = {
-  tags: ["visual-ready"],
+  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
   args: { primitive: "toggle-group" },
   parameters: parameters(
     "ui-core",
@@ -68,7 +68,7 @@ export const ToggleGroup: Story = {
 };
 
 export const Toolbar: Story = {
-  tags: ["visual-ready"],
+  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
   args: { primitive: "toolbar" },
   parameters: parameters(
     "ui-toolbar",
@@ -86,7 +86,7 @@ export const Toolbar: Story = {
 };
 
 export const DropdownMenu: Story = {
-  tags: ["visual-ready"],
+  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
   args: { primitive: "dropdown-menu" },
   parameters: parameters(
     "ui-dropdown-menu",
@@ -119,7 +119,7 @@ export const DropdownMenu: Story = {
 };
 
 export const ContextMenu: Story = {
-  tags: ["visual-ready"],
+  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
   args: { primitive: "context-menu" },
   parameters: parameters(
     "ui-context-menu",
@@ -156,7 +156,7 @@ export const ContextMenu: Story = {
 };
 
 export const Dialog: Story = {
-  tags: ["visual-ready"],
+  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
   args: { primitive: "dialog" },
   parameters: parameters(
     "ui-dialog",
@@ -191,7 +191,7 @@ export const Dialog: Story = {
 };
 
 export const Popover: Story = {
-  tags: ["visual-ready"],
+  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
   args: { primitive: "popover" },
   parameters: parameters(
     "ui-popover",
@@ -224,7 +224,7 @@ export const Popover: Story = {
 };
 
 export const Tooltip: Story = {
-  tags: ["visual-ready"],
+  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
   args: { primitive: "tooltip" },
   parameters: parameters(
     "ui-tooltip",
@@ -251,7 +251,7 @@ export const Tooltip: Story = {
 };
 
 export const Table: Story = {
-  tags: ["visual-ready"],
+  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
   args: { primitive: "table" },
   parameters: parameters(
     "ui-table",
@@ -269,7 +269,7 @@ export const Table: Story = {
 };
 
 export const ScrollArea: Story = {
-  tags: ["visual-ready"],
+  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
   args: { primitive: "scroll-area" },
   parameters: parameters(
     "ui-core",

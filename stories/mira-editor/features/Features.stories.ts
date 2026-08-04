@@ -28,7 +28,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Defaults: Story = {
-  tags: ["visual-ready"],
+  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
   parameters: {
     visualDelta: {
       images: [
@@ -54,7 +54,7 @@ export const Defaults: Story = {
 };
 
 export const WithoutToolbar: Story = {
-  tags: ["visual-ready"],
+  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
   parameters: {
     visualDelta: {
       images: [
@@ -77,7 +77,7 @@ export const WithoutToolbar: Story = {
 };
 
 export const WithoutWidgets: Story = {
-  tags: ["visual-ready"],
+  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
   parameters: {
     visualDelta: {
       images: [
@@ -103,7 +103,7 @@ export const WithoutWidgets: Story = {
 };
 
 export const EditModesOnly: Story = {
-  tags: ["visual-ready"],
+  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
   parameters: {
     visualDelta: {
       images: [
@@ -128,7 +128,7 @@ export const EditModesOnly: Story = {
 };
 
 export const CompactToolbarItems: Story = {
-  tags: ["visual-ready"],
+  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
   parameters: {
     visualDelta: {
       images: [

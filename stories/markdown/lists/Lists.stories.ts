@@ -41,7 +41,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Preview: Story = {
-  tags: ["visual-ready"],
+  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
   parameters: {
     visualDelta: {
       images: ["/visual-baselines/stories/markdown/lists/preview-chromium.png"],
@@ -119,7 +119,7 @@ export const CustomCalloutCatalog: Story = {
     value: listCalloutsMarkdown,
     extensions: [listCalloutCatalogExtension],
   },
-  tags: ["visual-ready"],
+  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
   parameters: {
     visualDelta: {
       images: [

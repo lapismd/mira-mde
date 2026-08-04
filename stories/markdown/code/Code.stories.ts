@@ -91,7 +91,7 @@ export const LivePreview: Story = {
 };
 
 export const SourceMode: Story = {
-  tags: ["visual-ready"],
+  tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
   name: "Source Mode",
   render: (args) => ({
     Component: EditorModeStory,
