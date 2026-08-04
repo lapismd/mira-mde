@@ -15,6 +15,7 @@ const config: StorybookConfig = {
       name: "@lapismd/storybook-addon-visual-delta",
       options: {
         visualDelta: {
+          allowVcsWrites: true,
           baselinePathMode: "nested-import",
           snapshotDir: "tests/visual/storybook.spec.ts-snapshots",
         },
