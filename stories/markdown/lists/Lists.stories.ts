@@ -54,7 +54,7 @@ export const Preview: Story = {
 };
 
 export const LivePreview: Story = {
-  tags: ["visual-pending", "!visual-approved", "!visual-ready", "!visual-failed"],
+  tags: ["visual-ready", "!visual-pending", "!visual-approved", "!visual-failed"],
   name: "Live Preview",
   render: (args) => ({
     Component: EditorModeStory,
@@ -84,7 +84,7 @@ export const LivePreview: Story = {
 };
 
 export const SourceMode: Story = {
-  tags: ["visual-pending", "!visual-approved", "!visual-ready", "!visual-failed"],
+  tags: ["visual-ready", "!visual-pending", "!visual-approved", "!visual-failed"],
   name: "Source Mode",
   render: (args) => ({
     Component: EditorModeStory,
@@ -173,5 +173,5 @@ export const CustomCalloutCatalogLive: Story = {
       mode: "live-preview",
     },
   }),
-  tags: ["visual-pending", "!visual-approved", "!visual-ready", "!visual-failed"],
+  tags: ["visual-ready", "!visual-pending", "!visual-approved", "!visual-failed"],
 };
