@@ -4,42 +4,44 @@ This matrix is both requirement traceability and the implementation progress
 artifact. The Storybook-only host, six-package public architecture, and
 authorized baseline regeneration migrations are complete.
 
-| Requirements                                                                                            | Evidence                                                                  | Status                                |
-| ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- | ------------------------------------- |
-| MIRA-ARCH-001, MIRA-ARCH-002, MIRA-ARCH-003, MIRA-ARCH-004                                              | Package exports, package checks/tests/builds, boundary review             | Implemented                           |
-| MIRA-ARCH-005                                                                                           | Storybook-only host migration and root script checks                      | Implemented by catalog-host slice     |
-| MIRA-ARCH-006, MIRA-ARCH-007, MIRA-ARCH-008, MIRA-ARCH-009, MIRA-ARCH-010, MIRA-ARCH-011, MIRA-ARCH-012 | Package manifests, boundary checker, pack fixtures, and catalog migration | Implemented by six-package migration  |
-| MIRA-ARCH-013                                                                                           | Theme stylesheet exports and tarball resolution checks                    | Implemented by extensible theme slice |
-| MIRA-MD-001, MIRA-MD-002, MIRA-MD-003, MIRA-MD-004, MIRA-MD-005, MIRA-MD-006                            | Package unit tests, Layout Showcase, Storybook browser acceptance         | Implemented                           |
-| MIRA-MD-007                                                                                             | Comprehensive fixture plus focused Storybook fixtures                     | Implemented; catalog checker enforced |
-| MIRA-MD-008, MIRA-MD-009                                                                                | Enforced Storybook accessibility and icon-bearing editor controls         | Implemented                           |
-| MIRA-MD-010                                                                                             | Focused outline story plus Storybook browser navigation acceptance        | Implemented                           |
-| MIRA-MD-011                                                                                             | Computed typography parity across source, live preview, and reading       | Implemented by typography repair      |
-| MIRA-MD-012                                                                                             | Nested blockquote task source and checkbox browser assertions             | Implemented by quoted-task repair     |
-| MIRA-UI-001, MIRA-UI-002, MIRA-UI-003, MIRA-UI-004, MIRA-UI-005                                         | Mira Editor, React, and Vanilla tests/builds                              | Implemented                           |
-| MIRA-UI-006, MIRA-UI-007, MIRA-UI-008                                                                   | Storybook browser project and UI primitive `play` interactions            | Implemented                           |
-| MIRA-UI-009                                                                                             | Svelte package checks and focused outline browser acceptance              | Implemented                           |
-| MIRA-UI-010                                                                                             | Cross-framework appearance contract tests                                 | Implemented by extensible theme slice |
-| MIRA-CSS-001, MIRA-CSS-002                                                                              | Package stylesheet exports, no-Tailwind package checks                    | Implemented                           |
-| MIRA-CSS-003, MIRA-CSS-004, MIRA-CSS-005, MIRA-CSS-006                                                  | Public surface/token registry and catalog checker                         | Implemented by catalog/token slice    |
-| MIRA-CSS-007, MIRA-CSS-008, MIRA-CSS-009, MIRA-CSS-010                                                  | Theme CSS contracts, component tests, and portaled-overlay stories        | Implemented by extensible theme slice |
-| MIRA-CSS-011                                                                                            | Computed callout, task-state, and floating-surface theme assertions       | Implemented by theme token repair     |
-| MIRA-CSS-012                                                                                            | Cataloged indentation tokens and continuation-widget browser geometry     | Implemented by indentation repair     |
-| MIRA-CSS-013                                                                                            | Computed task-delimiter colors in source and live-preview edit states     | Implemented by quoted-task repair     |
-| MIRA-AI-001, MIRA-AI-002, MIRA-AI-003                                                                   | `packages/mira-plugin-ai` unit tests                                      | Implemented                           |
-| MIRA-AI-004                                                                                             | Deterministic AI story interaction                                        | Implemented                           |
-| MIRA-MERMAID-001, MIRA-MERMAID-002, MIRA-MERMAID-003, MIRA-MERMAID-004                                  | Mermaid package tests and existing Storybook stories                      | Implemented                           |
-| MIRA-MERMAID-005                                                                                        | Expanded Mermaid story interaction matrix                                 | Implemented                           |
-| MIRA-CAT-001                                                                                            | Raw spec mirrors, link rewriting, one-to-one checker tests                | Implemented by catalog-host slice     |
-| MIRA-CAT-002                                                                                            | Catalog descriptions and governing-spec links                             | Implemented by catalog/token slice    |
-| MIRA-CAT-003, MIRA-CAT-004                                                                              | Storybook fixture consolidation and comprehensive demo stories            | Implemented by catalog-host slice     |
-| MIRA-CAT-005                                                                                            | Vitest Storybook browser project and interaction tests                    | Implemented                           |
-| MIRA-CAT-006                                                                                            | Addon-owned Visual Delta suite and authorized regenerated baselines       | Implemented by visual baseline slice  |
-| MIRA-CAT-007                                                                                            | Catalog coverage checker and ten focused UI `play` assertions             | Implemented                           |
-| MIRA-CAT-008                                                                                            | Focused outline story and comprehensive outline control                   | Implemented                           |
-| MIRA-CAT-009                                                                                            | Theme globals, fixed appearance stories, and browser assertions           | Implemented by extensible theme slice |
-| MIRA-GOV-001, MIRA-GOV-002, MIRA-GOV-003, MIRA-GOV-004, MIRA-GOV-005, MIRA-GOV-006, MIRA-GOV-007        | `pnpm spec:check`, checker tests, pull-request workflow                   | Implemented by governance slice       |
-| MIRA-GOV-008                                                                                            | Package-boundary checker and tarball leak tests                           | Implemented                           |
+| Requirements                                                                                            | Evidence                                                                   | Status                                |
+| ------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- | ------------------------------------- |
+| MIRA-ARCH-001, MIRA-ARCH-002, MIRA-ARCH-003, MIRA-ARCH-004                                              | Package exports, package checks/tests/builds, boundary review              | Implemented                           |
+| MIRA-ARCH-005                                                                                           | Storybook-only host migration and root script checks                       | Implemented by catalog-host slice     |
+| MIRA-ARCH-006, MIRA-ARCH-007, MIRA-ARCH-008, MIRA-ARCH-009, MIRA-ARCH-010, MIRA-ARCH-011, MIRA-ARCH-012 | Package manifests, boundary checker, pack fixtures, and catalog migration  | Implemented by six-package migration  |
+| MIRA-ARCH-013                                                                                           | Theme stylesheet exports and tarball resolution checks                     | Implemented by extensible theme slice |
+| MIRA-MD-001, MIRA-MD-002, MIRA-MD-003, MIRA-MD-004, MIRA-MD-005, MIRA-MD-006                            | Package unit tests, Layout Showcase, Storybook browser acceptance          | Implemented                           |
+| MIRA-MD-007                                                                                             | Comprehensive fixture plus focused Storybook fixtures                      | Implemented; catalog checker enforced |
+| MIRA-MD-008, MIRA-MD-009                                                                                | Enforced Storybook accessibility and icon-bearing editor controls          | Implemented                           |
+| MIRA-MD-010                                                                                             | Focused outline story plus Storybook browser navigation acceptance         | Implemented                           |
+| MIRA-MD-011                                                                                             | Computed typography parity across source, live preview, and reading        | Implemented by typography repair      |
+| MIRA-MD-012                                                                                             | Nested blockquote task source and checkbox browser assertions              | Implemented by quoted-task repair     |
+| MIRA-MD-013                                                                                             | Task-state registry tests and focused picker interaction/geometry checks   | Implemented by task-picker slice      |
+| MIRA-UI-001, MIRA-UI-002, MIRA-UI-003, MIRA-UI-004, MIRA-UI-005                                         | Mira Editor, React, and Vanilla tests/builds                               | Implemented                           |
+| MIRA-UI-006, MIRA-UI-007, MIRA-UI-008                                                                   | Storybook browser project and UI primitive `play` interactions             | Implemented                           |
+| MIRA-UI-009                                                                                             | Svelte package checks and focused outline browser acceptance               | Implemented                           |
+| MIRA-UI-010                                                                                             | Cross-framework appearance contract tests                                  | Implemented by extensible theme slice |
+| MIRA-CSS-001, MIRA-CSS-002                                                                              | Package stylesheet exports, no-Tailwind package checks                     | Implemented                           |
+| MIRA-CSS-003, MIRA-CSS-004, MIRA-CSS-005, MIRA-CSS-006                                                  | Public surface/token registry and catalog checker                          | Implemented by catalog/token slice    |
+| MIRA-CSS-007, MIRA-CSS-008, MIRA-CSS-009, MIRA-CSS-010                                                  | Theme CSS contracts, component tests, and portaled-overlay stories         | Implemented by extensible theme slice |
+| MIRA-CSS-011                                                                                            | Computed callout, task-state, and floating-surface theme assertions        | Implemented by theme token repair     |
+| MIRA-CSS-012                                                                                            | Cataloged indentation tokens and continuation-widget browser geometry      | Implemented by indentation repair     |
+| MIRA-CSS-013                                                                                            | Computed task-delimiter colors in source and live-preview edit states      | Implemented by quoted-task repair     |
+| MIRA-CSS-014                                                                                            | Task picker hover/focus visibility, portaled icon reuse, and line geometry | Implemented by task-picker slice      |
+| MIRA-AI-001, MIRA-AI-002, MIRA-AI-003                                                                   | `packages/mira-plugin-ai` unit tests                                       | Implemented                           |
+| MIRA-AI-004                                                                                             | Deterministic AI story interaction                                         | Implemented                           |
+| MIRA-MERMAID-001, MIRA-MERMAID-002, MIRA-MERMAID-003, MIRA-MERMAID-004                                  | Mermaid package tests and existing Storybook stories                       | Implemented                           |
+| MIRA-MERMAID-005                                                                                        | Expanded Mermaid story interaction matrix                                  | Implemented                           |
+| MIRA-CAT-001                                                                                            | Raw spec mirrors, link rewriting, one-to-one checker tests                 | Implemented by catalog-host slice     |
+| MIRA-CAT-002                                                                                            | Catalog descriptions and governing-spec links                              | Implemented by catalog/token slice    |
+| MIRA-CAT-003, MIRA-CAT-004                                                                              | Storybook fixture consolidation and comprehensive demo stories             | Implemented by catalog-host slice     |
+| MIRA-CAT-005                                                                                            | Vitest Storybook browser project and interaction tests                     | Implemented                           |
+| MIRA-CAT-006                                                                                            | Addon-owned Visual Delta suite and authorized regenerated baselines        | Implemented by visual baseline slice  |
+| MIRA-CAT-007                                                                                            | Catalog coverage checker and ten focused UI `play` assertions              | Implemented                           |
+| MIRA-CAT-008                                                                                            | Focused outline story and comprehensive outline control                    | Implemented                           |
+| MIRA-CAT-009                                                                                            | Theme globals, fixed appearance stories, and browser assertions            | Implemented by extensible theme slice |
+| MIRA-GOV-001, MIRA-GOV-002, MIRA-GOV-003, MIRA-GOV-004, MIRA-GOV-005, MIRA-GOV-006, MIRA-GOV-007        | `pnpm spec:check`, checker tests, pull-request workflow                    | Implemented by governance slice       |
+| MIRA-GOV-008                                                                                            | Package-boundary checker and tarball leak tests                            | Implemented                           |
 
 ## Validation tiers
 
@@ -211,6 +213,26 @@ including the retained expected-failure marker for the unrelated
 whitespace-only CodeMirror row; all 218 package tests, the package check and
 build, and the canonical spec gate also pass. No visual baselines were created
 or refreshed for this repair.
+
+The editable task-picker slice centralizes Mira's 22 shipped standard and
+custom checkbox states and mounts one shared Popover-backed control in both
+live-preview task widgets and editable preview checkboxes. The icon-only
+trigger remains absolutely positioned and hidden until its task line is
+hovered or focused. Its pointer hit area overlaps the checkbox edge to prevent
+a dead hover gap, while the visible hover treatment remains at least `3px`
+clear of the checkbox. Selecting a state closes the portaled menu, replaces
+only the one-character authored marker, and immediately restores the matching
+shipped task artwork without changing checkbox, text-column, or line-height
+geometry. Read-only reading mode and raw source mode retain their existing
+contracts. The shared registry and CodeMirror mutation tests pass within all
+221 Mira package tests; package check and build, canonical spec and catalog
+checks, root lint/test/build, and three focused Chromium cases pass. The
+Chromium coverage includes the original hover-to-trigger movement, all 22 menu
+options, custom-state selection, geometry stability, surface boundaries, and
+the Comprehensive Live Preview fixture. No visual baseline was created or
+refreshed. The aggregate `pnpm check:all` command remains blocked at its
+initial Prettier step by an unrelated `.visual-delta/config.json` formatting
+change outside this slice; none of this slice's files appears in that failure.
 
 The add-on's Docker stage does not trust authored `storybook-static` output,
 but it transports the affected cache and preview graph and may restore a

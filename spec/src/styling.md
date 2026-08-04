@@ -21,6 +21,7 @@ customization and Obsidian-compatible aliases retained as a compatibility layer.
 | MIRA-CSS-011 | Public theme tokens MUST retain their documented CSS value grammar and resolve to valid declarations in inherited, explicit, and system color modes; color-only functions MUST NOT wrap channel lists, shadows, or other non-color values. |
 | MIRA-CSS-012 | Mira MUST expose `--mira-indent-size`, `--mira-indent-unit`, and `--mira-list-indent` defaults and bridge them to the Obsidian-compatible indentation variables used by shipped CodeMirror list and continuation widgets.                  |
 | MIRA-CSS-013 | Visible task checkbox delimiters in source and live-preview editing MUST use the same muted syntax color as other Markdown delimiters while task content retains the normal prose color.                                                   |
+| MIRA-CSS-014 | The editable task-type trigger MUST use shipped semantic hooks and theme tokens, remain outside normal line layout, become visible on line hover or focus, and reuse the shipped task-checkbox artwork inside its portaled picker.         |
 
 Stylesheet order remains theme, UI, preview, Svelte/Mira Editor, and framework
 wrapper composition as documented by the package entrypoints.

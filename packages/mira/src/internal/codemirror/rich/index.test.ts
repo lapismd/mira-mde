@@ -133,6 +133,40 @@ describe("createRichEditorExtensions", () => {
     parent.remove();
   });
 
+  it("replaces only the task marker when a custom task type is selected", async () => {
+    const parent = document.createElement("div");
+    document.body.append(parent);
+    const source = "- [?] Needs decision";
+    const view = new EditorView({
+      doc: source,
+      selection: { anchor: source.indexOf("Needs") + 2 },
+      extensions: [
+        createMarkdownCodeMirrorExtensions(),
+        createRichEditorExtensions({ livePreview: true }),
+      ],
+      parent,
+    });
+    await nextFrame();
+    await nextFrame();
+
+    parent
+      .querySelector<HTMLButtonElement>('button[aria-label="Change task type"]')
+      ?.click();
+    await nextFrame();
+    document.body
+      .querySelector<HTMLButtonElement>(
+        '.mira-task-state-option__action[aria-label="Starred"]',
+      )
+      ?.click();
+    await nextFrame();
+    await nextFrame();
+
+    expect(view.state.doc.toString()).toBe("- [*] Needs decision");
+
+    view.destroy();
+    parent.remove();
+  });
+
   it("reserves nested border chrome for nested quote prefixes", async () => {
     const parent = document.createElement("div");
     document.body.append(parent);

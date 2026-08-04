@@ -1,4 +1,5 @@
 <script lang="ts">
+  import TaskCheckboxControl from "./task-checkbox-control.svelte";
   import { useAstNode, useMarkdown } from "../renderer/context.svelte";
   import type { HastNode } from "../renderer/types";
 
@@ -104,31 +105,47 @@
     };
   }
 
-  function onCheckedChange(value: boolean): void {
-    checked = value;
+  function applyTaskValue(value: string): void {
+    checked = value.trim().length > 0;
     if (ref?.parentElement) {
-      ref.parentElement.dataset.task = value ? "x" : task;
+      ref.parentElement.dataset.task = value;
+    }
+    if (parent?.properties) {
+      parent.properties["data-task"] = value;
     }
     if (node.node.type === "element") {
       node.node.properties ??= {};
-      node.node.properties.checked = value;
+      node.node.properties.checked = checked;
     }
-    markdown.onChange?.(value ? "x" : " ", offset.from, offset.to);
+    markdown.onChange?.(value, offset.from, offset.to);
   }
 
-  function handleChange(event: Event): void {
-    onCheckedChange((event.currentTarget as HTMLInputElement).checked);
+  function onCheckedChange(value: boolean): void {
+    applyTaskValue(value ? "x" : " ");
   }
 </script>
 
-<input
-  bind:this={ref}
-  {...restProps}
-  class={`task-list-item-checkbox ${className}`.trim()}
-  type="checkbox"
-  aria-label="Toggle task"
-  data-task={task}
-  {checked}
-  {disabled}
-  onchange={handleChange}
-/>
+{#if disabled}
+  <input
+    bind:this={ref}
+    {...restProps}
+    class={`task-list-item-checkbox ${className}`.trim()}
+    type="checkbox"
+    aria-label="Toggle task"
+    data-task={task}
+    {checked}
+    {disabled}
+  />
+{:else}
+  <span class="task-list-label" data-task={task}>
+    <TaskCheckboxControl
+      bind:ref
+      {...restProps}
+      checkboxClass={className}
+      {task}
+      {checked}
+      {onCheckedChange}
+      onTaskChange={applyTaskValue}
+    />
+  </span>
+{/if}

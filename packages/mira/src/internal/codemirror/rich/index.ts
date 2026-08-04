@@ -1018,7 +1018,6 @@ function decorateTaskCheckboxes(
           from: taskRange.checkboxStart,
           value: taskRange.taskValue,
           checked: taskRange.taskValue.trim().length > 0,
-          options,
         }),
       }).range(taskRange.markerStart, taskRange.checkboxEnd),
     );
