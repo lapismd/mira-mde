@@ -76,11 +76,14 @@ entry point.
   the public Markdown sans token for ordinary prose while the shipped
   code-specific hooks continue to select the monospaced token. Internal task
   marker ranges MUST account for authored blockquote prefixes before locating
-  the list and checkbox delimiters.
+  the list and checkbox delimiters. Internal live-preview fold controls MUST
+  remain directly adjacent to their list marker without introducing a new
+  consumer API.
 - `preview` exports Markdown preview, outline, embed, and renderer surfaces. Its
   shipped reading styles MUST keep a list guide continued through a child
   blockquote on the parent's painted guide column after accounting for the
-  blockquote border box.
+  blockquote border box. Reading list controls MUST use the first rendered item
+  row as their marker-alignment anchor even when the item wraps.
 - `tables` exports the supported Markdown and grid-table components.
 - `ui` and its documented component subpaths export the shared UI primitives.
 - `themes/mira.css`, `themes/obsidian.css`, `themes.css`, and `styles.css`

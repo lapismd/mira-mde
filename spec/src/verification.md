@@ -162,7 +162,7 @@ become visible. First-depth quote prefixes no longer create a second border.
 Browser acceptance measures the rendered parent border before entering source,
 then asserts that every editable child row retains that column and that the
 displaced active nested border is not painted.
-The complete focused Chromium indentation suite passes all 19 cases, including
+The complete focused Chromium indentation suite passes all 20 cases, including
 the retained expected-failure marker for the unrelated whitespace-only
 CodeMirror row. The parser and widget unit suite passes all 218 package tests;
 the package check and build, canonical spec check, and catalog check also pass.
@@ -170,6 +170,16 @@ No visual baselines were created or refreshed for this repair. The full
 `pnpm check:all` gate remains blocked at its initial Prettier check by 31
 pre-existing Storybook and Visual Delta configuration files outside this
 repair; none of this repair's files appear in that failure list.
+
+The list-control alignment follow-up reproduced two independent geometry
+errors in the nested list fixture. Reading mode used a range union across every
+wrapped text row, placing four controls about `10.5px` below their first-row
+markers while the single-line parent appeared correct. Live preview centered
+controls on the first row but retained an `8px` inline gap between the control
+hitbox and the marker. The repair uses the first rendered range rectangle in
+reading mode and removes the stale live-preview translation. Focused Chromium
+acceptance measures every foldable ordered and unordered row and exercises the
+collapse/expand interaction without changing visual baselines.
 
 The editor-typography follow-up reproduced ordinary source and live-preview
 Markdown at `Source Code Pro`, while the same reading-mode prose used the

@@ -76,6 +76,12 @@ border column as the parent guide. Its logical inset MUST compensate for the
 blockquote's own border box so tokenized non-zero quote borders cannot displace
 the continuation segment; editor widget geometry MUST remain unchanged.
 
+List expand/collapse controls use the marker as their geometry anchor. Reading
+mode MUST derive the vertical anchor from the first rendered client rect of the
+item content rather than the union of wrapped rows. Live preview MUST place the
+control hitbox directly against the marker's inline-start edge. Both surfaces
+MUST retain this relationship for nested, wrapped, ordered, and unordered items.
+
 Source and live-preview indented code blocks use syntax-tree-derived line hooks
 owned by Mira's CodeMirror extension. Shipped CSS MUST join those lines into one
 block surface with reading-mode background, border, radius, and padding values;

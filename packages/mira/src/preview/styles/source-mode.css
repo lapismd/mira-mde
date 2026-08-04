@@ -459,7 +459,7 @@
   padding-inline-end: 0;
   position: absolute;
   top: 50%;
-  transform: translate(calc(-100% + 0.5rem), calc(-50% - 2px));
+  transform: translateY(calc(-50% - 2px));
   width: 1rem;
 }
 

@@ -477,6 +477,118 @@ test("preserves nested list depth and quoted checklist structure across surfaces
   await expect(reading.locator('input[type="checkbox"]').first()).toBeVisible();
 });
 
+test("keeps list collapse controls beside first-row markers", async ({
+  page,
+}) => {
+  await gotoStory(
+    page,
+    "markdown-indentation--nested-lists-and-quotes-reading",
+  );
+  const readingMetrics = await page
+    .locator(".markdown-reading-view li.has-nested-list")
+    .evaluateAll((items) =>
+      items.map((item) => {
+        const control = item.querySelector<HTMLElement>(
+          ":scope > .list-collapse-indicator",
+        );
+        const bullet = item.querySelector<HTMLElement>(":scope > .list-bullet");
+        const content = Array.from(item.childNodes).find((node) => {
+          if (!node.textContent?.trim()) return false;
+          if (node.nodeType === Node.TEXT_NODE) return true;
+          if (node.nodeType !== Node.ELEMENT_NODE) return false;
+          const element = node as Element;
+          return !(
+            element.classList.contains("list-collapse-indicator") ||
+            element.classList.contains("list-bullet") ||
+            element.tagName === "UL" ||
+            element.tagName === "OL"
+          );
+        });
+        if (!control || !content) {
+          throw new Error("Expected a reading list control and item content");
+        }
+
+        const range = document.createRange();
+        range.selectNodeContents(content);
+        const contentRect = range.getClientRects()[0];
+        const controlRect = control.getBoundingClientRect();
+        const bulletRect = bullet?.getBoundingClientRect();
+        return {
+          inlineGap: bulletRect
+            ? bulletRect.left - controlRect.right
+            : contentRect.left - controlRect.right,
+          kind: bulletRect ? "ul" : "ol",
+          text: content.textContent?.trim(),
+          verticalDelta: Math.abs(
+            (controlRect.top + controlRect.bottom) / 2 -
+              (contentRect.top + contentRect.bottom) / 2,
+          ),
+        };
+      }),
+    );
+
+  expect(readingMetrics.length).toBeGreaterThan(0);
+  for (const metric of readingMetrics) {
+    expect(metric.verticalDelta, JSON.stringify(metric)).toBeLessThan(1.5);
+    expect(metric.inlineGap, JSON.stringify(metric)).toBeLessThan(20);
+    expect(metric.inlineGap, JSON.stringify(metric)).toBeGreaterThan(-4);
+  }
+
+  const readingControl = page
+    .locator(".markdown-reading-view li.has-nested-list")
+    .first()
+    .locator(":scope > .list-collapse-indicator");
+  await readingControl.click();
+  await expect(readingControl).toHaveAttribute("aria-label", "Expand list");
+  await readingControl.click();
+  await expect(readingControl).toHaveAttribute("aria-label", "Collapse list");
+
+  await gotoStory(
+    page,
+    "markdown-indentation--nested-lists-and-quotes-live-preview",
+  );
+  const liveMetrics = await page
+    .locator(".cm-line:has(.cm-fold-indicator)")
+    .evaluateAll((lines) =>
+      lines.map((line) => {
+        const control = line.querySelector<HTMLElement>(
+          ".cm-fold-indicator .collapse-indicator",
+        );
+        const marker = line.querySelector<HTMLElement>(".cm-formatting-list");
+        if (!control || !marker) {
+          throw new Error("Expected a live-preview control and list marker");
+        }
+        const controlRect = control.getBoundingClientRect();
+        const markerRect = marker.getBoundingClientRect();
+        return {
+          inlineGap: markerRect.left - controlRect.right,
+          text: line.textContent?.trim(),
+          verticalDelta: Math.abs(
+            (controlRect.top + controlRect.bottom) / 2 -
+              (markerRect.top + markerRect.bottom) / 2,
+          ),
+        };
+      }),
+    );
+
+  expect(liveMetrics.length).toBeGreaterThan(0);
+  for (const metric of liveMetrics) {
+    expect(metric.verticalDelta, JSON.stringify(metric)).toBeLessThan(1.5);
+    expect(Math.abs(metric.inlineGap), JSON.stringify(metric)).toBeLessThan(
+      1.5,
+    );
+  }
+
+  const liveControl = page
+    .locator(".cm-line:has(.cm-fold-indicator)")
+    .first()
+    .locator(".cm-fold-indicator .collapse-indicator");
+  await liveControl.click();
+  await expect(liveControl).toHaveAttribute("aria-label", "Expand section");
+  await liveControl.click();
+  await expect(liveControl).toHaveAttribute("aria-label", "Collapse section");
+});
+
 test("keeps nested task delimiters complete and muted while they are edited", async ({
   page,
 }) => {

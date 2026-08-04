@@ -74,25 +74,20 @@
       if (!node.textContent?.trim()) {
         return null;
       }
-
-      const range = document.createRange();
-      range.selectNodeContents(node);
-      const rect = range.getBoundingClientRect();
-      range.detach();
-      return rect.width || rect.height ? rect : null;
-    }
-
-    if (node.nodeType === Node.ELEMENT_NODE) {
+    } else if (node.nodeType === Node.ELEMENT_NODE) {
       const element = node as Element;
       if (isIgnoredAnchorElement(element) || !element.textContent?.trim()) {
         return null;
       }
-
-      const rect = element.getBoundingClientRect();
-      return rect.width || rect.height ? rect : null;
+    } else {
+      return null;
     }
 
-    return null;
+    const range = document.createRange();
+    range.selectNodeContents(node);
+    const rect = range.getClientRects()[0] ?? range.getBoundingClientRect();
+    range.detach();
+    return rect.width || rect.height ? rect : null;
   }
 
   function updateCollapseAnchor(): void {
