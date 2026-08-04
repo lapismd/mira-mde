@@ -40,9 +40,6 @@ const nestedListsAndQuotesCore = [
   "> > Nested quote keeps a second quote guide.",
 ];
 
-export const nestedListsAndQuotesLiveMarkdown =
-  nestedListsAndQuotesCore.join("\n");
-
 export const nestedListsAndQuotesMarkdown = [
   ...nestedListsAndQuotesCore,
   "3. Blockquote inside a list item:",

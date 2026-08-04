@@ -9,7 +9,6 @@ import {
   activePrefixesMarkdown,
   configurableIndentWidthMarkdown,
   continuationParagraphsMarkdown,
-  nestedListsAndQuotesLiveMarkdown,
   nestedListsAndQuotesMarkdown,
   wrappedListItemsMarkdown,
 } from "./fixtures";
@@ -276,7 +275,7 @@ export const NestedListsAndQuotesLivePreview: Story = {
   tags: ["visual-approved", "!visual-pending", "!visual-ready", "!visual-failed"],
   name: "Nested Lists and Quotes — Live Preview",
   args: {
-    value: nestedListsAndQuotesLiveMarkdown,
+    value: nestedListsAndQuotesMarkdown,
     mode: "live-preview",
     height: "40rem",
   },
@@ -295,14 +294,14 @@ export const NestedListsAndQuotesLivePreview: Story = {
         language: "html",
         type: "code",
         code: markdownEditorDocsSource(
-          "nestedListsAndQuotesLiveMarkdown",
+          "nestedListsAndQuotesMarkdown",
           "live-preview",
         ),
       },
     },
   },
   play: async ({ canvasElement }) => {
-    await expectTargetsVisible(canvasElement, nestedCoreTargets);
+    await expectTargetsVisible(canvasElement, nestedTargets);
   },
 };
 

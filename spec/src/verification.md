@@ -122,6 +122,10 @@ whitespace, `0px` top/list insets, a `16px` paragraph-to-list gap, and a
 `23.09px` nested list, matching the reading-mode measurements. All 14 focused
 Chromium indentation cases pass, including the intentionally retained expected
 failure marker for the unrelated whitespace-only CodeMirror row.
+The source and live-preview nested-list stories now consume the same
+`nestedListsAndQuotesMarkdown` fixture, so the indented blockquote section is
+present in both modes and both play assertions require every shared target to
+remain visible in the initial editor viewport.
 
 The add-on's Docker stage does not trust authored `storybook-static` output,
 but it transports the affected cache and preview graph and may restore a
