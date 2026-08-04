@@ -40,6 +40,7 @@ authorized baseline regeneration migrations are complete.
 | MIRA-CAT-007                                                                                            | Catalog coverage checker and ten focused UI `play` assertions              | Implemented                           |
 | MIRA-CAT-008                                                                                            | Focused outline story and comprehensive outline control                    | Implemented                           |
 | MIRA-CAT-009                                                                                            | Theme globals, fixed appearance stories, and browser assertions            | Implemented by extensible theme slice |
+| MIRA-CAT-010                                                                                            | Visual Delta host formatter configuration and source mutation regression   | Implemented                           |
 | MIRA-GOV-001, MIRA-GOV-002, MIRA-GOV-003, MIRA-GOV-004, MIRA-GOV-005, MIRA-GOV-006, MIRA-GOV-007        | `pnpm spec:check`, checker tests, pull-request workflow                    | Implemented by governance slice       |
 | MIRA-GOV-008                                                                                            | Package-boundary checker and tarball leak tests                            | Implemented                           |
 
@@ -79,6 +80,17 @@ Linux/ARM64 Chromium PNGs and explicit baseline metadata, while remaining
 `visual-pending` until human review. Their Storybook play functions require
 every regression target to remain inside the initial editor viewport, and
 focused Chromium acceptance owns the browser geometry assertions.
+
+The 2026-08-05 Visual Delta source-format audit traced the repository's
+31-file Prettier failure to 30 TypeScript CSF files whose review tags had been
+rewritten as compact four-status arrays, plus the independently formatted
+`.visual-delta/config.json`. The story changes contained no semantic or
+baseline-wiring delta. Mira now opts the linked Visual Delta host into its
+shell-free Prettier formatter contract so candidate CSF source is formatted
+with the exact story path before a single physical write. Addon and downstream
+formatter tests pass, as do `pnpm spec:check`, `pnpm catalog:check`,
+`pnpm check:all`, and the static Storybook build. The unrelated project-config
+JSON formatting is outside this story-source repair.
 
 The continuation-alignment repair records an inactive-widget regression where
 the parent bullet content began at `130.24px` while ordinary continuation text

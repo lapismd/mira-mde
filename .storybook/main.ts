@@ -18,6 +18,10 @@ const config: StorybookConfig = {
           allowVcsWrites: true,
           baselinePathMode: "nested-import",
           snapshotDir: "tests/visual/storybook.spec.ts-snapshots",
+          storySourceFormatter: {
+            command: "pnpm",
+            args: ["exec", "prettier", "--stdin-filepath", "{filePath}"],
+          },
         },
       },
     },
