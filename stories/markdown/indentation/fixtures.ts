@@ -34,10 +34,10 @@ const nestedListsAndQuotesCore = [
   "- Unordered parent",
   "\t- Tab-authored unordered child with enough text to wrap inside its nested level.",
   "\t\t- Double-tab unordered grandchild",
-  "> Quoted paragraph with enough text to wrap beneath the quote prefix instead of beneath the page edge.",
-  "> - Quoted unordered item with a long body that wraps beneath the item text.",
-  ">   - [ ] Quoted checklist child",
-  "> > Nested quote keeps a second quote guide.",
+  "  > Quoted paragraph with enough text to wrap beneath the quote prefix instead of beneath the page edge.",
+  "  > - Quoted unordered item with a long body that wraps beneath the item text.",
+  "  >   - [ ] Quoted checklist child",
+  "  > > Nested quote keeps a second quote guide.",
 ];
 
 export const nestedListsAndQuotesMarkdown = [

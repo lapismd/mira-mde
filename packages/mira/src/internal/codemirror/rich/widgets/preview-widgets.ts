@@ -21,6 +21,9 @@ export class BlockPreviewWidget extends WidgetType {
       from: number;
       to: number;
       markdown: string;
+      markdownFrom?: number;
+      markdownIndentLength?: number;
+      markdownIndentedLineStarts?: number[];
       nodeName: string;
       options: MiraRichEditorOptions;
     },
@@ -33,6 +36,10 @@ export class BlockPreviewWidget extends WidgetType {
       this.config.from === other.config.from &&
       this.config.to === other.config.to &&
       this.config.markdown === other.config.markdown &&
+      this.config.markdownFrom === other.config.markdownFrom &&
+      this.config.markdownIndentLength === other.config.markdownIndentLength &&
+      JSON.stringify(this.config.markdownIndentedLineStarts) ===
+        JSON.stringify(other.config.markdownIndentedLineStarts) &&
       this.config.nodeName === other.config.nodeName &&
       this.config.options.frontmatterOpen ===
         other.config.options.frontmatterOpen
@@ -98,8 +105,8 @@ export class BlockPreviewWidget extends WidgetType {
         frontmatterOpen: this.config.options.frontmatterOpen ?? true,
         frontmatterConfig: this.config.options.frontmatterConfig as any,
         onChange: (replacement: string, from: number, to: number) => {
-          const absoluteFrom = this.config.from + from;
-          const absoluteTo = this.config.from + to;
+          const absoluteFrom = this.absoluteMarkdownOffset(from);
+          const absoluteTo = this.absoluteMarkdownOffset(to);
           const nextValue = [
             view.state.doc.sliceString(0, absoluteFrom),
             replacement,
@@ -154,6 +161,16 @@ export class BlockPreviewWidget extends WidgetType {
     container.addEventListener("click", selectSource, { capture: true });
 
     return container;
+  }
+
+  private absoluteMarkdownOffset(offset: number): number {
+    const markdownFrom = this.config.markdownFrom ?? this.config.from;
+    const indentLength = this.config.markdownIndentLength ?? 0;
+    const indentedLines = this.config.markdownIndentedLineStarts ?? [];
+    const removedIndentCount = indentedLines.filter(
+      (lineStart) => lineStart <= offset,
+    ).length;
+    return markdownFrom + offset + removedIndentCount * indentLength;
   }
 
   private dispatchMarkdownReplacement(

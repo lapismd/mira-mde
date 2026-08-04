@@ -14,6 +14,7 @@ import {
 import { Table } from "@lezer/markdown";
 import { GenericDirectives } from "./directives";
 import { GridTable } from "./grid-table";
+import { ListAfterLazyBlockquote } from "./list-after-lazy-quote";
 import { parseLatex } from "./latex";
 import {
   EmbedLinkParser,
@@ -67,6 +68,7 @@ export function createMarkdownCodeMirrorExtensions(
       content: markdown({
         codeLanguages: [...languages, ...(options.codeLanguages ?? [])],
         extensions: [
+          ListAfterLazyBlockquote,
           Table,
           GridTable,
           GenericDirectives,

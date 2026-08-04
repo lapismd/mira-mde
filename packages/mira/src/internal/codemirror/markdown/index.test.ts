@@ -23,6 +23,30 @@ describe("createMarkdownCodeMirrorExtensions", () => {
     expect(syntaxTree(state).toString()).toContain("GridTable");
   });
 
+  it("starts a list after a lazy blockquote before parsing its indented quote", () => {
+    const state = EditorState.create({
+      doc: [
+        "- Unordered parent",
+        "  > Quoted paragraph",
+        "  > > Nested quote keeps a second quote guide.",
+        "3. Blockquote inside a list item:",
+        "",
+        "    > Skip a line and indent the quote markers four spaces.",
+        "    > The rendered blockquote stays attached to its first source line.",
+      ].join("\n"),
+      extensions: createMarkdownCodeMirrorExtensions(),
+    });
+    const tree = syntaxTree(state).toString();
+
+    expect(tree).toContain(
+      "BulletList(ListItem(ListMark,Paragraph,Blockquote(QuoteMark,Paragraph,QuoteMark,Blockquote",
+    );
+    expect(tree).toContain(
+      "OrderedList(ListItem(ListMark,Paragraph,Blockquote(QuoteMark,Paragraph(QuoteMark))))",
+    );
+    expect(tree).not.toContain("CodeBlock");
+  });
+
   it.each([
     ["justify", ["+>-----<+", "| A b C |", "+-------+"]],
     ["center", ["+:-----:+", "|  ABC  |", "+-------+"]],

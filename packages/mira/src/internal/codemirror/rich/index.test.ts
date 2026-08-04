@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { EditorView } from "@codemirror/view";
 import { defineMiraExtension } from "@lapismd/mira/extensions";
+import { createMarkdownCodeMirrorExtensions } from "../markdown";
 import { createRichEditorExtensions } from ".";
 
 function nextFrame(): Promise<void> {
@@ -108,6 +109,86 @@ describe("createRichEditorExtensions", () => {
 
     expect(getComputedStyle(view.contentDOM).whiteSpace).not.toBe("normal");
     expect(getComputedStyle(widget).whiteSpace).toBe("normal");
+
+    view.destroy();
+    parent.remove();
+  });
+
+  it("renders a four-space list continuation as a blockquote widget", async () => {
+    const parent = document.createElement("div");
+    document.body.append(parent);
+    const view = new EditorView({
+      doc: [
+        "> > Nested quote keeps a second quote guide.",
+        "3. Blockquote inside a list item:",
+        "",
+        "    > Skip a line and indent the quote markers four spaces.",
+        "    > The rendered blockquote stays attached to its first source line.",
+      ].join("\n"),
+      extensions: [
+        createMarkdownCodeMirrorExtensions(),
+        createRichEditorExtensions({ livePreview: true }),
+      ],
+      parent,
+    });
+    await nextFrame();
+    await nextFrame();
+
+    const widget = [...parent.querySelectorAll(".mira-rich-widget")].find(
+      (element) => element.textContent?.includes("Skip a line and indent"),
+    );
+    expect(widget?.getAttribute("data-node")).toBe("Blockquote");
+    expect(widget?.querySelector("blockquote")).not.toBeNull();
+    expect(widget?.querySelector(".mira-code-block")).toBeNull();
+    expect(widget?.textContent).not.toContain(
+      "> The rendered blockquote stays attached",
+    );
+    expect(parent.querySelector(".cm-indented-codeblock")).toBeNull();
+
+    view.destroy();
+    parent.remove();
+  });
+
+  it("maps normalized blockquote widget edits back to indented source", async () => {
+    const parent = document.createElement("div");
+    document.body.append(parent);
+    const source = [
+      "3. Blockquote inside a list item:",
+      "",
+      "    > First quoted line",
+      "    > - [ ] Nested task",
+    ].join("\n");
+    let edit:
+      | { from: number; nextValue: string; replacement: string; to: number }
+      | undefined;
+    const view = new EditorView({
+      doc: source,
+      extensions: [
+        createMarkdownCodeMirrorExtensions(),
+        createRichEditorExtensions({
+          livePreview: true,
+          onChange(replacement, from, to, nextValue) {
+            edit = { replacement, from, to, nextValue };
+          },
+        }),
+      ],
+      parent,
+    });
+    await nextFrame();
+    await nextFrame();
+
+    const checkbox = parent.querySelector<HTMLInputElement>(
+      'input[aria-label="Toggle task"]',
+    );
+    expect(checkbox).not.toBeNull();
+    checkbox!.checked = true;
+    checkbox!.dispatchEvent(new Event("change", { bubbles: true }));
+    await nextFrame();
+
+    expect(edit).toBeDefined();
+    expect(source.slice(edit!.from, edit!.to)).toBe(" ");
+    expect(edit!.replacement).toBe("x");
+    expect(edit!.nextValue).toContain("    > - [x] Nested task");
 
     view.destroy();
     parent.remove();

@@ -89,7 +89,7 @@
     const nextLine = source.indexOf("\n", from);
     const lineEnd = nextLine === -1 ? source.length : nextLine;
     const content = source.slice(lineStart, Math.max(lineEnd, to));
-    const match = content.match(/^(\s*(?:[*+-]|\d+[.)])\s*\[)(.)\]/u);
+    const match = content.match(/^(\s*(?:>\s*)*(?:[*+-]|\d+[.)])\s*\[)(.)\]/u);
 
     if (!match) {
       return null;

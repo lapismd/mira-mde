@@ -59,6 +59,11 @@ unordered marker spans hide their authored glyph and paint the same tokenized
 bullet shape used by reading mode; focusing the marker removes that presentation
 so the original `-`, `*`, or `+` stays editable.
 
+Reading-mode list guides remain owned by shipped preview CSS. When an indented
+blockquote follows a nested list under the same list item, a reading-only guide
+segment MUST bridge the quote's block margins and height; editor widget geometry
+MUST remain unchanged.
+
 Source and live-preview indented code blocks use syntax-tree-derived line hooks
 owned by Mira's CodeMirror extension. Shipped CSS MUST join those lines into one
 block surface with reading-mode background, border, radius, and padding values;

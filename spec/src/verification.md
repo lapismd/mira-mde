@@ -125,7 +125,35 @@ failure marker for the unrelated whitespace-only CodeMirror row.
 The source and live-preview nested-list stories now consume the same
 `nestedListsAndQuotesMarkdown` fixture, so the indented blockquote section is
 present in both modes and both play assertions require every shared target to
-remain visible in the initial editor viewport.
+remain visible in the initial editor viewport. The first quote group uses the
+unordered parent's continuation indent and is asserted beneath that list item
+in reading mode; the final quote group remains attached to its ordered parent.
+
+The aligned fixture exposed a parser-precedence mismatch in its final section:
+Lezer retained the `3.` list marker as a lazy continuation of the preceding
+nested quote and consequently classified the four-space child quote as a
+`CodeBlock`, while reading mode produced `OrderedList > ListItem > Blockquote`.
+Mira now ends the lazy quote leaf when an unquoted list marker drops an active
+blockquote context. The editor syntax tree therefore matches reading mode,
+keeps genuine eight-space list code unchanged, renders the child as a
+`Blockquote` widget by default, renders that widget from the syntax node rather
+than its list indentation, and no longer applies indented-code chrome to that
+content. Source-position mapping retains the authored range for widget edits.
+Focused unit and Chromium acceptance cover the exact fixture without creating
+or refreshing visual baselines.
+
+The reading-only indentation follow-up keeps the first quote group as a direct
+child of its unordered parent. When that parent already owns a nested list, a
+reading-mode quote pseudo-element continues the existing list guide through the
+quote's top and bottom spacing without changing live-preview widget geometry.
+The complete focused Chromium indentation suite passes all 16 cases, including
+the retained expected-failure marker for the unrelated whitespace-only
+CodeMirror row. The parser and widget unit suite passes all 214 package tests;
+the package check and build, canonical spec check, and catalog check also pass.
+No visual baselines were created or refreshed for this repair. The full
+`pnpm check:all` gate remains blocked at its initial Prettier check by 31
+pre-existing Storybook and Visual Delta configuration files outside this
+repair; none of this repair's files appear in that failure list.
 
 The add-on's Docker stage does not trust authored `storybook-static` output,
 but it transports the affected cache and preview graph and may restore a

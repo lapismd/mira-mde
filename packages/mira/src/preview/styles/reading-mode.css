@@ -22,6 +22,36 @@
   top: 0;
 }
 
+.markdown-reading-view
+  .markdown
+  li.rendered-list-item.show-guides
+  > :is(ul, ol)
+  + blockquote {
+  position: relative;
+}
+
+.markdown-reading-view
+  .markdown
+  li.rendered-list-item.show-guides
+  > :is(ul, ol)
+  + blockquote::before {
+  border-inline-end: var(--markdown-indentation-guide-width) solid
+    var(--markdown-indentation-guide-color);
+  bottom: calc(
+    -1em -
+      var(--markdown-indentation-guide-width, var(--indentation-guide-width))
+  );
+  content: "";
+  inset-inline-start: -1.5ch;
+  pointer-events: none;
+  position: absolute;
+  top: calc(
+    -1em -
+      var(--markdown-indentation-guide-width, var(--indentation-guide-width)) -
+      var(--markdown-indentation-guide-width, var(--indentation-guide-width))
+  );
+}
+
 .markdown-reading-view .markdown li.rendered-list-item.is-collapsed > ul,
 .markdown-reading-view .markdown li.rendered-list-item.is-collapsed > ol {
   display: none;

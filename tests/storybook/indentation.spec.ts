@@ -438,7 +438,10 @@ test("preserves nested list depth and quoted checklist structure across surfaces
   );
   const reading = page.locator(".markdown-reading-view");
   await expect(reading.locator("ol ol ol")).toHaveCount(1);
-  await expect(reading.locator("ul ul ul")).toHaveCount(1);
+  await expect(reading.locator("ul ul ul")).toHaveCount(2);
+  await expect(reading.locator("ul > li > blockquote").first()).toContainText(
+    "Quoted paragraph",
+  );
   await expect(reading.locator("blockquote blockquote")).toHaveCount(1);
   await expect(reading.locator('input[type="checkbox"]').first()).toBeVisible();
 });
@@ -480,6 +483,11 @@ test("matches live-preview blockquote child spacing to reading mode", async ({
     .locator(".mira-rich-widget--blockquote blockquote")
     .first();
   await expect(liveQuote).toBeVisible();
+  await expect(
+    page
+      .locator('.cm-line[data-list-kind="ul"]')
+      .filter({ hasText: "Unordered parent" }),
+  ).toHaveCount(1);
   await expect(liveQuote.locator(":scope > blockquote")).toHaveCount(1);
   const live = await readQuoteMetrics(liveQuote);
 
@@ -505,6 +513,90 @@ test("matches live-preview blockquote child spacing to reading mode", async ({
     Math.abs(live.nestedListHeight - reading.nestedListHeight),
   ).toBeLessThanOrEqual(1.5);
   expect(Math.abs(live.height - reading.height)).toBeLessThanOrEqual(2);
+});
+
+test("continues the reading-mode parent guide through its blockquote", async ({
+  page,
+}) => {
+  await gotoStory(
+    page,
+    "markdown-indentation--nested-lists-and-quotes-reading",
+  );
+  const metrics = await page
+    .locator(".markdown-reading-view li")
+    .filter({ hasText: "Unordered parent" })
+    .first()
+    .evaluate((element) => {
+      const item = element as HTMLElement;
+      const nestedList = item.querySelector<HTMLElement>(":scope > ul");
+      const quote = item.querySelector<HTMLElement>(":scope > blockquote");
+      const surface = item.closest<HTMLElement>(".markdown-reading-view");
+      if (!nestedList || !quote || !surface) {
+        throw new Error("Expected list-contained reading blockquote");
+      }
+      const itemRect = item.getBoundingClientRect();
+      const listRect = nestedList.getBoundingClientRect();
+      const quoteRect = quote.getBoundingClientRect();
+      const surfaceRect = surface.getBoundingClientRect();
+      const listGuide = getComputedStyle(nestedList, "::before");
+      const quoteGuide = getComputedStyle(quote, "::before");
+      return {
+        guideBottom: quoteRect.bottom - Number.parseFloat(quoteGuide.bottom),
+        guideTop: quoteRect.top + Number.parseFloat(quoteGuide.top),
+        guideWidth: Number.parseFloat(quoteGuide.borderInlineEndWidth),
+        itemBottom: itemRect.bottom,
+        listBottom: listRect.bottom,
+        listGuideX:
+          listRect.left + Number.parseFloat(listGuide.insetInlineStart),
+        quoteLeft: quoteRect.left,
+        quoteGuideX:
+          quoteRect.left + Number.parseFloat(quoteGuide.insetInlineStart),
+        surfaceLeft: surfaceRect.left,
+      };
+    });
+
+  expect(metrics.quoteLeft).toBeGreaterThan(metrics.surfaceLeft);
+  expect(metrics.guideWidth).toBeGreaterThan(0);
+  expect(
+    Math.abs(metrics.guideTop - metrics.listBottom),
+    JSON.stringify(metrics),
+  ).toBeLessThan(1.5);
+  expect(Math.abs(metrics.guideBottom - metrics.itemBottom)).toBeLessThan(1.5);
+  expect(Math.abs(metrics.quoteGuideX - metrics.listGuideX)).toBeLessThan(1.5);
+});
+
+test("renders a four-space blockquote inside its list item in live preview", async ({
+  page,
+}) => {
+  const quoteText = "Skip a line and indent the quote markers four spaces.";
+
+  await gotoStory(
+    page,
+    "markdown-indentation--nested-lists-and-quotes-live-preview",
+  );
+  const liveWidget = page
+    .locator('.mira-rich-widget[data-node="Blockquote"]')
+    .filter({ hasText: quoteText });
+  await expect(liveWidget).toBeVisible();
+  await expect(liveWidget.locator("blockquote")).toContainText(quoteText);
+  await expect(liveWidget).not.toContainText(
+    "> The rendered blockquote stays attached",
+  );
+  await expect(
+    page.locator(".cm-indented-codeblock").filter({ hasText: quoteText }),
+  ).toHaveCount(0);
+
+  await gotoStory(
+    page,
+    "markdown-indentation--nested-lists-and-quotes-reading",
+  );
+  const readingQuote = page
+    .locator(".markdown-reading-view li blockquote")
+    .filter({ hasText: quoteText });
+  await expect(readingQuote).toBeVisible();
+  await expect(readingQuote).toContainText(
+    "The rendered blockquote stays attached to its first source line.",
+  );
 });
 
 test("renders the indented live-preview blockquote in its focused story", async ({
@@ -567,6 +659,7 @@ test("aligns inactive continuation paragraphs with their parent content", async 
         expect(continuation.firstGlyphLeft).not.toBeNull();
         expect(
           Math.abs(continuation.firstGlyphLeft! - parent.firstGlyphLeft!),
+          `${id}: ${snippet} should align with ${group.parent}`,
         ).toBeLessThan(1.5);
         expectStableRowLefts(continuation);
       }

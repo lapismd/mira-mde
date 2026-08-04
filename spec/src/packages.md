@@ -65,7 +65,10 @@ entry point.
   factories and MUST NOT require a new consumer API. Internal rendered block
   widget styles MUST also normalize CodeMirror's source whitespace behavior so
   embedded Markdown retains the same block spacing as the public preview
-  renderer without exposing another styling API.
+  renderer without exposing another styling API. Internal Markdown parser
+  precedence MUST close a lazily continued blockquote when reading mode starts
+  a following list, so list-contained blockquotes and indented code retain the
+  same classification across editor and preview surfaces.
 - `preview` exports Markdown preview, outline, embed, and renderer surfaces.
 - `tables` exports the supported Markdown and grid-table components.
 - `ui` and its documented component subpaths export the shared UI primitives.

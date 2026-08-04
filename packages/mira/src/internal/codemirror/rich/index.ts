@@ -331,14 +331,24 @@ function buildBlockPreviewDecorations(
         return;
       }
 
-      const markdown = state.doc.sliceString(from, to);
+      const previewSource = getBlockPreviewSource(
+        state,
+        node.name,
+        node.from,
+        node.to,
+        from,
+        to,
+      );
       ranges.push(
         Decoration.replace({
           block: true,
           widget: new BlockPreviewWidget({
             from,
             to,
-            markdown,
+            markdown: previewSource.markdown,
+            markdownFrom: previewSource.from,
+            markdownIndentLength: previewSource.indentLength,
+            markdownIndentedLineStarts: previewSource.indentedLineStarts,
             nodeName: node.name,
             options,
           }),
@@ -389,6 +399,55 @@ function buildBlockPreviewDecorations(
   }
 
   return Decoration.set(sortRanges(ranges), true);
+}
+
+type BlockPreviewSource = RangeBoundary & {
+  indentLength?: number;
+  indentedLineStarts?: number[];
+  markdown: string;
+};
+
+function getBlockPreviewSource(
+  state: EditorState,
+  nodeName: string,
+  nodeFrom: number,
+  nodeTo: number,
+  replacementFrom: number,
+  replacementTo: number,
+): BlockPreviewSource {
+  if (
+    nodeName === "Blockquote" &&
+    /^[\t ]+$/u.test(state.doc.sliceString(replacementFrom, nodeFrom))
+  ) {
+    const indent = state.doc.sliceString(replacementFrom, nodeFrom);
+    const lines = state.doc.sliceString(nodeFrom, nodeTo).split("\n");
+    const indentedLineStarts: number[] = [];
+    let markdown = "";
+    for (const [index, sourceLine] of lines.entries()) {
+      if (index > 0) {
+        markdown += "\n";
+      }
+      const removesParentIndent = index > 0 && sourceLine.startsWith(indent);
+      if (removesParentIndent) {
+        indentedLineStarts.push(markdown.length);
+      }
+      markdown += removesParentIndent
+        ? sourceLine.slice(indent.length)
+        : sourceLine;
+    }
+    return {
+      from: nodeFrom,
+      to: nodeTo,
+      indentLength: indent.length,
+      indentedLineStarts,
+      markdown,
+    };
+  }
+  return {
+    from: replacementFrom,
+    to: replacementTo,
+    markdown: state.doc.sliceString(replacementFrom, replacementTo),
+  };
 }
 
 function buildInlinePreviewDecorations(
