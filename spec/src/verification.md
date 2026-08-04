@@ -14,6 +14,7 @@ authorized baseline regeneration migrations are complete.
 | MIRA-MD-007                                                                                             | Comprehensive fixture plus focused Storybook fixtures                     | Implemented; catalog checker enforced |
 | MIRA-MD-008, MIRA-MD-009                                                                                | Enforced Storybook accessibility and icon-bearing editor controls         | Implemented                           |
 | MIRA-MD-010                                                                                             | Focused outline story plus Storybook browser navigation acceptance        | Implemented                           |
+| MIRA-MD-011                                                                                             | Computed typography parity across source, live preview, and reading       | Implemented by typography repair      |
 | MIRA-UI-001, MIRA-UI-002, MIRA-UI-003, MIRA-UI-004, MIRA-UI-005                                         | Mira Editor, React, and Vanilla tests/builds                              | Implemented                           |
 | MIRA-UI-006, MIRA-UI-007, MIRA-UI-008                                                                   | Storybook browser project and UI primitive `play` interactions            | Implemented                           |
 | MIRA-UI-009                                                                                             | Svelte package checks and focused outline browser acceptance              | Implemented                           |
@@ -161,6 +162,20 @@ No visual baselines were created or refreshed for this repair. The full
 `pnpm check:all` gate remains blocked at its initial Prettier check by 31
 pre-existing Storybook and Visual Delta configuration files outside this
 repair; none of this repair's files appear in that failure list.
+
+The editor-typography follow-up reproduced ordinary source and live-preview
+Markdown at `Source Code Pro`, while the same reading-mode prose used the
+consumer-overridable `Inter`/system sans stack. The CodeMirror editor shell
+already selected the sans token, but its descendant scroller explicitly reset
+all editable content to `--mira-font-mono`. The repaired scroller now consumes
+the public sans token with a Mira fallback, while the existing code-specific
+hooks retain `--font-monospace`. Direct browser inspection resolves source,
+live-preview, and reading prose to the same `Inter`/system sans stack and the
+indented code block to `Source Code Pro`. All 18 focused Chromium indentation
+cases pass, including the retained expected-failure marker for the unrelated
+whitespace-only CodeMirror row; the 215-test package suite, package check and
+build, and canonical spec gate also pass. No visual baselines were created or
+refreshed for this repair.
 
 The add-on's Docker stage does not trust authored `storybook-static` output,
 but it transports the affected cache and preview graph and may restore a

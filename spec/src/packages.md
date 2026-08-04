@@ -72,7 +72,9 @@ entry point.
   blockquote chrome MUST preserve one aligned, line-owned outer guide across
   editable parent and child rows while suppressing nested marker pseudo-borders
   on an active editable line; this remains shipped CSS behavior and MUST NOT
-  require a consumer option.
+  require a consumer option. The internal CodeMirror document theme MUST honor
+  the public Markdown sans token for ordinary prose while the shipped
+  code-specific hooks continue to select the monospaced token.
 - `preview` exports Markdown preview, outline, embed, and renderer surfaces.
 - `tables` exports the supported Markdown and grid-table components.
 - `ui` and its documented component subpaths export the shared UI primitives.

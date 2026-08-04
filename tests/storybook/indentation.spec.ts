@@ -309,6 +309,37 @@ test("keeps wrapped ordered and unordered item rows aligned in both editor modes
   }
 });
 
+test("matches reading typography for editable prose while retaining monospaced code", async ({
+  page,
+}) => {
+  await gotoStory(
+    page,
+    "markdown-indentation--nested-lists-and-quotes-reading",
+  );
+  const readingFont = await page
+    .locator(".markdown-rendered li")
+    .filter({ hasText: "Unordered parent" })
+    .first()
+    .evaluate((element) => getComputedStyle(element).fontFamily);
+
+  for (const id of [
+    "markdown-indentation--nested-lists-and-quotes-source",
+    "markdown-indentation--nested-lists-and-quotes-live-preview",
+  ]) {
+    await gotoStory(page, id);
+    const line = lineContaining(page, "Unordered parent");
+    const typography = await line.evaluate((element) => {
+      const style = getComputedStyle(element);
+      return {
+        fontFamily: style.fontFamily,
+        monospace: style.getPropertyValue("--font-monospace").trim(),
+      };
+    });
+    expect(typography.fontFamily).toBe(readingFont);
+    expect(typography.fontFamily).not.toBe(typography.monospace);
+  }
+});
+
 test("renders inactive dash and asterisk markers as live-preview bullets", async ({
   page,
 }) => {
@@ -790,6 +821,14 @@ test("renders indented preformatted content as one code block across editor mode
     const line = lineContaining(page, "Eight-space preformatted content");
     await expect(line).toHaveClass(/cm-indented-codeblock-start/u);
     await expect(line).toHaveClass(/cm-indented-codeblock-end/u);
+    const codeTypography = await line.evaluate((element) => {
+      const style = getComputedStyle(element);
+      return {
+        fontFamily: style.fontFamily,
+        monospace: style.getPropertyValue("--font-monospace").trim(),
+      };
+    });
+    expect(codeTypography.fontFamily).toBe(codeTypography.monospace);
 
     const chrome = await codeBlockChromeMetrics(line);
     expect(chrome.background).not.toBe("rgba(0, 0, 0, 0)");

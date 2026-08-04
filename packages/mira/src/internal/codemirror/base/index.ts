@@ -126,7 +126,7 @@ export const miraEditorTheme = EditorView.theme({
     fontSize: "var(--mira-font-size)",
   },
   ".cm-scroller": {
-    fontFamily: "var(--mira-font-mono)",
+    fontFamily: "var(--font-sans, var(--mira-font-sans))",
     lineHeight: "var(--mira-line-height)",
   },
   // Only the top-level scroller — nested `.mod-inline` editors (table cells,
