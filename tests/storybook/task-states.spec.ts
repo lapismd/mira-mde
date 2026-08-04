@@ -78,6 +78,18 @@ test("live preview selects every shipped task type without changing line geometr
   await expect(trigger).toHaveCSS("opacity", "0");
   const before = await taskGeometry(line);
 
+  const checkboxBox = await checkbox.boundingBox();
+  if (!checkboxBox) {
+    throw new Error("Task checkbox bounding box is missing");
+  }
+  await page.mouse.move(
+    checkboxBox.x - 8,
+    checkboxBox.y + checkboxBox.height / 2,
+  );
+  await expect(trigger).toHaveCSS("opacity", "1");
+
+  await page.mouse.move(1, 1);
+  await expect(trigger).toHaveCSS("opacity", "0");
   await line.hover();
   await expect(trigger).toHaveCSS("opacity", "1");
   await trigger.hover();

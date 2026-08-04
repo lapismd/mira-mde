@@ -187,11 +187,20 @@
   z-index: 1;
 }
 
+.task-list-label:has(.mira-task-state-trigger)::before {
+  content: "";
+  inset-block: -0.25rem;
+  inset-inline-end: 100%;
+  position: absolute;
+  width: 1.5rem;
+}
+
 :is(
     .cm-task-line:hover,
     .cm-task-line:focus-within,
     .task-list-item:hover,
-    .task-list-item:focus-within
+    .task-list-item:focus-within,
+    .task-list-label:hover
   )
   .mira-task-state-trigger,
 .mira-task-state-trigger:hover,
