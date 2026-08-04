@@ -195,7 +195,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const SlashCommands: Story = {
-  tags: ["visual-pending"],
+  tags: ["visual-ready"],
   parameters: {
     visualDelta: {
       images: [
@@ -227,7 +227,7 @@ export const SlashCommands: Story = {
 };
 
 export const CustomSlashSnippet: Story = {
-  tags: ["visual-pending"],
+  tags: ["visual-ready"],
   parameters: {
     visualDelta: {
       images: [
@@ -251,7 +251,7 @@ export const CustomSlashSnippet: Story = {
 };
 
 export const SlashAutocomplete: Story = {
-  tags: ["visual-pending"],
+  tags: ["visual-ready"],
   parameters: {
     visualDelta: {
       images: [
@@ -275,7 +275,7 @@ export const SlashAutocomplete: Story = {
 };
 
 export const BlockControls: Story = {
-  tags: ["visual-pending"],
+  tags: ["visual-ready"],
   parameters: {
     visualDelta: {
       images: [
@@ -297,7 +297,7 @@ export const BlockControls: Story = {
 };
 
 export const FoldAndInlineHeadings: Story = {
-  tags: ["visual-pending"],
+  tags: ["visual-ready"],
   parameters: {
     visualDelta: {
       images: [
@@ -319,7 +319,7 @@ export const FoldAndInlineHeadings: Story = {
 };
 
 export const ImageAttachments: Story = {
-  tags: ["visual-pending"],
+  tags: ["visual-ready"],
   parameters: {
     visualDelta: {
       images: [
@@ -350,7 +350,7 @@ export const ImageAttachments: Story = {
 };
 
 export const CustomToolbar: Story = {
-  tags: ["visual-pending"],
+  tags: ["visual-ready"],
   parameters: {
     visualDelta: {
       images: [
@@ -391,7 +391,7 @@ export const ExtensionContributions: Story = {
     },
   },
   name: "Extension Commands, Toolbar, And Styles",
-  tags: ["visual-pending"],
+  tags: ["visual-ready"],
   args: {
     value:
       "# Extension contributions\n\nUse the extension toolbar button or press Mod+Shift+D.",
@@ -419,7 +419,7 @@ export const MarkdownAuthoring: Story = {
     },
   },
   name: "Completions, Smart Paste, And Input Handlers",
-  tags: ["visual-pending"],
+  tags: ["visual-ready"],
   args: {
     value: markdownAuthoringMarkdown,
     sourcePath: "notes/today.md",
@@ -432,7 +432,7 @@ export const MarkdownAuthoring: Story = {
 };
 
 export const AiPlugin: Story = {
-  tags: ["visual-pending"],
+  tags: ["visual-ready"],
   name: "AI Plugin",
   parameters: {
     ...catalogParameters("ai"),

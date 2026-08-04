@@ -27,7 +27,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Defaults: Story = {
-  tags: ["visual-pending"],
+  tags: ["visual-ready"],
   parameters: {
     visualDelta: {
       images: [
@@ -43,7 +43,7 @@ export const Defaults: Story = {
 };
 
 export const ReadonlyEditor: Story = {
-  tags: ["visual-pending"],
+  tags: ["visual-ready"],
   parameters: {
     visualDelta: {
       images: [
@@ -60,7 +60,7 @@ export const ReadonlyEditor: Story = {
 };
 
 export const IndentationSettings: Story = {
-  tags: ["visual-pending"],
+  tags: ["visual-ready"],
   parameters: {
     visualDelta: {
       images: [
@@ -82,7 +82,7 @@ export const IndentationSettings: Story = {
 };
 
 export const ReadingOptionsSettings: Story = {
-  tags: ["visual-pending"],
+  tags: ["visual-ready"],
   parameters: {
     visualDelta: {
       images: [

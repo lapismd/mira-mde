@@ -27,7 +27,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const LivePreview: Story = {
-  tags: ["visual-pending"],
+  tags: ["visual-ready"],
   parameters: {
     visualDelta: {
       images: [
@@ -44,7 +44,7 @@ export const LivePreview: Story = {
 };
 
 export const Source: Story = {
-  tags: ["visual-pending"],
+  tags: ["visual-ready"],
   parameters: {
     visualDelta: {
       images: [
@@ -61,7 +61,7 @@ export const Source: Story = {
 };
 
 export const Preview: Story = {
-  tags: ["visual-pending"],
+  tags: ["visual-ready"],
   parameters: {
     visualDelta: {
       images: [
@@ -78,7 +78,7 @@ export const Preview: Story = {
 };
 
 export const Split: Story = {
-  tags: ["visual-pending"],
+  tags: ["visual-ready"],
   parameters: {
     visualDelta: {
       images: [

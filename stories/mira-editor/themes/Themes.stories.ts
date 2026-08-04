@@ -81,7 +81,7 @@ function resolveTokenColor(element: HTMLElement, token: string): string {
 }
 
 export const MiraLight: Story = {
-  tags: ["visual-pending"],
+  tags: ["visual-ready"],
   parameters: visual(
     "/visual-baselines/stories/mira-editor/themes/mira-light-chromium.png",
   ),
@@ -98,7 +98,7 @@ export const MiraLight: Story = {
 };
 
 export const MiraDark: Story = {
-  tags: ["visual-pending"],
+  tags: ["visual-ready"],
   parameters: visual(
     "/visual-baselines/stories/mira-editor/themes/mira-dark-chromium.png",
   ),
@@ -114,7 +114,7 @@ export const MiraDark: Story = {
 };
 
 export const ObsidianLight: Story = {
-  tags: ["visual-pending"],
+  tags: ["visual-ready"],
   parameters: visual(
     "/visual-baselines/stories/mira-editor/themes/obsidian-light-chromium.png",
   ),
@@ -130,7 +130,7 @@ export const ObsidianLight: Story = {
 };
 
 export const ObsidianDark: Story = {
-  tags: ["visual-pending"],
+  tags: ["visual-ready"],
   parameters: visual(
     "/visual-baselines/stories/mira-editor/themes/obsidian-dark-chromium.png",
   ),
@@ -146,7 +146,7 @@ export const ObsidianDark: Story = {
 };
 
 export const PageInheritanceAndSystem: Story = {
-  tags: ["visual-pending"],
+  tags: ["visual-ready"],
   parameters: visual(
     "/visual-baselines/stories/mira-editor/themes/page-inheritance-and-system-chromium.png",
   ),
@@ -169,7 +169,7 @@ export const PageInheritanceAndSystem: Story = {
 };
 
 export const CustomThemeExtendingMira: Story = {
-  tags: ["visual-pending"],
+  tags: ["visual-ready"],
   parameters: visual(
     "/visual-baselines/stories/mira-editor/themes/custom-theme-extending-mira-chromium.png",
   ),
@@ -188,7 +188,7 @@ export const CustomThemeExtendingMira: Story = {
 };
 
 export const CustomThemeExtendingObsidian: Story = {
-  tags: ["visual-pending"],
+  tags: ["visual-ready"],
   parameters: visual(
     "/visual-baselines/stories/mira-editor/themes/custom-theme-extending-obsidian-chromium.png",
   ),
@@ -207,7 +207,7 @@ export const CustomThemeExtendingObsidian: Story = {
 };
 
 export const TargetedOverride: Story = {
-  tags: ["visual-pending"],
+  tags: ["visual-ready"],
   parameters: visual(
     "/visual-baselines/stories/mira-editor/themes/targeted-override-chromium.png",
   ),
