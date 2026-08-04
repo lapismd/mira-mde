@@ -33,7 +33,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Preview: Story = {
-  tags: ["visual-failed"],
+  tags: ["visual-pending", "!visual-approved", "!visual-ready", "!visual-failed"],
   parameters: {
     visualDelta: {
       images: ["/visual-baselines/stories/markdown/code/preview-chromium.png"],
@@ -61,7 +61,7 @@ export const Preview: Story = {
 };
 
 export const LivePreview: Story = {
-  tags: ["visual-failed"],
+  tags: ["visual-pending", "!visual-approved", "!visual-ready", "!visual-failed"],
   name: "Live Preview",
   render: (args) => ({
     Component: EditorModeStory,

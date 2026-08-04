@@ -148,7 +148,7 @@ export const LivePreview: Story = {
 };
 
 export const Source: Story = {
-  tags: ["visual-failed", "!visual-pending", "!visual-approved", "!visual-ready"],
+  tags: ["visual-pending", "!visual-approved", "!visual-ready", "!visual-failed"],
   parameters: {
     visualDelta: {
       images: ["/visual-baselines/stories/demo/source-chromium.png"],
@@ -177,7 +177,7 @@ export const ReadingPreview: Story = {
 };
 
 export const Split: Story = {
-  tags: ["visual-failed", "!visual-pending", "!visual-approved", "!visual-ready"],
+  tags: ["visual-pending", "!visual-approved", "!visual-ready", "!visual-failed"],
   parameters: {
     visualDelta: {
       images: ["/visual-baselines/stories/demo/split-chromium.png"],
