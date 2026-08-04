@@ -95,13 +95,18 @@ test("live preview selects every shipped task type without changing line geometr
     const visibleInset = Number.parseFloat(
       getComputedStyle(button, "::before").insetInlineEnd,
     );
+    const visibleStartInset = Number.parseFloat(
+      getComputedStyle(button, "::before").insetInlineStart,
+    );
     return {
       hitAreaOverlap: buttonRect.right - checkboxRect.left,
       visibleGap: checkboxRect.left - (buttonRect.right - visibleInset),
+      visibleStartInset,
     };
   });
   expect(hoverSpacing.hitAreaOverlap).toBeGreaterThan(0);
   expect(hoverSpacing.visibleGap).toBeGreaterThanOrEqual(3);
+  expect(hoverSpacing.visibleStartInset).toBeGreaterThanOrEqual(2);
   expectStableGeometry(before, await taskGeometry(line));
 
   await trigger.click();

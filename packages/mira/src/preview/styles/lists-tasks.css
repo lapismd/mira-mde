@@ -171,6 +171,7 @@
   content: "";
   inset: 0;
   inset-inline-end: 0.375rem;
+  inset-inline-start: 0.125rem;
   pointer-events: none;
   position: absolute;
   transition:
