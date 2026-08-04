@@ -951,6 +951,59 @@ test("keeps active continuation and blockquote prefix geometry stable", async ({
   await expect(quoteLine.locator(".cm-formatting-quote")).toHaveCount(1);
 });
 
+test("keeps blockquote chrome aligned while its source is editable", async ({
+  page,
+}) => {
+  await gotoStory(page, "markdown-indentation--active-prefixes-live-preview");
+  const renderedQuote = page
+    .locator(".mira-rich-widget--blockquote blockquote")
+    .first();
+  await expect(renderedQuote).toBeVisible();
+  const renderedBorderLeft = await renderedQuote.evaluate(
+    (element) => element.getBoundingClientRect().left,
+  );
+
+  await page.getByRole("button", { name: "Edit source" }).click();
+  await settleLayout(page);
+  const activeNestedQuote = lineContaining(
+    page,
+    "Nested quoted line keeps the rendered block attached",
+  );
+  await expect(activeNestedQuote).toHaveClass(/cm-activeLine/);
+  const chrome = await activeNestedQuote.evaluate((element) => {
+    const nestedBorder = element.querySelector<HTMLElement>(
+      ".cm-blockquote-border",
+    );
+    const marker = nestedBorder?.querySelector<HTMLElement>(".cm-meta");
+    if (!nestedBorder || !marker) {
+      throw new Error("Expected an editable nested blockquote prefix");
+    }
+    const lineRect = element.getBoundingClientRect();
+    const lineBorder = getComputedStyle(element, "::before");
+    const nestedBorderStyle = getComputedStyle(nestedBorder, "::before");
+    return {
+      lineBorderColor: lineBorder.borderInlineStartColor,
+      lineBorderLeft:
+        lineRect.left + Number.parseFloat(lineBorder.insetInlineStart),
+      lineBorderWidth: Number.parseFloat(lineBorder.borderInlineStartWidth),
+      markerColor: getComputedStyle(marker).color,
+      nestedBorderColor: nestedBorderStyle.borderInlineStartColor,
+      nestedBorderWidth: Number.parseFloat(
+        nestedBorderStyle.borderInlineStartWidth,
+      ),
+    };
+  });
+
+  expect(Math.abs(chrome.lineBorderLeft - renderedBorderLeft)).toBeLessThan(
+    1.5,
+  );
+  expect(chrome.lineBorderWidth).toBeGreaterThan(0);
+  expect(chrome.lineBorderColor).not.toBe("rgba(0, 0, 0, 0)");
+  expect(chrome.nestedBorderWidth).toBeGreaterThan(0);
+  expect(chrome.nestedBorderColor).toBe("rgba(0, 0, 0, 0)");
+  expect(chrome.markerColor).not.toBe("rgba(0, 0, 0, 0)");
+});
+
 test("applies the story's interactive eight-column indentation setting", async ({
   page,
 }) => {

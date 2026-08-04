@@ -146,7 +146,12 @@ The reading-only indentation follow-up keeps the first quote group as a direct
 child of its unordered parent. When that parent already owns a nested list, a
 reading-mode quote pseudo-element continues the existing list guide through the
 quote's top and bottom spacing without changing live-preview widget geometry.
-The complete focused Chromium indentation suite passes all 16 cases, including
+The live-preview edit-state follow-up restores Lapis's active-line contract:
+the line-owned outer blockquote border remains in the rendered column while a
+nested marker pseudo-border becomes transparent and the authored quote markers
+become visible. Browser acceptance measures the outer border before and after
+entering source and asserts that the displaced nested border is not painted.
+The complete focused Chromium indentation suite passes all 17 cases, including
 the retained expected-failure marker for the unrelated whitespace-only
 CodeMirror row. The parser and widget unit suite passes all 214 package tests;
 the package check and build, canonical spec check, and catalog check also pass.

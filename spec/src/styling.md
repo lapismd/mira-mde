@@ -57,7 +57,10 @@ CodeMirror line box. Consumer overrides of the bridged variables continue to
 control both widget width and guide spacing. In live preview, inactive
 unordered marker spans hide their authored glyph and paint the same tokenized
 bullet shape used by reading mode; focusing the marker removes that presentation
-so the original `-`, `*`, or `+` stays editable.
+so the original `-`, `*`, or `+` stays editable. When a blockquote line becomes
+active in live preview, its authored quote markers become visible and nested
+marker pseudo-borders become transparent; the line-owned outer border MUST stay
+in its rendered column without a duplicate, displaced guide beside the prefix.
 
 Reading-mode list guides remain owned by shipped preview CSS. When an indented
 blockquote follows a nested list under the same list item, a reading-only guide

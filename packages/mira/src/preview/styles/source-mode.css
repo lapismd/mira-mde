@@ -418,6 +418,12 @@
   color: var(--markdown-faint-color);
 }
 
+.markdown-live-preview-mode
+  .cm-blockquote.cm-activeLine
+  .cm-blockquote-border::before {
+  border-inline-start-color: transparent;
+}
+
 .markdown-editor-surface .cm-line .cm-fold-indicator {
   display: inline-block;
   opacity: 0;
