@@ -954,20 +954,47 @@ test("keeps active continuation and blockquote prefix geometry stable", async ({
 test("keeps blockquote chrome aligned while its source is editable", async ({
   page,
 }) => {
-  await gotoStory(page, "markdown-indentation--active-prefixes-live-preview");
-  const renderedQuote = page
-    .locator(".mira-rich-widget--blockquote blockquote")
-    .first();
+  await gotoStory(
+    page,
+    "markdown-indentation--nested-lists-and-quotes-live-preview",
+  );
+  const renderedWidget = page
+    .locator(".mira-rich-widget--blockquote")
+    .filter({ hasText: "Quoted paragraph with enough text" });
+  const renderedQuote = renderedWidget.locator("blockquote").first();
   await expect(renderedQuote).toBeVisible();
   const renderedBorderLeft = await renderedQuote.evaluate(
     (element) => element.getBoundingClientRect().left,
   );
 
-  await page.getByRole("button", { name: "Edit source" }).click();
+  await renderedWidget.getByRole("button", { name: "Edit source" }).click();
   await settleLayout(page);
+  const editableQuoteLines = page.locator(".cm-line.cm-blockquote");
+  await expect(editableQuoteLines).toHaveCount(4);
+  const outerBorders = await editableQuoteLines.evaluateAll((lines) =>
+    lines.map((element) => {
+      const lineRect = element.getBoundingClientRect();
+      const border = getComputedStyle(element, "::before");
+      return {
+        color: border.borderInlineStartColor,
+        left: lineRect.left + Number.parseFloat(border.insetInlineStart),
+        text: element.textContent ?? "",
+        width: Number.parseFloat(border.borderInlineStartWidth),
+      };
+    }),
+  );
+  for (const border of outerBorders) {
+    expect(
+      Math.abs(border.left - renderedBorderLeft),
+      `${border.text} should align with its rendered parent block`,
+    ).toBeLessThan(1.5);
+    expect(border.width).toBeGreaterThan(0);
+    expect(border.color).not.toBe("rgba(0, 0, 0, 0)");
+  }
+
   const activeNestedQuote = lineContaining(
     page,
-    "Nested quoted line keeps the rendered block attached",
+    "Nested quote keeps a second quote guide",
   );
   await expect(activeNestedQuote).toHaveClass(/cm-activeLine/);
   const chrome = await activeNestedQuote.evaluate((element) => {

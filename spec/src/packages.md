@@ -69,9 +69,10 @@ entry point.
   precedence MUST close a lazily continued blockquote when reading mode starts
   a following list, so list-contained blockquotes and indented code retain the
   same classification across editor and preview surfaces. Internal live-preview
-  blockquote chrome MUST preserve the line-owned outer guide while suppressing
-  nested marker pseudo-borders on an active editable line; this remains shipped
-  CSS behavior and MUST NOT require a consumer option.
+  blockquote chrome MUST preserve one aligned, line-owned outer guide across
+  editable parent and child rows while suppressing nested marker pseudo-borders
+  on an active editable line; this remains shipped CSS behavior and MUST NOT
+  require a consumer option.
 - `preview` exports Markdown preview, outline, embed, and renderer surfaces.
 - `tables` exports the supported Markdown and grid-table components.
 - `ui` and its documented component subpaths export the shared UI primitives.

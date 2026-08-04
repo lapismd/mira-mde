@@ -403,7 +403,7 @@
   width: 1px;
 }
 
-.markdown-editor-surface .cm-blockquote::before {
+.markdown-editor-surface .cm-editor .cm-line.cm-blockquote::before {
   inset-inline-start: 0;
 }
 

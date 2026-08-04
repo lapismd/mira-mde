@@ -149,11 +149,13 @@ quote's top and bottom spacing without changing live-preview widget geometry.
 The live-preview edit-state follow-up restores Lapis's active-line contract:
 the line-owned outer blockquote border remains in the rendered column while a
 nested marker pseudo-border becomes transparent and the authored quote markers
-become visible. Browser acceptance measures the outer border before and after
-entering source and asserts that the displaced nested border is not painted.
+become visible. First-depth quote prefixes no longer create a second border.
+Browser acceptance measures the rendered parent border before entering source,
+then asserts that every editable child row retains that column and that the
+displaced active nested border is not painted.
 The complete focused Chromium indentation suite passes all 17 cases, including
 the retained expected-failure marker for the unrelated whitespace-only
-CodeMirror row. The parser and widget unit suite passes all 214 package tests;
+CodeMirror row. The parser and widget unit suite passes all 215 package tests;
 the package check and build, canonical spec check, and catalog check also pass.
 No visual baselines were created or refreshed for this repair. The full
 `pnpm check:all` gate remains blocked at its initial Prettier check by 31

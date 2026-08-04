@@ -94,6 +94,37 @@ describe("createRichEditorExtensions", () => {
     parent.remove();
   });
 
+  it("reserves nested border chrome for nested quote prefixes", async () => {
+    const parent = document.createElement("div");
+    document.body.append(parent);
+    const view = new EditorView({
+      doc: "> outer quote\n> > nested quote",
+      extensions: [
+        createMarkdownCodeMirrorExtensions(),
+        createRichEditorExtensions({ livePreview: true }),
+      ],
+      parent,
+    });
+    view.dispatch({ selection: { anchor: 5 } });
+    await nextFrame();
+    await nextFrame();
+
+    const lines = [...parent.querySelectorAll(".cm-line")];
+    const outer = lines.find((line) =>
+      line.textContent?.includes("outer quote"),
+    );
+    const nested = lines.find((line) =>
+      line.textContent?.includes("nested quote"),
+    );
+    expect(outer?.querySelector(".cm-formatting-quote-1")).not.toBeNull();
+    expect(outer?.querySelector(".cm-blockquote-border")).toBeNull();
+    expect(nested?.querySelector(".cm-formatting-quote-2")).not.toBeNull();
+    expect(nested?.querySelector(".cm-blockquote-border")).not.toBeNull();
+
+    view.destroy();
+    parent.remove();
+  });
+
   it("resets source whitespace on rendered block widgets", () => {
     const parent = document.createElement("div");
     document.body.append(parent);

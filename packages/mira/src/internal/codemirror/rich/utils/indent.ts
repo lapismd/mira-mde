@@ -481,9 +481,22 @@ export function indentGuideDecorations(
                 layout.quoteFrom !== undefined &&
                 layout.quoteTo !== undefined
               ) {
+                const quoteDepth = (
+                  line.text
+                    .slice(layout.quoteFrom, layout.quoteTo)
+                    .match(/>/gu) ?? []
+                ).length;
                 decorations.push(
                   Decoration.mark({
-                    class: "cm-formatting-quote cm-blockquote-border",
+                    class: [
+                      "cm-formatting-quote",
+                      `cm-formatting-quote-${quoteDepth}`,
+                      "cm-quote",
+                      `cm-quote-${quoteDepth}`,
+                      quoteDepth > 1 ? "cm-blockquote-border" : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" "),
                   }).range(
                     line.from + layout.quoteFrom,
                     line.from + layout.quoteTo,
