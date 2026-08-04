@@ -621,7 +621,9 @@ test("continues the reading-mode parent guide through its blockquote", async ({
       const listRect = nestedList.getBoundingClientRect();
       const quoteRect = quote.getBoundingClientRect();
       const surfaceRect = surface.getBoundingClientRect();
+      const listStyle = getComputedStyle(nestedList);
       const listGuide = getComputedStyle(nestedList, "::before");
+      const quoteStyle = getComputedStyle(quote);
       const quoteGuide = getComputedStyle(quote, "::before");
       return {
         guideBottom: quoteRect.bottom - Number.parseFloat(quoteGuide.bottom),
@@ -630,15 +632,21 @@ test("continues the reading-mode parent guide through its blockquote", async ({
         itemBottom: itemRect.bottom,
         listBottom: listRect.bottom,
         listGuideX:
-          listRect.left + Number.parseFloat(listGuide.insetInlineStart),
+          listRect.left +
+          Number.parseFloat(listStyle.borderInlineStartWidth) +
+          Number.parseFloat(listGuide.insetInlineStart),
+        quoteBorderWidth: Number.parseFloat(quoteStyle.borderInlineStartWidth),
         quoteLeft: quoteRect.left,
         quoteGuideX:
-          quoteRect.left + Number.parseFloat(quoteGuide.insetInlineStart),
+          quoteRect.left +
+          Number.parseFloat(quoteStyle.borderInlineStartWidth) +
+          Number.parseFloat(quoteGuide.insetInlineStart),
         surfaceLeft: surfaceRect.left,
       };
     });
 
   expect(metrics.quoteLeft).toBeGreaterThan(metrics.surfaceLeft);
+  expect(metrics.quoteBorderWidth).toBeGreaterThan(0);
   expect(metrics.guideWidth).toBeGreaterThan(0);
   expect(
     Math.abs(metrics.guideTop - metrics.listBottom),

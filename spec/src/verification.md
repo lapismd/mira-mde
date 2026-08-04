@@ -149,6 +149,12 @@ The reading-only indentation follow-up keeps the first quote group as a direct
 child of its unordered parent. When that parent already owns a nested list, a
 reading-mode quote pseudo-element continues the existing list guide through the
 quote's top and bottom spacing without changing live-preview widget geometry.
+Painted-pixel inspection exposed a `2.97px` horizontal displacement that the
+original browser assertion missed: both pseudo-elements reported `-1.5ch`, but
+the quote segment's positioned containing block began after the tokenized `3px`
+blockquote border. The repair subtracts that computed border thickness from the
+quote segment inset, and Chromium acceptance compares the actual painted
+coordinates rather than the two declared offsets.
 The live-preview edit-state follow-up restores Lapis's active-line contract:
 the line-owned outer blockquote border remains in the rendered column while a
 nested marker pseudo-border becomes transparent and the authored quote markers
@@ -156,9 +162,9 @@ become visible. First-depth quote prefixes no longer create a second border.
 Browser acceptance measures the rendered parent border before entering source,
 then asserts that every editable child row retains that column and that the
 displaced active nested border is not painted.
-The complete focused Chromium indentation suite passes all 17 cases, including
+The complete focused Chromium indentation suite passes all 19 cases, including
 the retained expected-failure marker for the unrelated whitespace-only
-CodeMirror row. The parser and widget unit suite passes all 215 package tests;
+CodeMirror row. The parser and widget unit suite passes all 218 package tests;
 the package check and build, canonical spec check, and catalog check also pass.
 No visual baselines were created or refreshed for this repair. The full
 `pnpm check:all` gate remains blocked at its initial Prettier check by 31

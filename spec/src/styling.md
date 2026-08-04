@@ -71,8 +71,10 @@ the task content color or introducing another public token.
 
 Reading-mode list guides remain owned by shipped preview CSS. When an indented
 blockquote follows a nested list under the same list item, a reading-only guide
-segment MUST bridge the quote's block margins and height; editor widget geometry
-MUST remain unchanged.
+segment MUST bridge the quote's block margins and height on the same painted
+border column as the parent guide. Its logical inset MUST compensate for the
+blockquote's own border box so tokenized non-zero quote borders cannot displace
+the continuation segment; editor widget geometry MUST remain unchanged.
 
 Source and live-preview indented code blocks use syntax-tree-derived line hooks
 owned by Mira's CodeMirror extension. Shipped CSS MUST join those lines into one

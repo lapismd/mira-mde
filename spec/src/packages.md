@@ -77,7 +77,10 @@ entry point.
   code-specific hooks continue to select the monospaced token. Internal task
   marker ranges MUST account for authored blockquote prefixes before locating
   the list and checkbox delimiters.
-- `preview` exports Markdown preview, outline, embed, and renderer surfaces.
+- `preview` exports Markdown preview, outline, embed, and renderer surfaces. Its
+  shipped reading styles MUST keep a list guide continued through a child
+  blockquote on the parent's painted guide column after accounting for the
+  blockquote border box.
 - `tables` exports the supported Markdown and grid-table components.
 - `ui` and its documented component subpaths export the shared UI primitives.
 - `themes/mira.css`, `themes/obsidian.css`, `themes.css`, and `styles.css`

@@ -42,7 +42,9 @@
       var(--markdown-indentation-guide-width, var(--indentation-guide-width))
   );
   content: "";
-  inset-inline-start: -1.5ch;
+  inset-inline-start: calc(
+    -1.5ch - var(--markdown-blockquote-border-thickness)
+  );
   pointer-events: none;
   position: absolute;
   top: calc(
