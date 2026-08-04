@@ -16,6 +16,10 @@
   padding-inline-start: 0;
 }
 
+.markdown-editor-surface .cm-editor .cm-formatting-task {
+  color: var(--markdown-code-comment);
+}
+
 .markdown-live-preview-mode .cm-editor .cm-formatting-list-ul:not(.cm-line) {
   box-sizing: border-box;
   display: inline-block;

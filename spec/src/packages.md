@@ -74,7 +74,9 @@ entry point.
   on an active editable line; this remains shipped CSS behavior and MUST NOT
   require a consumer option. The internal CodeMirror document theme MUST honor
   the public Markdown sans token for ordinary prose while the shipped
-  code-specific hooks continue to select the monospaced token.
+  code-specific hooks continue to select the monospaced token. Internal task
+  marker ranges MUST account for authored blockquote prefixes before locating
+  the list and checkbox delimiters.
 - `preview` exports Markdown preview, outline, embed, and renderer surfaces.
 - `tables` exports the supported Markdown and grid-table components.
 - `ui` and its documented component subpaths export the shared UI primitives.

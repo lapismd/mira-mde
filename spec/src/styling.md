@@ -20,6 +20,7 @@ customization and Obsidian-compatible aliases retained as a compatibility layer.
 | MIRA-CSS-010 | Consumer theme tokens loaded after Mira MUST be able to extend a built-in palette by overriding only selected `--mira-*` variables, including on portaled editor overlays.                                                                 |
 | MIRA-CSS-011 | Public theme tokens MUST retain their documented CSS value grammar and resolve to valid declarations in inherited, explicit, and system color modes; color-only functions MUST NOT wrap channel lists, shadows, or other non-color values. |
 | MIRA-CSS-012 | Mira MUST expose `--mira-indent-size`, `--mira-indent-unit`, and `--mira-list-indent` defaults and bridge them to the Obsidian-compatible indentation variables used by shipped CodeMirror list and continuation widgets.                  |
+| MIRA-CSS-013 | Visible task checkbox delimiters in source and live-preview editing MUST use the same muted syntax color as other Markdown delimiters while task content retains the normal prose color.                                                   |
 
 Stylesheet order remains theme, UI, preview, Svelte/Mira Editor, and framework
 wrapper composition as documented by the package entrypoints.
@@ -62,6 +63,11 @@ active in live preview, its authored quote markers become visible and nested
 marker pseudo-borders become transparent; every editable child row's line-owned
 outer border MUST align with the rendered parent block border without a
 duplicate, displaced guide beside a first-depth prefix.
+
+Source and active live-preview task markers expose a stable
+`.cm-formatting-task` hook for their authored `[value]` delimiter. Shipped CSS
+uses the existing muted Markdown syntax color for that hook without changing
+the task content color or introducing another public token.
 
 Reading-mode list guides remain owned by shipped preview CSS. When an indented
 blockquote follows a nested list under the same list item, a reading-only guide

@@ -12,7 +12,9 @@ export function getTaskMarkerRange(
   text: string,
   lineStart: number,
 ): TaskMarkerRange | null {
-  const match = text.match(/^(\s*)((?:[-*+]|\d+[.)])\s+)\[([^\]\r\n])\]\s/u);
+  const match = text.match(
+    /^([ \t]*(?:>[ \t]*)*)((?:[-*+]|\d+[.)])[ \t]+)\[([^\]\r\n])\][ \t]/u,
+  );
   if (!match || match[1] === undefined || match[2] === undefined) {
     return null;
   }

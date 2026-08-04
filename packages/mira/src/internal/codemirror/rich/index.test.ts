@@ -94,6 +94,45 @@ describe("createRichEditorExtensions", () => {
     parent.remove();
   });
 
+  it("keeps a blockquote-nested task marker complete while it is edited", async () => {
+    const parent = document.createElement("div");
+    document.body.append(parent);
+    const source = "  >   - [ ] Quoted checklist child";
+    const view = new EditorView({
+      doc: source,
+      selection: { anchor: source.indexOf("[") + 1 },
+      extensions: [
+        createMarkdownCodeMirrorExtensions(),
+        createRichEditorExtensions({ livePreview: true }),
+      ],
+      parent,
+    });
+    await nextFrame();
+    await nextFrame();
+
+    const taskLine = [...parent.querySelectorAll(".cm-line")].find((line) =>
+      line.textContent?.includes("Quoted checklist child"),
+    );
+    expect(taskLine?.textContent).toContain("- [ ] Quoted checklist child");
+    expect(
+      [...(taskLine?.querySelectorAll(".cm-formatting-hidden") ?? [])].filter(
+        (node) => node.textContent?.includes("["),
+      ),
+    ).toHaveLength(0);
+    expect(taskLine?.querySelector(".cm-task-checkbox")).toBeNull();
+
+    view.dispatch({
+      selection: { anchor: source.indexOf("Quoted checklist child") + 3 },
+    });
+    await nextFrame();
+    await nextFrame();
+
+    expect(taskLine?.querySelector(".cm-task-checkbox")).not.toBeNull();
+
+    view.destroy();
+    parent.remove();
+  });
+
   it("reserves nested border chrome for nested quote prefixes", async () => {
     const parent = document.createElement("div");
     document.body.append(parent);

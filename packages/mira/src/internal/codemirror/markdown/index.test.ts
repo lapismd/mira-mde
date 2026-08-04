@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { syntaxTree } from "@codemirror/language";
 import { EditorState } from "@codemirror/state";
+import { EditorView } from "@codemirror/view";
 import { createMarkdownCodeMirrorExtensions } from ".";
 
 describe("createMarkdownCodeMirrorExtensions", () => {
@@ -45,6 +46,23 @@ describe("createMarkdownCodeMirrorExtensions", () => {
       "OrderedList(ListItem(ListMark,Paragraph,Blockquote(QuoteMark,Paragraph(QuoteMark))))",
     );
     expect(tree).not.toContain("CodeBlock");
+  });
+
+  it("marks quoted task delimiters for source-mode styling", async () => {
+    const parent = document.createElement("div");
+    document.body.append(parent);
+    const view = new EditorView({
+      doc: "  >   - [ ] Quoted checklist child",
+      extensions: createMarkdownCodeMirrorExtensions({ sourceMode: true }),
+      parent,
+    });
+    await new Promise((resolve) => requestAnimationFrame(() => resolve(null)));
+
+    const delimiter = parent.querySelector(".cm-formatting-task");
+    expect(delimiter?.textContent).toBe("[ ]");
+
+    view.destroy();
+    parent.remove();
   });
 
   it.each([

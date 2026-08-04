@@ -22,6 +22,25 @@ describe("task utilities", () => {
     expect(getTaskMarkerRange("- [-] Cancelled task", 0)?.taskValue).toBe("-");
   });
 
+  it("resolves task markers after authored blockquote prefixes", () => {
+    expect(
+      getTaskMarkerRange("  >   - [ ] Quoted checklist child", 20),
+    ).toEqual({
+      markerStart: 26,
+      checkboxStart: 28,
+      checkboxEnd: 31,
+      markerEnd: 32,
+      taskValue: " ",
+    });
+    expect(getTaskMarkerRange("> > 1. [x] Nested task", 0)).toEqual({
+      markerStart: 4,
+      checkboxStart: 7,
+      checkboxEnd: 10,
+      markerEnd: 11,
+      taskValue: "x",
+    });
+  });
+
   it("treats the task marker prefix as active for source reveal", () => {
     for (let anchor = 0; anchor <= 6; anchor += 1) {
       const state = EditorState.create({

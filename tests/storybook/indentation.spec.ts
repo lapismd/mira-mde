@@ -477,6 +477,58 @@ test("preserves nested list depth and quoted checklist structure across surfaces
   await expect(reading.locator('input[type="checkbox"]').first()).toBeVisible();
 });
 
+test("keeps nested task delimiters complete and muted while they are edited", async ({
+  page,
+}) => {
+  let mutedDelimiterColor: string | undefined;
+  for (const id of [
+    "markdown-indentation--nested-lists-and-quotes-source",
+    "markdown-indentation--nested-lists-and-quotes-live-preview",
+  ]) {
+    await gotoStory(page, id);
+    if (id.endsWith("live-preview")) {
+      const renderedWidget = page
+        .locator(".mira-rich-widget--blockquote")
+        .filter({ hasText: "Quoted checklist child" })
+        .first();
+      await renderedWidget.getByRole("button", { name: "Edit source" }).click();
+    }
+
+    const taskLine = lineContaining(page, "Quoted checklist child");
+    await placeCaretAtLineOffset(page, taskLine, 9);
+    const delimiter = taskLine.locator(".cm-formatting-task");
+    await expect(delimiter).toBeVisible();
+    await expect(delimiter).toHaveText("[ ]");
+    const delimiterMetrics = await delimiter.evaluate((element) => {
+      const style = getComputedStyle(element);
+      const content = element
+        .closest(".cm-line")
+        ?.querySelector<HTMLElement>(".cm-list-1:last-child");
+      return {
+        color: style.color,
+        contentColor: content ? getComputedStyle(content).color : null,
+        width: element.getBoundingClientRect().width,
+      };
+    });
+    expect(delimiterMetrics.width).toBeGreaterThan(0);
+    expect(delimiterMetrics.color).not.toBe(delimiterMetrics.contentColor);
+    if (id.endsWith("source")) {
+      const listMarkerColor = await taskLine
+        .locator(".cm-formatting-list .cm-meta")
+        .evaluate((element) => getComputedStyle(element).color);
+      expect(delimiterMetrics.color).toBe(listMarkerColor);
+      mutedDelimiterColor = delimiterMetrics.color;
+    } else {
+      expect(delimiterMetrics.color).toBe(mutedDelimiterColor);
+    }
+
+    if (id.endsWith("live-preview")) {
+      await placeCaretAtLineOffset(page, taskLine, 15);
+      await expect(taskLine.locator(".cm-task-checkbox")).toBeVisible();
+    }
+  }
+});
+
 test("matches live-preview blockquote child spacing to reading mode", async ({
   page,
 }) => {

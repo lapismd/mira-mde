@@ -15,6 +15,7 @@ authorized baseline regeneration migrations are complete.
 | MIRA-MD-008, MIRA-MD-009                                                                                | Enforced Storybook accessibility and icon-bearing editor controls         | Implemented                           |
 | MIRA-MD-010                                                                                             | Focused outline story plus Storybook browser navigation acceptance        | Implemented                           |
 | MIRA-MD-011                                                                                             | Computed typography parity across source, live preview, and reading       | Implemented by typography repair      |
+| MIRA-MD-012                                                                                             | Nested blockquote task source and checkbox browser assertions             | Implemented by quoted-task repair     |
 | MIRA-UI-001, MIRA-UI-002, MIRA-UI-003, MIRA-UI-004, MIRA-UI-005                                         | Mira Editor, React, and Vanilla tests/builds                              | Implemented                           |
 | MIRA-UI-006, MIRA-UI-007, MIRA-UI-008                                                                   | Storybook browser project and UI primitive `play` interactions            | Implemented                           |
 | MIRA-UI-009                                                                                             | Svelte package checks and focused outline browser acceptance              | Implemented                           |
@@ -24,6 +25,7 @@ authorized baseline regeneration migrations are complete.
 | MIRA-CSS-007, MIRA-CSS-008, MIRA-CSS-009, MIRA-CSS-010                                                  | Theme CSS contracts, component tests, and portaled-overlay stories        | Implemented by extensible theme slice |
 | MIRA-CSS-011                                                                                            | Computed callout, task-state, and floating-surface theme assertions       | Implemented by theme token repair     |
 | MIRA-CSS-012                                                                                            | Cataloged indentation tokens and continuation-widget browser geometry     | Implemented by indentation repair     |
+| MIRA-CSS-013                                                                                            | Computed task-delimiter colors in source and live-preview edit states     | Implemented by quoted-task repair     |
 | MIRA-AI-001, MIRA-AI-002, MIRA-AI-003                                                                   | `packages/mira-plugin-ai` unit tests                                      | Implemented                           |
 | MIRA-AI-004                                                                                             | Deterministic AI story interaction                                        | Implemented                           |
 | MIRA-MERMAID-001, MIRA-MERMAID-002, MIRA-MERMAID-003, MIRA-MERMAID-004                                  | Mermaid package tests and existing Storybook stories                      | Implemented                           |
@@ -176,6 +178,23 @@ cases pass, including the retained expected-failure marker for the unrelated
 whitespace-only CodeMirror row; the 215-test package suite, package check and
 build, and canonical spec gate also pass. No visual baselines were created or
 refreshed for this repair.
+
+The nested-task edit follow-up reproduced the opening `[` of the authored
+`- [ ]` marker as a zero-width `.cm-formatting-hidden` span after entering the
+quoted checklist line. The task range parser accepted indentation followed by
+a list marker but did not account for intervening blockquote prefixes, so the
+task-specific source reveal and checkbox replacement paths were both skipped.
+The repaired parser separates optional quote prefixes from the list marker,
+and the shared Markdown decoration layer gives `[value]` a stable
+`.cm-formatting-task` hook in both editor modes. Direct browser inspection
+measures the complete live-preview `[ ]` delimiter at `14.17px` and source at
+`14.16px`; both resolve to muted `rgb(105, 115, 134)` while their task content
+remains `rgb(29, 29, 32)`. Moving the caret into the task content restores the
+interactive checkbox. All 19 focused Chromium indentation cases pass,
+including the retained expected-failure marker for the unrelated
+whitespace-only CodeMirror row; all 218 package tests, the package check and
+build, and the canonical spec gate also pass. No visual baselines were created
+or refreshed for this repair.
 
 The add-on's Docker stage does not trust authored `storybook-static` output,
 but it transports the affected cache and preview graph and may restore a

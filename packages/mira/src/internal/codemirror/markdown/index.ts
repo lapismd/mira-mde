@@ -12,6 +12,7 @@ import {
   type ViewUpdate,
 } from "@codemirror/view";
 import { Table } from "@lezer/markdown";
+import { getTaskMarkerRange } from "../rich/utils/tasks";
 import { GenericDirectives } from "./directives";
 import { GridTable } from "./grid-table";
 import { ListAfterLazyBlockquote } from "./list-after-lazy-quote";
@@ -58,6 +59,9 @@ const embedMark = Decoration.mark({
   class: "cm-internal-link cm-embed-link",
 });
 const tagMark = Decoration.mark({ class: "cm-hashtag" });
+const taskFormattingMark = Decoration.mark({
+  class: "cm-formatting cm-formatting-task",
+});
 const frontmatterMark = Decoration.line({ class: "cm-hmd-frontmatter" });
 
 export function createMarkdownCodeMirrorExtensions(
@@ -141,6 +145,13 @@ function decorateInlineMarkdown(
   lineStart: number,
   ranges: Range<Decoration>[],
 ): void {
+  const taskRange = getTaskMarkerRange(text, lineStart);
+  if (taskRange) {
+    ranges.push(
+      taskFormattingMark.range(taskRange.checkboxStart, taskRange.checkboxEnd),
+    );
+  }
+
   for (const match of text.matchAll(/!\[\[[^\]\n]+]]/g)) {
     ranges.push(
       embedMark.range(
