@@ -36,7 +36,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const LivePreview: Story = {
-  tags: ["visual-ready"],
+  tags: ["visual-ready", "!visual-pending", "!visual-approved", "!visual-failed"],
   parameters: {
     visualDelta: {
       images: [
@@ -53,7 +53,7 @@ export const LivePreview: Story = {
 };
 
 export const Source: Story = {
-  tags: ["visual-ready"],
+  tags: ["visual-ready", "!visual-pending", "!visual-approved", "!visual-failed"],
   parameters: {
     visualDelta: {
       images: ["/visual-baselines/stories/markdown/layout/source-chromium.png"],
@@ -67,7 +67,7 @@ export const Source: Story = {
 };
 
 export const Preview: Story = {
-  tags: ["visual-ready"],
+  tags: ["visual-ready", "!visual-pending", "!visual-approved", "!visual-failed"],
   parameters: {
     visualDelta: {
       images: [
@@ -83,7 +83,7 @@ export const Preview: Story = {
 };
 
 export const Split: Story = {
-  tags: ["visual-ready"],
+  tags: ["visual-ready", "!visual-pending", "!visual-approved", "!visual-failed"],
   parameters: {
     visualDelta: {
       images: ["/visual-baselines/stories/markdown/layout/split-chromium.png"],
@@ -97,7 +97,7 @@ export const Split: Story = {
 };
 
 export const NarrowSource: Story = {
-  tags: ["visual-ready"],
+  tags: ["visual-ready", "!visual-pending", "!visual-approved", "!visual-failed"],
   parameters: {
     visualDelta: {
       images: [
@@ -114,7 +114,7 @@ export const NarrowSource: Story = {
 };
 
 export const WideSource: Story = {
-  tags: ["visual-ready"],
+  tags: ["visual-ready", "!visual-pending", "!visual-approved", "!visual-failed"],
   parameters: {
     visualDelta: {
       images: [
