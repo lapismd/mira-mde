@@ -51,6 +51,8 @@ authorized baseline regeneration migrations are complete.
 | MIRA-CAT-010                                                                                            | Visual Delta host formatter configuration and source mutation regression   | Implemented                           |
 | MIRA-GOV-001, MIRA-GOV-002, MIRA-GOV-003, MIRA-GOV-004, MIRA-GOV-005, MIRA-GOV-006, MIRA-GOV-007        | `pnpm spec:check`, checker tests, pull-request workflow                    | Implemented by governance slice       |
 | MIRA-GOV-008                                                                                            | Package-boundary checker and tarball leak tests                            | Implemented                           |
+| MIRA-MD-016                                                                                             | Live-preview table source-reveal typography and geometry interaction       | Implemented by table fallback slice   |
+| MIRA-CSS-017                                                                                            | Shared raw-table source/live selector and computed-style acceptance        | Implemented by table fallback slice   |
 
 The context-aware toolbar action slice adds one shared CodeMirror engine for
 ten action identifiers and exposes it through the Mira, Mira Editor, React, and
@@ -81,12 +83,14 @@ interaction contract.
 
 The source-table parity slice ports Lapis's `cm-table` source treatment through
 Mira's existing monospace token and verifies five padded pipe-table rows against
-ordinary source prose. The focused Tables Storybook project passes all three
-stories; live Storybook inspection resolves the rows to Source Code Pro with
-`white-space: pre` and equal 378 px widths while prose remains Inter. The
-canonical single-story Visual Delta capture passes and reports the expected
-5,127-pixel review delta for `markdown-tables--source-mode`; compare-only mode
-does not update the approved baseline.
+ordinary prose in Source and the editable Live Preview fallback. The focused
+Tables Storybook project passes all three stories; live Storybook inspection
+resolves the revealed Live Preview rows to Source Code Pro with `white-space:
+pre` and stable 379.29-379.31 px widths while prose remains Inter. Canonical
+single-story Visual Delta captures pass and report the expected review deltas:
+5,127 pixels for `markdown-tables--source-mode` and 7,419 pixels for
+`markdown-tables--live-preview`. Compare-only mode does not update either
+approved baseline.
 
 ## Validation tiers
 

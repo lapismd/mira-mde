@@ -98,7 +98,8 @@ entry point.
   preview checkboxes MUST share the internal task-type picker with live preview;
   read-only previews MUST retain their existing checkbox-only DOM contract.
 - `tables` exports the supported Markdown and grid-table components and owns
-  the `cm-table` source-line decoration consumed by shipped source-mode styles.
+  the `cm-table` raw-line decoration consumed by shipped source and
+  live-preview fallback styles.
 - `ui` and its documented component subpaths export the shared UI primitives.
 - `themes/mira.css`, `themes/obsidian.css`, `themes.css`, and `styles.css`
   provide explicit CSS entry points.
