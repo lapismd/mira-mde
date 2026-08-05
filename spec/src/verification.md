@@ -343,6 +343,20 @@ changes of 31,855 Reading pixels (5 percent) and 29,313 Live Preview pixels
 therefore exits non-zero; no visual baseline is created or refreshed by this
 follow-up.
 
+The Reading marker-column follow-up reproduces the final plain bullet 6.2 px to
+the right of its highlighted siblings. The highlighted background layering
+selector had overridden their absolute `list-bullet` boxes with zero-width
+relative boxes while the plain row retained the shipped 1.4ch marker box. The
+selector now excludes structural list controls. Direct browser inspection
+measures identical 12.36 px absolute marker boxes with a 0 px center offset, and
+focused Chromium acceptance requires highlighted and ordinary sibling marker
+centers and widths to remain within 0.5 px. The three focused Playwright cases,
+five Lists Storybook interactions, all 249 Mira package tests, package check and
+build, canonical spec checks, and `pnpm check:all` pass. Live Preview geometry
+is unchanged. The compare-only Visual Delta browser case passes and reports the
+expected pending Reading change of 31,933 pixels (5 percent); strict comparison
+therefore exits non-zero, and no visual baseline is created or refreshed.
+
 The add-on's Docker stage does not trust authored `storybook-static` output,
 but it transports the affected cache and preview graph and may restore a
 checksum-verified canonical static build. The `test:visual` gate therefore uses

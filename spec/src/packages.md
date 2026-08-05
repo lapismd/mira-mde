@@ -111,7 +111,9 @@ entry point.
   live-line padding and reading-background insets, keeping the CodeMirror line
   and widget margin contract unchanged. The live background start inset MUST
   clear the list bullet, and a reading background followed by a plain list item
-  MUST end before that sibling begins.
+  MUST end before that sibling begins. Reading background layering MUST leave
+  list-bullet and collapse-control positioning intact so highlighted and plain
+  siblings share the same painted marker column.
 - `tables` exports the supported Markdown and grid-table components and owns
   the `cm-table` raw-line decoration consumed by shipped source and
   live-preview fallback styles.

@@ -13,8 +13,13 @@
   padding-block-end: 0.55rem;
 }
 
-.markdown-rendered li.lc-list-callout > :not(ul, ol),
-.markdown-preview-surface .markdown li.lc-list-callout > :not(ul, ol) {
+.markdown-rendered
+  li.lc-list-callout
+  > :not(ul, ol, .list-bullet, .list-collapse-indicator),
+.markdown-preview-surface
+  .markdown
+  li.lc-list-callout
+  > :not(ul, ol, .list-bullet, .list-collapse-indicator) {
   position: relative;
   z-index: 1;
 }

@@ -167,6 +167,13 @@ async function readingTerminalBoundary(page: Page) {
       const panel = getComputedStyle(item, "::before");
       const itemContent = item.querySelector<HTMLElement>("p") ?? item;
       const nextContent = nextItem.querySelector<HTMLElement>("p") ?? nextItem;
+      const itemBullet = item.querySelector<HTMLElement>(".list-bullet");
+      const nextBullet = nextItem.querySelector<HTMLElement>(".list-bullet");
+      if (!itemBullet || !nextBullet) {
+        throw new Error("Reading list bullets are missing");
+      }
+      const itemBulletRect = itemBullet.getBoundingClientRect();
+      const nextBulletRect = nextBullet.getBoundingClientRect();
       return {
         gap:
           nextItemRect.top -
@@ -174,6 +181,13 @@ async function readingTerminalBoundary(page: Page) {
         contentOffset:
           nextContent.getBoundingClientRect().left -
           itemContent.getBoundingClientRect().left,
+        markerCenterOffset:
+          nextBulletRect.left +
+          nextBulletRect.width / 2 -
+          (itemBulletRect.left + itemBulletRect.width / 2),
+        markerWidthOffset: nextBulletRect.width - itemBulletRect.width,
+        highlightedMarkerPosition: getComputedStyle(itemBullet).position,
+        plainMarkerPosition: getComputedStyle(nextBullet).position,
       };
     });
 }
@@ -369,6 +383,10 @@ test("consecutive highlights stay separated and centered when the story item wra
   const terminalBoundary = await readingTerminalBoundary(page);
   expect(terminalBoundary.gap).toBeGreaterThan(1);
   expect(Math.abs(terminalBoundary.contentOffset)).toBeLessThan(0.5);
+  expect(Math.abs(terminalBoundary.markerCenterOffset)).toBeLessThan(0.5);
+  expect(Math.abs(terminalBoundary.markerWidthOffset)).toBeLessThan(0.5);
+  expect(terminalBoundary.highlightedMarkerPosition).toBe("absolute");
+  expect(terminalBoundary.plainMarkerPosition).toBe("absolute");
 });
 
 test("list-highlight pickers stay off raw-source surfaces", async ({
