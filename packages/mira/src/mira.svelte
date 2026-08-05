@@ -6,6 +6,7 @@
     createMiraEditorController,
     openImageFilePicker,
     type MiraEditorController,
+    type MiraMarkdownActionId,
   } from "@lapismd/mira/core";
   import {
     executeMiraCommand,
@@ -256,6 +257,13 @@
     controller?.focus();
   }
 
+  export function applyMarkdownAction(action: MiraMarkdownActionId): boolean {
+    if (readonly || mode === "preview") {
+      return false;
+    }
+    return controller?.applyMarkdownAction(action) ?? false;
+  }
+
   export function insertImage(): void {
     if (controller) {
       openImageFilePicker(controller.view, imageConfig);
@@ -471,30 +479,42 @@
         <Button
           variant="ghost"
           size="sm"
-          onclick={() => insertMarkdown("**strong**")}
+          aria-label="Bold"
+          disabled={readonly || mode === "preview"}
+          onclick={() => applyMarkdownAction("bold")}
         >
           B
         </Button>
         <Button
           variant="ghost"
           size="sm"
-          onclick={() => insertMarkdown("_emphasis_")}
+          aria-label="Italic"
+          disabled={readonly || mode === "preview"}
+          onclick={() => applyMarkdownAction("italic")}
         >
           I
         </Button>
         <Button
           variant="ghost"
           size="sm"
-          onclick={() => insertMarkdown("[label](https://example.com)")}
+          aria-label="Link"
+          disabled={readonly || mode === "preview"}
+          onclick={() => applyMarkdownAction("link")}
         >
           Link
         </Button>
-        <Button variant="ghost" size="sm" onclick={() => insertImage()}>
+        <Button
+          variant="ghost"
+          size="sm"
+          disabled={readonly || mode === "preview"}
+          onclick={() => insertImage()}
+        >
           Image
         </Button>
         <Button
           variant="ghost"
           size="sm"
+          disabled={readonly || mode === "preview"}
           onclick={() =>
             insertMarkdown("\n```mermaid\ngraph TD\n  A --> B\n```\n")}
         >

@@ -1,4 +1,7 @@
-import type { MiraEditorSelection } from "@lapismd/mira/core";
+import type {
+  MiraEditorSelection,
+  MiraMarkdownActionId,
+} from "@lapismd/mira/core";
 import type {
   MiraAssetResolver,
   MiraCommand,
@@ -93,6 +96,7 @@ export type MiraEditorToolbarProps = {
 };
 
 export type MiraEditorHandle = {
+  applyMarkdownAction: (action: MiraMarkdownActionId) => boolean;
   executeCommand: (commandId: string) => boolean;
   focus: () => void;
   getCommands: () => readonly MiraCommand[];

@@ -19,7 +19,10 @@ import {
   Table2,
   WandSparkles,
 } from "lucide-react";
-import type { MiraEditorSelection } from "@lapismd/mira/core";
+import type {
+  MiraEditorSelection,
+  MiraMarkdownActionId,
+} from "@lapismd/mira/core";
 import {
   resolveMiraExtensions,
   type MiraMode,
@@ -285,6 +288,8 @@ export const MiraEditor = forwardRef<MiraEditorHandle, MiraEditorProps>(
 
     const toolbarContext = useMemo<MiraEditorToolbarActionContext>(
       () => ({
+        applyMarkdownAction: (action) =>
+          editorRef.current?.applyMarkdownAction(action) ?? false,
         focus: () => editorRef.current?.focus(),
         getIndentGuides: () => indentGuides,
         getIndentWidth: () => indentWidth,
@@ -325,6 +330,12 @@ export const MiraEditor = forwardRef<MiraEditorHandle, MiraEditorProps>(
     useImperativeHandle(
       ref,
       () => ({
+        applyMarkdownAction(action: MiraMarkdownActionId) {
+          if (readonly || mode === "preview") {
+            return false;
+          }
+          return editorRef.current?.applyMarkdownAction(action) ?? false;
+        },
         executeCommand(commandId) {
           return editorRef.current?.executeCommand(commandId) ?? false;
         },
@@ -367,6 +378,7 @@ export const MiraEditor = forwardRef<MiraEditorHandle, MiraEditorProps>(
         handleSetMode,
         handleSetReadonly,
         mode,
+        readonly,
         resolvedExtensionContributions.commands,
         value,
       ],

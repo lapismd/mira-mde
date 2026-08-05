@@ -1,9 +1,13 @@
 import { tick } from "svelte";
 import { mount, unmount } from "svelte";
 import BoldIcon from "@lucide/svelte/icons/bold";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import MiraEditorToolbar from "./mira-editor-toolbar.svelte";
-import { MiraFeature, type MiraFeatureFlags } from "./features";
+import {
+  MiraFeature,
+  type MiraEditorToolbarActionContext,
+  type MiraFeatureFlags,
+} from "./features";
 import type { MiraEditorToolbarProps } from "./types";
 
 const noInsertItems: MiraFeatureFlags = {
@@ -49,6 +53,87 @@ function toolbarAction(id: string) {
     run: () => undefined,
   };
 }
+
+function actionContext(
+  overrides: Partial<MiraEditorToolbarActionContext> = {},
+): MiraEditorToolbarActionContext {
+  return {
+    value: "word",
+    mode: "source",
+    readonly: false,
+    focus: () => undefined,
+    getMarkdown: () => "word",
+    getMode: () => "source",
+    getSelection: () => null,
+    insertMarkdown: () => undefined,
+    setMarkdown: () => undefined,
+    setMode: () => undefined,
+    setReadonly: () => undefined,
+    setSelection: () => undefined,
+    ...overrides,
+  };
+}
+
+describe("default Markdown toolbar actions", () => {
+  it("delegates smart actions through an integrated editor context", async () => {
+    const applyMarkdownAction = vi.fn(() => true);
+    const insertMarkdown = vi.fn();
+    const toolbar = await renderToolbar({
+      context: actionContext({ applyMarkdownAction, insertMarkdown }),
+      featureConfigs: {
+        [MiraFeature.Toolbar]: {
+          items: ["heading", "strikethrough", "inlineCode", "numberedList"],
+        },
+      },
+    });
+
+    toolbar.target
+      .querySelector<HTMLButtonElement>('[aria-label="Strikethrough"]')
+      ?.click();
+
+    expect(applyMarkdownAction).toHaveBeenCalledWith("strikethrough");
+    expect(insertMarkdown).not.toHaveBeenCalled();
+    expect(
+      toolbar.target.querySelector('[aria-label="Inline code"]'),
+    ).toBeTruthy();
+    expect(
+      toolbar.target.querySelector('[aria-label="Numbered list"]'),
+    ).toBeTruthy();
+    toolbar.destroy();
+  });
+
+  it("retains template insertion for a standalone toolbar", async () => {
+    const onInsertMarkdown = vi.fn();
+    const toolbar = await renderToolbar({
+      onInsertMarkdown,
+      featureConfigs: {
+        [MiraFeature.Toolbar]: { items: ["bold"] },
+      },
+    });
+
+    toolbar.target
+      .querySelector<HTMLButtonElement>('[aria-label="Bold"]')
+      ?.click();
+    expect(onInsertMarkdown).toHaveBeenCalledWith("**strong**");
+    toolbar.destroy();
+  });
+
+  it("disables built-in actions in readonly and reading modes", async () => {
+    const preview = await renderToolbar({ mode: "preview" });
+    expect(
+      preview.target.querySelector<HTMLButtonElement>('[aria-label="Bold"]')
+        ?.disabled,
+    ).toBe(true);
+    preview.destroy();
+
+    const readonly = await renderToolbar({ readonly: true });
+    expect(
+      readonly.target.querySelector<HTMLButtonElement>('[aria-label="Bold"]')
+        ?.disabled,
+    ).toBe(true);
+    readonly.destroy();
+  });
+});
 
 describe("default toolbar separators", () => {
   it("does not render separators when only view controls are visible", async () => {

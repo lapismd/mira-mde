@@ -1,6 +1,9 @@
 import { mermaidExtension } from "@lapismd/mira-plugin-mermaid";
 import type { Component } from "svelte";
-import type { MiraEditorSelection } from "@lapismd/mira/core";
+import type {
+  MiraEditorSelection,
+  MiraMarkdownActionId,
+} from "@lapismd/mira/core";
 import {
   createSlashSnippet,
   type MiraExtension,
@@ -43,8 +46,11 @@ export type MiraEditorToolbarItem =
   | "heading"
   | "bold"
   | "italic"
+  | "strikethrough"
+  | "inlineCode"
   | "quote"
   | "bulletList"
+  | "numberedList"
   | "taskList"
   | "link"
   | "image"
@@ -65,6 +71,7 @@ export type MiraEditorToolbarActionContext = {
   getIndentWidth?: () => number;
   getIndentWithTabs?: () => boolean;
   getSelection: () => MiraEditorSelection | null;
+  applyMarkdownAction?: (action: MiraMarkdownActionId) => boolean;
   insertMarkdown: (markdown: string) => void;
   insertImage?: () => void;
   setIndentGuides?: (enabled: boolean) => void;
@@ -213,8 +220,11 @@ const defaultToolbarItems: MiraEditorToolbarItem[] = [
   "heading",
   "bold",
   "italic",
+  "strikethrough",
+  "inlineCode",
   "quote",
   "bulletList",
+  "numberedList",
   "taskList",
   "link",
   "image",
@@ -482,11 +492,13 @@ function isToolbarItemAvailable(
   switch (item) {
     case "bold":
     case "italic":
+    case "strikethrough":
       return features[MiraFeature.Formatting];
     case "heading":
       return features[MiraFeature.Headings];
     case "quote":
     case "bulletList":
+    case "numberedList":
     case "taskList":
       return features[MiraFeature.Lists];
     case "link":
@@ -499,6 +511,7 @@ function isToolbarItemAvailable(
       return features[MiraFeature.GridTables];
     case "mermaid":
       return features[MiraFeature.Mermaid];
+    case "inlineCode":
     case "code":
       return features[MiraFeature.Code];
     case "math":

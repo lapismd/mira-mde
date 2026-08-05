@@ -46,6 +46,37 @@ describe("Mira Editor feature resolution", () => {
     ).not.toEqual(expect.arrayContaining(["mermaid", "table"]));
   });
 
+  it("includes every smart action in the default toolbar", () => {
+    expect(resolveMiraEditorToolbarItems()).toEqual(
+      expect.arrayContaining([
+        "heading",
+        "bold",
+        "italic",
+        "strikethrough",
+        "inlineCode",
+        "quote",
+        "bulletList",
+        "numberedList",
+        "taskList",
+        "link",
+      ]),
+    );
+  });
+
+  it("filters new smart actions through their owning features", () => {
+    expect(
+      resolveMiraEditorToolbarItems({
+        features: {
+          [MiraFeature.Formatting]: false,
+          [MiraFeature.Code]: false,
+          [MiraFeature.Lists]: false,
+        },
+      }),
+    ).not.toEqual(
+      expect.arrayContaining(["strikethrough", "inlineCode", "numberedList"]),
+    );
+  });
+
   it("maps mode features to available modes", () => {
     expect(
       resolveMiraEditorModes({

@@ -32,6 +32,7 @@ export {
   isMiraEditMode,
   miraEditorModeLabels,
   miraEditorToolbarItemLabels,
+  markdownActionForMiraToolbarItem,
   miraViewOptionsLabel,
   miraViewToggleLabel,
   resolveMiraAlternateEditMode,
@@ -70,5 +71,6 @@ export type {
   ResolvedMiraEditorFeatures,
 } from "./features";
 export type { MiraViewModeMenuItem } from "./toolbar-model";
+export type { MiraMarkdownActionId } from "@lapismd/mira/core";
 export { MIRA_EDITOR_VERSION } from "./version";
 export default MiraEditor;

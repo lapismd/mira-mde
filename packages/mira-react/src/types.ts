@@ -1,4 +1,7 @@
-import type { MiraEditorSelection } from "@lapismd/mira/core";
+import type {
+  MiraEditorSelection,
+  MiraMarkdownActionId,
+} from "@lapismd/mira/core";
 import type {
   MiraAssetResolver,
   MiraCommand,
@@ -33,6 +36,7 @@ export type MiraReactIcon = ComponentType<{
 export type MiraEditorEditMode = Extract<MiraMode, "live-preview" | "source">;
 
 export type MiraHandle = {
+  applyMarkdownAction: (action: MiraMarkdownActionId) => boolean;
   executeCommand: (commandId: string) => boolean;
   focus: () => void;
   getCommands: () => readonly MiraCommand[];
@@ -119,8 +123,11 @@ export type MiraEditorToolbarItem =
   | "heading"
   | "bold"
   | "italic"
+  | "strikethrough"
+  | "inlineCode"
   | "quote"
   | "bulletList"
+  | "numberedList"
   | "taskList"
   | "link"
   | "image"
@@ -134,6 +141,7 @@ export type MiraEditorToolbarActionContext = {
   value: string;
   mode: MiraMode;
   readonly: boolean;
+  applyMarkdownAction?: (action: MiraMarkdownActionId) => boolean;
   focus: () => void;
   getIndentGuides?: () => boolean;
   getIndentWidth?: () => number;

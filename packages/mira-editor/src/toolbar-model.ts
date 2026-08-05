@@ -1,3 +1,4 @@
+import type { MiraMarkdownActionId } from "@lapismd/mira/core";
 import type { MiraMode } from "@lapismd/mira/extensions";
 import type { MiraEditorEditMode, MiraEditorToolbarItem } from "./features";
 
@@ -21,8 +22,11 @@ export const miraEditorToolbarItemLabels: Record<
   heading: "Heading",
   bold: "Bold",
   italic: "Italic",
+  strikethrough: "Strikethrough",
+  inlineCode: "Inline code",
   quote: "Blockquote",
   bulletList: "Bullet list",
+  numberedList: "Numbered list",
   taskList: "Task list",
   link: "Link",
   image: "Image",
@@ -156,10 +160,16 @@ export function templateForMiraToolbarItem(
       return "**strong**";
     case "italic":
       return "_emphasis_";
+    case "strikethrough":
+      return "~~strikethrough~~";
+    case "inlineCode":
+      return "`code`";
     case "quote":
       return "> Quote";
     case "bulletList":
       return "- List item";
+    case "numberedList":
+      return "1. List item";
     case "taskList":
       return "- [ ] Task";
     case "link":
@@ -176,5 +186,25 @@ export function templateForMiraToolbarItem(
       return "$E = mc^2$";
     case "mermaid":
       return "\n```mermaid\nflowchart TD\n  A[Start] --> B[Done]\n```\n";
+  }
+}
+
+export function markdownActionForMiraToolbarItem(
+  item: MiraEditorToolbarItem,
+): MiraMarkdownActionId | null {
+  switch (item) {
+    case "heading":
+    case "bold":
+    case "italic":
+    case "strikethrough":
+    case "inlineCode":
+    case "quote":
+    case "bulletList":
+    case "numberedList":
+    case "taskList":
+    case "link":
+      return item;
+    default:
+      return null;
   }
 }

@@ -1,5 +1,5 @@
 import { EditorSelection, EditorState } from "@codemirror/state";
-import { undo } from "@codemirror/commands";
+import { redo, undo } from "@codemirror/commands";
 import { describe, expect, it } from "vitest";
 import { createBaseCodeMirrorExtensions } from "../internal/codemirror/base";
 import { createMarkdownCodeMirrorExtensions } from "../internal/codemirror/markdown";
@@ -96,9 +96,9 @@ describe("inline Markdown toolbar actions", () => {
   });
 
   it("inserts empty delimiter pairs on whitespace and places the caret inside", () => {
-    const result = apply("one  two", "bold", 4);
-    expect(result.value).toBe("one **** two");
-    expect(result.selection.anchor).toBe(6);
+    const result = apply("one two", "bold", 3);
+    expect(result.value).toBe("one**** two");
+    expect(result.selection.anchor).toBe(5);
   });
 
   it("uses a longer inline-code fence when the selection contains backticks", () => {
@@ -138,6 +138,25 @@ describe("inline Markdown toolbar actions", () => {
     expect(changes).toEqual([{ value: "**word**", event: "input.format" }]);
     expect(undo(controller.view)).toBe(true);
     expect(controller.getValue()).toBe("word");
+    expect(redo(controller.view)).toBe(true);
+    expect(controller.getValue()).toBe("**word**");
+  });
+
+  it("preserves the editor scroll position while restoring focus", () => {
+    const controller = createController("word");
+    const host = document.createElement("div");
+    document.body.append(host);
+    controller.mount(host);
+    select(controller, 2);
+    controller.view.scrollDOM.scrollTop = 31;
+    controller.view.scrollDOM.scrollLeft = 7;
+
+    expect(controller.applyMarkdownAction("bold")).toBe(true);
+    expect(controller.view.hasFocus).toBe(true);
+    expect(controller.view.scrollDOM.scrollTop).toBe(31);
+    expect(controller.view.scrollDOM.scrollLeft).toBe(7);
+    controller.destroy();
+    host.remove();
   });
 
   it("rejects authoring actions in a readonly editor", () => {

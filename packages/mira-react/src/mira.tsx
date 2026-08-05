@@ -4,6 +4,7 @@ import {
   createMiraEditorController,
   openImageFilePicker,
   type MiraEditorController,
+  type MiraMarkdownActionId,
 } from "@lapismd/mira/core";
 import {
   executeMiraCommand,
@@ -151,6 +152,16 @@ export const Mira = forwardRef<MiraHandle, MiraProps>(function Mira(
       openImageFilePicker(controller.view, imageConfig);
     }
   }, [imageConfig]);
+
+  const handleApplyMarkdownAction = useCallback(
+    (action: MiraMarkdownActionId): boolean => {
+      if (readonlyRef.current || modeRef.current === "preview") {
+        return false;
+      }
+      return controllerRef.current?.applyMarkdownAction(action) ?? false;
+    },
+    [modeRef, readonlyRef],
+  );
 
   const createExtensionRuntimeContext = useCallback(
     (
@@ -364,6 +375,7 @@ export const Mira = forwardRef<MiraHandle, MiraProps>(function Mira(
   useImperativeHandle(
     ref,
     () => ({
+      applyMarkdownAction: handleApplyMarkdownAction,
       executeCommand,
       focus() {
         controllerRef.current?.focus();
@@ -397,6 +409,7 @@ export const Mira = forwardRef<MiraHandle, MiraProps>(function Mira(
     }),
     [
       handleInsertImage,
+      handleApplyMarkdownAction,
       handleInsertMarkdown,
       executeCommand,
       isCommandEnabled,
@@ -455,29 +468,34 @@ export const Mira = forwardRef<MiraHandle, MiraProps>(function Mira(
           <div className="mira__actions">
             <button
               className="mira-ui-button mira-ui-button--ghost mira-ui-button--sm"
-              onClick={() => handleInsertMarkdown("**strong**")}
+              aria-label="Bold"
+              disabled={readonly || mode === "preview"}
+              onClick={() => handleApplyMarkdownAction("bold")}
               type="button"
             >
               B
             </button>
             <button
               className="mira-ui-button mira-ui-button--ghost mira-ui-button--sm"
-              onClick={() => handleInsertMarkdown("_emphasis_")}
+              aria-label="Italic"
+              disabled={readonly || mode === "preview"}
+              onClick={() => handleApplyMarkdownAction("italic")}
               type="button"
             >
               I
             </button>
             <button
               className="mira-ui-button mira-ui-button--ghost mira-ui-button--sm"
-              onClick={() =>
-                handleInsertMarkdown("[label](https://example.com)")
-              }
+              aria-label="Link"
+              disabled={readonly || mode === "preview"}
+              onClick={() => handleApplyMarkdownAction("link")}
               type="button"
             >
               Link
             </button>
             <button
               className="mira-ui-button mira-ui-button--ghost mira-ui-button--sm"
+              disabled={readonly || mode === "preview"}
               onClick={handleInsertImage}
               type="button"
             >

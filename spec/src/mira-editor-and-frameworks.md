@@ -24,6 +24,11 @@ same controller and rendering contracts.
 View controls belong at the end of the toolbar. Consumers own surrounding
 application shells, routes, persistence, and domain state.
 
+Integrated toolbars delegate smart Markdown items through the public editor
+handle. A standalone toolbar without an editor context retains template
+insertion, while readonly and pure reading surfaces disable built-in authoring
+items.
+
 The batteries-included editor, plugins, React adapter, and Vanilla adapter
 consume only built public roots or documented subpath exports. They do not link
 to the consolidated workspace's private source directories. React exports

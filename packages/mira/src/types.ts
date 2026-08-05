@@ -11,7 +11,10 @@ import type {
   MiraTheme,
   MiraTemplateSelection,
 } from "@lapismd/mira/extensions";
-import type { MiraEditorSelection } from "@lapismd/mira/core";
+import type {
+  MiraEditorSelection,
+  MiraMarkdownActionId,
+} from "@lapismd/mira/core";
 import type {
   FrontmatterConfig,
   MarkdownOutlineVariant,
@@ -55,6 +58,7 @@ export type MiraProps = {
 };
 
 export type MiraHandle = {
+  applyMarkdownAction: (action: MiraMarkdownActionId) => boolean;
   executeCommand: (commandId: string) => boolean;
   focus: () => void;
   getCommands: () => readonly MiraCommand[];

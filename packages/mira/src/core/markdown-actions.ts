@@ -66,13 +66,16 @@ export function applyMiraMarkdownAction(
     return false;
   }
 
+  const scrollTop = view.scrollDOM.scrollTop;
+  const scrollLeft = view.scrollDOM.scrollLeft;
   view.dispatch({
     changes: edit.changes,
     selection: edit.selection,
-    scrollIntoView: true,
     annotations: Transaction.userEvent.of("input.format"),
   });
   view.focus();
+  view.scrollDOM.scrollTop = scrollTop;
+  view.scrollDOM.scrollLeft = scrollLeft;
   return true;
 }
 
@@ -375,6 +378,12 @@ function wordAtCaret(
   state: EditorState,
   caret: number,
 ): { from: number; to: number } | null {
+  if (
+    caret < state.doc.length &&
+    /\s/u.test(state.sliceDoc(caret, caret + 1))
+  ) {
+    return null;
+  }
   const direct = state.wordAt(caret);
   if (direct && direct.from <= caret && direct.to >= caret) {
     return direct;

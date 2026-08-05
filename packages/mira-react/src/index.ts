@@ -46,4 +46,5 @@ export type {
   MiraReactIcon,
   ResolvedMiraEditorFeatures,
 } from "./types";
+export type { MiraMarkdownActionId } from "@lapismd/mira/core";
 export default Mira;

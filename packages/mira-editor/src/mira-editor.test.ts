@@ -5,6 +5,30 @@ import type { MiraEditorHandle } from "./types";
 import MiraEditor from "./mira-editor.svelte";
 
 describe("MiraEditor extension contributions", () => {
+  it("exposes context-aware Markdown actions on the public handle", async () => {
+    const target = document.createElement("div");
+    document.body.append(target);
+    const component = mount(MiraEditor, {
+      target,
+      props: { value: "word", mode: "source" },
+    }) as unknown as MiraEditorHandle;
+
+    await tick();
+    component.setSelection({
+      anchor: { line: 0, ch: 2 },
+      head: { line: 0, ch: 2 },
+    });
+    expect(component.applyMarkdownAction("bold")).toBe(true);
+    expect(component.getMarkdown()).toBe("**word**");
+
+    component.setMode("preview");
+    expect(component.applyMarkdownAction("italic")).toBe(false);
+    expect(component.getMarkdown()).toBe("**word**");
+
+    await unmount(component as never);
+    target.remove();
+  });
+
   it("applies targeted appearance to the shell and portaled menus", async () => {
     const target = document.createElement("div");
     document.body.append(target);

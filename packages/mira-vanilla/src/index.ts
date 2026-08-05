@@ -126,6 +126,9 @@ export function createMiraEditor(
   }
 
   return {
+    applyMarkdownAction(action) {
+      return component.applyMarkdownAction(action);
+    },
     destroy() {
       unmount(component as never);
     },
@@ -188,4 +191,5 @@ export function createMiraEditor(
 }
 
 export type { MiraEditorHandle, MiraEditorProps, MiraProps };
+export type { MiraMarkdownActionId } from "@lapismd/mira";
 export default createMira;

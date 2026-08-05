@@ -11,7 +11,10 @@
   import TableIcon from "@lucide/svelte/icons/table-2";
   import WandSparklesIcon from "@lucide/svelte/icons/wand-sparkles";
   import { Mira, type MiraHandle } from "@lapismd/mira";
-  import type { MiraEditorSelection } from "@lapismd/mira/core";
+  import type {
+    MiraEditorSelection,
+    MiraMarkdownActionId,
+  } from "@lapismd/mira/core";
   import {
     resolveMiraExtensions,
     type MiraMode,
@@ -156,6 +159,7 @@
       value,
       mode,
       readonly,
+      applyMarkdownAction,
       focus,
       getIndentGuides: () => indentGuides,
       getIndentWidth: () => indentWidth,
@@ -230,6 +234,13 @@
     selection?: MiraTemplateSelection,
   ): void {
     editor?.insertMarkdown(markdown, selection);
+  }
+
+  export function applyMarkdownAction(action: MiraMarkdownActionId): boolean {
+    if (readonly || mode === "preview") {
+      return false;
+    }
+    return editor?.applyMarkdownAction(action) ?? false;
   }
 
   export function insertImage(): void {

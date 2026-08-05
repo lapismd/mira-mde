@@ -1,6 +1,7 @@
 import { mount, tick, unmount } from "svelte";
 import { describe, expect, it } from "vitest";
 import Mira from "./mira.svelte";
+import type { MiraHandle } from "./types";
 
 describe("Mira", () => {
   it("exports the Svelte component", () => {
@@ -44,6 +45,32 @@ describe("Mira", () => {
     expect(root?.hasAttribute("data-mira-color-mode")).toBe(false);
 
     await unmount(component);
+    target.remove();
+  });
+
+  it("uses the shared action engine through its handle and minimal toolbar", async () => {
+    const target = document.createElement("div");
+    document.body.append(target);
+    const component = mount(Mira, {
+      target,
+      props: { value: "word", mode: "source" },
+    }) as unknown as MiraHandle;
+
+    await tick();
+    component.setSelection({
+      anchor: { line: 0, ch: 2 },
+      head: { line: 0, ch: 2 },
+    });
+    target.querySelector<HTMLButtonElement>('[aria-label="Bold"]')?.click();
+    expect(component.getMarkdown()).toBe("**word**");
+    expect(component.applyMarkdownAction("bold")).toBe(true);
+    expect(component.getMarkdown()).toBe("word");
+
+    component.setMode("preview");
+    expect(component.applyMarkdownAction("italic")).toBe(false);
+    expect(component.getMarkdown()).toBe("word");
+
+    await unmount(component as never);
     target.remove();
   });
 });

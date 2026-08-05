@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   isMiraEditMode,
+  markdownActionForMiraToolbarItem,
   miraEditorToolbarItemLabels,
   miraViewToggleLabel,
   resolveMiraModeAfterSplit,
@@ -54,7 +55,17 @@ describe("toolbar model", () => {
   it("exposes labels and templates for framework renderers", () => {
     expect(isMiraEditMode("source")).toBe(true);
     expect(miraEditorToolbarItemLabels.bold).toBe("Bold");
+    expect(miraEditorToolbarItemLabels.strikethrough).toBe("Strikethrough");
+    expect(miraEditorToolbarItemLabels.inlineCode).toBe("Inline code");
+    expect(miraEditorToolbarItemLabels.numberedList).toBe("Numbered list");
     expect(templateForMiraToolbarItem("bold")).toBe("**strong**");
+    expect(templateForMiraToolbarItem("strikethrough")).toBe(
+      "~~strikethrough~~",
+    );
+    expect(templateForMiraToolbarItem("inlineCode")).toBe("`code`");
+    expect(templateForMiraToolbarItem("numberedList")).toBe("1. List item");
+    expect(markdownActionForMiraToolbarItem("bold")).toBe("bold");
+    expect(markdownActionForMiraToolbarItem("code")).toBeNull();
     expect(templateForMiraToolbarItem("gridTable")).toContain("+========+");
   });
 });

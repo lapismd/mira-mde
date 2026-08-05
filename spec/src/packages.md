@@ -34,6 +34,10 @@ install internal CodeMirror, renderer, UI, or theme workspaces separately.
 is part of its default feature set. The AI plugin remains opt-in. React and
 Vanilla depend only on the public products they adapt.
 
+The Markdown action identifier is exported additively from Mira and re-exported
+by the editor, React, and Vanilla entry points. Their handles delegate to Mira's
+controller so every framework uses the same transaction semantics.
+
 Repository-only tools such as `@lapismd/storybook-addon-visual-delta` belong in
 the private root manifest. They are not part of the six-package public release
 set and MUST NOT appear in packed consumer dependency graphs. The root consumes

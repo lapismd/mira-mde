@@ -1,5 +1,5 @@
 import { createRoot } from "react-dom/client";
-import { act, useState } from "react";
+import { act, createRef, useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { Bold } from "lucide-react";
 import type {
@@ -12,6 +12,7 @@ import {
   MiraFeature,
   Mira,
   resolveMiraEditorFeatures,
+  type MiraEditorHandle,
 } from ".";
 
 describe("@lapismd/mira-react", () => {
@@ -82,6 +83,68 @@ describe("@lapismd/mira-react", () => {
     act(() => {
       root.unmount();
     });
+  });
+
+  it("delegates toolbar clicks and the public handle to smart actions", () => {
+    const host = document.createElement("div");
+    const root = createRoot(host);
+    const editor = createRef<MiraEditorHandle>();
+
+    act(() => {
+      root.render(
+        <MiraEditor ref={editor} defaultMode="source" defaultValue="word" />,
+      );
+    });
+    act(() => {
+      editor.current?.setSelection({
+        anchor: { line: 0, ch: 2 },
+        head: { line: 0, ch: 2 },
+      });
+      host.querySelector<HTMLButtonElement>('[aria-label="Bold"]')?.click();
+    });
+    expect(editor.current?.getMarkdown()).toBe("**word**");
+
+    act(() => {
+      expect(editor.current?.applyMarkdownAction("bold")).toBe(true);
+    });
+    expect(editor.current?.getMarkdown()).toBe("word");
+
+    act(() => root.unmount());
+  });
+
+  it("retains standalone template insertion and disables reading actions", () => {
+    const host = document.createElement("div");
+    const root = createRoot(host);
+    const onInsertMarkdown = vi.fn();
+
+    act(() => {
+      root.render(
+        <MiraEditorToolbar
+          mode="preview"
+          onInsertMarkdown={onInsertMarkdown}
+          featureConfigs={{
+            [MiraFeature.Toolbar]: { items: ["bold"] },
+          }}
+        />,
+      );
+    });
+    const bold = host.querySelector<HTMLButtonElement>('[aria-label="Bold"]');
+    expect(bold?.disabled).toBe(true);
+
+    act(() => {
+      root.render(
+        <MiraEditorToolbar
+          mode="source"
+          onInsertMarkdown={onInsertMarkdown}
+          featureConfigs={{
+            [MiraFeature.Toolbar]: { items: ["bold"] },
+          }}
+        />,
+      );
+    });
+    act(() => bold?.click());
+    expect(onInsertMarkdown).toHaveBeenCalledWith("**strong**");
+    act(() => root.unmount());
   });
 
   it("renders the simplified view controls with configurable default edit mode", () => {

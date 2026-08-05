@@ -4,6 +4,7 @@ import {
   Braces,
   Check,
   Code,
+  CodeXml,
   Columns2,
   Ellipsis,
   FileCode,
@@ -13,8 +14,10 @@ import {
   Link,
   List,
   ListChecks,
+  ListOrdered,
   PencilLine,
   Quote,
+  Strikethrough,
   Table2,
   TableCellsSplit,
   Workflow,
@@ -30,6 +33,7 @@ import {
 import type { MiraMode } from "@lapismd/mira/extensions";
 import {
   isMiraEditMode,
+  markdownActionForMiraToolbarItem,
   miraEditorToolbarItemLabels,
   miraViewOptionsLabel,
   miraViewToggleLabel,
@@ -80,8 +84,11 @@ const toolbarItemIcons: Record<MiraEditorToolbarItem, MiraReactIcon> = {
   heading: Heading1,
   bold: Bold,
   italic: Italic,
+  strikethrough: Strikethrough,
+  inlineCode: CodeXml,
   quote: Quote,
   bulletList: List,
+  numberedList: ListOrdered,
   taskList: ListChecks,
   link: Link,
   image: Image,
@@ -253,6 +260,23 @@ export function MiraEditorToolbar({
   const actionContext = useCallback(
     () => context ?? fallbackContext(),
     [context, fallbackContext],
+  );
+
+  const runToolbarItem = useCallback(
+    (item: MiraEditorToolbarItem) => {
+      const activeContext = actionContext();
+      if (item === "image" && activeContext.insertImage) {
+        activeContext.insertImage();
+        return;
+      }
+      const action = markdownActionForMiraToolbarItem(item);
+      if (action && activeContext.applyMarkdownAction) {
+        activeContext.applyMarkdownAction(action);
+        return;
+      }
+      activeContext.insertMarkdown(templateForMiraToolbarItem(item));
+    },
+    [actionContext],
   );
 
   const dynamicBoolean = useCallback(
@@ -468,15 +492,9 @@ export function MiraEditorToolbar({
                 <button
                   aria-label={miraEditorToolbarItemLabels[item]}
                   className="mira-toolbar__button"
-                  disabled={readonly}
+                  disabled={readonly || mode === "preview"}
                   key={item}
-                  onClick={() =>
-                    item === "image" && actionContext().insertImage
-                      ? actionContext().insertImage()
-                      : actionContext().insertMarkdown(
-                          templateForMiraToolbarItem(item),
-                        )
-                  }
+                  onClick={() => runToolbarItem(item)}
                   title={miraEditorToolbarItemLabels[item]}
                   type="button"
                 >

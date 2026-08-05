@@ -7,4 +7,5 @@ export type {
   MiraProps,
   MiraOutlineVariant,
 } from "./types";
+export type { MiraMarkdownActionId } from "./core";
 export default Mira;

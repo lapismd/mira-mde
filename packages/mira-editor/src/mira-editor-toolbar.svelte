@@ -4,6 +4,7 @@
   import BracesIcon from "@lucide/svelte/icons/braces";
   import CheckIcon from "@lucide/svelte/icons/check";
   import CodeIcon from "@lucide/svelte/icons/code";
+  import CodeXmlIcon from "@lucide/svelte/icons/code-xml";
   import Columns2Icon from "@lucide/svelte/icons/columns-2";
   import EllipsisIcon from "@lucide/svelte/icons/ellipsis";
   import FileCodeIcon from "@lucide/svelte/icons/file-code";
@@ -15,10 +16,12 @@
   import LinkIcon from "@lucide/svelte/icons/link";
   import ListIcon from "@lucide/svelte/icons/list";
   import ListChecksIcon from "@lucide/svelte/icons/list-checks";
+  import ListOrderedIcon from "@lucide/svelte/icons/list-ordered";
   import ListTreeIcon from "@lucide/svelte/icons/list-tree";
   import PencilLineIcon from "@lucide/svelte/icons/pencil-line";
   import QuoteIcon from "@lucide/svelte/icons/quote";
   import SpaceIcon from "@lucide/svelte/icons/space";
+  import StrikethroughIcon from "@lucide/svelte/icons/strikethrough";
   import Table2Icon from "@lucide/svelte/icons/table-2";
   import TableCellsSplitIcon from "@lucide/svelte/icons/table-cells-split";
   import WorkflowIcon from "@lucide/svelte/icons/workflow";
@@ -47,6 +50,7 @@
   } from "./features";
   import {
     isMiraEditMode,
+    markdownActionForMiraToolbarItem,
     miraEditorToolbarItemLabels,
     miraViewOptionsLabel,
     miraViewToggleLabel,
@@ -135,8 +139,11 @@
     heading: Heading1Icon,
     bold: BoldIcon,
     italic: ItalicIcon,
+    strikethrough: StrikethroughIcon,
+    inlineCode: CodeXmlIcon,
     quote: QuoteIcon,
     bulletList: ListIcon,
+    numberedList: ListOrderedIcon,
     taskList: ListChecksIcon,
     link: LinkIcon,
     image: ImageIcon,
@@ -439,13 +446,19 @@
   });
 
   function insertTemplate(item: MiraEditorToolbarItem): void {
-    if (item === "image" && actionContext().insertImage) {
-      actionContext().insertImage?.();
+    const activeContext = actionContext();
+    if (item === "image" && activeContext.insertImage) {
+      activeContext.insertImage();
+      return;
+    }
+    const action = markdownActionForMiraToolbarItem(item);
+    if (action && activeContext.applyMarkdownAction) {
+      activeContext.applyMarkdownAction(action);
       return;
     }
     const markdown = templateForMiraToolbarItem(item);
     if (markdown) {
-      actionContext().insertMarkdown(markdown);
+      activeContext.insertMarkdown(markdown);
     }
   }
 </script>
@@ -713,7 +726,7 @@
                   <Toolbar.Button
                     {...triggerProps}
                     aria-label={miraEditorToolbarItemLabels[item]}
-                    disabled={readonly}
+                    disabled={readonly || mode === "preview"}
                   >
                     <Icon class="mira-editor__icon" aria-hidden="true" />
                   </Toolbar.Button>
