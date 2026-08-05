@@ -62,6 +62,21 @@ repeat-click results for headings, all four inline formats, links, blockquotes,
 and all three list types in both Source and Live Preview through the public
 handle harness; the focused Chromium project passes both stories.
 
+Final validation passes `pnpm spec:check`, `pnpm catalog:check`, the affected
+Mira, Mira Editor, React, and Vanilla check/test/build gates, `pnpm
+build-storybook`, `pnpm packages:pack`, and `pnpm check:all`. The focused
+Storybook Chromium project passes both Source and Live Preview interactions.
+The compare-only Visual Delta fallback captures all 132 eligible stories
+successfully in 4.2 minutes; strict mode reports the expected review-required
+toolbar-width deltas, while the two new interaction stories remain
+`skip-visual` and no baselines are created or updated. A clean Storybook
+restart clears two transient full-E2E host-readiness failures; the remaining
+two failures are the unrelated indentation caret-placement assertions for
+inactive bullet markers and preformatted list indentation. The requested live
+Carta comparison remains manual because the configured Chrome bridge is not
+available in this environment; automated Chromium acceptance covers the Mira
+interaction contract.
+
 ## Validation tiers
 
 - Specification-only: `pnpm spec:check`.

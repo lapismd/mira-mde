@@ -1,4 +1,4 @@
-import { EditorSelection, EditorState } from "@codemirror/state";
+import { EditorSelection } from "@codemirror/state";
 import { redo, undo } from "@codemirror/commands";
 import { describe, expect, it } from "vitest";
 import { createBaseCodeMirrorExtensions } from "../internal/codemirror/base";
