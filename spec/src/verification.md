@@ -326,11 +326,22 @@ both browser cases and report the expected pending changes of 3,549 reading
 pixels and 3,655 live-preview pixels (1 percent each). Strict comparison exits
 non-zero; no visual baseline is refreshed by this follow-up.
 
-The consecutive-highlight follow-up is in progress against MIRA-MD-017 and
-MIRA-CSS-018. Its acceptance target adds an initially visible list-callout that
-wraps in both focused stories and verifies a positive background-panel gap
-between each adjacent highlighted item in Live Preview and Reading without
-introducing CodeMirror margins or refreshing visual baselines.
+The consecutive-highlight follow-up implements MIRA-MD-017 and MIRA-CSS-018
+with adjacent-line end padding in Live Preview and an adjacent reading-panel
+inset. The focused catalog fixture now includes an initially visible `?`
+highlight that wraps in both stories. Browser geometry measures a 4.0 px gap
+between all three adjacent Live Preview panels and a 3.2 px gap between all
+three Reading panels, while CodeMirror line margins remain zero. The live
+panel's start inset leaves more than 1 px after the rendered bullet, and the
+final Reading panel leaves more than 1 px before the following plain item while
+preserving its content column. The focused Chromium acceptance also verifies
+that the wrapped background spans the full line height and its marker remains
+centered on the first visual row. Visual
+Delta compare-only runs pass both browser cases and report the expected pending
+changes of 31,855 Reading pixels (5 percent) and 29,313 Live Preview pixels
+(5 percent), including the newly visible wrapped example. Strict comparison
+therefore exits non-zero; no visual baseline is created or refreshed by this
+follow-up.
 
 The add-on's Docker stage does not trust authored `storybook-static` output,
 but it transports the affected cache and preview graph and may restore a

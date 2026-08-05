@@ -97,6 +97,7 @@ export const listCalloutsMarkdown = String.raw`# List callouts
 
 - & Highlighted with the default catalog
 - @ Documentation uses the default book icon
+- ? This deliberately long highlighted list item demonstrates how the callout background, marker, and spacing remain consistent when the prose wraps onto another visual row in both live editing and reading mode without changing the underlying Markdown structure.
 - ^ A custom decision marker contributed by an extension
 - % This disabled default stays a plain list item
 `;

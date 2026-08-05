@@ -109,7 +109,9 @@ entry point.
   spacing around the mounted control.
 - Preview styling MUST express consecutive list-highlight separation through
   live-line padding and reading-background insets, keeping the CodeMirror line
-  and widget margin contract unchanged.
+  and widget margin contract unchanged. The live background start inset MUST
+  clear the list bullet, and a reading background followed by a plain list item
+  MUST end before that sibling begins.
 - `tables` exports the supported Markdown and grid-table components and owns
   the `cm-table` raw-line decoration consumed by shipped source and
   live-preview fallback styles.

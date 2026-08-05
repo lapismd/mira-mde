@@ -53,6 +53,9 @@ async function calloutGeometry(
     const triggerRect = trigger.getBoundingClientRect();
     const glyphRect = glyph.getBoundingClientRect();
     const backgroundRect = background?.getBoundingClientRect();
+    const backgroundStyle = background
+      ? getComputedStyle(background)
+      : undefined;
     const contentRange = document.createRange();
     contentRange.selectNodeContents(content);
     const contentRects = Array.from(contentRange.getClientRects()).filter(
@@ -83,6 +86,12 @@ async function calloutGeometry(
       computedLineHeight,
       lineHeight: element.getBoundingClientRect().height,
       backgroundHeight: backgroundRect?.height ?? 0,
+      bulletToPanelGap:
+        backgroundRect && backgroundStyle
+          ? backgroundRect.left +
+            Number.parseFloat(backgroundStyle.paddingLeft) -
+            bulletRect.right
+          : 0,
     };
   }, contentText);
 }
@@ -95,6 +104,95 @@ async function triggerChrome(trigger: Locator) {
       boxShadow: style.boxShadow,
     };
   });
+}
+
+async function livePanelGaps(page: Page) {
+  return page.locator(".cm-line.lc-list-callout").evaluateAll((lines) =>
+    lines.slice(0, -1).map((line, index) => {
+      const background = line.querySelector<HTMLElement>(".lc-list-bg");
+      const nextBackground =
+        lines[index + 1]?.querySelector<HTMLElement>(".lc-list-bg");
+      if (!background || !nextBackground) {
+        throw new Error("Consecutive live-preview callout backgrounds missing");
+      }
+      const backgroundRect = background.getBoundingClientRect();
+      const nextBackgroundRect = nextBackground.getBoundingClientRect();
+      const backgroundStyle = getComputedStyle(background);
+      const nextBackgroundStyle = getComputedStyle(nextBackground);
+      const visualBottom =
+        backgroundRect.bottom -
+        Number.parseFloat(backgroundStyle.paddingBottom);
+      const nextVisualTop =
+        nextBackgroundRect.top +
+        Number.parseFloat(nextBackgroundStyle.paddingTop);
+      const lineStyle = getComputedStyle(line);
+      return {
+        gap: nextVisualTop - visualBottom,
+        marginBlockStart: lineStyle.marginBlockStart,
+        marginBlockEnd: lineStyle.marginBlockEnd,
+      };
+    }),
+  );
+}
+
+async function readingPanelGaps(page: Page) {
+  return page.locator("li.lc-list-callout").evaluateAll((items) =>
+    items.slice(0, -1).map((item, index) => {
+      const nextItem = items[index + 1];
+      if (!nextItem) {
+        throw new Error("Consecutive reading callout item missing");
+      }
+      const itemRect = item.getBoundingClientRect();
+      const nextItemRect = nextItem.getBoundingClientRect();
+      const panel = getComputedStyle(item, "::before");
+      const nextPanel = getComputedStyle(nextItem, "::before");
+      const visualBottom = itemRect.bottom - Number.parseFloat(panel.bottom);
+      const nextVisualTop = nextItemRect.top + Number.parseFloat(nextPanel.top);
+      return nextVisualTop - visualBottom;
+    }),
+  );
+}
+
+async function readingTerminalBoundary(page: Page) {
+  return page
+    .locator("li.lc-list-callout")
+    .last()
+    .evaluate((item) => {
+      const nextItem = item.nextElementSibling as HTMLElement | null;
+      if (!nextItem) {
+        throw new Error("Plain list item after the final highlight is missing");
+      }
+      const itemRect = item.getBoundingClientRect();
+      const nextItemRect = nextItem.getBoundingClientRect();
+      const panel = getComputedStyle(item, "::before");
+      const itemContent = item.querySelector<HTMLElement>("p") ?? item;
+      const nextContent = nextItem.querySelector<HTMLElement>("p") ?? nextItem;
+      return {
+        gap:
+          nextItemRect.top -
+          (itemRect.bottom - Number.parseFloat(panel.bottom)),
+        contentOffset:
+          nextContent.getBoundingClientRect().left -
+          itemContent.getBoundingClientRect().left,
+      };
+    });
+}
+
+async function textRowCount(element: Locator, contentText: string) {
+  return element.evaluate((node, expectedContent) => {
+    const walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT);
+    while (walker.nextNode()) {
+      const text = walker.currentNode as Text;
+      if (text.data.includes(expectedContent)) {
+        const range = document.createRange();
+        range.selectNodeContents(text);
+        return Array.from(range.getClientRects()).filter(
+          (rect) => rect.width > 0 && rect.height > 0,
+        ).length;
+      }
+    }
+    throw new Error("Wrapping list-highlight text is missing");
+  }, contentText);
 }
 
 function expectStableGeometry(
@@ -128,6 +226,7 @@ test("live preview selects and clears resolved list highlights without shifting 
   expect(restChrome.backgroundColor).toBe("rgba(0, 0, 0, 0)");
   expect(restChrome.boxShadow).toBe("none");
   expect(before.triggerLeft).toBeGreaterThanOrEqual(before.bulletRight - 0.5);
+  expect(before.bulletToPanelGap).toBeGreaterThan(1);
   expect(before.markerChromeLeft - before.bulletRight).toBeGreaterThan(1);
   expect(before.contentGap).toBeGreaterThan(3);
   expect(before.contentGap).toBeLessThan(9);
@@ -190,7 +289,7 @@ test("live preview selects and clears resolved list highlights without shifting 
   ).toHaveCount(0);
 });
 
-test("list-highlight text and icons stay compact and centered when the item wraps", async ({
+test("consecutive highlights stay separated and centered when the story item wraps", async ({
   page,
 }) => {
   await gotoStory(page, "markdown-lists--custom-callout-catalog-live");
@@ -202,7 +301,7 @@ test("list-highlight text and icons stay compact and centered when the item wrap
     .locator(".cm-line.lc-list-callout")
     .filter({ hasText: "Documentation uses the default book icon" });
   const wrappedLine = page.locator(".cm-line.lc-list-callout").filter({
-    hasText: "A custom decision marker contributed by an extension",
+    hasText: "This deliberately long highlighted list item",
   });
 
   const textGeometry = await calloutGeometry(textLine);
@@ -210,11 +309,6 @@ test("list-highlight text and icons stay compact and centered when the item wrap
     iconLine,
     "Documentation uses the default book icon",
   );
-  const unwrappedGeometry = await calloutGeometry(
-    wrappedLine,
-    "A custom decision marker contributed by an extension",
-  );
-
   expect(
     Math.abs(iconGeometry.contentLeft - textGeometry.contentLeft),
   ).toBeLessThan(0.75);
@@ -224,27 +318,11 @@ test("list-highlight text and icons stay compact and centered when the item wrap
     Math.abs(iconGeometry.glyphCenterY - iconGeometry.firstContentCenterY),
   ).toBeLessThan(1);
 
-  await page.locator(".mira-story-surface--editor").evaluate((element) => {
-    element.setAttribute(
-      "style",
-      `${element.getAttribute("style") ?? ""}; width: 28rem`,
-    );
-  });
-
-  await expect
-    .poll(async () => {
-      const geometry = await calloutGeometry(
-        wrappedLine,
-        "A custom decision marker contributed by an extension",
-      );
-      return geometry.contentRowCount;
-    })
-    .toBeGreaterThan(1);
-
   const wrappedGeometry = await calloutGeometry(
     wrappedLine,
-    "A custom decision marker contributed by an extension",
+    "This deliberately long highlighted list item",
   );
+  expect(wrappedGeometry.contentRowCount).toBeGreaterThan(1);
   expect(wrappedGeometry.lineHeight).toBeGreaterThan(
     wrappedGeometry.computedLineHeight * 1.5,
   );
@@ -257,19 +335,45 @@ test("list-highlight text and icons stay compact and centered when the item wrap
     ),
   ).toBeLessThan(1);
   expect(
-    Math.abs(wrappedGeometry.contentGap - unwrappedGeometry.contentGap),
+    Math.abs(wrappedGeometry.contentGap - textGeometry.contentGap),
   ).toBeLessThan(0.5);
-});
 
-test("list-highlight pickers stay off read-only and raw-source surfaces", async ({
-  page,
-}) => {
+  const liveGaps = await livePanelGaps(page);
+  expect(liveGaps).toHaveLength(3);
+  for (const panel of liveGaps) {
+    expect(panel.gap).toBeGreaterThan(2.5);
+    expect(panel.marginBlockStart).toBe("0px");
+    expect(panel.marginBlockEnd).toBe("0px");
+  }
+
   await gotoStory(page, "markdown-lists--custom-callout-catalog");
   await expect(
     page.getByRole("button", { name: /Change list highlight/u }),
   ).toHaveCount(0);
-  await expect(page.locator("[data-list-callout-marker]")).toHaveCount(3);
+  await expect(page.locator("[data-list-callout-marker]")).toHaveCount(4);
+  const wrappedReadingItem = page
+    .locator("li.lc-list-callout")
+    .filter({ hasText: "This deliberately long highlighted list item" });
+  await expect(wrappedReadingItem).toBeVisible();
+  expect(
+    await textRowCount(
+      wrappedReadingItem,
+      "This deliberately long highlighted list item",
+    ),
+  ).toBeGreaterThan(1);
+  const readingGaps = await readingPanelGaps(page);
+  expect(readingGaps).toHaveLength(3);
+  for (const gap of readingGaps) {
+    expect(gap).toBeGreaterThan(2.5);
+  }
+  const terminalBoundary = await readingTerminalBoundary(page);
+  expect(terminalBoundary.gap).toBeGreaterThan(1);
+  expect(Math.abs(terminalBoundary.contentOffset)).toBeLessThan(0.5);
+});
 
+test("list-highlight pickers stay off raw-source surfaces", async ({
+  page,
+}) => {
   await gotoStory(page, "demo-comprehensive--source");
   await expect(
     page.getByRole("button", { name: /Change list highlight/u }),

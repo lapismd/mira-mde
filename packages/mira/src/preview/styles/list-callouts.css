@@ -8,6 +8,11 @@
   padding-block-end: 0.35rem;
 }
 
+.markdown-editor-surface
+  .cm-line.lc-list-callout:has(+ .cm-line.lc-list-callout) {
+  padding-block-end: 0.55rem;
+}
+
 .markdown-rendered li.lc-list-callout > :not(ul, ol),
 .markdown-preview-surface .markdown li.lc-list-callout > :not(ul, ol) {
   position: relative;
@@ -29,6 +34,20 @@
   pointer-events: none;
   position: absolute;
   z-index: 0;
+}
+
+.markdown-rendered li.lc-list-callout:has(+ li.lc-list-callout)::before,
+.markdown-preview-surface
+  .markdown
+  li.lc-list-callout:has(+ li.lc-list-callout)::before {
+  inset-block-end: 0.35rem;
+}
+
+.markdown-rendered li.lc-list-callout:has(+ li:not(.lc-list-callout))::before,
+.markdown-preview-surface
+  .markdown
+  li.lc-list-callout:has(+ li:not(.lc-list-callout))::before {
+  inset-block-end: var(--lc-bg-bottom-reading, 0.15rem);
 }
 
 .markdown-rendered .lc-list-marker,
@@ -240,6 +259,7 @@
   padding: inherit;
   pointer-events: none;
   position: absolute;
+  inset-inline-start: var(--lc-bg-start-live, 0.13rem);
   z-index: -1;
 }
 

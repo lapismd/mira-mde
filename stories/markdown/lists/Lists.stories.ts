@@ -177,7 +177,7 @@ export const CustomCalloutCatalog: Story = {
     ).not.toBeInTheDocument();
     await expect(
       canvasElement.querySelectorAll("[data-list-callout-marker]"),
-    ).toHaveLength(3);
+    ).toHaveLength(4);
   },
 };
 
@@ -217,6 +217,9 @@ export const CustomCalloutCatalogLive: Story = {
     ).toBeVisible();
     await expect(
       canvas.getByRole("button", { name: "Change list highlight (@)" }),
+    ).toBeVisible();
+    await expect(
+      canvas.getByRole("button", { name: "Change list highlight (?)" }),
     ).toBeVisible();
     await expect(
       canvas.getByRole("button", { name: "Change list highlight (^)" }),
