@@ -28,9 +28,9 @@ type Story = StoryObj<typeof meta>;
 
 export const Defaults: Story = {
   tags: [
-    "visual-pending",
+    "visual-ready",
+    "!visual-pending",
     "!visual-approved",
-    "!visual-ready",
     "!visual-failed",
   ],
   parameters: {
@@ -49,9 +49,9 @@ export const Defaults: Story = {
 
 export const ReadonlyEditor: Story = {
   tags: [
-    "visual-pending",
+    "visual-ready",
+    "!visual-pending",
     "!visual-approved",
-    "!visual-ready",
     "!visual-failed",
   ],
   parameters: {
@@ -71,9 +71,9 @@ export const ReadonlyEditor: Story = {
 
 export const IndentationSettings: Story = {
   tags: [
-    "visual-pending",
+    "visual-ready",
+    "!visual-pending",
     "!visual-approved",
-    "!visual-ready",
     "!visual-failed",
   ],
   parameters: {
@@ -98,9 +98,9 @@ export const IndentationSettings: Story = {
 
 export const ReadingOptionsSettings: Story = {
   tags: [
-    "visual-pending",
+    "visual-ready",
+    "!visual-pending",
     "!visual-approved",
-    "!visual-ready",
     "!visual-failed",
   ],
   parameters: {

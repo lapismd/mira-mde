@@ -111,9 +111,9 @@ async function expectAboutLogoHalf(
 
 export const MiraLight: Story = {
   tags: [
-    "visual-pending",
+    "visual-ready",
+    "!visual-pending",
     "!visual-approved",
-    "!visual-ready",
     "!visual-failed",
   ],
   parameters: visual(
@@ -134,9 +134,9 @@ export const MiraLight: Story = {
 
 export const MiraDark: Story = {
   tags: [
-    "visual-pending",
+    "visual-ready",
+    "!visual-pending",
     "!visual-approved",
-    "!visual-ready",
     "!visual-failed",
   ],
   parameters: visual(
@@ -156,9 +156,9 @@ export const MiraDark: Story = {
 
 export const ObsidianLight: Story = {
   tags: [
-    "visual-pending",
+    "visual-ready",
+    "!visual-pending",
     "!visual-approved",
-    "!visual-ready",
     "!visual-failed",
   ],
   parameters: visual(
@@ -177,9 +177,9 @@ export const ObsidianLight: Story = {
 
 export const ObsidianDark: Story = {
   tags: [
-    "visual-pending",
+    "visual-ready",
+    "!visual-pending",
     "!visual-approved",
-    "!visual-ready",
     "!visual-failed",
   ],
   parameters: visual(
@@ -198,9 +198,9 @@ export const ObsidianDark: Story = {
 
 export const PageInheritanceAndSystem: Story = {
   tags: [
-    "visual-pending",
+    "visual-ready",
+    "!visual-pending",
     "!visual-approved",
-    "!visual-ready",
     "!visual-failed",
   ],
   parameters: visual(
@@ -227,9 +227,9 @@ export const PageInheritanceAndSystem: Story = {
 
 export const CustomThemeExtendingMira: Story = {
   tags: [
-    "visual-pending",
+    "visual-ready",
+    "!visual-pending",
     "!visual-approved",
-    "!visual-ready",
     "!visual-failed",
   ],
   parameters: visual(
@@ -251,9 +251,9 @@ export const CustomThemeExtendingMira: Story = {
 
 export const CustomThemeExtendingObsidian: Story = {
   tags: [
-    "visual-pending",
+    "visual-ready",
+    "!visual-pending",
     "!visual-approved",
-    "!visual-ready",
     "!visual-failed",
   ],
   parameters: visual(
@@ -275,9 +275,9 @@ export const CustomThemeExtendingObsidian: Story = {
 
 export const TargetedOverride: Story = {
   tags: [
-    "visual-pending",
+    "visual-ready",
+    "!visual-pending",
     "!visual-approved",
-    "!visual-ready",
     "!visual-failed",
   ],
   parameters: visual(

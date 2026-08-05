@@ -35,9 +35,9 @@ type Story = StoryObj<typeof meta>;
 
 export const Preview: Story = {
   tags: [
-    "visual-pending",
+    "visual-ready",
+    "!visual-pending",
     "!visual-approved",
-    "!visual-ready",
     "!visual-failed",
   ],
   parameters: {
@@ -55,9 +55,9 @@ export const Preview: Story = {
 
 export const OutlineNavigation: Story = {
   tags: [
-    "visual-pending",
+    "visual-ready",
+    "!visual-pending",
     "!visual-approved",
-    "!visual-ready",
     "!visual-failed",
   ],
   name: "Outline Navigation",
@@ -130,9 +130,9 @@ export const OutlineNavigation: Story = {
 
 export const OutlineSidebar: Story = {
   tags: [
-    "visual-pending",
+    "visual-ready",
+    "!visual-pending",
     "!visual-approved",
-    "!visual-ready",
     "!visual-failed",
   ],
   name: "Outline Sidebar",
@@ -184,9 +184,9 @@ export const OutlineSidebar: Story = {
 
 export const LivePreview: Story = {
   tags: [
-    "visual-pending",
+    "visual-ready",
+    "!visual-pending",
     "!visual-approved",
-    "!visual-ready",
     "!visual-failed",
   ],
   name: "Live Preview",
@@ -219,9 +219,9 @@ export const LivePreview: Story = {
 
 export const SourceMode: Story = {
   tags: [
-    "visual-pending",
+    "visual-ready",
+    "!visual-pending",
     "!visual-approved",
-    "!visual-ready",
     "!visual-failed",
   ],
   name: "Source Mode",

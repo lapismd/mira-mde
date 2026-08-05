@@ -90,9 +90,9 @@ type Story = StoryObj<typeof meta>;
 
 export const Playground: Story = {
   tags: [
-    "visual-pending",
+    "visual-ready",
+    "!visual-pending",
     "!visual-approved",
-    "!visual-ready",
     "!visual-failed",
   ],
   parameters: {
@@ -169,9 +169,9 @@ export const Playground: Story = {
 
 export const LivePreview: Story = {
   tags: [
-    "visual-pending",
+    "visual-ready",
+    "!visual-pending",
     "!visual-approved",
-    "!visual-ready",
     "!visual-failed",
   ],
   parameters: {
@@ -189,9 +189,9 @@ export const LivePreview: Story = {
 
 export const Source: Story = {
   tags: [
-    "visual-pending",
+    "visual-ready",
+    "!visual-pending",
     "!visual-approved",
-    "!visual-ready",
     "!visual-failed",
   ],
   parameters: {
@@ -208,9 +208,9 @@ export const Source: Story = {
 
 export const ReadingPreview: Story = {
   tags: [
-    "visual-pending",
+    "visual-ready",
+    "!visual-pending",
     "!visual-approved",
-    "!visual-ready",
     "!visual-failed",
   ],
   parameters: {
@@ -228,9 +228,9 @@ export const ReadingPreview: Story = {
 
 export const Split: Story = {
   tags: [
-    "visual-pending",
+    "visual-ready",
+    "!visual-pending",
     "!visual-approved",
-    "!visual-ready",
     "!visual-failed",
   ],
   parameters: {
@@ -247,9 +247,9 @@ export const Split: Story = {
 
 export const Composable: Story = {
   tags: [
-    "visual-pending",
+    "visual-ready",
+    "!visual-pending",
     "!visual-approved",
-    "!visual-ready",
     "!visual-failed",
   ],
   parameters: {
