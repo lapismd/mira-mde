@@ -35,9 +35,9 @@ type Story = StoryObj<typeof meta>;
 
 export const ButtonsAndSeparators: Story = {
   tags: [
-    "visual-ready",
+    "visual-approved",
     "!visual-pending",
-    "!visual-approved",
+    "!visual-ready",
     "!visual-failed",
   ],
   parameters: parameters(
@@ -56,9 +56,9 @@ export const ButtonsAndSeparators: Story = {
 
 export const ToggleGroup: Story = {
   tags: [
-    "visual-ready",
+    "visual-approved",
     "!visual-pending",
-    "!visual-approved",
+    "!visual-ready",
     "!visual-failed",
   ],
   args: { primitive: "toggle-group" },
@@ -79,9 +79,9 @@ export const ToggleGroup: Story = {
 
 export const Toolbar: Story = {
   tags: [
-    "visual-ready",
+    "visual-approved",
     "!visual-pending",
-    "!visual-approved",
+    "!visual-ready",
     "!visual-failed",
   ],
   args: { primitive: "toolbar" },
@@ -102,9 +102,9 @@ export const Toolbar: Story = {
 
 export const DropdownMenu: Story = {
   tags: [
-    "visual-ready",
+    "visual-approved",
     "!visual-pending",
-    "!visual-approved",
+    "!visual-ready",
     "!visual-failed",
   ],
   args: { primitive: "dropdown-menu" },
@@ -140,9 +140,9 @@ export const DropdownMenu: Story = {
 
 export const ContextMenu: Story = {
   tags: [
-    "visual-ready",
+    "visual-approved",
     "!visual-pending",
-    "!visual-approved",
+    "!visual-ready",
     "!visual-failed",
   ],
   args: { primitive: "context-menu" },
@@ -182,9 +182,9 @@ export const ContextMenu: Story = {
 
 export const Dialog: Story = {
   tags: [
-    "visual-ready",
+    "visual-approved",
     "!visual-pending",
-    "!visual-approved",
+    "!visual-ready",
     "!visual-failed",
   ],
   args: { primitive: "dialog" },
@@ -222,9 +222,9 @@ export const Dialog: Story = {
 
 export const Popover: Story = {
   tags: [
-    "visual-ready",
+    "visual-approved",
     "!visual-pending",
-    "!visual-approved",
+    "!visual-ready",
     "!visual-failed",
   ],
   args: { primitive: "popover" },
@@ -260,9 +260,9 @@ export const Popover: Story = {
 
 export const Tooltip: Story = {
   tags: [
-    "visual-ready",
+    "visual-approved",
     "!visual-pending",
-    "!visual-approved",
+    "!visual-ready",
     "!visual-failed",
   ],
   args: { primitive: "tooltip" },
@@ -292,9 +292,9 @@ export const Tooltip: Story = {
 
 export const Table: Story = {
   tags: [
-    "visual-ready",
+    "visual-approved",
     "!visual-pending",
-    "!visual-approved",
+    "!visual-ready",
     "!visual-failed",
   ],
   args: { primitive: "table" },
@@ -315,9 +315,9 @@ export const Table: Story = {
 
 export const ScrollArea: Story = {
   tags: [
-    "visual-ready",
+    "visual-approved",
     "!visual-pending",
-    "!visual-approved",
+    "!visual-ready",
     "!visual-failed",
   ],
   args: { primitive: "scroll-area" },

@@ -35,9 +35,9 @@ type Story = StoryObj<typeof meta>;
 
 export const Preview: Story = {
   tags: [
-    "visual-ready",
+    "visual-approved",
     "!visual-pending",
-    "!visual-approved",
+    "!visual-ready",
     "!visual-failed",
   ],
   parameters: {
@@ -55,9 +55,9 @@ export const Preview: Story = {
 
 export const LivePreview: Story = {
   tags: [
-    "visual-ready",
+    "visual-approved",
     "!visual-pending",
-    "!visual-approved",
+    "!visual-ready",
     "!visual-failed",
   ],
   name: "Live Preview",
@@ -90,9 +90,9 @@ export const LivePreview: Story = {
 
 export const SourceMode: Story = {
   tags: [
-    "visual-ready",
+    "visual-approved",
     "!visual-pending",
-    "!visual-approved",
+    "!visual-ready",
     "!visual-failed",
   ],
   name: "Source Mode",
@@ -140,9 +140,9 @@ export const PropertyActions: Story = {
     Component: FrontmatterActionsStory,
   }),
   tags: [
-    "visual-ready",
+    "visual-approved",
     "!visual-pending",
-    "!visual-approved",
+    "!visual-ready",
     "!visual-failed",
   ],
   play: async ({ canvasElement, step }) => {

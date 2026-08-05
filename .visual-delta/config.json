@@ -13,9 +13,7 @@
   },
   "previewSplitZoomDefault": "fit",
   "diffResultZoomDefault": "100%",
-  "browsers": [
-    "chromium"
-  ],
+  "browsers": ["chromium"],
   "captureWorkspaceIgnore": [],
   "workflow": {
     "autoAcceptLiveStoryComparisons": true,
