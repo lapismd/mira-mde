@@ -6,18 +6,19 @@ install internal CodeMirror, renderer, UI, or theme workspaces separately.
 
 ## Requirements
 
-| ID            | Requirement                                                                                                                                                                                                                                     |
-| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| MIRA-ARCH-006 | The public release set MUST contain exactly `@lapismd/mira`, `@lapismd/mira-editor`, `@lapismd/mira-plugin-ai`, `@lapismd/mira-plugin-mermaid`, `@lapismd/mira-react`, and `@lapismd/mira-vanilla`.                                             |
-| MIRA-ARCH-007 | Public packages MUST use version `0.0.1`, public npm access metadata, explicit export maps, shipped-file lists, side-effect declarations, and package descriptions; repository automation MUST NOT publish them without separate authorization. |
-| MIRA-ARCH-008 | `@lapismd/mira` MUST provide the Svelte-first root plus supported `core`, `extensions`, `codemirror`, `preview`, `tables`, `ui`, theme CSS, and aggregate stylesheet subpaths.                                                                  |
-| MIRA-ARCH-009 | Public package output MUST NOT reference `@mira-mde/*`, `@mira-internal/*`, or another unshipped implementation package.                                                                                                                        |
-| MIRA-ARCH-010 | Public dependencies MUST flow from `mira` to plugins and `mira-editor`, then to React and Vanilla adapters; plugins MUST integrate through supported Mira entry points.                                                                         |
-| MIRA-ARCH-011 | Vue and Solid placeholders MUST remain private under `internal/adapters` until they implement and verify a public adapter contract.                                                                                                             |
-| MIRA-ARCH-012 | Package, symbol, DOM-hook, documentation, catalog, and Storybook identities MUST use the canonical Mira names without compatibility aliases for the pre-release `@mira-mde/*` surface.                                                          |
-| MIRA-ARCH-013 | `@lapismd/mira` MUST export the individual Mira and Obsidian theme stylesheets plus an aggregate stylesheet that loads every built-in palette.                                                                                                  |
-| MIRA-ARCH-014 | `@lapismd/mira-editor` MUST ship the logo used by its default About dialog and export a version constant synchronized with its package manifest, so the dialog remains self-contained for consumers.                                            |
-| MIRA-ARCH-015 | `@lapismd/mira` MUST expose the additive Markdown action identifier and controller operation, and Mira Editor, React, and Vanilla handles and declarative toolbar contexts MUST delegate that operation without duplicating action semantics.   |
+| ID            | Requirement                                                                                                                                                                                                                                            |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| MIRA-ARCH-006 | The public release set MUST contain exactly `@lapismd/mira`, `@lapismd/mira-editor`, `@lapismd/mira-plugin-ai`, `@lapismd/mira-plugin-mermaid`, `@lapismd/mira-react`, and `@lapismd/mira-vanilla`.                                                    |
+| MIRA-ARCH-007 | Public packages MUST use independent stable Semantic Versions, public npm access metadata, explicit export maps, shipped-file lists, side-effect declarations, and package descriptions; the first public version of each package MUST remain `0.0.1`. |
+| MIRA-ARCH-008 | `@lapismd/mira` MUST provide the Svelte-first root plus supported `core`, `extensions`, `codemirror`, `preview`, `tables`, `ui`, theme CSS, and aggregate stylesheet subpaths.                                                                         |
+| MIRA-ARCH-009 | Public package output MUST NOT reference `@mira-mde/*`, `@mira-internal/*`, or another unshipped implementation package.                                                                                                                               |
+| MIRA-ARCH-010 | Public dependencies MUST flow from `mira` to plugins and `mira-editor`, then to React and Vanilla adapters; plugins MUST integrate through supported Mira entry points.                                                                                |
+| MIRA-ARCH-011 | Vue and Solid placeholders MUST remain private under `internal/adapters` until they implement and verify a public adapter contract.                                                                                                                    |
+| MIRA-ARCH-012 | Package, symbol, DOM-hook, documentation, catalog, and Storybook identities MUST use the canonical Mira names without compatibility aliases for the pre-release `@mira-mde/*` surface.                                                                 |
+| MIRA-ARCH-013 | `@lapismd/mira` MUST export the individual Mira and Obsidian theme stylesheets plus an aggregate stylesheet that loads every built-in palette.                                                                                                         |
+| MIRA-ARCH-014 | `@lapismd/mira-editor` MUST ship the logo used by its default About dialog and export a version constant synchronized with its package manifest, so the dialog remains self-contained for consumers.                                                   |
+| MIRA-ARCH-015 | `@lapismd/mira` MUST expose the additive Markdown action identifier and controller operation, and Mira Editor, React, and Vanilla handles and declarative toolbar contexts MUST delegate that operation without duplicating action semantics.          |
+| MIRA-ARCH-016 | Public internal dependencies MUST use pre-1.0-compatible `workspace:~` ranges, release planning MUST follow the public dependency graph, and only packages whose exact local version is absent from npm MAY be selected for publication.               |
 
 ## Public graph
 
@@ -37,6 +38,22 @@ Vanilla depend only on the public products they adapt.
 The Markdown action identifier is exported additively from Mira and re-exported
 by the editor, React, and Vanilla entry points. Their handles delegate to Mira's
 controller so every framework uses the same transaction semantics.
+
+## Release model
+
+The six public packages version independently. Changesets record release intent
+and generate one changelog per affected package; a change to one product does
+not force an unrelated package release. When an internal dependency must move,
+Changesets updates its dependants according to the public graph and the
+pre-1.0-compatible `workspace:~` ranges.
+
+Release planning compares every local public version with npm. An exact version
+that already exists is skipped, an unpublished exact version is selected, and a
+local version behind the registry fails closed. Selected packages are built and
+packed once, in dependency order, and publication consumes those verified
+tarballs rather than repacking mutable workspace source. Stable releases are the
+only supported channel in this slice; prerelease and canary releases remain out
+of scope.
 
 Repository-only tools such as `@lapismd/storybook-addon-visual-delta` belong in
 the private root manifest. They are not part of the six-package public release
