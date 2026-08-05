@@ -209,6 +209,8 @@
         "data-list-callout-marker",
         "data-callout-char",
         "data-callout-icon",
+        "data-offset",
+        "data-offset-end",
         "data-sourcepos",
       ],
       img: [...(defaultSchema.attributes?.img ?? []), "src", "alt", "title"],

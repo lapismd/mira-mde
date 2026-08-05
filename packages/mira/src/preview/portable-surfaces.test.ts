@@ -108,4 +108,44 @@ describe("portable preview surfaces", () => {
     await unmount(component);
     expect(cleanup).toHaveBeenCalled();
   });
+
+  it("keeps read-only list callouts passive and makes editable markers selectable", async () => {
+    const readOnlyTarget = document.createElement("div");
+    const editableTarget = document.createElement("div");
+    document.body.append(readOnlyTarget, editableTarget);
+    const readOnly = mount(MarkdownPreview, {
+      target: readOnlyTarget,
+      props: {
+        value: "- & Highlighted",
+      },
+    });
+    const editable = mount(MarkdownPreview, {
+      target: editableTarget,
+      props: {
+        value: "- & Highlighted",
+        onChange: vi.fn(),
+      },
+    });
+    await settle();
+
+    expect(
+      readOnlyTarget.querySelector("[data-list-callout-marker]"),
+    ).not.toBeNull();
+    expect(
+      readOnlyTarget.querySelector(".mira-list-callout-trigger"),
+    ).toBeNull();
+
+    const editableTrigger = editableTarget.querySelector<HTMLElement>(
+      ".mira-list-callout-trigger",
+    );
+    expect(editableTrigger?.tagName).toBe("BUTTON");
+    expect(editableTrigger?.getAttribute("aria-label")).toBe(
+      "Change list highlight (&)",
+    );
+
+    await unmount(readOnly);
+    await unmount(editable);
+    readOnlyTarget.remove();
+    editableTarget.remove();
+  });
 });

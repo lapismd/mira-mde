@@ -14,8 +14,10 @@ import {
   type ViewUpdate,
   WidgetType,
 } from "@codemirror/view";
-import type { MiraResolvedListCallout } from "@lapismd/mira/extensions";
-import { resolveMiraExtensions } from "@lapismd/mira/extensions";
+import {
+  resolveMiraExtensions,
+  resolveMiraListCallouts,
+} from "@lapismd/mira/extensions";
 import { miraRichEditorTheme } from "./theme";
 import type { MiraRichEditorOptions } from "./types";
 import { codeBlockLineDecorations } from "./utils/code-block-lines";
@@ -63,6 +65,7 @@ import {
   InlineMarkdownWidget,
   InlineMathWidget,
 } from "./widgets/preview-widgets";
+import { ListCalloutWidget } from "./widgets/list-callout";
 import { TaskCheckboxWidget } from "./widgets/task-checkbox";
 
 export { getFoldAnchor } from "./decorations/fold-indicators";
@@ -457,6 +460,7 @@ function buildInlinePreviewDecorations(
   const ranges: Range<Decoration>[] = [];
   const replaceWidgets = options.livePreview ?? true;
   const fencedCodeLineClasses = getFencedCodeLineClasses(view.state);
+  const listCallouts = resolveMiraListCallouts(options.listCallouts);
   const listCalloutMatcher = createListCalloutMatcher(options.listCallouts);
   const syntaxHiddenRanges: RangeBoundary[] = [];
   const activeInlineSourceRanges: RangeBoundary[] = [];
@@ -488,6 +492,7 @@ function buildInlinePreviewDecorations(
           ranges,
           view.state,
           listCalloutMatcher,
+          listCallouts,
         );
         decorateTaskCheckboxes(
           line.text,
@@ -549,50 +554,6 @@ function buildInlinePreviewDecorations(
   return Decoration.set(sortRanges(ranges), true);
 }
 
-class ListCalloutMarkerWidget extends WidgetType {
-  constructor(private readonly callout: MiraResolvedListCallout) {
-    super();
-  }
-
-  override toDOM(): HTMLElement {
-    const span = document.createElement("span");
-    span.className = "lc-list-marker";
-    span.setAttribute("aria-hidden", "true");
-    span.dataset.calloutChar = this.callout.char;
-    if (this.callout.icon) {
-      span.dataset.calloutIcon = this.callout.icon;
-    }
-
-    const cleanup = this.callout.renderMarker?.(span, this.callout);
-    if (typeof cleanup === "function") {
-      listCalloutMarkerCleanups.set(span, cleanup);
-    } else if (!span.childNodes.length) {
-      if (this.callout.icon === "book-open") {
-        span.append(createBookOpenIcon());
-      } else {
-        span.textContent = this.callout.char;
-      }
-    }
-    return span;
-  }
-
-  override eq(widget: ListCalloutMarkerWidget): boolean {
-    return (
-      widget.callout.char === this.callout.char &&
-      widget.callout.color === this.callout.color &&
-      widget.callout.icon === this.callout.icon &&
-      widget.callout.renderMarker === this.callout.renderMarker
-    );
-  }
-
-  override destroy(dom: HTMLElement): void {
-    listCalloutMarkerCleanups.get(dom)?.();
-    listCalloutMarkerCleanups.delete(dom);
-  }
-}
-
-const listCalloutMarkerCleanups = new WeakMap<HTMLElement, () => void>();
-
 class ListCalloutBackgroundWidget extends WidgetType {
   override toDOM(): HTMLElement {
     const span = document.createElement("span");
@@ -612,6 +573,7 @@ function decorateListCallouts(
   ranges: Range<Decoration>[],
   state: EditorState,
   matchListCallout: ListCalloutMatcher,
+  listCallouts: ReturnType<typeof resolveMiraListCallouts>,
 ): void {
   const markerRange = matchListCallout(text, lineStart);
   if (!markerRange) {
@@ -647,32 +609,15 @@ function decorateListCallouts(
 
   ranges.push(
     Decoration.replace({
-      widget: new ListCalloutMarkerWidget(markerRange.callout),
+      widget: new ListCalloutWidget({
+        from: markerRange.markerStart,
+        to: markerRange.markerEnd,
+        removeTo: markerRange.removeEnd,
+        callout: markerRange.callout,
+        callouts: listCallouts,
+      }),
     }).range(markerRange.markerStart, markerRange.markerEnd),
   );
-}
-
-function createBookOpenIcon(): SVGSVGElement {
-  const namespace = "http://www.w3.org/2000/svg";
-  const svg = document.createElementNS(namespace, "svg");
-  svg.setAttribute("viewBox", "0 0 24 24");
-  svg.setAttribute("fill", "none");
-  svg.setAttribute("stroke", "currentColor");
-  svg.setAttribute("stroke-width", "2");
-  svg.setAttribute("stroke-linecap", "round");
-  svg.setAttribute("stroke-linejoin", "round");
-  svg.setAttribute("aria-hidden", "true");
-
-  for (const data of [
-    "M12 7v14",
-    "M3 18a1 1 0 0 1-1-1V5a2 2 0 0 1 2-2h5a3 3 0 0 1 3 3v15a3 3 0 0 0-3-3Z",
-    "M21 18a1 1 0 0 0 1-1V5a2 2 0 0 0-2-2h-5a3 3 0 0 0-3 3v15a3 3 0 0 1 3-3Z",
-  ]) {
-    const path = document.createElementNS(namespace, "path");
-    path.setAttribute("d", data);
-    svg.append(path);
-  }
-  return svg;
 }
 
 function decorateInlineSyntax(

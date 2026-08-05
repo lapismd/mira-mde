@@ -6,6 +6,7 @@ import {
 export type ListCalloutMarkerRange = {
   markerStart: number;
   markerEnd: number;
+  removeEnd: number;
   marker: string;
   color: string;
   callout: ReturnType<typeof resolveMiraListCallouts>[number];
@@ -42,9 +43,12 @@ export function createListCalloutMatcher(
     }
 
     const markerStart = lineStart + (match[1]?.length ?? 0);
+    const markerEnd = markerStart + marker.length;
     return {
       markerStart,
-      markerEnd: markerStart + marker.length,
+      markerEnd,
+      removeEnd:
+        markerEnd + (/\s/u.test(text[markerEnd - lineStart] ?? "") ? 1 : 0),
       marker,
       color: callout.color,
       callout,

@@ -339,7 +339,13 @@ describe("createRichEditorExtensions", () => {
 
     expect(parent.querySelector(".cm-line[data-callout='^']")).not.toBeNull();
     expect(parent.querySelector(".cm-line[data-callout='%']")).toBeNull();
-    expect(parent.querySelector("[data-callout-char='^']")).not.toBeNull();
+    const trigger = parent.querySelector<HTMLElement>(
+      "[data-callout-char='^']",
+    );
+    expect(trigger?.tagName).toBe("BUTTON");
+    expect(trigger?.getAttribute("aria-label")).toBe(
+      "Change list highlight (^)",
+    );
 
     view.destroy();
     parent.remove();

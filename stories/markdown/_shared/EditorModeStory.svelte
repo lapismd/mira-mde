@@ -42,6 +42,7 @@
     toolbars?: MiraEditorToolbarDefinition[];
     height?: string;
     width?: string;
+    exposeValue?: boolean;
   };
 
   let {
@@ -69,6 +70,7 @@
     toolbars = [],
     height = "34rem",
     width = "100%",
+    exposeValue = false,
   }: Props = $props();
 
   const mergedFeatures = $derived({
@@ -81,6 +83,7 @@
 
 <div
   class="mira-story-surface mira-story-surface--editor"
+  data-markdown-value={exposeValue ? value : undefined}
   style={`--mira-story-editor-height: ${height}; max-width: 100%; width: ${width};`}
 >
   <MiraEditor

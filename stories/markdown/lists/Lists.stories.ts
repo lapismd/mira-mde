@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/svelte-vite";
+import { expect, within } from "storybook/test";
 import EditorModeStory from "../_shared/EditorModeStory.svelte";
 import MarkdownPreviewStory from "../_shared/MarkdownPreviewStory.svelte";
 import {
@@ -169,6 +170,15 @@ export const CustomCalloutCatalog: Story = {
       },
     },
   },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(
+      canvas.queryByRole("button", { name: /Change list highlight/u }),
+    ).not.toBeInTheDocument();
+    await expect(
+      canvasElement.querySelectorAll("[data-list-callout-marker]"),
+    ).toHaveLength(3);
+  },
 };
 
 export const CustomCalloutCatalogLive: Story = {
@@ -191,6 +201,7 @@ export const CustomCalloutCatalogLive: Story = {
       value: listCalloutsMarkdown,
       extensions: [listCalloutCatalogExtension],
       mode: "live-preview",
+      exposeValue: true,
     },
   }),
   tags: [
@@ -199,4 +210,19 @@ export const CustomCalloutCatalogLive: Story = {
     "!visual-ready",
     "!visual-failed",
   ],
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(
+      canvas.getByRole("button", { name: "Change list highlight (&)" }),
+    ).toBeVisible();
+    await expect(
+      canvas.getByRole("button", { name: "Change list highlight (@)" }),
+    ).toBeVisible();
+    await expect(
+      canvas.getByRole("button", { name: "Change list highlight (^)" }),
+    ).toBeVisible();
+    await expect(
+      canvas.queryByRole("button", { name: "Change list highlight (%)" }),
+    ).not.toBeInTheDocument();
+  },
 };

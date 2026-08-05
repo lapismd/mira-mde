@@ -90,8 +90,10 @@ entry point.
   state registry and the exported Popover primitive to select a custom marker,
   update only that marker character, and preserve line geometry without adding
   a public option or entry point. Editable list-callout widgets MUST reuse the
-  resolved extension catalog and the exported Popover primitive to select or
-  remove an authored callout marker without changing list geometry.
+  resolved extension catalog and the exported Popover primitive to turn the
+  rendered marker itself into the selection trigger, select another marker, or
+  remove the authored marker and its separator without changing geometry
+  between highlight types.
 - `preview` exports Markdown preview, outline, embed, and renderer surfaces. Its
   shipped reading styles MUST keep a list guide continued through a child
   blockquote on the parent's painted guide column after accounting for the
@@ -99,8 +101,8 @@ entry point.
   row as their marker-alignment anchor even when the item wraps. Editable
   preview checkboxes MUST share the internal task-type picker with live preview;
   editable list-callout markers MUST share the internal list-highlight picker
-  with live preview. Read-only previews MUST retain their existing non-button
-  marker and checkbox DOM contracts.
+  with live preview. Read-only previews MUST retain their existing passive,
+  non-button marker and checkbox DOM contracts.
 - `tables` exports the supported Markdown and grid-table components and owns
   the `cm-table` raw-line decoration consumed by shipped source and
   live-preview fallback styles.

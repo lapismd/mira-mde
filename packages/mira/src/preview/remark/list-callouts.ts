@@ -55,6 +55,12 @@ export const remarkListCallouts: Plugin<[RemarkListCalloutOptions?], Root> = (
       }
 
       const remainder = first.value.slice(match[0].length);
+      const sourceOffset = first.position?.start.offset;
+      const markerIndex = match[0].indexOf(marker);
+      const markerOffset =
+        typeof sourceOffset === "number" && markerIndex >= 0
+          ? sourceOffset + markerIndex
+          : undefined;
       const markerNode = {
         type: "listCalloutMarker",
         data: {
@@ -65,6 +71,12 @@ export const remarkListCallouts: Plugin<[RemarkListCalloutOptions?], Root> = (
             "data-list-callout-marker": "true",
             "data-callout-char": callout.char,
             ...(callout.icon ? { "data-callout-icon": callout.icon } : {}),
+            ...(markerOffset === undefined
+              ? {}
+              : {
+                  "data-offset": markerOffset,
+                  "data-offset-end": markerOffset + marker.length,
+                }),
           },
           hChildren: [],
         },

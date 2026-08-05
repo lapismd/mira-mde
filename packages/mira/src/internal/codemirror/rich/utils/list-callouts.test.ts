@@ -6,12 +6,14 @@ describe("list callout utilities", () => {
     expect(getListCalloutMarkerRange("- & Highlighted item", 0)).toMatchObject({
       markerStart: 2,
       markerEnd: 3,
+      removeEnd: 4,
       marker: "&",
       color: "255, 214, 0",
     });
     expect(getListCalloutMarkerRange("  1. ? Question", 10)).toMatchObject({
       markerStart: 15,
       markerEnd: 16,
+      removeEnd: 17,
       marker: "?",
       color: "255, 145, 0",
     });
@@ -21,6 +23,7 @@ describe("list callout utilities", () => {
     expect(getListCalloutMarkerRange("- [ ] ! Warning", 0)).toMatchObject({
       markerStart: 6,
       markerEnd: 7,
+      removeEnd: 8,
       marker: "!",
       color: "255, 23, 68",
     });
@@ -36,6 +39,7 @@ describe("list callout utilities", () => {
       {
         markerStart: 6,
         markerEnd: 8,
+        removeEnd: 9,
         marker: "^^",
         color: "80, 70, 220",
         callout: {

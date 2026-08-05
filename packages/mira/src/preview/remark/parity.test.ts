@@ -101,6 +101,8 @@ describe("Lapis preview parity plugins", () => {
     expect(
       markers.map((marker) => marker.properties?.["data-callout-char"]),
     ).toEqual(["&", "?"]);
+    expect(markers[0]?.properties?.["data-offset"]).toBe(2);
+    expect(markers[0]?.properties?.["data-offset-end"]).toBe(3);
   });
 
   it("renders an injected list callout catalog and can disable defaults", () => {

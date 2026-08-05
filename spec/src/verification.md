@@ -53,8 +53,8 @@ authorized baseline regeneration migrations are complete.
 | MIRA-GOV-008                                                                                            | Package-boundary checker and tarball leak tests                            | Implemented                           |
 | MIRA-MD-016                                                                                             | Live-preview table source-reveal typography and geometry interaction       | Implemented by table fallback slice   |
 | MIRA-CSS-017                                                                                            | Shared raw-table source/live selector and computed-style acceptance        | Implemented by table fallback slice   |
-| MIRA-MD-017                                                                                             | Editable list-highlight catalog, mutation, and surface-boundary acceptance | In progress                           |
-| MIRA-CSS-018                                                                                            | Layout-stable marker trigger and portaled highlight picker acceptance      | In progress                           |
+| MIRA-MD-017                                                                                             | Editable list-highlight catalog, mutation, and surface-boundary acceptance | Implemented by list-highlight slice   |
+| MIRA-CSS-018                                                                                            | Layout-stable marker trigger and portaled highlight picker acceptance      | Implemented by list-highlight slice   |
 
 The context-aware toolbar action slice adds one shared CodeMirror engine for
 ten action identifiers and exposes it through the Mira, Mira Editor, React, and
@@ -296,13 +296,23 @@ refreshed. The aggregate `pnpm check:all` command remains blocked at its
 initial Prettier step by an unrelated `.visual-delta/config.json` formatting
 change outside this slice; none of this slice's files appears in that failure.
 
-The editable list-highlight picker slice is in progress. Its acceptance target
-is the same shared-control boundary as task states: rendered markers in live
-preview and editable preview expose the resolved default and extension catalog,
-selection changes only the authored callout token, clearing also removes its
-separator space, and raw source plus read-only reading markers remain plain
-Markdown/rendered output. Focused interaction coverage will verify marker,
-content-column, and line-height stability before this status is promoted.
+The editable list-highlight picker slice mounts one shared Popover-backed
+control in live preview and editable preview while leaving raw source and
+read-only reading markers passive. Its catalog consumes all resolved defaults
+and extension contributions, excludes disabled markers, preserves custom marker
+renderers, and adds a clear action. Focused Chromium acceptance verifies eight
+options for the custom story (seven resolved markers plus clear), exact `&` to
+`?` source replacement, separator-aware clearing, unchanged marker/content/line
+geometry between highlight types, and the surface boundaries. Trigger and
+option buttons remain transparent with no shadow at rest; browser inspection
+resolves the open ghost state to a neutral background and a 1 px inset border
+while retaining the configured marker color. The five focused Lists Storybook
+interactions, two focused Playwright cases, all 249 Mira package tests, package
+check and build, canonical spec and catalog checks, and `pnpm check:all` pass.
+The compare-only Visual Delta capture also completes its browser case and
+reports the expected pending change of 3,795 pixels (1 percent) against the
+pre-picker reference. Strict comparison therefore exits non-zero; no visual
+baseline was created or refreshed for this slice.
 
 The add-on's Docker stage does not trust authored `storybook-static` output,
 but it transports the affected cache and preview graph and may restore a
