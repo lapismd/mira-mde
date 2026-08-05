@@ -28,10 +28,10 @@ type Story = StoryObj<typeof meta>;
 
 export const LivePreview: Story = {
   tags: [
-    "visual-approved",
+    "visual-failed",
     "!visual-pending",
+    "!visual-approved",
     "!visual-ready",
-    "!visual-failed",
   ],
   parameters: {
     visualDelta: {
@@ -50,10 +50,10 @@ export const LivePreview: Story = {
 
 export const Source: Story = {
   tags: [
-    "visual-approved",
+    "visual-failed",
     "!visual-pending",
+    "!visual-approved",
     "!visual-ready",
-    "!visual-failed",
   ],
   parameters: {
     visualDelta: {
@@ -94,10 +94,10 @@ export const Preview: Story = {
 
 export const Split: Story = {
   tags: [
-    "visual-approved",
+    "visual-failed",
     "!visual-pending",
+    "!visual-approved",
     "!visual-ready",
-    "!visual-failed",
   ],
   parameters: {
     visualDelta: {

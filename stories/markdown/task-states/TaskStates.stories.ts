@@ -69,10 +69,10 @@ export const Preview: Story = {
 
 export const LivePreview: Story = {
   tags: [
-    "visual-approved",
+    "visual-failed",
     "!visual-pending",
+    "!visual-approved",
     "!visual-ready",
-    "!visual-failed",
   ],
   name: "Live Preview",
   render: (args) => ({
@@ -113,10 +113,10 @@ export const LivePreview: Story = {
 
 export const SourceMode: Story = {
   tags: [
-    "visual-approved",
+    "visual-failed",
     "!visual-pending",
+    "!visual-approved",
     "!visual-ready",
-    "!visual-failed",
   ],
   name: "Source Mode",
   render: (args) => ({

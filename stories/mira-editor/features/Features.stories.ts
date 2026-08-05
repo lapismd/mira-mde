@@ -29,10 +29,10 @@ type Story = StoryObj<typeof meta>;
 
 export const Defaults: Story = {
   tags: [
-    "visual-approved",
+    "visual-failed",
     "!visual-pending",
+    "!visual-approved",
     "!visual-ready",
-    "!visual-failed",
   ],
   parameters: {
     visualDelta: {
@@ -60,10 +60,10 @@ export const Defaults: Story = {
 
 export const WithoutToolbar: Story = {
   tags: [
-    "visual-approved",
+    "visual-failed",
     "!visual-pending",
+    "!visual-approved",
     "!visual-ready",
-    "!visual-failed",
   ],
   parameters: {
     visualDelta: {
@@ -88,10 +88,10 @@ export const WithoutToolbar: Story = {
 
 export const WithoutWidgets: Story = {
   tags: [
-    "visual-approved",
+    "visual-failed",
     "!visual-pending",
+    "!visual-approved",
     "!visual-ready",
-    "!visual-failed",
   ],
   parameters: {
     visualDelta: {
@@ -119,10 +119,10 @@ export const WithoutWidgets: Story = {
 
 export const EditModesOnly: Story = {
   tags: [
-    "visual-approved",
+    "visual-failed",
     "!visual-pending",
+    "!visual-approved",
     "!visual-ready",
-    "!visual-failed",
   ],
   parameters: {
     visualDelta: {
@@ -149,10 +149,10 @@ export const EditModesOnly: Story = {
 
 export const CompactToolbarItems: Story = {
   tags: [
-    "visual-approved",
+    "visual-failed",
     "!visual-pending",
+    "!visual-approved",
     "!visual-ready",
-    "!visual-failed",
   ],
   parameters: {
     visualDelta: {
