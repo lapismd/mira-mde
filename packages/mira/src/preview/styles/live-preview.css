@@ -39,3 +39,20 @@
 .markdown-live-preview-mode .mira-rich-widget.markdown-rendered .callout {
   margin: 0;
 }
+
+/* Keep adjacent rendered callouts distinct without adding CodeMirror margins. */
+.markdown-live-preview-mode
+  .mira-rich-widget.markdown-rendered
+  .callout
+  + .callout {
+  background-clip: padding-box;
+  border-top-color: transparent;
+  border-top-width: calc(var(--callout-border-width) + var(--size-4-1));
+}
+
+.markdown-live-preview-mode
+  .mira-rich-widget.markdown-rendered
+  .callout
+  + .callout:hover {
+  border-top-color: transparent;
+}

@@ -75,6 +75,101 @@ test("the CodeMirror scroller owns comprehensive live-preview overflow", async (
     .toBeGreaterThan(0);
 });
 
+test("the comprehensive reading story renders its grid and callout gallery", async ({
+  page,
+}) => {
+  await gotoStory(page, "demo-comprehensive--reading-preview");
+
+  const preview = page
+    .locator(
+      ".markdown-preview-surface--reading:not(.markdown-preview-surface--embedded)",
+    )
+    .first();
+  const grid = preview.locator("table").filter({
+    hasText: "column spanning",
+  });
+  await expect(grid).toBeVisible();
+  await expect(grid.locator("tr")).toHaveCount(6);
+
+  const callouts = preview.locator(".callout");
+  await expect(callouts).toHaveCount(16);
+  await expect(
+    preview.locator(".callout[data-callout='abstract']"),
+  ).toContainText("Abstract, Summary, Tldr");
+  const gallery = await callouts.evaluateAll((elements) =>
+    elements.slice(-12).map((element) => ({
+      backgroundColor: getComputedStyle(element).backgroundColor,
+      type: element.getAttribute("data-callout"),
+    })),
+  );
+  expect(gallery.map(({ type }) => type)).toEqual([
+    "note",
+    "abstract",
+    "info",
+    "tip",
+    "success",
+    "question",
+    "warning",
+    "failure",
+    "danger",
+    "bug",
+    "example",
+    "quote",
+  ]);
+  expect(
+    gallery.every(
+      ({ backgroundColor }) => backgroundColor !== "rgba(0, 0, 0, 0)",
+    ),
+  ).toBe(true);
+});
+
+test("the comprehensive live-preview callout gallery keeps painted gaps", async ({
+  page,
+}) => {
+  await gotoStory(page, "demo-comprehensive--live-preview");
+
+  const abstractCallout = page
+    .locator(".callout[data-callout='abstract']")
+    .filter({ hasText: "Abstract, Summary, Tldr" });
+  await scrollEditorUntilVisible(page, abstractCallout);
+
+  const gallery = page.locator(".callout");
+  await expect(gallery).toHaveCount(12);
+  const geometry = await gallery.evaluateAll((elements) =>
+    elements.map((element) => {
+      const style = getComputedStyle(element);
+      const widget = element.closest<HTMLElement>(".mira-rich-widget");
+      const widgetStyle = widget ? getComputedStyle(widget) : null;
+      return {
+        backgroundClip: style.backgroundClip,
+        borderTopWidth: Number.parseFloat(style.borderTopWidth),
+        marginBottom: Number.parseFloat(style.marginBottom),
+        marginTop: Number.parseFloat(style.marginTop),
+        widgetMarginBottom: Number.parseFloat(widgetStyle?.marginBottom ?? "0"),
+        widgetMarginTop: Number.parseFloat(widgetStyle?.marginTop ?? "0"),
+      };
+    }),
+  );
+
+  expect(
+    geometry
+      .slice(1)
+      .every(({ backgroundClip }) => backgroundClip === "padding-box"),
+  ).toBe(true);
+  expect(
+    geometry.slice(1).every(({ borderTopWidth }) => borderTopWidth >= 4),
+  ).toBe(true);
+  expect(
+    geometry.every(
+      ({ marginBottom, marginTop, widgetMarginBottom, widgetMarginTop }) =>
+        marginBottom === 0 &&
+        marginTop === 0 &&
+        widgetMarginBottom === 0 &&
+        widgetMarginTop === 0,
+    ),
+  ).toBe(true);
+});
+
 test("the comprehensive split story synchronizes both scroll owners", async ({
   page,
 }) => {

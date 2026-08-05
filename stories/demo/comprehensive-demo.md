@@ -134,24 +134,25 @@ MultiMarkdown spans:
 
 Grid table with headers, sections, row/column spans, and alignment:
 
+<!-- prettier-ignore -->
 +-------------------+------+
-| Table Headings | Here |
+| Table Headings    | Here |
 +--------+----------+------+
-| Sub | Headings | Too |
+| Sub    | Headings | Too  |
 +========+=================+
-| cell | column spanning |
-| spans +---------:+------+
-| rows | normal | cell |
+| cell   | column spanning |
+| spans  +---------:+------+
+| rows   |   normal | cell |
 +---v----+:---------------:+
-| | cells can be |
-| | _formatted_ |
-| | **paragraphs** |
-| | ~~~ |
-| multi | and contain |
-| line | blocks |
-| cells | ~~~ |
+|        | cells can be    |
+|        | _formatted_     |
+|        | **paragraphs**  |
+|        | ~~~             |
+| multi  | and contain     |
+| line   | blocks          |
+| cells  | ~~~             |
 +========+=========:+======+
-| footer | cells | |
+| footer |    cells |      |
 +--------+----------+------+
 
 ## Raw HTML and directives

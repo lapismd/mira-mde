@@ -54,7 +54,9 @@ authorized baseline regeneration migrations are complete.
 | MIRA-MD-016                                                                                             | Live-preview table source-reveal typography and geometry interaction       | Implemented by table fallback slice   |
 | MIRA-CSS-017                                                                                            | Shared raw-table source/live selector and computed-style acceptance        | Implemented by table fallback slice   |
 | MIRA-MD-017                                                                                             | Editable list-highlight catalog, mutation, and surface-boundary acceptance | Implemented by list-highlight slice   |
+| MIRA-MD-018                                                                                             | Comprehensive reading grid/callout structure and live-preview gap geometry | Implemented by comprehensive repair   |
 | MIRA-CSS-018                                                                                            | Layout-stable marker trigger and portaled highlight picker acceptance      | Implemented by list-highlight slice   |
+| MIRA-CSS-019                                                                                            | Consecutive live-preview callout painted-gap and zero-margin acceptance    | Implemented by comprehensive repair   |
 
 The context-aware toolbar action slice adds one shared CodeMirror engine for
 ten action identifiers and exposes it through the Mira, Mira Editor, React, and
@@ -356,6 +358,17 @@ build, canonical spec checks, and `pnpm check:all` pass. Live Preview geometry
 is unchanged. The compare-only Visual Delta browser case passes and reports the
 expected pending Reading change of 31,933 pixels (5 percent); strict comparison
 therefore exits non-zero, and no visual baseline is created or refreshed.
+
+The comprehensive rendering repair implements MIRA-MD-018 and MIRA-CSS-019. The shared fixture
+had lost the column padding required by the Adobe grid-table grammar, so its
+malformed table consumed the later one-line callouts as literal paragraphs in
+Reading mode. A formatter-safe grid now produces the expected six table rows
+and preserves all 16 rendered callouts, including the 12 colored gallery
+variants. Consecutive Live Preview callouts use a transparent painted top edge
+for a 5.9 px visual gap while every callout and CodeMirror widget margin stays
+at zero. The two focused Chromium cases, canonical spec and catalog checks,
+Mira package check, test, and build, and `pnpm check:all` pass. No visual
+baseline is created or refreshed by this repair.
 
 The add-on's Docker stage does not trust authored `storybook-static` output,
 but it transports the affected cache and preview graph and may restore a

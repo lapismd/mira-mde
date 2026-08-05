@@ -102,7 +102,9 @@ entry point.
   preview checkboxes MUST share the internal task-type picker with live preview;
   editable list-callout markers MUST share the internal list-highlight picker
   with live preview. Read-only previews MUST retain their existing passive,
-  non-button marker and checkbox DOM contracts.
+  non-button marker and checkbox DOM contracts. Shipped live-preview callout
+  styling MUST separate consecutive rendered callouts through paint and
+  padding geometry rather than margins on CodeMirror lines or widget roots.
 - The shared list-highlight control MUST own one margin-free padded marker slot
   for both text and icon renderers. CodeMirror and editable preview integrations
   MUST preserve that slot on wrapped lines rather than adding surface-specific
