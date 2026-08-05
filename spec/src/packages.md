@@ -107,6 +107,9 @@ entry point.
   for both text and icon renderers. CodeMirror and editable preview integrations
   MUST preserve that slot on wrapped lines rather than adding surface-specific
   spacing around the mounted control.
+- Preview styling MUST express consecutive list-highlight separation through
+  live-line padding and reading-background insets, keeping the CodeMirror line
+  and widget margin contract unchanged.
 - `tables` exports the supported Markdown and grid-table components and owns
   the `cm-table` raw-line decoration consumed by shipped source and
   live-preview fallback styles.

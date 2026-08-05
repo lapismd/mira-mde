@@ -326,6 +326,12 @@ both browser cases and report the expected pending changes of 3,549 reading
 pixels and 3,655 live-preview pixels (1 percent each). Strict comparison exits
 non-zero; no visual baseline is refreshed by this follow-up.
 
+The consecutive-highlight follow-up is in progress against MIRA-MD-017 and
+MIRA-CSS-018. Its acceptance target adds an initially visible list-callout that
+wraps in both focused stories and verifies a positive background-panel gap
+between each adjacent highlighted item in Live Preview and Reading without
+introducing CodeMirror margins or refreshing visual baselines.
+
 The add-on's Docker stage does not trust authored `storybook-static` output,
 but it transports the affected cache and preview graph and may restore a
 checksum-verified canonical static build. The `test:visual` gate therefore uses
