@@ -19,13 +19,13 @@ authorized baseline regeneration migrations are complete.
 | MIRA-MD-011                                                                                             | Computed typography parity across source, live preview, and reading        | Implemented by typography repair      |
 | MIRA-MD-012                                                                                             | Nested blockquote task source and checkbox browser assertions              | Implemented by quoted-task repair     |
 | MIRA-MD-013                                                                                             | Task-state registry tests and focused picker interaction/geometry checks   | Implemented by task-picker slice      |
-| MIRA-MD-014                                                                                             | Core action-engine syntax, selection, transaction, and readonly tests      | In progress                           |
+| MIRA-MD-014                                                                                             | Core action-engine syntax, selection, transaction, and readonly tests      | Implemented by action-engine slice    |
 | MIRA-UI-001, MIRA-UI-002, MIRA-UI-003, MIRA-UI-004, MIRA-UI-005                                         | Mira Editor, React, and Vanilla tests/builds                               | Implemented                           |
 | MIRA-UI-006, MIRA-UI-007, MIRA-UI-008                                                                   | Storybook browser project and UI primitive `play` interactions             | Implemented                           |
 | MIRA-UI-009                                                                                             | Svelte package checks and focused outline browser acceptance               | Implemented                           |
 | MIRA-UI-010                                                                                             | Cross-framework appearance contract tests                                  | Implemented by extensible theme slice |
 | MIRA-UI-011                                                                                             | Version-sync unit test and toolbar About dialog Storybook interaction      | Implemented by About dialog slice     |
-| MIRA-UI-012                                                                                             | Core action-engine tests and focused source/live-preview toolbar stories   | In progress                           |
+| MIRA-UI-012                                                                                             | Core action-engine tests and focused source/live-preview toolbar stories   | Implemented by toolbar-action slice   |
 | MIRA-CSS-001, MIRA-CSS-002                                                                              | Package stylesheet exports, no-Tailwind package checks                     | Implemented                           |
 | MIRA-CSS-003, MIRA-CSS-004, MIRA-CSS-005, MIRA-CSS-006                                                  | Public surface/token registry and catalog checker                          | Implemented by catalog/token slice    |
 | MIRA-CSS-007, MIRA-CSS-008, MIRA-CSS-009, MIRA-CSS-010                                                  | Theme CSS contracts, component tests, and portaled-overlay stories         | Implemented by extensible theme slice |
@@ -49,6 +49,18 @@ authorized baseline regeneration migrations are complete.
 | MIRA-CAT-010                                                                                            | Visual Delta host formatter configuration and source mutation regression   | Implemented                           |
 | MIRA-GOV-001, MIRA-GOV-002, MIRA-GOV-003, MIRA-GOV-004, MIRA-GOV-005, MIRA-GOV-006, MIRA-GOV-007        | `pnpm spec:check`, checker tests, pull-request workflow                    | Implemented by governance slice       |
 | MIRA-GOV-008                                                                                            | Package-boundary checker and tarball leak tests                            | Implemented                           |
+
+The context-aware toolbar action slice adds one shared CodeMirror engine for
+ten action identifiers and exposes it through the Mira, Mira Editor, React, and
+Vanilla handles. Core coverage verifies compatible delimiter removal,
+word/whitespace behavior, nested syntax, link targets, multiline normalization,
+selection direction, one-step undo and redo, focus and scroll stability, and
+readonly rejection. Framework suites verify smart dispatch, accessible default
+items, feature filtering, standalone template fallback, and source/reading
+availability. Two `skip-visual` Storybook interactions exercise first-click and
+repeat-click results for headings, all four inline formats, links, blockquotes,
+and all three list types in both Source and Live Preview through the public
+handle harness; the focused Chromium project passes both stories.
 
 ## Validation tiers
 

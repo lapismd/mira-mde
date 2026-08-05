@@ -54,3 +54,8 @@ Use `features` and `featureConfigs` on `MiraEditor` to enable or disable package
 ### Compact Toolbar
 
 <Canvas of={FeaturesStories.CompactToolbarItems} meta={FeaturesStories} />
+
+Context-aware toolbar actions are covered by deterministic Source and Live
+Preview stories. The harness uses the public editor handle to place the caret or
+selection, then the story clicks each real toolbar control twice to verify both
+application and removal without relying on private CodeMirror state.
