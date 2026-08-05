@@ -103,8 +103,8 @@ async function expectRawTableTypography(
 
 export const Preview: Story = {
   tags: [
-    "visual-approved",
-    "!visual-pending",
+    "visual-pending",
+    "!visual-approved",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -123,8 +123,8 @@ export const Preview: Story = {
 
 export const LivePreview: Story = {
   tags: [
-    "visual-approved",
-    "!visual-pending",
+    "visual-pending",
+    "!visual-approved",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -173,8 +173,8 @@ export const LivePreview: Story = {
 
 export const SourceMode: Story = {
   tags: [
-    "visual-approved",
-    "!visual-pending",
+    "visual-pending",
+    "!visual-approved",
     "!visual-ready",
     "!visual-failed",
   ],

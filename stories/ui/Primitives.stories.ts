@@ -35,8 +35,8 @@ type Story = StoryObj<typeof meta>;
 
 export const ButtonsAndSeparators: Story = {
   tags: [
-    "visual-approved",
-    "!visual-pending",
+    "visual-pending",
+    "!visual-approved",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -56,8 +56,8 @@ export const ButtonsAndSeparators: Story = {
 
 export const ToggleGroup: Story = {
   tags: [
-    "visual-approved",
-    "!visual-pending",
+    "visual-pending",
+    "!visual-approved",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -79,8 +79,8 @@ export const ToggleGroup: Story = {
 
 export const Toolbar: Story = {
   tags: [
-    "visual-approved",
-    "!visual-pending",
+    "visual-pending",
+    "!visual-approved",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -102,8 +102,8 @@ export const Toolbar: Story = {
 
 export const DropdownMenu: Story = {
   tags: [
-    "visual-approved",
-    "!visual-pending",
+    "visual-pending",
+    "!visual-approved",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -140,8 +140,8 @@ export const DropdownMenu: Story = {
 
 export const ContextMenu: Story = {
   tags: [
-    "visual-approved",
-    "!visual-pending",
+    "visual-pending",
+    "!visual-approved",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -182,8 +182,8 @@ export const ContextMenu: Story = {
 
 export const Dialog: Story = {
   tags: [
-    "visual-approved",
-    "!visual-pending",
+    "visual-pending",
+    "!visual-approved",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -222,8 +222,8 @@ export const Dialog: Story = {
 
 export const Popover: Story = {
   tags: [
-    "visual-approved",
-    "!visual-pending",
+    "visual-pending",
+    "!visual-approved",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -260,8 +260,8 @@ export const Popover: Story = {
 
 export const Tooltip: Story = {
   tags: [
-    "visual-approved",
-    "!visual-pending",
+    "visual-pending",
+    "!visual-approved",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -292,8 +292,8 @@ export const Tooltip: Story = {
 
 export const Table: Story = {
   tags: [
-    "visual-approved",
-    "!visual-pending",
+    "visual-pending",
+    "!visual-approved",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -315,8 +315,8 @@ export const Table: Story = {
 
 export const ScrollArea: Story = {
   tags: [
-    "visual-approved",
-    "!visual-pending",
+    "visual-pending",
+    "!visual-approved",
     "!visual-ready",
     "!visual-failed",
   ],

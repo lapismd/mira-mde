@@ -196,8 +196,8 @@ type Story = StoryObj<typeof meta>;
 
 export const SlashCommands: Story = {
   tags: [
-    "visual-approved",
-    "!visual-pending",
+    "visual-pending",
+    "!visual-approved",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -233,8 +233,8 @@ export const SlashCommands: Story = {
 
 export const CustomSlashSnippet: Story = {
   tags: [
-    "visual-approved",
-    "!visual-pending",
+    "visual-pending",
+    "!visual-approved",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -262,8 +262,8 @@ export const CustomSlashSnippet: Story = {
 
 export const SlashAutocomplete: Story = {
   tags: [
-    "visual-approved",
-    "!visual-pending",
+    "visual-pending",
+    "!visual-approved",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -291,8 +291,8 @@ export const SlashAutocomplete: Story = {
 
 export const BlockControls: Story = {
   tags: [
-    "visual-approved",
-    "!visual-pending",
+    "visual-pending",
+    "!visual-approved",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -318,8 +318,8 @@ export const BlockControls: Story = {
 
 export const FoldAndInlineHeadings: Story = {
   tags: [
-    "visual-approved",
-    "!visual-pending",
+    "visual-pending",
+    "!visual-approved",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -345,8 +345,8 @@ export const FoldAndInlineHeadings: Story = {
 
 export const ImageAttachments: Story = {
   tags: [
-    "visual-approved",
-    "!visual-pending",
+    "visual-pending",
+    "!visual-approved",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -381,8 +381,8 @@ export const ImageAttachments: Story = {
 
 export const CustomToolbar: Story = {
   tags: [
-    "visual-approved",
-    "!visual-pending",
+    "visual-pending",
+    "!visual-approved",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -427,8 +427,8 @@ export const ExtensionContributions: Story = {
   },
   name: "Extension Commands, Toolbar, And Styles",
   tags: [
-    "visual-approved",
-    "!visual-pending",
+    "visual-pending",
+    "!visual-approved",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -460,8 +460,8 @@ export const MarkdownAuthoring: Story = {
   },
   name: "Completions, Smart Paste, And Input Handlers",
   tags: [
-    "visual-approved",
-    "!visual-pending",
+    "visual-pending",
+    "!visual-approved",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -478,8 +478,8 @@ export const MarkdownAuthoring: Story = {
 
 export const AiPlugin: Story = {
   tags: [
-    "visual-approved",
-    "!visual-pending",
+    "visual-pending",
+    "!visual-approved",
     "!visual-ready",
     "!visual-failed",
   ],
