@@ -23,6 +23,7 @@ customization and Obsidian-compatible aliases retained as a compatibility layer.
 | MIRA-CSS-013 | Visible task checkbox delimiters in source and live-preview editing MUST use the same muted syntax color as other Markdown delimiters while task content retains the normal prose color.                                                   |
 | MIRA-CSS-014 | The editable task-type trigger MUST use shipped semantic hooks and theme tokens, remain outside normal line layout, become visible on line hover or focus, and reuse the shipped task-checkbox artwork inside its portaled picker.         |
 | MIRA-CSS-015 | The Mira Editor About dialog MUST use shipped semantic hooks and tokens. Its combined logo asset MUST retain intrinsic dimensions, scale down responsively, and expose only the active light or dark half within the portaled dialog.      |
+| MIRA-CSS-016 | Shipped source-mode table-line CSS MUST resolve through `--font-monospace`, preserve authored spacing with `white-space: pre`, and size each raw row to its content without changing rendered table-widget or reading-table typography.      |
 
 Stylesheet order remains theme, UI, preview, Svelte/Mira Editor, and framework
 wrapper composition as documented by the package entrypoints.

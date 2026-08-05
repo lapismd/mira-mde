@@ -80,9 +80,11 @@ entry point.
   on an active editable line; this remains shipped CSS behavior and MUST NOT
   require a consumer option. The internal CodeMirror document theme MUST honor
   the public Markdown sans token for ordinary prose while the shipped
-  code-specific hooks continue to select the monospaced token. Internal task
-  marker ranges MUST account for authored blockquote prefixes before locating
-  the list and checkbox delimiters. Internal live-preview fold controls MUST
+  code-specific hooks continue to select the monospaced token. Source-mode
+  pipe-table line hooks MUST also select that monospaced token and preserve
+  non-wrapping preformatted row geometry so authored delimiters remain aligned.
+  Internal task marker ranges MUST account for authored blockquote prefixes
+  before locating the list and checkbox delimiters. Internal live-preview fold controls MUST
   remain directly adjacent to their list marker without introducing a new
   consumer API. Editable rendered task widgets MUST reuse one internal task
   state registry and the exported Popover primitive to select a custom marker,
