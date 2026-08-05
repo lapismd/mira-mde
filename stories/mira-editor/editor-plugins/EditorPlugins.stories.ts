@@ -196,10 +196,10 @@ type Story = StoryObj<typeof meta>;
 
 export const SlashCommands: Story = {
   tags: [
-    "visual-failed",
-    "!visual-pending",
+    "visual-pending",
     "!visual-approved",
     "!visual-ready",
+    "!visual-failed",
   ],
   parameters: {
     visualDelta: {
@@ -233,10 +233,10 @@ export const SlashCommands: Story = {
 
 export const CustomSlashSnippet: Story = {
   tags: [
-    "visual-failed",
-    "!visual-pending",
+    "visual-pending",
     "!visual-approved",
     "!visual-ready",
+    "!visual-failed",
   ],
   parameters: {
     visualDelta: {
@@ -262,10 +262,10 @@ export const CustomSlashSnippet: Story = {
 
 export const SlashAutocomplete: Story = {
   tags: [
-    "visual-failed",
-    "!visual-pending",
+    "visual-pending",
     "!visual-approved",
     "!visual-ready",
+    "!visual-failed",
   ],
   parameters: {
     visualDelta: {
@@ -291,10 +291,10 @@ export const SlashAutocomplete: Story = {
 
 export const BlockControls: Story = {
   tags: [
-    "visual-failed",
-    "!visual-pending",
+    "visual-pending",
     "!visual-approved",
     "!visual-ready",
+    "!visual-failed",
   ],
   parameters: {
     visualDelta: {
@@ -318,10 +318,10 @@ export const BlockControls: Story = {
 
 export const FoldAndInlineHeadings: Story = {
   tags: [
-    "visual-failed",
-    "!visual-pending",
+    "visual-pending",
     "!visual-approved",
     "!visual-ready",
+    "!visual-failed",
   ],
   parameters: {
     visualDelta: {
@@ -345,10 +345,10 @@ export const FoldAndInlineHeadings: Story = {
 
 export const ImageAttachments: Story = {
   tags: [
-    "visual-failed",
-    "!visual-pending",
+    "visual-pending",
     "!visual-approved",
     "!visual-ready",
+    "!visual-failed",
   ],
   parameters: {
     visualDelta: {
@@ -381,10 +381,10 @@ export const ImageAttachments: Story = {
 
 export const CustomToolbar: Story = {
   tags: [
-    "visual-failed",
-    "!visual-pending",
+    "visual-pending",
     "!visual-approved",
     "!visual-ready",
+    "!visual-failed",
   ],
   parameters: {
     visualDelta: {
@@ -427,10 +427,10 @@ export const ExtensionContributions: Story = {
   },
   name: "Extension Commands, Toolbar, And Styles",
   tags: [
-    "visual-failed",
-    "!visual-pending",
+    "visual-pending",
     "!visual-approved",
     "!visual-ready",
+    "!visual-failed",
   ],
   args: {
     value:
@@ -460,10 +460,10 @@ export const MarkdownAuthoring: Story = {
   },
   name: "Completions, Smart Paste, And Input Handlers",
   tags: [
-    "visual-failed",
-    "!visual-pending",
+    "visual-pending",
     "!visual-approved",
     "!visual-ready",
+    "!visual-failed",
   ],
   args: {
     value: markdownAuthoringMarkdown,
@@ -478,10 +478,10 @@ export const MarkdownAuthoring: Story = {
 
 export const AiPlugin: Story = {
   tags: [
-    "visual-failed",
-    "!visual-pending",
+    "visual-pending",
     "!visual-approved",
     "!visual-ready",
+    "!visual-failed",
   ],
   name: "AI Plugin",
   parameters: {

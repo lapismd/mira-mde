@@ -87,10 +87,10 @@ export const LivePreview: Story = {
 
 export const SourceMode: Story = {
   tags: [
-    "visual-failed",
-    "!visual-pending",
+    "visual-pending",
     "!visual-approved",
     "!visual-ready",
+    "!visual-failed",
   ],
   name: "Source Mode",
   render: (args) => ({
