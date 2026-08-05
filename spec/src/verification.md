@@ -10,6 +10,7 @@ authorized baseline regeneration migrations are complete.
 | MIRA-ARCH-005                                                                                           | Storybook-only host migration and root script checks                       | Implemented by catalog-host slice     |
 | MIRA-ARCH-006, MIRA-ARCH-007, MIRA-ARCH-008, MIRA-ARCH-009, MIRA-ARCH-010, MIRA-ARCH-011, MIRA-ARCH-012 | Package manifests, boundary checker, pack fixtures, and catalog migration  | Implemented by six-package migration  |
 | MIRA-ARCH-013                                                                                           | Theme stylesheet exports and tarball resolution checks                     | Implemented by extensible theme slice |
+| MIRA-ARCH-014                                                                                           | Mira Editor build output and package-version synchronization test          | Implemented by About dialog slice     |
 | MIRA-MD-001, MIRA-MD-002, MIRA-MD-003, MIRA-MD-004, MIRA-MD-005, MIRA-MD-006                            | Package unit tests, Layout Showcase, Storybook browser acceptance          | Implemented                           |
 | MIRA-MD-007                                                                                             | Comprehensive fixture plus focused Storybook fixtures                      | Implemented; catalog checker enforced |
 | MIRA-MD-008, MIRA-MD-009                                                                                | Enforced Storybook accessibility and icon-bearing editor controls          | Implemented                           |
@@ -21,6 +22,7 @@ authorized baseline regeneration migrations are complete.
 | MIRA-UI-006, MIRA-UI-007, MIRA-UI-008                                                                   | Storybook browser project and UI primitive `play` interactions             | Implemented                           |
 | MIRA-UI-009                                                                                             | Svelte package checks and focused outline browser acceptance               | Implemented                           |
 | MIRA-UI-010                                                                                             | Cross-framework appearance contract tests                                  | Implemented by extensible theme slice |
+| MIRA-UI-011                                                                                             | Version-sync unit test and toolbar About dialog Storybook interaction      | Implemented by About dialog slice     |
 | MIRA-CSS-001, MIRA-CSS-002                                                                              | Package stylesheet exports, no-Tailwind package checks                     | Implemented                           |
 | MIRA-CSS-003, MIRA-CSS-004, MIRA-CSS-005, MIRA-CSS-006                                                  | Public surface/token registry and catalog checker                          | Implemented by catalog/token slice    |
 | MIRA-CSS-007, MIRA-CSS-008, MIRA-CSS-009, MIRA-CSS-010                                                  | Theme CSS contracts, component tests, and portaled-overlay stories         | Implemented by extensible theme slice |
@@ -28,6 +30,7 @@ authorized baseline regeneration migrations are complete.
 | MIRA-CSS-012                                                                                            | Cataloged indentation tokens and continuation-widget browser geometry      | Implemented by indentation repair     |
 | MIRA-CSS-013                                                                                            | Computed task-delimiter colors in source and live-preview edit states      | Implemented by quoted-task repair     |
 | MIRA-CSS-014                                                                                            | Task picker hover/focus visibility, portaled icon reuse, and line geometry | Implemented by task-picker slice      |
+| MIRA-CSS-015                                                                                            | Light/dark logo crop geometry in focused theme story interactions          | Implemented by About dialog slice     |
 | MIRA-AI-001, MIRA-AI-002, MIRA-AI-003                                                                   | `packages/mira-plugin-ai` unit tests                                       | Implemented                           |
 | MIRA-AI-004                                                                                             | Deterministic AI story interaction                                         | Implemented                           |
 | MIRA-MERMAID-001, MIRA-MERMAID-002, MIRA-MERMAID-003, MIRA-MERMAID-004                                  | Mermaid package tests and existing Storybook stories                       | Implemented                           |
@@ -350,6 +353,20 @@ CodeMirror, preview, table, UI, and Svelte tests without inheriting the root-onl
 Storybook browser project. The batteries-included editor, AI, Mermaid, React,
 and Vanilla downstream workspaces also pass their focused check, test, and build
 gates against the public Mira entrypoints.
+
+The About dialog slice trims the combined light/dark logo from `1536x1024` and
+`2159766` bytes to `960x337` and `148896` bytes while retaining the two source
+variants. The root README embeds the optimized brand sheet; Mira Editor ships
+its package-owned copy and exports a manifest-synchronized version constant.
+The toolbar overflow opens one accessible, theme-aware dialog whose bounded
+viewport exposes the asset's left half in light mode and right half in dark
+mode. Focused explicit-light, explicit-dark, and system-mode logo assertions
+pass within the 14 Storybook theme and comprehensive tests. Direct Chromium
+inspection measured a `240px` viewport and `480px` image, with a zero light
+offset and exact `-240px` dark translation. The package
+check, 22 unit tests, build/publint, six-package tarball consumer validation,
+canonical spec and catalog gates, `pnpm check:all`, and the static Storybook
+build pass. No visual baseline was created or refreshed.
 
 The portable parity audit recorded 59 present features, six consumer-adapter
 boundaries, six Lapis-only behaviors, and no remaining portable P0-P2 gaps at

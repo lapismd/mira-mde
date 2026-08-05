@@ -9,6 +9,7 @@
   import FileCodeIcon from "@lucide/svelte/icons/file-code";
   import Heading1Icon from "@lucide/svelte/icons/heading-1";
   import ImageIcon from "@lucide/svelte/icons/image";
+  import InfoIcon from "@lucide/svelte/icons/info";
   import IndentIncreaseIcon from "@lucide/svelte/icons/indent-increase";
   import ItalicIcon from "@lucide/svelte/icons/italic";
   import LinkIcon from "@lucide/svelte/icons/link";
@@ -55,6 +56,7 @@
     templateForMiraToolbarItem,
   } from "./toolbar-model";
   import type { MiraEditorToolbarProps } from "./types";
+  import MiraEditorAboutDialog from "./mira-editor-about-dialog.svelte";
 
   let {
     value = "",
@@ -120,6 +122,7 @@
   );
 
   let lastNonSplitMode = $state<MiraMode | null>(null);
+  let aboutDialogOpen = $state(false);
 
   const modeIcons = {
     source: FileCodeIcon,
@@ -664,6 +667,11 @@
           {/if}
         </DropdownMenu.Item>
       {/each}
+      <DropdownMenu.Separator />
+      <DropdownMenu.Item onclick={() => (aboutDialogOpen = true)}>
+        <InfoIcon class="mira-editor-toolbar__menu-icon" aria-hidden="true" />
+        <span>About Mira</span>
+      </DropdownMenu.Item>
     </DropdownMenu.Content>
   </DropdownMenu.Root>
 {/snippet}
@@ -765,4 +773,5 @@
       {/if}
     </Toolbar.Root>
   </div>
+  <MiraEditorAboutDialog bind:open={aboutDialogOpen} />
 </Tooltip.Provider>

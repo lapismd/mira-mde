@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import BoldIcon from "@lucide/svelte/icons/bold";
 import MiraEditor from ".";
+import packageManifest from "../package.json";
 import {
   createMiraEditorExtensions,
   defaultMiraEditorEditMode,
@@ -13,8 +14,13 @@ import {
   resolveMiraEditorToolbarDefinitions,
   resolveMiraEditorToolbarItems,
 } from "./features";
+import { MIRA_EDITOR_VERSION } from "./version";
 
 describe("Mira Editor feature resolution", () => {
+  it("keeps the public version synchronized with the package manifest", () => {
+    expect(MIRA_EDITOR_VERSION).toBe(packageManifest.version);
+  });
+
   it("exports the Svelte editor from the package root", () => {
     expect(MiraEditor).toBeTruthy();
   });

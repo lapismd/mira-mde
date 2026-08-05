@@ -72,6 +72,64 @@
   width: 0.9rem;
 }
 
+.mira-editor-about-dialog {
+  width: min(32rem, calc(100% - 2rem));
+}
+
+.mira-editor-about-dialog__header {
+  text-align: center;
+}
+
+.mira-editor-about-dialog__logo-viewport {
+  aspect-ratio: 480 / 337;
+  display: block;
+  margin: 0 auto;
+  max-width: 15rem;
+  overflow: hidden;
+  width: 100%;
+}
+
+.mira-editor-about-dialog__logo-image {
+  display: block;
+  height: auto;
+  max-width: none;
+  transform: translateX(0);
+  width: 200%;
+}
+
+@media (prefers-color-scheme: dark) {
+  .mira-editor-about-dialog__logo-image {
+    transform: translateX(-50%);
+  }
+}
+
+:where(.dark, .theme-dark)
+  .mira-editor-about-dialog:not([data-mira-color-mode])
+  .mira-editor-about-dialog__logo-image,
+.mira-editor-about-dialog:where(.dark, .theme-dark)
+  .mira-editor-about-dialog__logo-image,
+.mira-editor-about-dialog[data-mira-color-mode="dark"]
+  .mira-editor-about-dialog__logo-image {
+  transform: translateX(-50%);
+}
+
+:where(.light, .theme-light)
+  .mira-editor-about-dialog:not([data-mira-color-mode])
+  .mira-editor-about-dialog__logo-image,
+.mira-editor-about-dialog:where(.light, .theme-light)
+  .mira-editor-about-dialog__logo-image,
+.mira-editor-about-dialog[data-mira-color-mode="light"]
+  .mira-editor-about-dialog__logo-image {
+  transform: translateX(0);
+}
+
+.mira-editor-about-dialog__version {
+  color: var(--mira-muted-foreground);
+  font-size: 0.875rem;
+  margin: 0;
+  text-align: center;
+}
+
 .mira-editor__editor {
   flex: 1;
   min-height: 0;

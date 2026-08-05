@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/svelte-vite";
-import { expect, userEvent, within } from "storybook/test";
+import { expect, userEvent, waitFor, within } from "storybook/test";
 import { catalogParameters } from "../catalog/catalog.mjs";
+import { MIRA_EDITOR_VERSION } from "@lapismd/mira-editor";
 import ComprehensiveDemoStory from "./ComprehensiveDemoStory.svelte";
 import comprehensiveMarkdown from "./comprehensive-demo.md?raw";
 
@@ -133,6 +134,35 @@ export const Playground: Story = {
         body.getByText("Source mode", { selector: "span" }),
       );
       await expect(editor).toHaveAttribute("data-mode", "source");
+    });
+
+    await step("show package details from the toolbar menu", async () => {
+      await waitFor(() =>
+        expect(canvasElement.ownerDocument.body).not.toHaveStyle({
+          pointerEvents: "none",
+        }),
+      );
+      await userEvent.click(
+        canvas.getByRole("button", { name: "View options" }),
+      );
+      const body = within(canvasElement.ownerDocument.body);
+      await userEvent.click(body.getByRole("menuitem", { name: "About Mira" }));
+
+      const dialog = await body.findByRole("dialog", { name: "About Mira" });
+      await expect(dialog).toBeVisible();
+      await expect(
+        within(dialog).getByRole("img", {
+          name: "Mira MDE logo",
+        }),
+      ).toBeVisible();
+      await expect(
+        within(dialog).getByText(`Version ${MIRA_EDITOR_VERSION}`),
+      ).toBeVisible();
+
+      await userEvent.click(
+        within(dialog).getByRole("button", { name: "Close" }),
+      );
+      await expect(dialog).not.toBeVisible();
     });
   },
 };

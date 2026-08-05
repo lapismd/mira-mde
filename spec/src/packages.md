@@ -16,6 +16,7 @@ install internal CodeMirror, renderer, UI, or theme workspaces separately.
 | MIRA-ARCH-011 | Vue and Solid placeholders MUST remain private under `internal/adapters` until they implement and verify a public adapter contract.                                                                                                             |
 | MIRA-ARCH-012 | Package, symbol, DOM-hook, documentation, catalog, and Storybook identities MUST use the canonical Mira names without compatibility aliases for the pre-release `@mira-mde/*` surface.                                                          |
 | MIRA-ARCH-013 | `@lapismd/mira` MUST export the individual Mira and Obsidian theme stylesheets plus an aggregate stylesheet that loads every built-in palette.                                                                                                  |
+| MIRA-ARCH-014 | `@lapismd/mira-editor` MUST ship the logo used by its default About dialog and export a version constant synchronized with its package manifest, so the dialog remains self-contained for consumers.                                            |
 
 ## Public graph
 
@@ -115,6 +116,11 @@ The public product stage is complete: the six approved manifests are versioned
 check, test, build, and package-boundary gates. The React package exports
 components only, while both imperative mounting factories are isolated in
 `@lapismd/mira-vanilla`.
+
+The Mira Editor package also owns the optimized logo used by its default About
+dialog. Its emitted image asset and public `MIRA_EDITOR_VERSION` constant travel
+with the package; a manifest-sync test requires release version changes to
+update the displayed value.
 
 `pnpm packages:pack` packs and installs all six products together in a temporary
 consumer project. Its Svelte, React, and Vanilla compile fixtures validate type

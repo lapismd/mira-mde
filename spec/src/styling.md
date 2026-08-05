@@ -22,6 +22,7 @@ customization and Obsidian-compatible aliases retained as a compatibility layer.
 | MIRA-CSS-012 | Mira MUST expose `--mira-indent-size`, `--mira-indent-unit`, and `--mira-list-indent` defaults and bridge them to the Obsidian-compatible indentation variables used by shipped CodeMirror list and continuation widgets.                  |
 | MIRA-CSS-013 | Visible task checkbox delimiters in source and live-preview editing MUST use the same muted syntax color as other Markdown delimiters while task content retains the normal prose color.                                                   |
 | MIRA-CSS-014 | The editable task-type trigger MUST use shipped semantic hooks and theme tokens, remain outside normal line layout, become visible on line hover or focus, and reuse the shipped task-checkbox artwork inside its portaled picker.         |
+| MIRA-CSS-015 | The Mira Editor About dialog MUST use shipped semantic hooks and tokens. Its combined logo asset MUST retain intrinsic dimensions, scale down responsively, and expose only the active light or dark half within the portaled dialog.      |
 
 Stylesheet order remains theme, UI, preview, Svelte/Mira Editor, and framework
 wrapper composition as documented by the package entrypoints.
@@ -64,6 +65,13 @@ active in live preview, its authored quote markers become visible and nested
 marker pseudo-borders become transparent; every editable child row's line-owned
 outer border MUST align with the rendered parent block border without a
 duplicate, displaced guide beside a first-depth prefix.
+
+The default toolbar About dialog inherits the editor's portaled appearance
+tokens. Its combined light/dark logo keeps explicit intrinsic dimensions to
+avoid layout shift, scales down to the available inline size, and is capped by
+shipped semantic CSS so it cannot overflow or dominate the dialog. The image
+viewport exposes its left half for light appearances and right half for dark
+appearances, including explicit, inherited, and system color modes.
 
 Source and active live-preview task markers expose a stable
 `.cm-formatting-task` hook for their authored `[value]` delimiter. Shipped CSS

@@ -111,3 +111,40 @@ describe("default toolbar separators", () => {
     toolbar.destroy();
   });
 });
+
+describe("toolbar About dialog", () => {
+  it("opens the package-branded version dialog from View options", async () => {
+    const toolbar = await renderToolbar({ features: noInsertItems });
+
+    toolbar.target
+      .querySelector<HTMLButtonElement>('[aria-label="View options"]')
+      ?.click();
+    await tick();
+
+    const aboutItem = Array.from(
+      document.body.querySelectorAll<HTMLElement>('[role="menuitem"]'),
+    ).find((item) => item.textContent?.includes("About Mira"));
+    expect(aboutItem).toBeTruthy();
+
+    aboutItem?.click();
+    await tick();
+
+    const dialog = document.body.querySelector<HTMLElement>('[role="dialog"]');
+    expect(dialog?.getAttribute("aria-labelledby")).toBeTruthy();
+    expect(dialog?.textContent).toContain("About Mira");
+    expect(dialog?.textContent).toContain("Version 0.0.1");
+    expect(
+      dialog?.querySelector<HTMLImageElement>('img[alt="Mira MDE logo"]'),
+    ).toBeTruthy();
+
+    dialog
+      ?.querySelector<HTMLButtonElement>('[data-slot="dialog-close"]')
+      ?.click();
+    await tick();
+    expect(dialog?.dataset.state).toBe("closed");
+    await new Promise((resolve) => window.setTimeout(resolve, 250));
+    expect(document.body.querySelector('[role="dialog"]')).toBeNull();
+
+    toolbar.destroy();
+  });
+});

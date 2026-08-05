@@ -80,6 +80,35 @@ function resolveTokenColor(element: HTMLElement, token: string): string {
   return color;
 }
 
+async function expectAboutLogoHalf(
+  canvasElement: HTMLElement,
+  colorMode: "light" | "dark",
+): Promise<void> {
+  const canvas = within(canvasElement);
+  const body = within(canvasElement.ownerDocument.body);
+  await userEvent.click(canvas.getByRole("button", { name: "View options" }));
+  await userEvent.click(body.getByRole("menuitem", { name: "About Mira" }));
+
+  const dialog = await body.findByRole("dialog", { name: "About Mira" });
+  const logo = within(dialog).getByRole("img", { name: "Mira MDE logo" });
+  const viewport = logo.parentElement;
+  if (!viewport) throw new Error("About logo viewport did not render");
+
+  const viewportRect = viewport.getBoundingClientRect();
+  const logoRect = logo.getBoundingClientRect();
+  await expect(Math.abs(logoRect.width - viewportRect.width * 2)).toBeLessThan(
+    1,
+  );
+  const themedEdgeDelta =
+    colorMode === "light"
+      ? Math.abs(logoRect.left - viewportRect.left)
+      : Math.abs(logoRect.right - viewportRect.right);
+  await expect(themedEdgeDelta).toBeLessThan(1);
+
+  await userEvent.click(within(dialog).getByRole("button", { name: "Close" }));
+  await expect(dialog).not.toBeVisible();
+}
+
 export const MiraLight: Story = {
   tags: [
     "visual-approved",
@@ -99,6 +128,7 @@ export const MiraLight: Story = {
       colorScheme: "light",
     });
     await expect(shell).toHaveAttribute("data-mira-theme", "mira");
+    await expectAboutLogoHalf(canvasElement, "light");
   },
 };
 
@@ -120,6 +150,7 @@ export const MiraDark: Story = {
       foreground: "rgb(241, 243, 247)",
       colorScheme: "dark",
     });
+    await expectAboutLogoHalf(canvasElement, "dark");
   },
 };
 
@@ -190,6 +221,7 @@ export const PageInheritanceAndSystem: Story = {
     });
     await expect(shell).not.toHaveAttribute("data-mira-theme");
     await expect(shell).toHaveAttribute("data-mira-color-mode", "system");
+    await expectAboutLogoHalf(canvasElement, "light");
   },
 };
 

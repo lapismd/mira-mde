@@ -70,4 +70,5 @@ export type {
   ResolvedMiraEditorFeatures,
 } from "./features";
 export type { MiraViewModeMenuItem } from "./toolbar-model";
+export { MIRA_EDITOR_VERSION } from "./version";
 export default MiraEditor;
