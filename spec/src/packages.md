@@ -89,14 +89,18 @@ entry point.
   consumer API. Editable rendered task widgets MUST reuse one internal task
   state registry and the exported Popover primitive to select a custom marker,
   update only that marker character, and preserve line geometry without adding
-  a public option or entry point.
+  a public option or entry point. Editable list-callout widgets MUST reuse the
+  resolved extension catalog and the exported Popover primitive to select or
+  remove an authored callout marker without changing list geometry.
 - `preview` exports Markdown preview, outline, embed, and renderer surfaces. Its
   shipped reading styles MUST keep a list guide continued through a child
   blockquote on the parent's painted guide column after accounting for the
   blockquote border box. Reading list controls MUST use the first rendered item
   row as their marker-alignment anchor even when the item wraps. Editable
   preview checkboxes MUST share the internal task-type picker with live preview;
-  read-only previews MUST retain their existing checkbox-only DOM contract.
+  editable list-callout markers MUST share the internal list-highlight picker
+  with live preview. Read-only previews MUST retain their existing non-button
+  marker and checkbox DOM contracts.
 - `tables` exports the supported Markdown and grid-table components and owns
   the `cm-table` raw-line decoration consumed by shipped source and
   live-preview fallback styles.

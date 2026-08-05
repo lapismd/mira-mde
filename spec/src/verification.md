@@ -53,6 +53,8 @@ authorized baseline regeneration migrations are complete.
 | MIRA-GOV-008                                                                                            | Package-boundary checker and tarball leak tests                            | Implemented                           |
 | MIRA-MD-016                                                                                             | Live-preview table source-reveal typography and geometry interaction       | Implemented by table fallback slice   |
 | MIRA-CSS-017                                                                                            | Shared raw-table source/live selector and computed-style acceptance        | Implemented by table fallback slice   |
+| MIRA-MD-017                                                                                             | Editable list-highlight catalog, mutation, and surface-boundary acceptance | In progress                           |
+| MIRA-CSS-018                                                                                            | Layout-stable marker trigger and portaled highlight picker acceptance      | In progress                           |
 
 The context-aware toolbar action slice adds one shared CodeMirror engine for
 ten action identifiers and exposes it through the Mira, Mira Editor, React, and
@@ -293,6 +295,14 @@ the Comprehensive Live Preview fixture. No visual baseline was created or
 refreshed. The aggregate `pnpm check:all` command remains blocked at its
 initial Prettier step by an unrelated `.visual-delta/config.json` formatting
 change outside this slice; none of this slice's files appears in that failure.
+
+The editable list-highlight picker slice is in progress. Its acceptance target
+is the same shared-control boundary as task states: rendered markers in live
+preview and editable preview expose the resolved default and extension catalog,
+selection changes only the authored callout token, clearing also removes its
+separator space, and raw source plus read-only reading markers remain plain
+Markdown/rendered output. Focused interaction coverage will verify marker,
+content-column, and line-height stability before this status is promoted.
 
 The add-on's Docker stage does not trust authored `storybook-static` output,
 but it transports the affected cache and preview graph and may restore a
