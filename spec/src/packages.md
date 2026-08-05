@@ -103,6 +103,10 @@ entry point.
   editable list-callout markers MUST share the internal list-highlight picker
   with live preview. Read-only previews MUST retain their existing passive,
   non-button marker and checkbox DOM contracts.
+- The shared list-highlight control MUST own one margin-free padded marker slot
+  for both text and icon renderers. CodeMirror and editable preview integrations
+  MUST preserve that slot on wrapped lines rather than adding surface-specific
+  spacing around the mounted control.
 - `tables` exports the supported Markdown and grid-table components and owns
   the `cm-table` raw-line decoration consumed by shipped source and
   live-preview fallback styles.

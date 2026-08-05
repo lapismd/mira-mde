@@ -24,34 +24,75 @@ async function scrollEditorUntilVisible(page: Page, locator: Locator) {
   await expect(locator.first()).toBeVisible();
 }
 
-async function calloutGeometry(line: Locator) {
-  return line.evaluate((element) => {
+async function calloutGeometry(
+  line: Locator,
+  contentText = "Highlighted with the default catalog",
+) {
+  return line.evaluate((element, expectedContent) => {
     const bullet = element.querySelector<HTMLElement>(".cm-formatting-list");
     const trigger = element.querySelector<HTMLElement>(
       ".mira-list-callout-trigger",
     );
+    const glyph = trigger?.querySelector<HTMLElement>(
+      ".mira-list-callout-glyph",
+    );
+    const background = element.querySelector<HTMLElement>(".lc-list-bg");
     const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
     let content: Text | null = null;
     while (walker.nextNode()) {
       const text = walker.currentNode as Text;
-      if (text.data.includes("Highlighted with the default catalog")) {
+      if (text.data.includes(expectedContent)) {
         content = text;
         break;
       }
     }
-    if (!bullet || !trigger || !content) {
+    if (!bullet || !trigger || !glyph || !content) {
       throw new Error("List-highlight geometry target is missing");
     }
     const bulletRect = bullet.getBoundingClientRect();
     const triggerRect = trigger.getBoundingClientRect();
+    const glyphRect = glyph.getBoundingClientRect();
+    const backgroundRect = background?.getBoundingClientRect();
     const contentRange = document.createRange();
     contentRange.selectNodeContents(content);
-    const contentRect = contentRange.getBoundingClientRect();
+    const contentRects = Array.from(contentRange.getClientRects()).filter(
+      (rect) => rect.width > 0 && rect.height > 0,
+    );
+    const firstContentRect = contentRects[0];
+    if (!firstContentRect) {
+      throw new Error("List-highlight content row is missing");
+    }
+    const markerChrome = getComputedStyle(trigger, "::before");
+    const markerChromeLeft =
+      triggerRect.left + (Number.parseFloat(markerChrome.left) || 0);
+    const computedLineHeight = Number.parseFloat(
+      getComputedStyle(element).lineHeight,
+    );
     return {
       bulletLeft: bulletRect.left,
+      bulletRight: bulletRect.right,
       triggerLeft: triggerRect.left,
-      contentLeft: contentRect.left,
+      markerChromeLeft,
+      glyphLeft: glyphRect.left,
+      glyphRight: glyphRect.right,
+      glyphCenterY: glyphRect.top + glyphRect.height / 2,
+      contentLeft: firstContentRect.left,
+      contentGap: firstContentRect.left - glyphRect.right,
+      firstContentCenterY: firstContentRect.top + firstContentRect.height / 2,
+      contentRowCount: contentRects.length,
+      computedLineHeight,
       lineHeight: element.getBoundingClientRect().height,
+      backgroundHeight: backgroundRect?.height ?? 0,
+    };
+  }, contentText);
+}
+
+async function triggerChrome(trigger: Locator) {
+  return trigger.evaluate((element) => {
+    const style = getComputedStyle(element, "::before");
+    return {
+      backgroundColor: style.backgroundColor,
+      boxShadow: style.boxShadow,
     };
   });
 }
@@ -83,10 +124,21 @@ test("live preview selects and clears resolved list highlights without shifting 
   await expect(trigger).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
   await expect(trigger).toHaveCSS("box-shadow", "none");
   const before = await calloutGeometry(line);
+  const restChrome = await triggerChrome(trigger);
+  expect(restChrome.backgroundColor).toBe("rgba(0, 0, 0, 0)");
+  expect(restChrome.boxShadow).toBe("none");
+  expect(before.triggerLeft).toBeGreaterThanOrEqual(before.bulletRight - 0.5);
+  expect(before.markerChromeLeft - before.bulletRight).toBeGreaterThan(1);
+  expect(before.contentGap).toBeGreaterThan(3);
+  expect(before.contentGap).toBeLessThan(9);
+  expect(
+    Math.abs(before.glyphCenterY - before.firstContentCenterY),
+  ).toBeLessThan(1);
 
   await trigger.hover();
-  await expect(trigger).not.toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
-  await expect(trigger).not.toHaveCSS("box-shadow", "none");
+  const hoverChrome = await triggerChrome(trigger);
+  expect(hoverChrome.backgroundColor).not.toBe("rgba(0, 0, 0, 0)");
+  expect(hoverChrome.boxShadow).not.toBe("none");
   expectStableGeometry(before, await calloutGeometry(line));
 
   await trigger.click();
@@ -136,6 +188,77 @@ test("live preview selects and clears resolved list highlights without shifting 
   await expect(
     line.getByRole("button", { name: /Change list highlight/u }),
   ).toHaveCount(0);
+});
+
+test("list-highlight text and icons stay compact and centered when the item wraps", async ({
+  page,
+}) => {
+  await gotoStory(page, "markdown-lists--custom-callout-catalog-live");
+
+  const textLine = page
+    .locator(".cm-line.lc-list-callout")
+    .filter({ hasText: "Highlighted with the default catalog" });
+  const iconLine = page
+    .locator(".cm-line.lc-list-callout")
+    .filter({ hasText: "Documentation uses the default book icon" });
+  const wrappedLine = page.locator(".cm-line.lc-list-callout").filter({
+    hasText: "A custom decision marker contributed by an extension",
+  });
+
+  const textGeometry = await calloutGeometry(textLine);
+  const iconGeometry = await calloutGeometry(
+    iconLine,
+    "Documentation uses the default book icon",
+  );
+  const unwrappedGeometry = await calloutGeometry(
+    wrappedLine,
+    "A custom decision marker contributed by an extension",
+  );
+
+  expect(
+    Math.abs(iconGeometry.contentLeft - textGeometry.contentLeft),
+  ).toBeLessThan(0.75);
+  expect(iconGeometry.contentGap).toBeGreaterThan(3);
+  expect(iconGeometry.contentGap).toBeLessThan(9);
+  expect(
+    Math.abs(iconGeometry.glyphCenterY - iconGeometry.firstContentCenterY),
+  ).toBeLessThan(1);
+
+  await page.locator(".mira-story-surface--editor").evaluate((element) => {
+    element.setAttribute(
+      "style",
+      `${element.getAttribute("style") ?? ""}; width: 28rem`,
+    );
+  });
+
+  await expect
+    .poll(async () => {
+      const geometry = await calloutGeometry(
+        wrappedLine,
+        "A custom decision marker contributed by an extension",
+      );
+      return geometry.contentRowCount;
+    })
+    .toBeGreaterThan(1);
+
+  const wrappedGeometry = await calloutGeometry(
+    wrappedLine,
+    "A custom decision marker contributed by an extension",
+  );
+  expect(wrappedGeometry.lineHeight).toBeGreaterThan(
+    wrappedGeometry.computedLineHeight * 1.5,
+  );
+  expect(wrappedGeometry.backgroundHeight).toBeGreaterThanOrEqual(
+    wrappedGeometry.lineHeight,
+  );
+  expect(
+    Math.abs(
+      wrappedGeometry.glyphCenterY - wrappedGeometry.firstContentCenterY,
+    ),
+  ).toBeLessThan(1);
+  expect(
+    Math.abs(wrappedGeometry.contentGap - unwrappedGeometry.contentGap),
+  ).toBeLessThan(0.5);
 });
 
 test("list-highlight pickers stay off read-only and raw-source surfaces", async ({

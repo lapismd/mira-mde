@@ -38,17 +38,23 @@
   display: inline-block;
   font-family: var(--font-monospace, var(--mira-font-mono));
   font-weight: 700;
-  margin-inline-end: 0.4em;
   pointer-events: none;
+}
+
+.markdown-rendered .lc-list-marker:not(.mira-list-callout-trigger),
+.markdown-preview-surface
+  .markdown
+  .lc-list-marker:not(.mira-list-callout-trigger) {
+  padding-inline-end: 0.3em;
 }
 
 .markdown-rendered .lc-list-marker > svg,
 .markdown-preview-surface .markdown .lc-list-marker > svg,
 .markdown-editor-surface .lc-list-marker > svg {
   display: inline-block;
-  height: 1em;
-  position: relative;
-  width: 1em;
+  height: 0.9em;
+  vertical-align: -0.1em;
+  width: 0.9em;
 }
 
 .mira-list-callout-widget {
@@ -57,7 +63,7 @@
 }
 
 .mira-list-callout-trigger {
-  align-items: baseline;
+  align-items: center;
   appearance: none;
   background: transparent;
   border: 0;
@@ -65,14 +71,26 @@
   cursor: pointer;
   display: inline-flex;
   font: inherit;
+  isolation: isolate;
   justify-content: center;
   line-height: inherit;
-  margin-inline-end: 0.22em;
-  margin-inline-start: -0.18em;
-  padding: 0 0.18em;
+  margin: 0;
+  padding: 0 0.13em 0 0.2em;
   pointer-events: auto;
   position: relative;
   vertical-align: baseline;
+}
+
+.mira-list-callout-trigger::before {
+  background: transparent;
+  border-radius: inherit;
+  box-shadow: none;
+  content: "";
+  inset-block: 0;
+  inset-inline: 0.1em 0;
+  pointer-events: none;
+  position: absolute;
+  z-index: 0;
 }
 
 .markdown-editor-surface .mira-list-callout-trigger,
@@ -81,13 +99,20 @@
 }
 
 .mira-list-callout-trigger:is(:hover, :focus-visible, [data-state="open"]) {
-  background-color: var(--background-modifier-hover, var(--mira-accent-soft));
-  box-shadow: inset 0 0 0 1px
-    var(--background-modifier-border, var(--mira-border));
   outline: none;
 }
 
-.mira-list-callout-trigger:focus-visible {
+.mira-list-callout-trigger:is(
+    :hover,
+    :focus-visible,
+    [data-state="open"]
+  )::before {
+  background-color: var(--background-modifier-hover, var(--mira-accent-soft));
+  box-shadow: inset 0 0 0 1px
+    var(--background-modifier-border, var(--mira-border));
+}
+
+.mira-list-callout-trigger:focus-visible::before {
   box-shadow:
     inset 0 0 0 1px var(--background-modifier-border, var(--mira-border)),
     0 0 0 2px var(--background-modifier-border-focus, var(--mira-focus-ring));
@@ -95,14 +120,21 @@
 
 .mira-list-callout-glyph {
   align-items: center;
+  block-size: 1em;
   display: inline-flex;
+  flex: 0 0 0.85em;
+  inline-size: 0.85em;
   justify-content: center;
+  line-height: 1;
   pointer-events: none;
+  position: relative;
+  z-index: 1;
 }
 
 .mira-list-callout-glyph > svg {
-  height: 1em;
-  width: 1em;
+  display: block;
+  height: 0.78em;
+  width: 0.78em;
 }
 
 [data-slot="popover-content"].mira-list-callout-menu {

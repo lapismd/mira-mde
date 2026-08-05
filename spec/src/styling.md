@@ -30,6 +30,14 @@ customization and Obsidian-compatible aliases retained as a compatibility layer.
 Stylesheet order remains theme, UI, preview, Svelte/Mira Editor, and framework
 wrapper composition as documented by the package entrypoints.
 
+List-highlight triggers reserve one fixed marker slot inside their existing
+inline footprint. Inline-start and inline-end padding provide separation
+without CSS margins; the ghost chrome is inset inside that footprint so its
+border begins after the list bullet. Text and SVG markers are centered in the
+same slot, keeping the following content column and first-row alignment stable
+when a CodeMirror line wraps. Passive reading markers use compact end padding
+because their parsed source separator is not rendered.
+
 Theme, UI, preview, and composable-editor CSS are physically owned by
 `@lapismd/mira`. The package exports `/themes/mira.css`,
 `/themes/obsidian.css`, `/themes.css`, the documented UI and preview style

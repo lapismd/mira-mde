@@ -314,11 +314,17 @@ reports the expected pending change of 3,795 pixels (1 percent) against the
 pre-picker reference. Strict comparison therefore exits non-zero; no visual
 baseline was created or refreshed for this slice.
 
-The list-highlight spacing follow-up is in progress against MIRA-CSS-018. Its
-acceptance target replaces inherited marker margins with a fixed padded slot,
-keeps the interactive border clear of the list bullet, centers text and icon
-markers on the first visual row, and exercises the same geometry on wrapped
-CodeMirror lines without refreshing visual baselines.
+The list-highlight spacing follow-up replaces inherited marker margins with a
+fixed padded slot. Browser geometry resolves to zero inline margins, a 1.4 px
+bullet-to-border gap, and the same 16.5 px trigger footprint for text and icon
+markers. Three focused Chromium cases verify compact post-marker spacing,
+shared content columns, first-row centering, a background spanning the full
+height of a wrapped CodeMirror line, unchanged source mutation geometry, and
+the existing reading/source boundaries. Passive reading markers retain compact
+padding after the parsed marker. Fresh compare-only Visual Delta captures pass
+both browser cases and report the expected pending changes of 3,549 reading
+pixels and 3,655 live-preview pixels (1 percent each). Strict comparison exits
+non-zero; no visual baseline is refreshed by this follow-up.
 
 The add-on's Docker stage does not trust authored `storybook-static` output,
 but it transports the affected cache and preview graph and may restore a
