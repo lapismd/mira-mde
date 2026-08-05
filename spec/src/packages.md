@@ -118,7 +118,9 @@ entry point.
   siblings share the same painted marker column.
 - `tables` exports the supported Markdown and grid-table components and owns
   the `cm-table` raw-line decoration consumed by shipped source and
-  live-preview fallback styles.
+  live-preview fallback styles. Its default CodeMirror extensions MUST attach
+  the matching grid-table line decoration and intercept grid-table Tab/Enter
+  navigation before the generic indentation keymap.
 - `ui` and its documented component subpaths export the shared UI primitives.
 - `themes/mira.css`, `themes/obsidian.css`, `themes.css`, and `styles.css`
   provide explicit CSS entry points.

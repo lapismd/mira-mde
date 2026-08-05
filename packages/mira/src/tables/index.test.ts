@@ -3,6 +3,6 @@ import { createTableExtensions } from ".";
 
 describe("codemirror tables public API", () => {
   it("creates the default table extensions", () => {
-    expect(createTableExtensions()).toHaveLength(1);
+    expect(createTableExtensions()).toHaveLength(2);
   });
 });

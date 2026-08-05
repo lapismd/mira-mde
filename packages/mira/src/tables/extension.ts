@@ -14,6 +14,13 @@ import {
 import { TableNode } from "./table-node";
 import type { TableExtensionProps } from "./types";
 
+export {
+  getGridTableNode,
+  gridTableExtension,
+  gridTableTabAction,
+} from "./grid-table-extension";
+import { gridTableExtension } from "./grid-table-extension";
+
 export function getTableNode(
   view: EditorView,
 ): [
@@ -218,5 +225,5 @@ export function tableExtension({
 }
 
 export function createTableExtensions(): Extension[] {
-  return [tableExtension()];
+  return [tableExtension(), gridTableExtension()];
 }

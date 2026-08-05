@@ -57,6 +57,7 @@ authorized baseline regeneration migrations are complete.
 | MIRA-MD-018                                                                                             | Comprehensive reading grid/callout structure and live-preview gap geometry | Implemented by comprehensive repair   |
 | MIRA-CSS-018                                                                                            | Layout-stable marker trigger and portaled highlight picker acceptance      | Implemented by list-highlight slice   |
 | MIRA-CSS-019                                                                                            | Consecutive live-preview callout painted-gap and zero-margin acceptance    | Implemented by comprehensive repair   |
+| MIRA-MD-019, MIRA-CSS-020                                                                               | Grid-table keymap, serialization, selection, and computed typography       | Implemented by grid-table parity      |
 
 The context-aware toolbar action slice adds one shared CodeMirror engine for
 ten action identifiers and exposes it through the Mira, Mira Editor, React, and
@@ -369,6 +370,20 @@ for a 5.9 px visual gap while every callout and CodeMirror widget margin stays
 at zero. The two focused Chromium cases, canonical spec and catalog checks,
 Mira package check, test, and build, and `pnpm check:all` pass. No visual
 baseline is created or refreshed by this repair.
+
+The grid-table source parity slice implements MIRA-MD-019 and MIRA-CSS-020.
+Before the repair, Tab on the `Table Headings` row inserted four leading spaces,
+reclassified it as an indented list line, and left grid rows without the table
+line hooks that provide monospaced typography. Mira now composes Lapis's
+grid-table keymap and line-decoration contract alongside the existing pipe-table
+extension: Tab serializes the complete aligned grid and selects the next cell,
+while Shift-Tab and Enter retain the grid navigation commands. All 19 authored
+rows carry `cm-table`, `cm-formatting-table`, and `cm-formatting-grid-table` in
+Source mode and after Live Preview's source reveal, resolving to the shared
+monospaced, preformatted line style. The 251-test Mira suite, three Grid Tables
+Storybook interactions, two focused Chromium keyboard/typography cases,
+canonical spec and catalog checks, package build/publint, and `pnpm check:all`
+pass. No visual baseline is created or refreshed by this slice.
 
 The add-on's Docker stage does not trust authored `storybook-static` output,
 but it transports the affected cache and preview graph and may restore a
