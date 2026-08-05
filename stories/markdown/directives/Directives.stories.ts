@@ -87,8 +87,8 @@ export const LivePreview: Story = {
 
 export const SourceMode: Story = {
   tags: [
-    "visual-pending",
-    "!visual-approved",
+    "visual-approved",
+    "!visual-pending",
     "!visual-ready",
     "!visual-failed",
   ],

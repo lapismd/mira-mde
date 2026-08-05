@@ -50,8 +50,8 @@ export const Preview: Story = {
 
 export const LivePreview: Story = {
   tags: [
-    "visual-pending",
-    "!visual-approved",
+    "visual-approved",
+    "!visual-pending",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -85,8 +85,8 @@ export const LivePreview: Story = {
 
 export const SourceMode: Story = {
   tags: [
-    "visual-pending",
-    "!visual-approved",
+    "visual-approved",
+    "!visual-pending",
     "!visual-ready",
     "!visual-failed",
   ],

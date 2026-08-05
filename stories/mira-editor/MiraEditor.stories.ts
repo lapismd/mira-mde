@@ -31,8 +31,8 @@ type Story = StoryObj<typeof meta>;
 /** Interactive playground — Controls drive the public configuration props. */
 export const Playground: Story = {
   tags: [
-    "visual-pending",
-    "!visual-approved",
+    "visual-approved",
+    "!visual-pending",
     "!visual-ready",
     "!visual-failed",
   ],

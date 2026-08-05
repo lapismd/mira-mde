@@ -29,8 +29,8 @@ type Story = StoryObj<typeof meta>;
 
 export const Defaults: Story = {
   tags: [
-    "visual-pending",
-    "!visual-approved",
+    "visual-approved",
+    "!visual-pending",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -60,8 +60,8 @@ export const Defaults: Story = {
 
 export const WithoutToolbar: Story = {
   tags: [
-    "visual-pending",
-    "!visual-approved",
+    "visual-approved",
+    "!visual-pending",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -88,8 +88,8 @@ export const WithoutToolbar: Story = {
 
 export const WithoutWidgets: Story = {
   tags: [
-    "visual-pending",
-    "!visual-approved",
+    "visual-approved",
+    "!visual-pending",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -119,8 +119,8 @@ export const WithoutWidgets: Story = {
 
 export const EditModesOnly: Story = {
   tags: [
-    "visual-pending",
-    "!visual-approved",
+    "visual-approved",
+    "!visual-pending",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -149,8 +149,8 @@ export const EditModesOnly: Story = {
 
 export const CompactToolbarItems: Story = {
   tags: [
-    "visual-pending",
-    "!visual-approved",
+    "visual-approved",
+    "!visual-pending",
     "!visual-ready",
     "!visual-failed",
   ],

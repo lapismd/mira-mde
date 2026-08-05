@@ -107,8 +107,8 @@ const activeTargets = [
 
 export const WrappedListItemsSource: Story = {
   tags: [
-    "visual-pending",
-    "!visual-approved",
+    "visual-approved",
+    "!visual-pending",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -138,8 +138,8 @@ export const WrappedListItemsSource: Story = {
 
 export const WrappedListItemsLivePreview: Story = {
   tags: [
-    "visual-pending",
-    "!visual-approved",
+    "visual-approved",
+    "!visual-pending",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -173,8 +173,8 @@ export const WrappedListItemsLivePreview: Story = {
 
 export const ContinuationParagraphsSource: Story = {
   tags: [
-    "visual-pending",
-    "!visual-approved",
+    "visual-approved",
+    "!visual-pending",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -216,8 +216,8 @@ export const ContinuationParagraphsSource: Story = {
 
 export const ContinuationParagraphsLivePreview: Story = {
   tags: [
-    "visual-pending",
-    "!visual-approved",
+    "visual-approved",
+    "!visual-pending",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -259,8 +259,8 @@ export const ContinuationParagraphsLivePreview: Story = {
 
 export const NestedListsAndQuotesSource: Story = {
   tags: [
-    "visual-pending",
-    "!visual-approved",
+    "visual-approved",
+    "!visual-pending",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -298,8 +298,8 @@ export const NestedListsAndQuotesSource: Story = {
 
 export const NestedListsAndQuotesLivePreview: Story = {
   tags: [
-    "visual-pending",
-    "!visual-approved",
+    "visual-approved",
+    "!visual-pending",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -337,8 +337,8 @@ export const NestedListsAndQuotesLivePreview: Story = {
 
 export const NestedListsAndQuotesReading: Story = {
   tags: [
-    "visual-pending",
-    "!visual-approved",
+    "visual-approved",
+    "!visual-pending",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -373,8 +373,8 @@ export const NestedListsAndQuotesReading: Story = {
 
 export const ActivePrefixesSource: Story = {
   tags: [
-    "visual-pending",
-    "!visual-approved",
+    "visual-approved",
+    "!visual-pending",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -413,8 +413,8 @@ export const ActivePrefixesSource: Story = {
 
 export const ActivePrefixesLivePreview: Story = {
   tags: [
-    "visual-pending",
-    "!visual-approved",
+    "visual-approved",
+    "!visual-pending",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -456,8 +456,8 @@ export const ActivePrefixesLivePreview: Story = {
 
 export const ConfigurableIndentWidth: Story = {
   tags: [
-    "visual-pending",
-    "!visual-approved",
+    "visual-approved",
+    "!visual-pending",
     "!visual-ready",
     "!visual-failed",
   ],

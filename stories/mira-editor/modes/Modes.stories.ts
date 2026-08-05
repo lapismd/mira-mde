@@ -28,8 +28,8 @@ type Story = StoryObj<typeof meta>;
 
 export const LivePreview: Story = {
   tags: [
-    "visual-pending",
-    "!visual-approved",
+    "visual-approved",
+    "!visual-pending",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -50,8 +50,8 @@ export const LivePreview: Story = {
 
 export const Source: Story = {
   tags: [
-    "visual-pending",
-    "!visual-approved",
+    "visual-approved",
+    "!visual-pending",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -94,8 +94,8 @@ export const Preview: Story = {
 
 export const Split: Story = {
   tags: [
-    "visual-pending",
-    "!visual-approved",
+    "visual-approved",
+    "!visual-pending",
     "!visual-ready",
     "!visual-failed",
   ],
