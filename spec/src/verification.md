@@ -395,16 +395,16 @@ Stories retain `visual-pending` until human acceptance is recorded separately;
 this review state does not mean their committed baseline or deterministic
 comparison is missing.
 
-The Visual Delta suite is reviewed at `0.0.5` and temporarily installed from
-the sibling source checkout while the remaining integration issues are being
-resolved. It retains the canonical capture runner used by both Storybook's Diff
-Browser action and the CLI, so a host-local browser cannot be mislabeled as the
+The Visual Delta suite is reviewed at the published `0.0.6` release and is
+installed from the registry through the root's semver development dependency.
+It retains the canonical capture runner used by both Storybook's Diff Browser
+action and the CLI, so a host-local browser cannot be mislabeled as the
 Linux/ARM64 baseline target. The package retains the `0.0.4` guards that build a source worker only when
 `tsconfig.node-build.json` exists, use its executable shipped `dist` worker
 otherwise, and exclude `.turbo` from both clean-workspace staging and post-run
 artifact inventory. The package carries focused regression tests for both
-behaviors, so Mira consumes the linked source without its former `0.0.3` pnpm
-patch. Version `0.0.5` replaces the physical-path-sensitive,
+behaviors, so Mira consumes upstream without its former `0.0.3` pnpm patch.
+Version `0.0.5` replaces the physical-path-sensitive,
 repeated-story version 2 affected cache with compact logical version 3 state,
 enables affected planning when the host option is omitted, and guardedly
 revalidates eligible version 2 passes. It also caches verified canonical static
@@ -416,16 +416,18 @@ the Playwright worker for every story. Mira declares its established
 inheriting the release's flat `story-id` default. The upgrade remains
 compare-only and does not authorize baseline image changes.
 
-The linked source additionally recreates workspace-local pnpm links in every
+During the temporary source-link phase, the add-on additionally recreated
+workspace-local pnpm links in every
 fresh canonical staging directory even after its dependency volume is warm. It
-stages the external Visual Delta checkout at the consumer's resolved `link:`
+staged the external Visual Delta checkout at the consumer's resolved `link:`
 target with a separate Linux dependency volume, so canonical capture neither
-skips package-local links nor imports macOS `node_modules`. Focused runner tests
-cover both the warm relink command and isolated linked-source staging. The
-staged copy is disposable and writable so pnpm can materialize the shipped CLI
+skipped package-local links nor imported macOS `node_modules`. Focused runner
+tests cover both the warm relink command and isolated linked-source staging. The
+staged copy was disposable and writable so pnpm could materialize the shipped CLI
 bin without mutating the host checkout. A content-only fingerprint of the
-linked manifest, lockfile, and source enters the canonical static-build key,
-preventing a source edit from restoring stale output.
+linked manifest, lockfile, and source entered the canonical static-build key,
+preventing a source edit from restoring stale output. Published `0.0.6` now
+contains the reviewed repairs, so Mira no longer needs that integration link.
 
 Linked-source validation passes all 17 strict doctor checks, including a fresh
 Storybook build and the full Linux/ARM64 runner probe, with no warnings or
@@ -458,6 +460,16 @@ but returned a transient macOS `ENOTEMPTY` while removing its temporary staging
 directory; the immediate repeat passed without a downstream patch. The
 dependency update also passes `pnpm spec:check`, `pnpm catalog:check`, and
 `pnpm check:all`; no visual baseline is created or refreshed by the upgrade.
+
+Published-release restoration resolves
+`@lapismd/storybook-addon-visual-delta@0.0.6` from pnpm's registry store rather
+than the sibling checkout, and the lockfile records the published tarball's
+integrity. The upstream strict doctor rebuild passes 16 checks with no warnings
+or errors and inventories all 132 visual files. Its compare-only affected
+dry-run selects all 132 stories because the root manifest changed, without
+running captures, changing review status, or mutating a baseline. The migration
+passes `pnpm spec:check`, `pnpm catalog:check`, and `pnpm check:all` against the
+published package.
 
 The Storybook patch refresh aligns `storybook`, addon-a11y, addon-docs,
 addon-themes, addon-vitest, and svelte-vite at `10.5.6`, while retaining the

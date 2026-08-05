@@ -38,13 +38,13 @@ resolution.
 Storybook infrastructure dependencies are root-only development tools and MUST
 NOT leak into a public package manifest or emitted package output. The reviewed
 Visual Delta release is upgraded independently from Mira's six-package runtime
-graph and remains subject to the catalog's build and compare-only gates. A
-temporary root-only `link:` dependency MAY consume its sibling source checkout
-while integration repairs are in progress, but MUST NOT enter any public
-package graph. The Visual Delta package MUST own clean-stage worker fallback,
-generated-cache exclusions, fresh-workspace dependency relinking, and linked
-source build identity required by those gates; Mira does not maintain a
-downstream pnpm patch for behavior available in the reviewed upstream source.
+graph and remains subject to the catalog's build and compare-only gates. Mira
+consumes the reviewed published `0.0.6` release through a root-only semver
+dependency; sibling source links MUST NOT enter the canonical install or any
+public package graph. The Visual Delta package MUST own the clean-stage worker
+fallback, generated-cache exclusions, canonical build identity, and runner
+behavior required by those gates; Mira does not maintain a downstream pnpm
+patch for behavior available in the reviewed upstream release.
 
 The root keeps the `storybook`, accessibility, docs, themes, Vitest, and Svelte
 Vite packages on one reviewed patch line; the current set is `10.5.6`.

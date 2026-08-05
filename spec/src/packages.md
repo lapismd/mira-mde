@@ -41,16 +41,12 @@ controller so every framework uses the same transaction semantics.
 Repository-only tools such as `@lapismd/storybook-addon-visual-delta` belong in
 the private root manifest. They are not part of the six-package public release
 set and MUST NOT appear in packed consumer dependency graphs. The root consumes
-the reviewed `0.0.5` source checkout through the temporary private
-`link:../../storybook-addon-visual-delta` development dependency while its
-canonical-runner integration is being stabilized. The linked checkout owns the
-compact, path-independent affected state, canonical Storybook build reuse,
-fresh-workspace dependency relinking, and isolated linked-source staging used
-by this repository. Its staged content fingerprint also makes linked source
-edits part of the canonical static-build identity; Mira does not duplicate
-those fixes in a downstream patch.
-The link MUST remain repository-only and MUST NOT enter any public package's
-manifest or packed dependency graph.
+the reviewed published `0.0.6` release through a normal semver development
+dependency. That upstream release owns the compact, path-independent affected
+state, canonical Storybook build reuse, isolated staging, and runner behavior
+used by this repository; Mira does not duplicate those fixes in a downstream
+patch. The dependency MUST remain repository-only and MUST NOT enter any public
+package's manifest or packed dependency graph.
 
 The private root toolchain aligns the six core Storybook packages at `10.5.6`.
 That alignment is repository infrastructure only: it MUST NOT add Storybook to
