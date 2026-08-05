@@ -314,6 +314,12 @@ reports the expected pending change of 3,795 pixels (1 percent) against the
 pre-picker reference. Strict comparison therefore exits non-zero; no visual
 baseline was created or refreshed for this slice.
 
+The list-highlight spacing follow-up is in progress against MIRA-CSS-018. Its
+acceptance target replaces inherited marker margins with a fixed padded slot,
+keeps the interactive border clear of the list bullet, centers text and icon
+markers on the first visual row, and exercises the same geometry on wrapped
+CodeMirror lines without refreshing visual baselines.
+
 The add-on's Docker stage does not trust authored `storybook-static` output,
 but it transports the affected cache and preview graph and may restore a
 checksum-verified canonical static build. The `test:visual` gate therefore uses
