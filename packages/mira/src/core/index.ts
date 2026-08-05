@@ -15,6 +15,15 @@ import type {
   MiraTemplateSelection,
   MiraMode,
 } from "@lapismd/mira/extensions";
+import {
+  applyMiraMarkdownAction,
+  type MiraMarkdownActionId,
+} from "./markdown-actions";
+export {
+  applyMiraMarkdownAction,
+  miraMarkdownActionIds,
+  type MiraMarkdownActionId,
+} from "./markdown-actions";
 export {
   createMiraCodeMirrorExtensions,
   type MiraCodeMirrorExtensionsOptions,
@@ -234,6 +243,10 @@ export class MiraEditorController {
       ...transaction,
       selection: EditorSelection.single(anchor, head),
     });
+  }
+
+  applyMarkdownAction(action: MiraMarkdownActionId): boolean {
+    return applyMiraMarkdownAction(this.view, action);
   }
 
   private createState(

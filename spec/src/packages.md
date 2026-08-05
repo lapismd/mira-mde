@@ -17,6 +17,7 @@ install internal CodeMirror, renderer, UI, or theme workspaces separately.
 | MIRA-ARCH-012 | Package, symbol, DOM-hook, documentation, catalog, and Storybook identities MUST use the canonical Mira names without compatibility aliases for the pre-release `@mira-mde/*` surface.                                                          |
 | MIRA-ARCH-013 | `@lapismd/mira` MUST export the individual Mira and Obsidian theme stylesheets plus an aggregate stylesheet that loads every built-in palette.                                                                                                  |
 | MIRA-ARCH-014 | `@lapismd/mira-editor` MUST ship the logo used by its default About dialog and export a version constant synchronized with its package manifest, so the dialog remains self-contained for consumers.                                            |
+| MIRA-ARCH-015 | `@lapismd/mira` MUST expose the additive Markdown action identifier and controller operation, and Mira Editor, React, and Vanilla handles and declarative toolbar contexts MUST delegate that operation without duplicating action semantics.   |
 
 ## Public graph
 
