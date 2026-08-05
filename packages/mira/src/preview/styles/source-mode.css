@@ -10,6 +10,13 @@
   );
 }
 
+/* Keep authored pipe-table columns aligned without changing rendered tables. */
+.markdown-source-mode .cm-editor.markdown-source-view .cm-line.cm-table {
+  font-family: var(--font-monospace);
+  white-space: pre;
+  width: fit-content;
+}
+
 .markdown-editor-surface .cm-editor .cm-formatting-list-ul,
 .markdown-editor-surface .cm-editor .cm-formatting-list-ol {
   font-variant-numeric: tabular-nums;

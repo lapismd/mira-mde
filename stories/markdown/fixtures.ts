@@ -129,11 +129,11 @@ export const calloutsMarkdown = String.raw`# Callouts
 
 export const tablesMarkdown = String.raw`# Pipe tables
 
-| Package | Surface | Status |
-| :--- | :---: | ---: |
-| @lapismd/mira/preview | reading | 100 |
-| @lapismd/mira | editor | 100 |
-| @lapismd/mira-editor | toolbar | 100 |
+| Package                | Surface | Status |
+| :--------------------- | :-----: | -----: |
+| @lapismd/mira/preview  | reading | 100    |
+| @lapismd/mira          | editor  | 100    |
+| @lapismd/mira-editor   | toolbar | 100    |
 
 Pipe tables support alignment markers and shared preview/live-preview styling.
 `;

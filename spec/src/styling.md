@@ -23,7 +23,7 @@ customization and Obsidian-compatible aliases retained as a compatibility layer.
 | MIRA-CSS-013 | Visible task checkbox delimiters in source and live-preview editing MUST use the same muted syntax color as other Markdown delimiters while task content retains the normal prose color.                                                   |
 | MIRA-CSS-014 | The editable task-type trigger MUST use shipped semantic hooks and theme tokens, remain outside normal line layout, become visible on line hover or focus, and reuse the shipped task-checkbox artwork inside its portaled picker.         |
 | MIRA-CSS-015 | The Mira Editor About dialog MUST use shipped semantic hooks and tokens. Its combined logo asset MUST retain intrinsic dimensions, scale down responsively, and expose only the active light or dark half within the portaled dialog.      |
-| MIRA-CSS-016 | Shipped source-mode table-line CSS MUST resolve through `--font-monospace`, preserve authored spacing with `white-space: pre`, and size each raw row to its content without changing rendered table-widget or reading-table typography.      |
+| MIRA-CSS-016 | Shipped source-mode table-line CSS MUST resolve through `--font-monospace`, preserve authored spacing with `white-space: pre`, and size each raw row to its content without changing rendered table-widget or reading-table typography.    |
 
 Stylesheet order remains theme, UI, preview, Svelte/Mira Editor, and framework
 wrapper composition as documented by the package entrypoints.
@@ -49,6 +49,11 @@ does not register themes, inject consumer CSS, or observe ancestor mutations;
 normal custom-property inheritance makes page changes live. Explicit component
 appearance is copied to its portaled overlay roots so targeted editors keep the
 same tokens outside their DOM subtree.
+
+Raw pipe-table rows reuse the existing `--font-monospace` bridge. Their
+source-mode selector also sets preformatted whitespace and fit-content row
+sizing, keeping padded delimiter columns aligned without changing ordinary
+editor prose or rendered table typography.
 
 The default indentation contract uses four columns at `0.5625em` per column.
 `--mira-list-indent` composes those values, while the preview bridge exposes

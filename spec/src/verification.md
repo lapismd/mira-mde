@@ -20,7 +20,7 @@ authorized baseline regeneration migrations are complete.
 | MIRA-MD-012                                                                                             | Nested blockquote task source and checkbox browser assertions              | Implemented by quoted-task repair     |
 | MIRA-MD-013                                                                                             | Task-state registry tests and focused picker interaction/geometry checks   | Implemented by task-picker slice      |
 | MIRA-MD-014                                                                                             | Core action-engine syntax, selection, transaction, and readonly tests      | Implemented by action-engine slice    |
-| MIRA-MD-015                                                                                             | Source-table Storybook computed typography and row-geometry assertions     | Planned by source-table parity slice  |
+| MIRA-MD-015                                                                                             | Source-table Storybook computed typography and row-geometry assertions     | Implemented by table parity slice     |
 | MIRA-UI-001, MIRA-UI-002, MIRA-UI-003, MIRA-UI-004, MIRA-UI-005                                         | Mira Editor, React, and Vanilla tests/builds                               | Implemented                           |
 | MIRA-UI-006, MIRA-UI-007, MIRA-UI-008                                                                   | Storybook browser project and UI primitive `play` interactions             | Implemented                           |
 | MIRA-UI-009                                                                                             | Svelte package checks and focused outline browser acceptance               | Implemented                           |
@@ -35,7 +35,7 @@ authorized baseline regeneration migrations are complete.
 | MIRA-CSS-013                                                                                            | Computed task-delimiter colors in source and live-preview edit states      | Implemented by quoted-task repair     |
 | MIRA-CSS-014                                                                                            | Task picker hover/focus visibility, portaled icon reuse, and line geometry | Implemented by task-picker slice      |
 | MIRA-CSS-015                                                                                            | Light/dark logo crop geometry in focused theme story interactions          | Implemented by About dialog slice     |
-| MIRA-CSS-016                                                                                            | Shipped source-table selector and focused computed-style acceptance        | Planned by source-table parity slice  |
+| MIRA-CSS-016                                                                                            | Shipped source-table selector and focused computed-style acceptance        | Implemented by table parity slice     |
 | MIRA-AI-001, MIRA-AI-002, MIRA-AI-003                                                                   | `packages/mira-plugin-ai` unit tests                                       | Implemented                           |
 | MIRA-AI-004                                                                                             | Deterministic AI story interaction                                         | Implemented                           |
 | MIRA-MERMAID-001, MIRA-MERMAID-002, MIRA-MERMAID-003, MIRA-MERMAID-004                                  | Mermaid package tests and existing Storybook stories                       | Implemented                           |
@@ -78,6 +78,15 @@ inactive bullet markers and preformatted list indentation. The requested live
 Carta comparison remains manual because the configured Chrome bridge is not
 available in this environment; automated Chromium acceptance covers the Mira
 interaction contract.
+
+The source-table parity slice ports Lapis's `cm-table` source treatment through
+Mira's existing monospace token and verifies five padded pipe-table rows against
+ordinary source prose. The focused Tables Storybook project passes all three
+stories; live Storybook inspection resolves the rows to Source Code Pro with
+`white-space: pre` and equal 378 px widths while prose remains Inter. The
+canonical single-story Visual Delta capture passes and reports the expected
+5,127-pixel review delta for `markdown-tables--source-mode`; compare-only mode
+does not update the approved baseline.
 
 ## Validation tiers
 

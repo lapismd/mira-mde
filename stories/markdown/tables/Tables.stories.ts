@@ -136,4 +136,64 @@ export const SourceMode: Story = {
       },
     },
   },
+  play: async ({ canvasElement }) => {
+    const tableLines = Array.from(
+      canvasElement.querySelectorAll<HTMLElement>(".cm-line.cm-table"),
+    );
+    const proseLine = Array.from(
+      canvasElement.querySelectorAll<HTMLElement>(".cm-line"),
+    ).find((line) =>
+      line.textContent?.includes(
+        "Pipe tables support alignment markers and shared preview",
+      ),
+    );
+
+    await expect(tableLines).toHaveLength(5);
+    await expect(proseLine).toBeDefined();
+
+    const tableStyle = getComputedStyle(tableLines[0]!);
+    const proseStyle = getComputedStyle(proseLine!);
+    const monoProbe = document.createElement("span");
+    monoProbe.style.fontFamily = "var(--font-monospace)";
+    monoProbe.style.position = "absolute";
+    monoProbe.style.visibility = "hidden";
+    tableLines[0]!.append(monoProbe);
+    const monoFontFamily = getComputedStyle(monoProbe).fontFamily;
+    monoProbe.remove();
+
+    await expect(tableLines[0]!.classList).toContain("cm-formatting-table");
+    await expect(tableStyle.fontFamily).toBe(monoFontFamily);
+    await expect(tableStyle.whiteSpace).toBe("pre");
+    await expect(proseStyle.fontFamily).not.toBe(monoFontFamily);
+
+    const pipeOffsets = tableLines.map((line) => {
+      const lineLeft = line.getBoundingClientRect().left;
+      const walker = document.createTreeWalker(line, NodeFilter.SHOW_TEXT);
+      const offsets: number[] = [];
+      let node = walker.nextNode();
+
+      while (node) {
+        const text = node.textContent ?? "";
+        for (let index = 0; index < text.length; index += 1) {
+          if (text[index] !== "|") continue;
+          const range = document.createRange();
+          range.setStart(node, index);
+          range.setEnd(node, index + 1);
+          offsets.push(range.getBoundingClientRect().left - lineLeft);
+        }
+        node = walker.nextNode();
+      }
+
+      return offsets;
+    });
+
+    for (const offsets of pipeOffsets) {
+      await expect(offsets).toHaveLength(4);
+      offsets.forEach((offset, index) => {
+        expect(Math.abs(offset - pipeOffsets[0]![index]!)).toBeLessThanOrEqual(
+          0.5,
+        );
+      });
+    }
+  },
 };
