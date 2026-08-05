@@ -356,8 +356,9 @@ gates against the public Mira entrypoints.
 
 The About dialog slice trims the combined light/dark logo from `1536x1024` and
 `2159766` bytes to `960x337` and `148896` bytes while retaining the two source
-variants. The root README embeds the optimized brand sheet; Mira Editor ships
-its package-owned copy and exports a manifest-synchronized version constant.
+variants. The root README selects derived left/light and right/dark crops for
+GitHub's active color mode; Mira Editor ships the optimized combined sheet and
+exports a manifest-synchronized version constant.
 The toolbar overflow opens one accessible, theme-aware dialog whose bounded
 viewport exposes the asset's left half in light mode and right half in dark
 mode. Focused explicit-light, explicit-dark, and system-mode logo assertions

@@ -1,6 +1,7 @@
 # Mira
 
-![Mira MDE light and dark logos](assets/logo.png)
+![Mira MDE](assets/logo-light.png#gh-light-mode-only)
+![Mira MDE](assets/logo-dark.png#gh-dark-mode-only)
 
 Standalone, package-oriented Markdown editor extracted from the Lapis Notes markdown
 plugin. Mira is built around CodeMirror 6, Svelte 5, unified/remark/rehype,
