@@ -1182,7 +1182,7 @@ hr.mira-doodle-divider__native {
 
 .mira-doodle-divider__control:focus-visible,
 .mira-doodle-divider__variant-item:focus-visible {
-  outline: 2px solid var(--mira-ring);
+  outline: 2px solid var(--mira-focus-ring, var(--mira-accent));
   outline-offset: 1px;
 }
 
@@ -1207,7 +1207,7 @@ hr.mira-doodle-divider__native {
   background: var(--mira-popover);
   border: 1px solid var(--mira-border);
   border-radius: var(--mira-radius, 0.5rem);
-  box-shadow: var(--mira-popover-shadow, var(--mira-widget-shadow));
+  box-shadow: var(--mira-widget-shadow);
 }
 
 .mira-doodle-divider__variant-menu[hidden] {

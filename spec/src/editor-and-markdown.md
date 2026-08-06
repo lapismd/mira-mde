@@ -68,6 +68,8 @@ field, and then remount the same logical widget. The refresh search skips the
 current family when alternatives exist; the family action searches for the
 first valid seed mapped to the requested configured variant. `controls: false`
 suppresses this authoring surface without changing Reading output.
+The menu reuses Mira's public focus-ring and widget-elevation contracts rather
+than defining extension-private styling tokens.
 
 The table extension decorates every raw pipe-table row with `cm-table` and
 `cm-formatting-table`. Shipped CSS scopes the monospaced, preformatted row

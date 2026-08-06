@@ -53,7 +53,8 @@ package or require a framework adapter. Storybook exercises those exports
 through the same package subpath rather than importing internal draw or parser
 helpers. Its options also expose a `controls` switch, while custom seed factories
 receive explicit `reroll` and `variant` reasons for Live Preview authoring
-actions.
+actions. Its controls consume the core package's cataloged focus and elevation
+tokens without expanding the public token registry.
 
 ## Release model
 
