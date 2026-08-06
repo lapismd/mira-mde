@@ -29,6 +29,7 @@ authorized baseline regeneration migrations are complete.
 | MIRA-UI-011                                                                                             | Version-sync unit test and toolbar About dialog Storybook interaction      | Implemented by About dialog slice               |
 | MIRA-UI-012                                                                                             | Core action-engine tests and focused source/live-preview toolbar stories   | Implemented by toolbar-action slice             |
 | MIRA-UI-013                                                                                             | Selection-toolbar unit, contract, and focused Storybook interactions       | Implemented by selection-toolbar slice          |
+| MIRA-UI-014                                                                                             | Block classification, conversion, framework, and Storybook interactions    | Implementation in progress                      |
 | MIRA-CSS-001, MIRA-CSS-002                                                                              | Package stylesheet exports, no-Tailwind package checks                     | Implemented                                     |
 | MIRA-CSS-003, MIRA-CSS-004, MIRA-CSS-005, MIRA-CSS-006                                                  | Public surface/token registry and catalog checker                          | Implemented by catalog/token slice              |
 | MIRA-CSS-007, MIRA-CSS-008, MIRA-CSS-009, MIRA-CSS-010                                                  | Theme CSS contracts, component tests, and portaled-overlay stories         | Implemented by extensible theme slice           |
@@ -111,6 +112,14 @@ the centered pill at `139.94px` by `40px`, with a `1px` token border, `999px`
 radius, `8px` selection gap, and less than `0.001px` selection-center delta. The
 dedicated stories remain `visual-pending`; no visual baseline was created or
 refreshed.
+
+The contextual block-toolbar slice starts from the existing first-row drag
+gutter and block-range model. Implementation is complete when the opt-in trigger
+uses authored block semantics, the anchored menu performs content-preserving
+single-block conversions in one transaction, explicit custom placements work
+through Svelte, React, and Vanilla, and focused Source and Live Preview stories
+cover wrapped geometry, keyboard access, and custom actions without updating a
+visual baseline.
 
 Final validation passes `pnpm spec:check`, `pnpm catalog:check`, the affected
 Mira, Mira Editor, React, and Vanilla check/test/build gates, `pnpm
