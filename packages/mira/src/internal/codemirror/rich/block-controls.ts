@@ -1,8 +1,8 @@
 import {
+  EditorState,
   Prec,
   StateEffect,
   StateField,
-  type EditorState,
   type Extension,
   type Range,
 } from "@codemirror/state";
@@ -24,8 +24,18 @@ import type {
   MiraBlockActionContext,
   MiraMarkdownBlockHandle,
   MiraMarkdownBlockRange,
+  MiraToolbarIconName,
 } from "@lapismd/mira/extensions";
 import type { MiraRichEditorOptions } from "./types";
+import {
+  applyBlockToolbarItem,
+  blockPresentation,
+  canApplyBlockToolbarItem,
+  createBlockToolbarIcon,
+  resolveMiraBlockControlsOptions,
+  type ResolvedMiraBlockToolbarConfig,
+} from "./block-toolbar";
+import type { MiraBlockToolbarItemId } from "@lapismd/mira/extensions";
 import {
   collectMarkdownBlockHandles,
   deleteMarkdownBlockHandle,
@@ -62,6 +72,19 @@ type BlockHighlightState = {
   handleId: string | null;
   range: MiraMarkdownBlockRange | null;
   decorations: DecorationSet;
+};
+
+type BlockToolbarMenuItem = {
+  disabled: boolean;
+  group: string;
+  icon: Parameters<typeof createBlockToolbarIcon>[1];
+  id: string;
+  label: string;
+  selected: boolean;
+  shortcut?: string;
+  type?: MiraBlockToolbarItemId;
+  renderIcon?: (target: HTMLElement) => void | (() => void);
+  run: () => void | Promise<void>;
 };
 
 const dragActivationDistance = 5;
@@ -122,37 +145,53 @@ const blockHighlightStateField = StateField.define<BlockHighlightState>({
 export function blockControlExtensions(
   options: MiraRichEditorOptions,
 ): Extension[] {
-  if (options.blockControls !== true) {
+  const resolvedBlockControls = resolveMiraBlockControlsOptions(
+    options.blockControls,
+  );
+  if (!resolvedBlockControls.enabled) {
     return [];
   }
 
   return [
     blockControlsTheme,
+    resolvedBlockControls.toolbar
+      ? EditorView.editorAttributes.of({
+          class: "mira-block-toolbar-enabled",
+        })
+      : [],
     blockHighlightStateField,
-    blockHandleGutter(),
+    blockHandleGutter(Boolean(resolvedBlockControls.toolbar)),
     Prec.highest(keymap.of(blockControlKeymap())),
     ViewPlugin.fromClass(
       class extends BlockControlsPlugin {
         constructor(view: EditorView) {
-          super(view, options);
+          super(view, options, resolvedBlockControls.toolbar);
         }
       },
     ),
   ];
 }
 
-function blockHandleGutter(): Extension {
+function blockHandleGutter(toolbarEnabled: boolean): Extension {
   return gutter({
     class: "mira-block-controls-gutter",
     initialSpacer: () => blockHandleSpacerMarker,
     lineMarker(view, line) {
       const handle = handleForVisualLine(view, line);
       const selectedHandleId = blockHighlight(view.state).handleId;
-      const active = handle
-        ? activeHandleIdsForState(view.state).has(handle.id)
-        : false;
+      const activeHandleIds = activeHandleIdsForState(view.state);
+      const active = handle ? activeHandleIds.has(handle.id) : false;
       const selected = handle ? handle.id === selectedHandleId : false;
-      return handle ? new BlockHandleMarker(handle, active, selected) : null;
+      return handle
+        ? new BlockHandleMarker(
+            handle,
+            active,
+            selected,
+            toolbarEnabled &&
+              activeHandleIds.size <= 1 &&
+              !view.state.facet(EditorState.readOnly),
+          )
+        : null;
     },
     lineMarkerChange(update) {
       return (
@@ -264,6 +303,7 @@ class BlockHandleMarker extends GutterMarker {
     private readonly handle: MiraMarkdownBlockHandle,
     private readonly active: boolean,
     private readonly selected: boolean,
+    private readonly toolbarVisible: boolean,
   ) {
     super();
   }
@@ -275,11 +315,14 @@ class BlockHandleMarker extends GutterMarker {
       other.handle.handleRange.from === this.handle.handleRange.from &&
       other.handle.handleRange.to === this.handle.handleRange.to &&
       other.active === this.active &&
-      other.selected === this.selected
+      other.selected === this.selected &&
+      other.toolbarVisible === this.toolbarVisible
     );
   }
 
   override toDOM(): Node {
+    const row = document.createElement("span");
+    row.className = "mira-block-controls-row";
     const button = document.createElement("button");
     button.type = "button";
     button.className = [
@@ -297,7 +340,30 @@ class BlockHandleMarker extends GutterMarker {
       "Drag to move. Click to highlight. Right-click for block actions.",
     );
     button.innerHTML = blockHandleSvg;
-    return button;
+    row.append(button);
+
+    if (this.toolbarVisible) {
+      const presentation = blockPresentation(this.handle);
+      const trigger = document.createElement("button");
+      trigger.type = "button";
+      trigger.className = [
+        "mira-block-toolbar-trigger",
+        this.active ? "mira-block-toolbar-trigger--active" : "",
+        this.selected ? "mira-block-toolbar-trigger--selected" : "",
+      ]
+        .filter(Boolean)
+        .join(" ");
+      trigger.dataset.miraBlockId = this.handle.id;
+      trigger.dataset.miraBlockType = presentation.type ?? "rich";
+      trigger.setAttribute("aria-haspopup", "menu");
+      trigger.setAttribute("aria-expanded", "false");
+      trigger.setAttribute("aria-label", `Change ${presentation.label}`);
+      trigger.setAttribute("title", `Change ${presentation.label}`);
+      trigger.append(createBlockToolbarIcon(document, presentation.icon));
+      row.append(trigger);
+    }
+
+    return row;
   }
 }
 
@@ -376,24 +442,40 @@ class BlockControlsPlugin implements PluginValue {
   private readonly layer = document.createElement("div");
   private readonly dropLine = document.createElement("div");
   private readonly menu = document.createElement("div");
+  private readonly toolbarPortal = document.createElement("div");
+  private readonly toolbarMenu = document.createElement("div");
   private handles: MiraMarkdownBlockHandle[] = [];
   private blockRects: BlockRect[] = [];
   private dragState: DragState | null = null;
   private dropTarget: DropTarget | null = null;
   private renderFrame: number | null = null;
   private suppressNextClick = false;
+  private toolbarHandleId: string | null = null;
+  private toolbarIconCleanups: Array<() => void> = [];
+  private toolbarTrigger: HTMLButtonElement | null = null;
 
   constructor(
     private readonly view: EditorView,
     private readonly options: MiraRichEditorOptions,
+    private readonly toolbarConfig: ResolvedMiraBlockToolbarConfig | null,
   ) {
     this.layer.className = "mira-block-controls-layer";
     this.dropLine.className = "mira-block-drop-line";
     this.menu.className = "mira-block-menu";
     this.menu.setAttribute("role", "menu");
     this.menu.hidden = true;
+    this.toolbarMenu.className = "mira-block-toolbar-menu";
+    this.toolbarMenu.setAttribute("role", "menu");
+    this.toolbarMenu.setAttribute(
+      "aria-label",
+      this.toolbarConfig?.ariaLabel ?? "Change block type",
+    );
+    this.toolbarMenu.setAttribute("data-mira-overlay", "");
+    this.toolbarMenu.hidden = true;
+    this.toolbarMenu.addEventListener("keydown", this.handleToolbarMenuKeyDown);
     this.layer.append(this.dropLine, this.menu);
     this.view.dom.append(this.layer);
+    this.mountToolbarPortal();
 
     this.view.dom.addEventListener("pointerdown", this.handleHandlePointerDown);
     this.view.dom.addEventListener("click", this.handleHandleClick);
@@ -412,6 +494,7 @@ class BlockControlsPlugin implements PluginValue {
   update(update: ViewUpdate): void {
     if (update.docChanged) {
       this.closeMenu();
+      this.closeToolbarMenu();
       this.scheduleRender();
       return;
     }
@@ -422,6 +505,9 @@ class BlockControlsPlugin implements PluginValue {
       update.geometryChanged
     ) {
       this.closeMenu();
+      if (update.selectionSet) {
+        this.closeToolbarMenu();
+      }
       this.scheduleRender();
     }
   }
@@ -448,10 +534,55 @@ class BlockControlsPlugin implements PluginValue {
     );
     document.removeEventListener("keydown", this.handleDocumentKeyDown);
     this.detachDragListeners();
+    this.toolbarMenu.removeEventListener(
+      "keydown",
+      this.handleToolbarMenuKeyDown,
+    );
     if (this.renderFrame !== null) {
       cancelAnimationFrame(this.renderFrame);
     }
+    this.toolbarPortal.remove();
     this.layer.remove();
+  }
+
+  private mountToolbarPortal(): void {
+    const ownerDocument = this.view.dom.ownerDocument;
+    this.syncToolbarPortalAppearance();
+    this.toolbarPortal.style.inset = "0";
+    this.toolbarPortal.style.pointerEvents = "none";
+    this.toolbarPortal.style.position = "fixed";
+    this.toolbarPortal.style.zIndex = "1000";
+    this.toolbarPortal.append(this.toolbarMenu);
+    ownerDocument.body.append(this.toolbarPortal);
+  }
+
+  private syncToolbarPortalAppearance(): void {
+    const themeHost = this.view.dom.closest<HTMLElement>("[data-mira-theme]");
+    const modeHost = this.view.dom.closest<HTMLElement>(
+      "[data-mira-color-mode]",
+    );
+    const colorHost = this.view.dom.closest<HTMLElement>(".light, .dark");
+    this.toolbarPortal.className = [
+      "mira mira-block-toolbar-portal",
+      ...this.view.dom.classList,
+      ...(colorHost
+        ? Array.from(colorHost.classList).filter(
+            (className) => className === "light" || className === "dark",
+          )
+        : []),
+    ].join(" ");
+    const theme = themeHost?.getAttribute("data-mira-theme");
+    const mode = modeHost?.getAttribute("data-mira-color-mode");
+    if (theme) {
+      this.toolbarPortal.setAttribute("data-mira-theme", theme);
+    } else {
+      this.toolbarPortal.removeAttribute("data-mira-theme");
+    }
+    if (mode) {
+      this.toolbarPortal.setAttribute("data-mira-color-mode", mode);
+    } else {
+      this.toolbarPortal.removeAttribute("data-mira-color-mode");
+    }
   }
 
   private readonly scheduleRender = (): void => {
@@ -465,11 +596,10 @@ class BlockControlsPlugin implements PluginValue {
   };
 
   private render(): void {
+    this.syncToolbarPortalAppearance();
     this.handles = collectMarkdownBlockHandles(this.view.state);
     this.blockRects = [];
     const rootRect = this.view.dom.getBoundingClientRect();
-    const fragment = document.createDocumentFragment();
-    fragment.append(this.dropLine, this.menu);
 
     for (const handle of this.handles) {
       const rect = this.measureHandle(handle, rootRect);
@@ -485,12 +615,35 @@ class BlockControlsPlugin implements PluginValue {
       });
     }
 
-    this.layer.replaceChildren(fragment);
     if (this.dropTarget) {
       this.showDropLine(this.dropTarget.top);
     } else {
       this.hideDropLine();
     }
+    this.refreshOpenToolbarTrigger();
+  }
+
+  private refreshOpenToolbarTrigger(): void {
+    if (this.toolbarMenu.hidden || !this.toolbarHandleId) {
+      return;
+    }
+    const trigger = Array.from(
+      this.view.dom.querySelectorAll<HTMLButtonElement>(
+        ".mira-block-toolbar-trigger",
+      ),
+    ).find(
+      (candidate) => candidate.dataset.miraBlockId === this.toolbarHandleId,
+    );
+    if (!trigger) {
+      this.closeToolbarMenu();
+      return;
+    }
+    this.toolbarTrigger?.classList.remove("mira-block-toolbar-trigger--open");
+    this.toolbarTrigger?.setAttribute("aria-expanded", "false");
+    this.toolbarTrigger = trigger;
+    trigger.classList.add("mira-block-toolbar-trigger--open");
+    trigger.setAttribute("aria-expanded", "true");
+    this.positionToolbarMenu(trigger);
   }
 
   private measureHandle(
@@ -535,6 +688,18 @@ class BlockControlsPlugin implements PluginValue {
   };
 
   private readonly handleHandleClick = (event: MouseEvent): void => {
+    const toolbarTrigger = closestBlockToolbarTrigger(event.target);
+    const toolbarHandle = toolbarTrigger
+      ? this.handleForButton(toolbarTrigger)
+      : null;
+    if (toolbarTrigger && toolbarHandle) {
+      event.preventDefault();
+      event.stopPropagation();
+      this.highlightHandle(toolbarHandle);
+      this.openToolbarMenu(toolbarHandle, toolbarTrigger);
+      return;
+    }
+
     const handle = closestBlockHandle(event.target);
     const target = handle ? this.handleForButton(handle) : null;
     if (!handle || !target) {
@@ -564,6 +729,24 @@ class BlockControlsPlugin implements PluginValue {
   };
 
   private readonly handleHandleKeyDown = (event: KeyboardEvent): void => {
+    const toolbarTrigger = closestBlockToolbarTrigger(event.target);
+    const toolbarHandle = toolbarTrigger
+      ? this.handleForButton(toolbarTrigger)
+      : null;
+    if (toolbarTrigger && toolbarHandle) {
+      if (
+        event.key === "Enter" ||
+        event.key === " " ||
+        event.key === "ArrowDown"
+      ) {
+        event.preventDefault();
+        event.stopPropagation();
+        this.highlightHandle(toolbarHandle);
+        this.openToolbarMenu(toolbarHandle, toolbarTrigger);
+      }
+      return;
+    }
+
     const button = closestBlockHandle(event.target);
     const handle = button ? this.handleForButton(button) : null;
     if (!button || !handle) {
@@ -754,6 +937,193 @@ class BlockControlsPlugin implements PluginValue {
     }
   }
 
+  private openToolbarMenu(
+    handle: MiraMarkdownBlockHandle,
+    trigger: HTMLButtonElement,
+  ): void {
+    if (!this.toolbarConfig) {
+      return;
+    }
+
+    this.closeMenu();
+    this.closeToolbarMenu();
+    this.syncToolbarPortalAppearance();
+    const items = this.toolbarItemsFor(handle);
+    let previousGroup: string | null = null;
+    const nodes: Node[] = [];
+    for (const item of items) {
+      if (previousGroup !== null && item.group !== previousGroup) {
+        const separator = this.toolbarMenu.ownerDocument.createElement("div");
+        separator.className = "mira-block-toolbar-menu__separator";
+        separator.setAttribute("role", "separator");
+        nodes.push(separator);
+      }
+      nodes.push(this.createToolbarMenuItem(item));
+      previousGroup = item.group;
+    }
+
+    this.toolbarMenu.replaceChildren(...nodes);
+    this.toolbarMenu.hidden = false;
+    this.toolbarHandleId = handle.id;
+    this.toolbarTrigger = trigger;
+    trigger.classList.add("mira-block-toolbar-trigger--open");
+    trigger.setAttribute("aria-expanded", "true");
+    this.positionToolbarMenu(trigger);
+
+    const selected = this.toolbarMenu.querySelector<HTMLButtonElement>(
+      '.mira-block-toolbar-menu__item[data-selected="true"]:not(:disabled)',
+    );
+    const first = this.toolbarMenu.querySelector<HTMLButtonElement>(
+      ".mira-block-toolbar-menu__item:not(:disabled)",
+    );
+    (selected ?? first)?.focus();
+  }
+
+  private toolbarItemsFor(
+    handle: MiraMarkdownBlockHandle,
+  ): BlockToolbarMenuItem[] {
+    const current = blockPresentation(handle).type;
+    const builtIns = (this.toolbarConfig?.items ?? []).map((type) => {
+      const definition = blockToolbarItemDefinition(type);
+      return {
+        ...definition,
+        id: `mira-block-toolbar-${type}`,
+        type,
+        selected: current === type,
+        disabled:
+          !canApplyBlockToolbarItem(handle, type) ||
+          (type === "image" && !this.options.insertImage),
+        run: () => {
+          applyBlockToolbarItem(this.view, handle, type, {
+            insertImage: this.options.insertImage
+              ? () => this.options.insertImage?.(this.view)
+              : undefined,
+          });
+        },
+      };
+    });
+    const context = this.actionContext(handle);
+    const custom = (this.options.blockActions ?? [])
+      .filter((action) => action.placements?.includes("block-menu"))
+      .map<BlockToolbarMenuItem>((action) => ({
+        id: action.id,
+        label: action.label,
+        group: action.group ?? "extensions",
+        icon: blockActionIcon(action.icon),
+        shortcut: action.shortcut,
+        renderIcon: action.renderIcon,
+        selected: false,
+        disabled: dynamicDisabled(action, context),
+        run: () => action.run(context),
+      }));
+    return [...builtIns, ...custom];
+  }
+
+  private createToolbarMenuItem(item: BlockToolbarMenuItem): HTMLButtonElement {
+    const button = this.toolbarMenu.ownerDocument.createElement("button");
+    button.type = "button";
+    button.className = "mira-block-toolbar-menu__item";
+    button.dataset.blockToolbarItem = item.type ?? item.id;
+    button.dataset.selected = item.selected ? "true" : "false";
+    button.disabled = item.disabled;
+    if (item.type && item.type !== "image") {
+      button.setAttribute("role", "menuitemradio");
+      button.setAttribute("aria-checked", String(item.selected));
+    } else {
+      button.setAttribute("role", "menuitem");
+    }
+
+    const icon = this.toolbarMenu.ownerDocument.createElement("span");
+    icon.className = "mira-block-toolbar-menu__icon";
+    const cleanup = item.renderIcon?.(icon);
+    if (cleanup) {
+      this.toolbarIconCleanups.push(cleanup);
+    } else if (icon.childNodes.length === 0) {
+      icon.append(
+        createBlockToolbarIcon(this.toolbarMenu.ownerDocument, item.icon),
+      );
+    }
+    const label = this.toolbarMenu.ownerDocument.createElement("span");
+    label.className = "mira-block-toolbar-menu__label";
+    label.textContent = item.label;
+    button.append(icon, label);
+    if (item.shortcut) {
+      const shortcut = this.toolbarMenu.ownerDocument.createElement("kbd");
+      shortcut.className = "mira-block-toolbar-menu__shortcut";
+      shortcut.textContent = item.shortcut;
+      button.append(shortcut);
+    }
+
+    button.onclick = () => {
+      if (!item.disabled) {
+        void item.run();
+      }
+      this.closeToolbarMenu();
+      this.view.focus();
+    };
+    return button;
+  }
+
+  private positionToolbarMenu(trigger: HTMLButtonElement): void {
+    const triggerRect = trigger.getBoundingClientRect();
+    const menuRect = this.toolbarMenu.getBoundingClientRect();
+    const viewportWidth =
+      this.toolbarMenu.ownerDocument.defaultView?.innerWidth ??
+      triggerRect.right;
+    const viewportHeight =
+      this.toolbarMenu.ownerDocument.defaultView?.innerHeight ??
+      triggerRect.bottom;
+    const gap = 8;
+    let left = triggerRect.right + gap;
+    if (triggerRect.right + gap + menuRect.width > viewportWidth) {
+      left = triggerRect.left - menuRect.width - gap;
+    }
+    const maxLeft = Math.max(gap, viewportWidth - menuRect.width - gap);
+    const maxTop = Math.max(gap, viewportHeight - menuRect.height - gap);
+    const top = Math.max(gap, Math.min(triggerRect.top, maxTop));
+    this.toolbarMenu.style.left = `${Math.max(gap, Math.min(left, maxLeft))}px`;
+    this.toolbarMenu.style.top = `${top}px`;
+  }
+
+  private readonly handleToolbarMenuKeyDown = (event: KeyboardEvent): void => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      event.stopPropagation();
+      const trigger = this.toolbarTrigger;
+      this.closeToolbarMenu();
+      trigger?.focus();
+      return;
+    }
+    if (event.key === "Tab") {
+      this.closeToolbarMenu();
+      return;
+    }
+
+    const buttons = Array.from(
+      this.toolbarMenu.querySelectorAll<HTMLButtonElement>(
+        ".mira-block-toolbar-menu__item:not(:disabled)",
+      ),
+    );
+    const activeIndex = buttons.indexOf(
+      this.toolbarMenu.ownerDocument.activeElement as HTMLButtonElement,
+    );
+    const nextIndex =
+      event.key === "ArrowDown"
+        ? (Math.max(0, activeIndex) + 1) % buttons.length
+        : event.key === "ArrowUp"
+          ? (activeIndex <= 0 ? buttons.length : activeIndex) - 1
+          : event.key === "Home"
+            ? 0
+            : event.key === "End"
+              ? buttons.length - 1
+              : null;
+    if (nextIndex === null || buttons.length === 0) {
+      return;
+    }
+    event.preventDefault();
+    buttons[nextIndex]?.focus();
+  };
+
   private openMenu(
     handle: MiraMarkdownBlockHandle,
     button: HTMLButtonElement,
@@ -794,7 +1164,10 @@ class BlockControlsPlugin implements PluginValue {
   private actionsFor(handle: MiraMarkdownBlockHandle): MiraBlockAction[] {
     return [
       ...builtInBlockActions(this.view, this.handles, handle),
-      ...(this.options.blockActions ?? []),
+      ...(this.options.blockActions ?? []).filter(
+        (action) =>
+          !action.placements || action.placements.includes("context-menu"),
+      ),
     ];
   }
 
@@ -843,6 +1216,20 @@ class BlockControlsPlugin implements PluginValue {
     this.menu.replaceChildren();
   }
 
+  private closeToolbarMenu(): void {
+    for (const cleanup of this.toolbarIconCleanups.splice(0)) {
+      cleanup();
+    }
+    this.toolbarMenu.hidden = true;
+    this.toolbarMenu.replaceChildren();
+    this.toolbarHandleId = null;
+    if (this.toolbarTrigger) {
+      this.toolbarTrigger.classList.remove("mira-block-toolbar-trigger--open");
+      this.toolbarTrigger.setAttribute("aria-expanded", "false");
+      this.toolbarTrigger = null;
+    }
+  }
+
   private highlightHandle(handle: MiraMarkdownBlockHandle): void {
     this.view.dispatch({
       effects: setBlockHighlightEffect.of({
@@ -871,7 +1258,20 @@ class BlockControlsPlugin implements PluginValue {
       this.closeMenu();
     }
 
-    if (!closestBlockHandle(target) && !this.menu.contains(target)) {
+    if (
+      !this.toolbarMenu.hidden &&
+      !this.toolbarMenu.contains(target) &&
+      !closestBlockToolbarTrigger(target)
+    ) {
+      this.closeToolbarMenu();
+    }
+
+    if (
+      !closestBlockHandle(target) &&
+      !closestBlockToolbarTrigger(target) &&
+      !this.menu.contains(target) &&
+      !this.toolbarMenu.contains(target)
+    ) {
       this.clearHighlight();
     }
   };
@@ -879,6 +1279,7 @@ class BlockControlsPlugin implements PluginValue {
   private readonly handleDocumentKeyDown = (event: KeyboardEvent): void => {
     if (event.key === "Escape") {
       this.closeMenu();
+      this.closeToolbarMenu();
       this.clearHighlight();
     }
   };
@@ -997,6 +1398,58 @@ function builtInBlockActions(
   ];
 }
 
+function blockToolbarItemDefinition(
+  type: MiraBlockToolbarItemId,
+): Pick<BlockToolbarMenuItem, "group" | "icon" | "label" | "shortcut"> {
+  switch (type) {
+    case "task":
+      return { group: "text", icon: "task", label: "Task" };
+    case "paragraph":
+      return { group: "text", icon: "paragraph", label: "Paragraph" };
+    case "heading1":
+      return {
+        group: "headings",
+        icon: "heading1",
+        label: "Heading 1",
+        shortcut: "⌥⌘1",
+      };
+    case "heading2":
+      return {
+        group: "headings",
+        icon: "heading2",
+        label: "Heading 2",
+        shortcut: "⌥⌘2",
+      };
+    case "heading3":
+      return {
+        group: "headings",
+        icon: "heading3",
+        label: "Heading 3",
+        shortcut: "⌥⌘3",
+      };
+    case "divider":
+      return { group: "structure", icon: "divider", label: "Divider" };
+    case "bulletList":
+      return { group: "structure", icon: "bulletList", label: "Bullet list" };
+    case "numberedList":
+      return {
+        group: "structure",
+        icon: "numberedList",
+        label: "Numbered list",
+      };
+    case "quote":
+      return { group: "structure", icon: "quote", label: "Blockquote" };
+    case "image":
+      return { group: "insert", icon: "image", label: "Image" };
+  }
+}
+
+function blockActionIcon(
+  icon: MiraToolbarIconName | undefined,
+): BlockToolbarMenuItem["icon"] {
+  return icon === "check" ? "task" : (icon ?? "generic");
+}
+
 function activeHandle(
   view: EditorView,
   handles: MiraMarkdownBlockHandle[],
@@ -1066,6 +1519,14 @@ function closestBlockHandle(
     : null;
 }
 
+function closestBlockToolbarTrigger(
+  target: EventTarget | null,
+): HTMLButtonElement | null {
+  return target instanceof Element
+    ? target.closest<HTMLButtonElement>(".mira-block-toolbar-trigger")
+    : null;
+}
+
 function dynamicDisabled(
   action: MiraBlockAction,
   context: MiraBlockActionContext,
@@ -1116,6 +1577,13 @@ const blockControlsTheme = EditorView.theme({
     minWidth: "1.25rem",
     width: "1.25rem",
   },
+  "&.mira-block-toolbar-enabled .cm-gutter.mira-block-controls-gutter": {
+    minWidth: "2.625rem",
+    width: "2.625rem",
+  },
+  "&.mira-block-toolbar-enabled .cm-gutters": {
+    marginInlineEnd: "1.125rem",
+  },
   ".mira-block-controls-gutter .cm-gutterElement": {
     // Stay on the first visual line when a block wraps (not mid-block).
     alignItems: "flex-start",
@@ -1123,6 +1591,21 @@ const blockControlsTheme = EditorView.theme({
     justifyContent: "center",
     minWidth: "1.25rem",
     padding: "0",
+  },
+  "&.mira-block-toolbar-enabled .mira-block-controls-gutter .cm-gutterElement":
+    {
+      minWidth: "2.625rem",
+      width: "2.625rem",
+    },
+  ".mira-block-controls-row": {
+    alignItems: "center",
+    display: "inline-flex",
+    gap: "0.125rem",
+    height: "1.5rem",
+    justifyContent: "center",
+    lineHeight: "inherit",
+    marginTop: "max(0px, calc((1lh - 1.5rem) / 2))",
+    width: "2.625rem",
   },
   ".mira-block-handle-spacer": {
     display: "block",
@@ -1155,6 +1638,9 @@ const blockControlsTheme = EditorView.theme({
     transition: "opacity 120ms ease, color 120ms ease",
     width: "1rem",
   },
+  ".mira-block-controls-row .mira-block-handle": {
+    marginTop: "0",
+  },
   ".mira-block-controls-gutter:hover .mira-block-handle, .mira-block-handle--active, .mira-block-handle--selected, .mira-block-handle:hover, .mira-block-handle:focus-visible":
     {
       opacity: "1",
@@ -1178,6 +1664,60 @@ const blockControlsTheme = EditorView.theme({
     strokeLinejoin: "round",
     strokeWidth: "3",
     width: "1rem",
+  },
+  ".mira-block-toolbar-trigger": {
+    alignItems: "center",
+    appearance: "none",
+    background: "var(--mira-accent-soft)",
+    border: "1px solid transparent",
+    borderRadius: "999px",
+    boxShadow: "none",
+    color: "var(--mira-muted-foreground)",
+    cursor: "pointer",
+    display: "inline-flex",
+    flex: "0 0 1.5rem",
+    height: "1.5rem",
+    justifyContent: "center",
+    lineHeight: "1",
+    opacity: "0",
+    padding: "0",
+    pointerEvents: "none",
+    transition:
+      "background-color 120ms ease, border-color 120ms ease, color 120ms ease, opacity 120ms ease",
+    width: "1.5rem",
+  },
+  ".mira-block-controls-gutter .cm-gutterElement:hover .mira-block-toolbar-trigger, .mira-block-toolbar-trigger--active, .mira-block-toolbar-trigger--selected, .mira-block-toolbar-trigger--open, .mira-block-toolbar-trigger:focus-visible":
+    {
+      opacity: "1",
+      pointerEvents: "auto",
+    },
+  ".mira-block-toolbar-trigger:hover, .mira-block-toolbar-trigger:focus-visible, .mira-block-toolbar-trigger--open":
+    {
+      background: "var(--mira-accent-soft)",
+      borderColor: "var(--mira-border)",
+      color: "var(--mira-foreground)",
+      outline: "none",
+    },
+  ".mira-block-toolbar-trigger:focus-visible": {
+    borderColor: "var(--mira-focus-ring, var(--mira-accent))",
+    boxShadow: "0 0 0 1px var(--mira-focus-ring, var(--mira-accent))",
+  },
+  ".mira-block-toolbar__icon-svg": {
+    fill: "none",
+    height: "0.875rem",
+    pointerEvents: "none",
+    stroke: "currentColor",
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    strokeWidth: "2",
+    width: "0.875rem",
+  },
+  ".mira-block-toolbar__icon-text": {
+    fontFamily: "var(--mira-font-sans)",
+    fontSize: "0.6875rem",
+    fontWeight: "650",
+    letterSpacing: "-0.04em",
+    pointerEvents: "none",
   },
   ".mira-block-drop-line": {
     background: "var(--mira-accent)",
@@ -1226,5 +1766,83 @@ const blockControlsTheme = EditorView.theme({
   },
   ".mira-block-menu__item--destructive": {
     color: "var(--mira-danger, #dc2626)",
+  },
+  ".mira-block-toolbar-menu": {
+    background: "var(--mira-popover)",
+    border: "1px solid var(--mira-border)",
+    borderRadius: "calc(var(--mira-radius) * 2)",
+    boxShadow: "var(--mira-widget-shadow)",
+    color: "var(--mira-popover-foreground)",
+    display: "grid",
+    fontFamily: "var(--mira-font-sans)",
+    fontSize: "14px",
+    maxHeight: "min(32rem, calc(100vh - 1rem))",
+    minWidth: "16rem",
+    overflowY: "auto",
+    padding: "0.375rem",
+    pointerEvents: "auto",
+    position: "fixed",
+  },
+  ".mira-block-toolbar-menu[hidden]": {
+    display: "none",
+  },
+  ".mira-block-toolbar-menu__separator": {
+    background: "var(--mira-border)",
+    height: "1px",
+    margin: "0.3rem 0.25rem",
+  },
+  ".mira-block-toolbar-menu__item": {
+    alignItems: "center",
+    appearance: "none",
+    background: "transparent",
+    border: "0",
+    borderRadius: "calc(var(--mira-radius) * 0.75)",
+    color: "inherit",
+    cursor: "pointer",
+    display: "grid",
+    font: "inherit",
+    gap: "0.625rem",
+    gridTemplateColumns: "1.25rem minmax(0, 1fr) auto",
+    minHeight: "2.25rem",
+    padding: "0.4rem 0.5rem",
+    textAlign: "left",
+    width: "100%",
+  },
+  '.mira-block-toolbar-menu__item[data-selected="true"]': {
+    background: "var(--mira-accent-soft)",
+    color: "var(--mira-accent)",
+  },
+  ".mira-block-toolbar-menu__item:hover, .mira-block-toolbar-menu__item:focus-visible":
+    {
+      background: "var(--mira-accent-soft)",
+      outline: "none",
+    },
+  ".mira-block-toolbar-menu__item:focus-visible": {
+    boxShadow: "inset 0 0 0 1px var(--mira-focus-ring, var(--mira-accent))",
+  },
+  ".mira-block-toolbar-menu__item:disabled": {
+    cursor: "not-allowed",
+    opacity: "0.45",
+  },
+  ".mira-block-toolbar-menu__icon": {
+    alignItems: "center",
+    color: "var(--mira-muted-foreground)",
+    display: "inline-flex",
+    height: "1.25rem",
+    justifyContent: "center",
+    width: "1.25rem",
+  },
+  ".mira-block-toolbar-menu__label": {
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
+  },
+  ".mira-block-toolbar-menu__shortcut": {
+    background: "var(--mira-muted)",
+    borderRadius: "999px",
+    color: "var(--mira-muted-foreground)",
+    font: "inherit",
+    fontSize: "0.75rem",
+    padding: "0.15rem 0.4rem",
   },
 });

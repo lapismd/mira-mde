@@ -13,6 +13,7 @@ authorized baseline regeneration migrations are complete.
 | MIRA-ARCH-014                                                                                           | Mira Editor build output and package-version synchronization test          | Implemented by About dialog slice               |
 | MIRA-ARCH-015                                                                                           | Public handle, adapter, and declarative-toolbar contract tests             | Implemented by adapter slice                    |
 | MIRA-ARCH-016                                                                                           | Shared public graph, registry planner, tarball manifest, and release tests | Implemented                                     |
+| MIRA-ARCH-017                                                                                           | Public block-control and action-placement contract tests                   | Implementation in progress                      |
 | MIRA-MD-001, MIRA-MD-002, MIRA-MD-003, MIRA-MD-004, MIRA-MD-005, MIRA-MD-006                            | Package unit tests, Layout Showcase, Storybook browser acceptance          | Implemented                                     |
 | MIRA-MD-007                                                                                             | Comprehensive fixture plus focused Storybook fixtures                      | Implemented; catalog checker enforced           |
 | MIRA-MD-008, MIRA-MD-009                                                                                | Enforced Storybook accessibility and icon-bearing editor controls          | Implemented                                     |
@@ -62,6 +63,7 @@ authorized baseline regeneration migrations are complete.
 | MIRA-CSS-018                                                                                            | Layout-stable marker trigger and portaled highlight picker acceptance      | Implemented by list-highlight slice             |
 | MIRA-CSS-019                                                                                            | Consecutive live-preview callout painted-gap and zero-margin acceptance    | Implemented by comprehensive repair             |
 | MIRA-MD-019, MIRA-CSS-020                                                                               | Grid-table keymap, serialization, selection, and computed typography       | Implemented by grid-table parity                |
+| MIRA-MD-020                                                                                             | Block metadata, safe conversion, undo, selection, and geometry tests       | Implementation in progress                      |
 
 The selective-release slice defines the exact six-package graph once, configures
 independent Changesets versions and package-owned changelogs, and uses

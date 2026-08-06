@@ -116,7 +116,37 @@ export type MiraMarkdownBlockHandle = {
   affectedRange: MiraMarkdownBlockRange;
   headingLevel?: number;
   listIndent?: number;
+  listKind?: "bullet" | "numbered" | "task";
+  taskMarker?: string;
   parentId?: string;
+};
+
+export const miraBlockToolbarItemIds = [
+  "task",
+  "paragraph",
+  "heading1",
+  "heading2",
+  "heading3",
+  "divider",
+  "bulletList",
+  "numberedList",
+  "quote",
+  "image",
+] as const;
+
+export type MiraBlockToolbarItemId = (typeof miraBlockToolbarItemIds)[number];
+
+export type MiraBlockToolbarConfig = {
+  /** Accessible name for the anchored block menu. */
+  ariaLabel?: string;
+  /** Built-in actions shown before explicitly placed custom actions. */
+  items?: readonly MiraBlockToolbarItemId[];
+};
+
+export type MiraBlockControlsOptions = {
+  enabled?: boolean;
+  /** Enable and optionally configure the contextual block toolbar. */
+  toolbar?: boolean | MiraBlockToolbarConfig;
 };
 
 export type MiraTemplateSelection =
@@ -200,8 +230,12 @@ export type MiraToolbarItem = {
   tooltip?: string;
   icon?: MiraToolbarIconName;
   group?: string;
+  placements?: readonly MiraToolbarPlacement[];
+  shortcut?: string;
   align?: "start" | "end";
 };
+
+export type MiraToolbarPlacement = "toolbar" | "block-menu";
 
 export type MiraToolbarIconName =
   | "check"
@@ -253,10 +287,18 @@ export type MiraBlockAction = {
   id: string;
   label: string;
   description?: string;
+  group?: string;
+  icon?: MiraToolbarIconName;
+  /** Mount a framework-native icon into the contextual block menu. */
+  renderIcon?: (target: HTMLElement) => void | (() => void);
+  placements?: readonly MiraBlockActionPlacement[];
+  shortcut?: string;
   destructive?: boolean;
   disabled?: MiraBlockActionDynamicBoolean;
   run: (context: MiraBlockActionContext) => void | Promise<void>;
 };
+
+export type MiraBlockActionPlacement = "context-menu" | "block-menu";
 
 export type MiraLinkResolver = (target: {
   href: string;
@@ -477,6 +519,14 @@ export type MiraExtensionRuntimeContext = {
   focus: () => void;
   insertMarkdown: (markdown: string, selection?: MiraTemplateSelection) => void;
   insertImage?: () => void;
+  block?: MiraMarkdownBlockRange;
+  blocks?: MiraMarkdownBlockRange[];
+  handle?: MiraMarkdownBlockHandle;
+  replaceRange?: (
+    markdown: string,
+    range: MiraTextRange,
+    selection?: MiraTemplateSelection,
+  ) => void;
 };
 
 export type MiraExtensionContext = {

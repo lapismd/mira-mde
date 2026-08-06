@@ -5,12 +5,14 @@ import type {
   MiraListCallout,
   MiraLinkResolver,
   MiraBlockAction,
+  MiraBlockControlsOptions,
 } from "@lapismd/mira/extensions";
+import type { EditorView } from "@codemirror/view";
 
 export type MiraRichEditorOptions = {
   enabled?: boolean;
   livePreview?: boolean;
-  blockControls?: boolean;
+  blockControls?: boolean | MiraBlockControlsOptions;
   blockActions?: MiraBlockAction[];
   indentGuides?: boolean;
   extensions?: MiraExtension[];
@@ -28,4 +30,5 @@ export type MiraRichEditorOptions = {
     nextValue: string,
   ) => void;
   onFrontmatterChange?: (nextYaml: string, nextValue: string) => void;
+  insertImage?: (view: EditorView) => void;
 };

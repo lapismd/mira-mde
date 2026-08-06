@@ -184,6 +184,23 @@ Nested
     expect(handles[1]?.affectedRange.text).toBe("  - child\n    nested");
     expect(handles[2]?.listIndent).toBe(0);
   });
+
+  it("records bullet, ordered, and custom task list semantics", () => {
+    const handles = collectMarkdownBlockHandles(
+      state(`- bullet
+1. ordered
+* [?] custom task
+`),
+    ).filter((handle) => handle.role === "list-item");
+
+    expect(
+      handles.map(({ listKind, taskMarker }) => ({ listKind, taskMarker })),
+    ).toEqual([
+      { listKind: "bullet", taskMarker: undefined },
+      { listKind: "numbered", taskMarker: undefined },
+      { listKind: "task", taskMarker: "?" },
+    ]);
+  });
 });
 
 describe("Markdown block mutations", () => {

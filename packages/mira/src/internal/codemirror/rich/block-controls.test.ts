@@ -1,5 +1,6 @@
 import { EditorView } from "@codemirror/view";
-import { describe, expect, it } from "vitest";
+import { EditorState } from "@codemirror/state";
+import { describe, expect, it, vi } from "vitest";
 import { createRichEditorExtensions } from ".";
 
 function nextFrame(): Promise<void> {
@@ -58,6 +59,275 @@ describe("block controls", () => {
     expect(handle).not.toBeNull();
     expect(getComputedStyle(gutterElement!).alignItems).toBe("flex-start");
     expect(handle!.classList.contains("mira-block-handle")).toBe(true);
+
+    view.destroy();
+    parent.remove();
+  });
+
+  it("renders the contextual toolbar only when explicitly enabled", async () => {
+    const legacyParent = document.createElement("div");
+    document.body.append(legacyParent);
+    const legacyView = new EditorView({
+      doc: "Paragraph",
+      extensions: [
+        createRichEditorExtensions({
+          blockControls: true,
+          livePreview: false,
+        }),
+      ],
+      parent: legacyParent,
+    });
+    await nextFrame();
+    expect(
+      legacyParent.querySelector(".mira-block-toolbar-trigger"),
+    ).toBeNull();
+    legacyView.destroy();
+    legacyParent.remove();
+
+    const parent = document.createElement("div");
+    document.body.append(parent);
+    const view = new EditorView({
+      doc: "Paragraph",
+      extensions: [
+        createRichEditorExtensions({
+          blockControls: { toolbar: true },
+          livePreview: false,
+        }),
+      ],
+      parent,
+    });
+    await nextFrame();
+
+    expect(view.dom.classList.contains("mira-block-toolbar-enabled")).toBe(
+      true,
+    );
+    expect(
+      parent
+        .querySelector<HTMLButtonElement>(".mira-block-toolbar-trigger")
+        ?.getAttribute("aria-label"),
+    ).toBe("Change Paragraph");
+    expect(
+      getComputedStyle(
+        parent.querySelector<HTMLElement>(".mira-block-controls-gutter")!,
+      ).width,
+    ).not.toBe("1.25rem");
+
+    view.destroy();
+    parent.remove();
+  });
+
+  it("opens the contextual menu and converts the active block", async () => {
+    const parent = document.createElement("div");
+    document.body.append(parent);
+    const view = new EditorView({
+      doc: "# Heading",
+      extensions: [
+        createRichEditorExtensions({
+          blockControls: { toolbar: true },
+          livePreview: false,
+        }),
+      ],
+      parent,
+    });
+    await nextFrame();
+
+    parent
+      .querySelector<HTMLButtonElement>(".mira-block-toolbar-trigger")!
+      .click();
+    await nextFrame();
+
+    const menu = document.body.querySelector<HTMLElement>(
+      ".mira-block-toolbar-menu",
+    );
+    expect(menu?.hidden).toBe(false);
+    expect(menu?.getAttribute("role")).toBe("menu");
+    expect(
+      menu?.parentElement?.classList.contains("mira-block-toolbar-portal"),
+    ).toBe(true);
+    expect(
+      menu
+        ?.querySelector('[data-block-toolbar-item="heading1"]')
+        ?.getAttribute("aria-checked"),
+    ).toBe("true");
+
+    menu
+      ?.querySelector<HTMLButtonElement>('[data-block-toolbar-item="heading2"]')
+      ?.click();
+    expect(view.state.doc.toString()).toBe("## Heading");
+    expect(menu?.hidden).toBe(true);
+
+    view.destroy();
+    expect(document.body.contains(menu)).toBe(false);
+    parent.remove();
+  });
+
+  it("hides the contextual trigger for readonly editors", async () => {
+    const parent = document.createElement("div");
+    document.body.append(parent);
+    const view = new EditorView({
+      doc: "Paragraph",
+      extensions: [
+        EditorState.readOnly.of(true),
+        createRichEditorExtensions({
+          blockControls: { toolbar: true },
+          livePreview: false,
+        }),
+      ],
+      parent,
+    });
+    await nextFrame();
+
+    expect(parent.querySelector(".mira-block-toolbar-trigger")).toBeNull();
+
+    view.destroy();
+    parent.remove();
+  });
+
+  it("hides contextual triggers for multi-block selections", async () => {
+    const parent = document.createElement("div");
+    document.body.append(parent);
+    const view = new EditorView({
+      doc: "Alpha\n\nBeta",
+      extensions: [
+        createRichEditorExtensions({
+          blockControls: { toolbar: true },
+          livePreview: false,
+        }),
+      ],
+      parent,
+    });
+    await nextFrame();
+    expect(parent.querySelectorAll(".mira-block-toolbar-trigger")).toHaveLength(
+      2,
+    );
+
+    view.dispatch({
+      selection: { anchor: 0, head: view.state.doc.length },
+    });
+    await nextFrame();
+    expect(parent.querySelector(".mira-block-toolbar-trigger")).toBeNull();
+
+    view.destroy();
+    parent.remove();
+  });
+
+  it("shows explicitly placed block actions without moving the selection", async () => {
+    const parent = document.createElement("div");
+    document.body.append(parent);
+    let activeBlock = "";
+    const cleanupIcon = vi.fn();
+    const view = new EditorView({
+      doc: "Alpha\n\nBeta",
+      selection: { anchor: 8 },
+      extensions: [
+        createRichEditorExtensions({
+          blockControls: { toolbar: true },
+          blockActions: [
+            {
+              id: "talk",
+              label: "Talk",
+              icon: "sparkles",
+              placements: ["block-menu"],
+              renderIcon(target) {
+                target.dataset.frameworkIcon = "mounted";
+                return cleanupIcon;
+              },
+              run(context) {
+                activeBlock = context.block.text;
+              },
+            },
+          ],
+          livePreview: false,
+        }),
+      ],
+      parent,
+    });
+    await nextFrame();
+
+    parent
+      .querySelector<HTMLButtonElement>(
+        '[data-mira-block-id="line-1"] + .mira-block-toolbar-trigger',
+      )
+      ?.click();
+    await nextFrame();
+    expect(
+      document.body.querySelector('[data-framework-icon="mounted"]'),
+    ).not.toBeNull();
+    document.body
+      .querySelector<HTMLButtonElement>('[data-block-toolbar-item="talk"]')
+      ?.click();
+
+    expect(activeBlock).toBe("Alpha");
+    expect(view.state.selection.main.head).toBe(8);
+    expect(parent.querySelector(".mira-block-menu")?.textContent).not.toContain(
+      "Talk",
+    );
+    expect(cleanupIcon).toHaveBeenCalledOnce();
+
+    view.destroy();
+    parent.remove();
+  });
+
+  it("supports keyboard navigation and returns focus on Escape", async () => {
+    const parent = document.createElement("div");
+    document.body.append(parent);
+    const view = new EditorView({
+      doc: "Paragraph",
+      extensions: [
+        createRichEditorExtensions({
+          blockControls: { toolbar: true },
+          livePreview: false,
+        }),
+      ],
+      parent,
+    });
+    await nextFrame();
+
+    const trigger = parent.querySelector<HTMLButtonElement>(
+      ".mira-block-toolbar-trigger",
+    )!;
+    trigger.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        bubbles: true,
+        cancelable: true,
+        key: "ArrowDown",
+      }),
+    );
+    await nextFrame();
+
+    const menu = document.body.querySelector<HTMLElement>(
+      ".mira-block-toolbar-menu",
+    )!;
+    const first = menu.querySelector<HTMLButtonElement>(
+      ".mira-block-toolbar-menu__item:not(:disabled)",
+    )!;
+    expect(menu.hidden).toBe(false);
+    expect(menu.contains(document.activeElement)).toBe(true);
+    first.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        bubbles: true,
+        cancelable: true,
+        key: "End",
+      }),
+    );
+    expect(document.activeElement).toBe(
+      Array.from(
+        menu.querySelectorAll<HTMLButtonElement>(
+          ".mira-block-toolbar-menu__item:not(:disabled)",
+        ),
+      ).at(-1),
+    );
+    document.activeElement?.dispatchEvent(
+      new KeyboardEvent("keydown", {
+        bubbles: true,
+        cancelable: true,
+        key: "Escape",
+      }),
+    );
+    expect(menu.hidden).toBe(true);
+    expect(document.activeElement).toBe(
+      parent.querySelector(".mira-block-toolbar-trigger"),
+    );
 
     view.destroy();
     parent.remove();

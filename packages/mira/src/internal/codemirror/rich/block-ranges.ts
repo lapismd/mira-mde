@@ -390,12 +390,15 @@ function collectListItemHandles(
     const affectedRange = createBlock(state, "list", lines, index, endIndex);
     const id = `list-item-${line.number}`;
     const parentId = stack.at(-1)?.id;
+    const metadata = listItemMetadata(line.text);
     handles.push({
       id,
       role: "list-item",
       handleRange: { ...handleRange, id },
       affectedRange: { ...affectedRange, id },
       listIndent: indent,
+      listKind: metadata?.kind,
+      taskMarker: metadata?.taskMarker,
       parentId,
     });
     stack.push({ id, indent });
@@ -900,6 +903,22 @@ function isListItem(line: MarkdownLine): boolean {
 
 function listIndent(line: MarkdownLine): number {
   return line.text.match(/^\s*/u)?.[0].length ?? 0;
+}
+
+function listItemMetadata(text: string): {
+  kind: "bullet" | "numbered" | "task";
+  taskMarker?: string;
+} | null {
+  const match = text.match(
+    /^\s*(?:([-*+])|(\d+[.)]))\s+(?:\[([^\]\n])\]\s+)?/u,
+  );
+  if (!match) {
+    return null;
+  }
+  if (match[3] !== undefined) {
+    return { kind: "task", taskMarker: match[3] };
+  }
+  return { kind: match[2] ? "numbered" : "bullet" };
 }
 
 function consumeList(lines: MarkdownLine[], startIndex: number): number {

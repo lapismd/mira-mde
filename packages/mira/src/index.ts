@@ -8,4 +8,11 @@ export type {
   MiraOutlineVariant,
 } from "./types";
 export type { MiraMarkdownActionId } from "./core";
+export {
+  miraBlockToolbarItemIds,
+  type MiraBlockControlsOptions,
+  type MiraBlockToolbarConfig,
+  type MiraBlockToolbarItemId,
+  type MiraToolbarPlacement,
+} from "./extensions";
 export default Mira;

@@ -12,8 +12,12 @@ import { createRichEditorExtensions } from "../internal/codemirror/rich/index";
 import { createTableExtensions } from "../tables/index";
 import {
   createMiraCommandKeymap,
+  executeMiraCommand,
+  isMiraCommandEnabled,
   resolveMiraExtensions,
   type MiraAssetResolver,
+  type MiraBlockControlsOptions,
+  type MiraBlockAction,
   type MiraExtension,
   type MiraExtensionRuntimeContext,
   type MiraFileAdapter,
@@ -30,7 +34,7 @@ export type MiraCodeMirrorExtensionsOptions = {
   placeholder?: string;
   lineWrapping?: boolean;
   spellcheck?: boolean;
-  blockControls?: boolean;
+  blockControls?: boolean | MiraBlockControlsOptions;
   indentGuides?: boolean;
   indentWithTabs?: boolean;
   indentWidth?: number;
@@ -84,6 +88,25 @@ export function createMiraCodeMirrorExtensions(
     readonly,
     sourcePath,
   });
+  const toolbarBlockActions: MiraBlockAction[] = resolved.toolbarItems
+    .filter((item) => item.placements?.includes("block-menu"))
+    .map((item) => ({
+      id: `toolbar-${item.id}`,
+      label: item.label,
+      group: item.group,
+      icon: item.icon,
+      shortcut: item.shortcut,
+      placements: ["block-menu"],
+      disabled(context) {
+        const command = resolved.commands.find(
+          (candidate) => candidate.id === item.command,
+        );
+        return !command || !isMiraCommandEnabled(command, context);
+      },
+      run(context) {
+        executeMiraCommand(resolved.commands, item.command, context);
+      },
+    }));
 
   return [
     createBaseCodeMirrorExtensions({
@@ -108,8 +131,9 @@ export function createMiraCodeMirrorExtensions(
       sourcePath,
     }),
     createRichEditorExtensions({
-      blockActions: resolved.blockActions,
-      blockControls: blockControls && mode !== "preview" && !readonly,
+      blockActions: [...resolved.blockActions, ...toolbarBlockActions],
+      blockControls: mode !== "preview" && !readonly ? blockControls : false,
+      insertImage: (view) => runtimeContext(view).insertImage?.(),
       livePreview: mode === "live-preview",
       indentGuides,
       extensions,

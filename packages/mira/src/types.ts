@@ -1,5 +1,6 @@
 import type {
   MiraAssetResolver,
+  MiraBlockControlsOptions,
   MiraCommand,
   MiraExtension,
   MiraFileAdapter,
@@ -31,7 +32,7 @@ export type MiraProps = {
   placeholder?: string;
   lineWrapping?: boolean;
   spellcheck?: boolean;
-  blockControls?: boolean;
+  blockControls?: boolean | MiraBlockControlsOptions;
   indentGuides?: boolean;
   indentWithTabs?: boolean;
   indentWidth?: number;
