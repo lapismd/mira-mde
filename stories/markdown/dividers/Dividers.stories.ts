@@ -1,6 +1,6 @@
 import { doodleDividersExtension } from "@lapismd/mira/extensions";
 import type { Meta, StoryObj } from "@storybook/svelte-vite";
-import { expect, userEvent, waitFor } from "storybook/test";
+import { expect, userEvent, waitFor, within } from "storybook/test";
 import { catalogParameters } from "../../catalog/catalog.mjs";
 import EditorModeStory from "../_shared/EditorModeStory.svelte";
 import MarkdownPreviewStory from "../_shared/MarkdownPreviewStory.svelte";
@@ -13,7 +13,9 @@ import {
   doodleDividersMarkdown,
 } from "./fixtures";
 
-const seededDoodleDividers = doodleDividersExtension();
+const seededDoodleDividers = doodleDividersExtension({
+  createSeed: () => 0x00000006,
+});
 const customDoodleDividers = doodleDividersExtension({
   variants: [customDoodleDividerVariant],
   palette: ["#e11d48", "#7c3aed"],
@@ -117,6 +119,71 @@ export const LivePreview: Story = {
       );
     });
 
+    let selectedSeed = "00000000";
+    await step("reroll and explicitly select the divider family", async () => {
+      const firstWidget = canvasElement.querySelector<HTMLElement>(
+        ".mira-rich-widget--horizontalrule",
+      )!;
+      const initialVariant = firstWidget.querySelector<SVGElement>(
+        "svg.mira-doodle-divider",
+      )?.dataset.variant;
+      expect(initialVariant).toBe("loop");
+      await userEvent.hover(firstWidget);
+      await userEvent.click(
+        within(firstWidget).getByRole("button", {
+          name: "Refresh divider style",
+        }),
+      );
+
+      await waitFor(() => {
+        const doodle = canvasElement.querySelector<SVGElement>(
+          ".mira-rich-widget--horizontalrule svg.mira-doodle-divider",
+        );
+        expect(doodle?.dataset.seed).toBe("00000006");
+        expect(doodle?.dataset.variant).toBe("waves");
+      });
+
+      const refreshedWidget = canvasElement.querySelector<HTMLElement>(
+        ".mira-rich-widget--horizontalrule",
+      )!;
+      await userEvent.click(
+        within(refreshedWidget).getByRole("button", {
+          name: "Choose divider style",
+        }),
+      );
+      const menu = within(refreshedWidget).getByRole("menu", {
+        name: "Divider style",
+      });
+      expect(menu).toBeVisible();
+      expect(within(menu).getAllByRole("menuitemradio")).toHaveLength(8);
+      expect(
+        within(menu).getByRole("menuitemradio", { name: "Waves" }),
+      ).toHaveAttribute("aria-checked", "true");
+      await userEvent.click(
+        within(menu).getByRole("menuitemradio", { name: "Plain" }),
+      );
+
+      await waitFor(() => {
+        const doodle = canvasElement.querySelector<SVGElement>(
+          ".mira-rich-widget--horizontalrule svg.mira-doodle-divider",
+        );
+        expect(doodle?.dataset.variant).toBe("plain");
+        selectedSeed = doodle?.dataset.seed ?? "";
+        expect(selectedSeed).not.toBe("00000006");
+        expect(editor.dataset.markdownValue).toContain(
+          `<!-- mira-divider:v1:${selectedSeed} -->\n---`,
+        );
+      });
+
+      expect(
+        within(
+          canvasElement.querySelector<HTMLElement>(
+            ".mira-rich-widget--horizontalrule",
+          )!,
+        ).getByRole("button", { name: "Edit source" }),
+      ).toBeVisible();
+    });
+
     await step(
       "reveal and restore the complete authored source pair",
       async () => {
@@ -126,7 +193,7 @@ export const LivePreview: Story = {
         await userEvent.click(firstDoodleWidget);
         await waitFor(() => {
           expect(editor.dataset.markdownValue).toContain(
-            "<!-- mira-divider:v1:00000000 -->\n---",
+            `<!-- mira-divider:v1:${selectedSeed} -->\n---`,
           );
           expect(
             canvasElement.querySelectorAll("svg.mira-doodle-divider").length,

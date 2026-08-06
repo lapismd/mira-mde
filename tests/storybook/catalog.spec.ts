@@ -125,3 +125,101 @@ test("the comprehensive demo enables every first-party plugin and contextual too
   await page.keyboard.type("\n/ask");
   await expect(page.getByRole("option", { name: /Ask AI/ })).toBeVisible();
 });
+
+test("Live Preview doodle dividers reroll and select a family beside the source control", async ({
+  page,
+}) => {
+  await page.goto(
+    "/iframe.html?id=markdown-dividers--live-preview&viewMode=story",
+  );
+  const editor = page.locator(".mira-story-surface--editor");
+  const widget = page.locator(".mira-rich-widget--horizontalrule").first();
+  const controls = widget.locator(".mira-doodle-divider__controls");
+  const source = widget.getByRole("button", { name: "Edit source" });
+  const refresh = widget.getByRole("button", {
+    name: "Refresh divider style",
+  });
+  const picker = widget.getByRole("button", {
+    name: "Choose divider style",
+  });
+  await expect(widget).toBeVisible();
+  await expect(controls).toHaveCSS("opacity", "0");
+  await widget.hover();
+  await expect(controls).toHaveCSS("opacity", "1");
+
+  const [sourceBox, refreshBox, pickerBox, contentBox] = await Promise.all([
+    source.boundingBox(),
+    refresh.boundingBox(),
+    picker.boundingBox(),
+    page.locator(".cm-content").boundingBox(),
+  ]);
+  expect(sourceBox).not.toBeNull();
+  expect(refreshBox).not.toBeNull();
+  expect(pickerBox).not.toBeNull();
+  expect(contentBox).not.toBeNull();
+  expect(Math.abs(sourceBox!.y - refreshBox!.y)).toBeLessThanOrEqual(1);
+  expect(Math.abs(refreshBox!.y - pickerBox!.y)).toBeLessThanOrEqual(1);
+  expect(sourceBox!.x - (refreshBox!.x + refreshBox!.width)).toBeGreaterThan(2);
+  expect(sourceBox!.x - (refreshBox!.x + refreshBox!.width)).toBeLessThan(6);
+
+  await picker.focus();
+  await picker.press("ArrowDown");
+  const menu = widget.getByRole("menu", { name: "Divider style" });
+  await expect(menu).toBeVisible();
+  await expect(menu.getByRole("menuitemradio")).toHaveCount(8);
+  const currentItem = menu.locator(
+    '[role="menuitemradio"][aria-checked="true"]',
+  );
+  await expect(currentItem).toHaveCount(1);
+  await expect(currentItem).toBeFocused();
+  await page.keyboard.press("Home");
+  await expect(
+    menu.getByRole("menuitemradio", { name: "Scribble" }),
+  ).toBeFocused();
+  await page.keyboard.press("Enter");
+
+  await expect(
+    page.locator(
+      '.mira-rich-widget--horizontalrule svg.mira-doodle-divider[data-variant="scribble"]',
+    ),
+  ).toHaveCount(1);
+  const selectedSeed = await page
+    .locator(".mira-rich-widget--horizontalrule svg.mira-doodle-divider")
+    .first()
+    .getAttribute("data-seed");
+  expect(selectedSeed).toMatch(/^[0-9a-f]{8}$/u);
+  await expect(editor).toHaveAttribute(
+    "data-markdown-value",
+    new RegExp(`mira-divider:v1:${selectedSeed}`),
+  );
+  expect((await page.locator(".cm-content").boundingBox())?.x).toBe(
+    contentBox!.x,
+  );
+
+  const selectedVariant = await page
+    .locator(".mira-rich-widget--horizontalrule svg.mira-doodle-divider")
+    .first()
+    .getAttribute("data-variant");
+  await page
+    .locator(".mira-rich-widget--horizontalrule")
+    .first()
+    .getByRole("button", { name: "Refresh divider style" })
+    .click();
+  await expect
+    .poll(async () =>
+      page
+        .locator(".mira-rich-widget--horizontalrule svg.mira-doodle-divider")
+        .first()
+        .getAttribute("data-variant"),
+    )
+    .not.toBe(selectedVariant);
+
+  await page.goto("/iframe.html?id=markdown-dividers--reading&viewMode=story");
+  await expect(
+    page.getByRole("button", { name: "Refresh divider style" }),
+  ).toHaveCount(0);
+  await page.goto("/iframe.html?id=markdown-dividers--source&viewMode=story");
+  await expect(
+    page.getByRole("button", { name: "Refresh divider style" }),
+  ).toHaveCount(0);
+});

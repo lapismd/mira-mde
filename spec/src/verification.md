@@ -67,7 +67,7 @@ authorized baseline regeneration migrations are complete.
 | MIRA-MD-019, MIRA-CSS-020                                                                               | Grid-table keymap, serialization, selection, and computed typography       | Implemented by grid-table parity                |
 | MIRA-MD-020                                                                                             | Block metadata, safe conversion, undo, selection, and geometry tests       | Implemented by contextual block toolbar core    |
 | MIRA-MD-021, MIRA-CSS-021                                                                               | Seed lifecycle, SVG determinism, logical-block, and Storybook acceptance   | Implemented: 299 Mira, 146 Storybook, 44 E2E    |
-| MIRA-MD-022, MIRA-CSS-022, MIRA-CAT-012                                                                 | Live Preview divider reroll, family picker, and layout acceptance          | Planned by divider authoring controls           |
+| MIRA-MD-022, MIRA-CSS-022, MIRA-CAT-012                                                                 | Live Preview divider reroll, family picker, and layout acceptance          | Implemented by divider-control slice            |
 
 The selective-release slice defines the exact six-package graph once, configures
 independent Changesets versions and package-owned changelogs, and uses
@@ -597,6 +597,22 @@ preformatted continuation caret state. Compare-only Visual Delta captures all
 six comprehensive stories successfully and reports the expected approved-image
 differences of 1–3 percent after enabling the new UI. It creates or refreshes no
 baseline and does not change story review status.
+
+The divider authoring-control slice implements MIRA-MD-022, MIRA-CSS-022, and
+MIRA-CAT-012. Writable Live Preview widgets expose a compact family picker and
+refresh control directly before the existing source-edit button; Source,
+Reading, readonly, bare-rule, and invalid-drawing surfaces remain unchanged.
+The 301-test Mira suite covers deterministic family selection, rerolling to a
+different family, custom seed factories, one-step undo, caret and scroll
+preservation, menu keyboard/focus behavior, outside dismissal, and opt-out and
+readonly boundaries. All 146 Storybook interactions and the focused Chromium
+geometry/authoring acceptance pass, as do `pnpm spec:check`, `pnpm check:all`,
+the Mira package build with publint, and the static Storybook build. Direct
+Chromium inspection verifies the controls and radio menu in both the focused
+divider story and Comprehensive Live Preview. Compare-only Visual Delta reports
+the new pending divider story as missing its intentionally uncreated baseline
+and retains the known 26,404-pixel Comprehensive difference; it creates or
+refreshes no baseline and changes no review status.
 
 The portable parity audit recorded 59 present features, six consumer-adapter
 boundaries, six Lapis-only behaviors, and no remaining portable P0-P2 gaps at

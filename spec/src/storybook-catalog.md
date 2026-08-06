@@ -107,7 +107,8 @@ expected policy failure.
 The focused divider page covers Source, Live Preview, Reading, custom variants,
 the frozen v1 gallery, a 24-divider review page, and a story-only refresh
 control. The Live Preview story additionally exercises the shipped inline reroll
-and family picker beside the source-edit control. All divider stories remain
+and family picker beside the source-edit control, including its selected radio
+state and the synchronized authored seed. All divider stories remain
 `visual-pending`; their interactions verify
 semantic native rules, hidden decorative SVGs, source fallback, deterministic
 families, nested rules, and explicit migration without creating baselines.
