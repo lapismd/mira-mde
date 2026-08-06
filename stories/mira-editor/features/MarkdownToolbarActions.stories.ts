@@ -96,6 +96,46 @@ async function runToolbarActionAcceptance({
   canvasElement: HTMLElement;
   step: (name: string, run: () => Promise<void>) => Promise<void>;
 }): Promise<void> {
+  await step("format a selection from the contextual toolbar", async () => {
+    const canvas = within(canvasElement);
+    await setupAction(
+      canvasElement,
+      "Format this selection",
+      { line: 0, ch: 7 },
+      { line: 0, ch: 11 },
+    );
+
+    const contextualToolbar = await waitFor(() =>
+      canvas.getByRole("toolbar", { name: "Text formatting" }),
+    );
+    expect(
+      within(contextualToolbar)
+        .getAllByRole("button")
+        .map((button) => button.getAttribute("aria-label")),
+    ).toEqual(["Link", "Bold", "Italic", "Strikethrough"]);
+
+    await userEvent.click(
+      within(contextualToolbar).getByRole("button", { name: "Bold" }),
+    );
+    await expectMarkdown(canvasElement, "Format **this** selection");
+    await userEvent.click(
+      within(
+        canvas.getByRole("toolbar", { name: "Text formatting" }),
+      ).getByRole("button", { name: "Bold" }),
+    );
+    await expectMarkdown(canvasElement, "Format this selection");
+
+    await setupAction(canvasElement, "Collapsed selection", {
+      line: 0,
+      ch: 4,
+    });
+    await waitFor(() =>
+      expect(
+        canvas.queryByRole("toolbar", { name: "Text formatting" }),
+      ).not.toBeInTheDocument(),
+    );
+  });
+
   await step("toggle an H1 at the containing line", async () => {
     await expectToggle({
       canvasElement,

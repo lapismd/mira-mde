@@ -1,7 +1,10 @@
 <script lang="ts">
   import { MiraEditor, type MiraEditorHandle } from "@lapismd/mira-editor";
   import type { MiraEditorSelection } from "@lapismd/mira/core";
-  import type { MiraMode } from "@lapismd/mira/extensions";
+  import {
+    selectionToolbarExtension,
+    type MiraMode,
+  } from "@lapismd/mira/extensions";
 
   type SetupDetail = {
     markdown: string;
@@ -17,6 +20,7 @@
   } = $props();
 
   let editor: MiraEditorHandle | null = $state(null);
+  const extensions = [selectionToolbarExtension()];
 
   function markdownActionHarness(node: HTMLElement) {
     const setup = (event: Event) => {
@@ -47,6 +51,7 @@
     bind:value
     bind:mode
     sourcePath="toolbar-actions.md"
+    {extensions}
     spellcheck={false}
     indentWithTabs={false}
     indentWidth={2}

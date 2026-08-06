@@ -5,10 +5,11 @@
     type MiraFeatureFlags,
     type MiraOutlineVariant,
   } from "@lapismd/mira-editor";
-  import type {
-    MiraColorMode,
-    MiraMode,
-    MiraTheme,
+  import {
+    selectionToolbarExtension,
+    type MiraColorMode,
+    type MiraMode,
+    type MiraTheme,
   } from "@lapismd/mira/extensions";
   import { mermaidExtension } from "@lapismd/mira-plugin-mermaid";
   import { Mira } from "@lapismd/mira";
@@ -46,7 +47,12 @@
     height = "min(68rem, calc(100vh - 5rem))",
   }: Props = $props();
 
-  const extensions = $derived(mermaidEnabled ? [mermaidExtension()] : []);
+  const selectionToolbar = selectionToolbarExtension();
+  const defaultExtensions = [selectionToolbar];
+  const extensions = $derived([
+    selectionToolbar,
+    ...(mermaidEnabled ? [mermaidExtension()] : []),
+  ]);
   const features = $derived({
     [MiraFeature.Mermaid]: mermaidEnabled,
   } satisfies MiraFeatureFlags);
@@ -98,6 +104,7 @@
         {outline}
         {outlineVariant}
         {features}
+        extensions={defaultExtensions}
         {indentGuides}
         {indentWithTabs}
         {indentWidth}

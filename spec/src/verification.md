@@ -28,7 +28,7 @@ authorized baseline regeneration migrations are complete.
 | MIRA-UI-010                                                                                             | Cross-framework appearance contract tests                                  | Implemented by extensible theme slice           |
 | MIRA-UI-011                                                                                             | Version-sync unit test and toolbar About dialog Storybook interaction      | Implemented by About dialog slice               |
 | MIRA-UI-012                                                                                             | Core action-engine tests and focused source/live-preview toolbar stories   | Implemented by toolbar-action slice             |
-| MIRA-UI-013                                                                                             | Selection-toolbar unit, contract, and focused Storybook interactions       | In progress                                     |
+| MIRA-UI-013                                                                                             | Selection-toolbar unit, contract, and focused Storybook interactions       | Implemented by selection-toolbar slice          |
 | MIRA-CSS-001, MIRA-CSS-002                                                                              | Package stylesheet exports, no-Tailwind package checks                     | Implemented                                     |
 | MIRA-CSS-003, MIRA-CSS-004, MIRA-CSS-005, MIRA-CSS-006                                                  | Public surface/token registry and catalog checker                          | Implemented by catalog/token slice              |
 | MIRA-CSS-007, MIRA-CSS-008, MIRA-CSS-009, MIRA-CSS-010                                                  | Theme CSS contracts, component tests, and portaled-overlay stories         | Implemented by extensible theme slice           |
@@ -91,6 +91,26 @@ availability. Two `skip-visual` Storybook interactions exercise first-click and
 repeat-click results for headings, all four inline formats, links, blockquotes,
 and all three list types in both Source and Live Preview through the public
 handle harness; the focused Chromium project passes both stories.
+
+The selection-toolbar slice exports the optional `selectionToolbarExtension`
+from Mira's portable extension entrypoint and the lower-level CodeMirror
+factory from `/codemirror`. Its default link, bold, italic, and strikethrough
+buttons preserve the active selection and delegate to the same Markdown action
+engine; consumers can reorder the five supported inline actions, override
+labels, and prefer above or below placement. Each square action target has a
+`999px` circular radius and exposes exact enclosing syntax through
+`aria-pressed`; activating a pressed action unwraps that syntax while retaining
+the selected text. The pill combines its token border with a lower inset edge
+so its complete outline remains visible above the light-theme shadow. The
+extension is absent from readonly and reading surfaces, hides for collapsed or
+blurred selections, and supports Tab entry, arrow-key navigation, and Escape
+return to the editor. The Mira suite passes 259 tests, while the focused
+Storybook Chromium run passes the default and active-formatting visual stories
+and both source/live-preview action stories. Live browser inspection measures
+the centered pill at `139.94px` by `40px`, with a `1px` token border, `999px`
+radius, `8px` selection gap, and less than `0.001px` selection-center delta. The
+dedicated stories remain `visual-pending`; no visual baseline was created or
+refreshed.
 
 Final validation passes `pnpm spec:check`, `pnpm catalog:check`, the affected
 Mira, Mira Editor, React, and Vanilla check/test/build gates, `pnpm
