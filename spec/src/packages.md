@@ -20,6 +20,7 @@ install internal CodeMirror, renderer, UI, or theme workspaces separately.
 | MIRA-ARCH-015 | `@lapismd/mira` MUST expose the additive Markdown action identifier and controller operation, and Mira Editor, React, and Vanilla handles and declarative toolbar contexts MUST delegate that operation without duplicating action semantics.                                                                                                                                                                                                    |
 | MIRA-ARCH-016 | Public internal dependencies MUST use pre-1.0-compatible `workspace:~` ranges, release planning MUST follow the public dependency graph, and only packages whose exact local version is absent from npm MAY be selected for publication.                                                                                                                                                                                                         |
 | MIRA-ARCH-017 | `@lapismd/mira` MUST expose additive block-control toolbar configuration, semantic block metadata, and explicit `toolbar`, `block-menu`, and `context-menu` action placements; Mira Editor, React, and Vanilla MUST normalize those contracts without creating framework-specific editing semantics. The core package MUST own the shared page-wide gutter allowance, clipped-surface escape, and themed overlay behavior used by every adapter. |
+| MIRA-ARCH-018 | `@lapismd/mira/extensions` MUST expose the opt-in doodle-divider factory, immutable default variant gallery and palette, synchronous seed and drawing contracts, and explicit pure Markdown seed-migration helper without adding a separately released package or runtime drawing dependency.                                                                                                                                                    |
 
 ## Public graph
 
@@ -44,6 +45,11 @@ Block-control toolbar configuration and explicit action placements follow the
 same graph. Mira Editor filters default contextual items through its feature
 flags, React adapts native icons without replacing the core menu, and Vanilla
 forwards the Svelte editor contract unchanged.
+
+The doodle-divider feature follows the same portable extension boundary. Its
+factory, default gallery, customization types, and explicit migration helper
+ship from `/extensions`; the implementation does not create a seventh public
+package or require a framework adapter.
 
 ## Release model
 

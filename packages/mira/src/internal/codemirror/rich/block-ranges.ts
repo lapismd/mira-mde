@@ -1,4 +1,4 @@
-import type { EditorState } from "@codemirror/state";
+import { Transaction, type EditorState } from "@codemirror/state";
 import type { EditorView } from "@codemirror/view";
 import type {
   MiraMarkdownBlockHandle,
@@ -7,6 +7,10 @@ import type {
   MiraTemplateSelection,
   MiraTextRange,
 } from "../../../extensions/index";
+import {
+  isMiraDoodleDividerLinePair,
+  miraDuplicatedBlockRange,
+} from "../../doodle-dividers";
 
 type MarkdownLine = {
   number: number;
@@ -177,7 +181,13 @@ export function duplicateMarkdownBlockRange(
     changes: { from: 0, to: view.state.doc.length, insert: insertion.markdown },
     selection: { anchor: insertion.to },
     scrollIntoView: true,
-    userEvent: "input.duplicate.block",
+    annotations: [
+      Transaction.userEvent.of("input.duplicate.block"),
+      miraDuplicatedBlockRange.of({
+        from: insertion.from,
+        to: insertion.to,
+      }),
+    ],
   });
 }
 
@@ -205,7 +215,13 @@ export function duplicateMarkdownBlockHandle(
     changes: { from: 0, to: view.state.doc.length, insert: insertion.markdown },
     selection: { anchor: insertion.to },
     scrollIntoView: true,
-    userEvent: "input.duplicate.block",
+    annotations: [
+      Transaction.userEvent.of("input.duplicate.block"),
+      miraDuplicatedBlockRange.of({
+        from: insertion.from,
+        to: insertion.to,
+      }),
+    ],
   });
 }
 
@@ -268,6 +284,10 @@ function parseBlock(
 ): { kind: MiraMarkdownBlockKind; endIndex: number } {
   const line = lines[startIndex]!;
   const next = lines[startIndex + 1];
+
+  if (next && isMiraDoodleDividerLinePair(line.text, next.text)) {
+    return { kind: "thematic-break", endIndex: startIndex + 1 };
+  }
 
   if (startIndex === 0 && isFrontmatterFence(line.trimmed)) {
     return {
@@ -1043,6 +1063,7 @@ function startsSpecialBlock(lines: MarkdownLine[], index: number): boolean {
   const line = lines[index]!;
   const next = lines[index + 1];
   return Boolean(
+    (next && isMiraDoodleDividerLinePair(line.text, next.text)) ||
     directiveFenceName(line.trimmed) ||
     fencedCodeMarker(line.text) ||
     mathFenceName(line.trimmed) ||

@@ -5,6 +5,18 @@ import type { Component } from "svelte";
 import type { Pluggable } from "unified";
 
 export {
+  defaultMiraDoodleDividerPalette,
+  defaultMiraDoodleDividerVariants,
+  doodleDividersExtension,
+  materializeDoodleDividerSeeds,
+  type MiraDoodleDividerDrawContext,
+  type MiraDoodleDividerMaterializeOptions,
+  type MiraDoodleDividerSeedContext,
+  type MiraDoodleDividerSeedReason,
+  type MiraDoodleDividersOptions,
+  type MiraDoodleDividerVariant,
+} from "./doodle-dividers";
+export {
   selectionToolbarExtension,
   defaultMiraSelectionToolbarActions,
   miraSelectionToolbarActionIds,

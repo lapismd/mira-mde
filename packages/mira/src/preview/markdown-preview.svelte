@@ -207,6 +207,7 @@
         "data-heading",
         "data-line",
         "data-list-callout-marker",
+        "data-mira-doodle-divider-seed",
         "data-callout-char",
         "data-callout-icon",
         "data-offset",

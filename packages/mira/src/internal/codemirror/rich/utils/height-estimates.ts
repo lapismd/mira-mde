@@ -28,7 +28,11 @@ export function estimateMarkdownBlockHeight(markdown: string): number {
     return estimateTableWidgetHeight(markdown);
   }
 
-  if (/^\s*---(?:\r?\n|$)/.test(markdown)) {
+  if (
+    /^\s*(?:<!-- mira-divider:v1:[0-9a-f]{8} -->\s*)?---(?:\r?\n|$)/u.test(
+      markdown,
+    )
+  ) {
     return Math.max(
       64,
       lineCount * RICH_BLOCK_LINE_HEIGHT_ESTIMATE_PX +

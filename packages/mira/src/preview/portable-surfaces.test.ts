@@ -2,6 +2,7 @@ import { mount, tick, unmount } from "svelte";
 import { describe, expect, it, vi } from "vitest";
 import {
   defineMiraExtension,
+  doodleDividersExtension,
   type MiraFileAdapter,
 } from "@lapismd/mira/extensions";
 import FileEmbed from "./file-embed.svelte";
@@ -107,6 +108,32 @@ describe("portable preview surfaces", () => {
     expect(target.querySelector("p")?.dataset.diagnostic).toBe("checked");
     await unmount(component);
     expect(cleanup).toHaveBeenCalled();
+  });
+
+  it("renders seeded doodle dividers while retaining bare native rules", async () => {
+    const target = document.createElement("div");
+    const component = mount(MarkdownPreview, {
+      target,
+      props: {
+        value: `<!-- mira-divider:v1:4f32a91c -->
+---
+
+---`,
+        extensions: [doodleDividersExtension()],
+      },
+    });
+    await settle();
+
+    const rules = target.querySelectorAll("hr");
+    expect(rules).toHaveLength(2);
+    expect(rules[0]?.dataset.miraDoodleDivider).toBe("true");
+    expect(rules[1]?.dataset.miraDoodleDivider).toBeUndefined();
+    expect(target.querySelectorAll(".mira-doodle-divider")).toHaveLength(1);
+    expect(
+      target.querySelector(".mira-doodle-divider")?.getAttribute("aria-hidden"),
+    ).toBe("true");
+
+    await unmount(component);
   });
 
   it("keeps read-only list callouts passive and makes editable markers selectable", async () => {

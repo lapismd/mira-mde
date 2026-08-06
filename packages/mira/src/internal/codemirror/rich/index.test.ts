@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { EditorView } from "@codemirror/view";
-import { defineMiraExtension } from "@lapismd/mira/extensions";
+import {
+  defineMiraExtension,
+  doodleDividersExtension,
+} from "@lapismd/mira/extensions";
 import { createMarkdownCodeMirrorExtensions } from "../markdown";
 import { createRichEditorExtensions } from ".";
 
@@ -11,6 +14,50 @@ function nextFrame(): Promise<void> {
 describe("createRichEditorExtensions", () => {
   it("can be disabled", () => {
     expect(createRichEditorExtensions({ enabled: false })).toEqual([]);
+  });
+
+  it("renders and reveals a seeded divider comment and rule as one widget", async () => {
+    const parent = document.createElement("div");
+    document.body.append(parent);
+    const source = `<!-- mira-divider:v1:4f32a91c -->
+---
+
+After`;
+    const doodles = doodleDividersExtension();
+    const view = new EditorView({
+      doc: source,
+      selection: { anchor: source.length },
+      extensions: [
+        createMarkdownCodeMirrorExtensions(),
+        createRichEditorExtensions({
+          livePreview: true,
+          extensions: [doodles],
+        }),
+      ],
+      parent,
+    });
+    await nextFrame();
+    await nextFrame();
+
+    const widget = parent.querySelector<HTMLElement>(
+      ".mira-rich-widget--horizontalrule",
+    );
+    const divider = widget?.querySelector<SVGElement>(".mira-doodle-divider");
+    expect(widget).not.toBeNull();
+    expect(divider?.dataset.seed).toBe("4f32a91c");
+    expect(parent.textContent).not.toContain("mira-divider:v1");
+
+    divider?.dispatchEvent(
+      new MouseEvent("click", { bubbles: true, button: 0 }),
+    );
+    await nextFrame();
+
+    expect(view.state.selection.main.from).toBe(0);
+    expect(view.state.selection.main.to).toBe(source.indexOf("\n\nAfter"));
+    expect(parent.textContent).toContain("mira-divider:v1:4f32a91c");
+
+    view.destroy();
+    parent.remove();
   });
 
   it("keeps source mode free of live-preview hide/replace decorations", async () => {

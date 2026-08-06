@@ -107,6 +107,30 @@ directive
       ":::note\ndirective\n:::",
     );
   });
+
+  it("treats a seeded divider comment and rule as one logical block", () => {
+    const blocks = collectMarkdownBlockRanges(
+      state(`Alpha
+
+<!-- mira-divider:v1:00000001 -->
+---
+
+Beta`),
+    );
+
+    expect(
+      blocks.map(({ kind, startLine, endLine }) => ({
+        kind,
+        startLine,
+        endLine,
+      })),
+    ).toEqual([
+      { kind: "paragraph", startLine: 1, endLine: 1 },
+      { kind: "thematic-break", startLine: 3, endLine: 4 },
+      { kind: "paragraph", startLine: 6, endLine: 6 },
+    ]);
+    expect(blocks[1]?.text).toBe("<!-- mira-divider:v1:00000001 -->\n---");
+  });
 });
 
 describe("collectMarkdownBlockHandles", () => {
@@ -227,6 +251,41 @@ describe("Markdown block mutations", () => {
     duplicateMarkdownBlockRange(editor.view, alpha!);
 
     expect(editor.view.state.doc.toString()).toBe("Alpha\n\nAlpha\n\nBeta\n");
+    editor.destroy();
+  });
+
+  it("moves and deletes a seeded divider as one authored pair", () => {
+    const editor = createView(`Alpha
+
+<!-- mira-divider:v1:00000001 -->
+---
+
+Beta
+`);
+    let blocks = collectMarkdownBlockRanges(editor.view.state);
+    const divider = blocks.find((block) => block.kind === "thematic-break")!;
+    const beta = blocks.find((block) => block.text === "Beta")!;
+
+    expect(
+      moveMarkdownBlockRange(editor.view, divider, {
+        block: beta,
+        position: "after",
+      }),
+    ).toBe(true);
+    expect(editor.view.state.doc.toString()).toBe(`Alpha
+
+Beta
+
+<!-- mira-divider:v1:00000001 -->
+---
+`);
+
+    blocks = collectMarkdownBlockRanges(editor.view.state);
+    deleteMarkdownBlockRange(
+      editor.view,
+      blocks.find((block) => block.kind === "thematic-break")!,
+    );
+    expect(editor.view.state.doc.toString()).toBe("Alpha\n\nBeta\n\n");
     editor.destroy();
   });
 

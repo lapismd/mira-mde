@@ -18,6 +18,7 @@ import {
   resolveMiraExtensions,
   resolveMiraListCallouts,
 } from "@lapismd/mira/extensions";
+import { resolveMiraDoodleDividerPair } from "../../doodle-dividers";
 import { miraRichEditorTheme } from "./theme";
 import type { MiraRichEditorOptions } from "./types";
 import { codeBlockLineDecorations } from "./utils/code-block-lines";
@@ -297,8 +298,15 @@ function buildBlockPreviewDecorations(
         return;
       }
 
-      const from = state.doc.lineAt(node.from).from;
-      const to = state.doc.lineAt(node.to).to;
+      let from = state.doc.lineAt(node.from).from;
+      let to = state.doc.lineAt(node.to).to;
+      if (node.name === "HorizontalRule") {
+        const pair = resolveMiraDoodleDividerPair(state, node.from, node.to);
+        if (pair) {
+          from = pair.from;
+          to = pair.to;
+        }
+      }
       const selectionInside =
         node.name === "Frontmatter"
           ? rangeContainsSelectionCursor(state, from, to) &&

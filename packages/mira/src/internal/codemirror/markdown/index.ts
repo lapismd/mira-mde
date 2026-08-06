@@ -52,6 +52,27 @@ export type MiraMarkdownCodeMirrorOptions = {
   sourceMode?: boolean;
 };
 
+export function createMiraMarkdownLanguage(
+  codeLanguages: LanguageDescription[] = [],
+): Extension {
+  return yamlFrontmatter({
+    content: markdown({
+      codeLanguages: [...languages, ...codeLanguages],
+      extensions: [
+        ListAfterLazyBlockquote,
+        Table,
+        GridTable,
+        GenericDirectives,
+        EmbedLinkParser,
+        WikiLinkParser,
+        PathLinkParser,
+        TagParser,
+        parseLatex(),
+      ],
+    }),
+  });
+}
+
 const wikiLinkMark = Decoration.mark({
   class: "cm-internal-link cm-wikilink",
 });
@@ -68,22 +89,7 @@ export function createMarkdownCodeMirrorExtensions(
   options: MiraMarkdownCodeMirrorOptions = {},
 ): Extension[] {
   return [
-    yamlFrontmatter({
-      content: markdown({
-        codeLanguages: [...languages, ...(options.codeLanguages ?? [])],
-        extensions: [
-          ListAfterLazyBlockquote,
-          Table,
-          GridTable,
-          GenericDirectives,
-          EmbedLinkParser,
-          WikiLinkParser,
-          PathLinkParser,
-          TagParser,
-          parseLatex(),
-        ],
-      }),
-    }),
+    createMiraMarkdownLanguage(options.codeLanguages),
     markdownSourceDecorations(),
     EditorView.editorAttributes.of({
       class: options.sourceMode
