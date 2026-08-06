@@ -157,21 +157,56 @@ test("the task-type picker stays off read-only and raw-source surfaces", async (
   ).toHaveCount(0);
 });
 
-test("Comprehensive Live Preview exposes the task picker without changing its fixture", async ({
+test("Comprehensive Live Preview keeps the task picker clear of the block toolbar", async ({
   page,
 }) => {
   await gotoStory(page, "demo-comprehensive--live-preview");
   const taskLine = page
     .locator(".cm-task-line")
-    .filter({ hasText: "Nested task continuation stays aligned" });
+    .filter({ hasText: "Plain Markdown checklist item" });
   await scrollEditorUntilVisible(page, taskLine);
 
   const trigger = taskLine.getByRole("button", { name: "Change task type" });
   await taskLine.hover();
   await expect(trigger).toHaveCSS("opacity", "1");
+  const taskBox = await trigger.boundingBox();
+  if (!taskBox) throw new Error("Task picker bounding box is missing");
+  const blockBox = await page
+    .locator(".mira-block-toolbar-trigger")
+    .evaluateAll((buttons, taskTop) => {
+      const nearest = buttons
+        .map((button) => button.getBoundingClientRect())
+        .sort(
+          (left, right) =>
+            Math.abs(left.top - taskTop) - Math.abs(right.top - taskTop),
+        )[0];
+      if (!nearest || Math.abs(nearest.top - taskTop) >= 4) return null;
+      return {
+        left: nearest.left,
+        right: nearest.right,
+        width: nearest.width,
+      };
+    }, taskBox.y);
+  expect(blockBox).not.toBeNull();
+  expect(blockBox!.width).toBeGreaterThanOrEqual(19);
+  expect(blockBox!.width).toBeLessThanOrEqual(21);
+  expect(taskBox.x - blockBox!.right).toBeGreaterThanOrEqual(2);
+
+  const before = await taskLine.evaluate((line) => ({
+    left: line.getBoundingClientRect().left,
+    scrollLeft: line.closest(".cm-scroller")?.scrollLeft ?? 0,
+  }));
   await trigger.hover();
   await trigger.click();
-  await expect(page.locator(".mira-task-state-menu")).toBeVisible();
-  await page.keyboard.press("Escape");
-  await expect(page.locator(".mira-task-state-menu")).toBeHidden();
+  const menu = page.locator(".mira-task-state-menu");
+  await expect(menu).toBeVisible();
+  await menu.getByRole("radio", { name: "In progress" }).click();
+  await expect(menu).toBeHidden();
+  await expect(taskLine).toHaveAttribute("data-task", "/");
+  const after = await taskLine.evaluate((line) => ({
+    left: line.getBoundingClientRect().left,
+    scrollLeft: line.closest(".cm-scroller")?.scrollLeft ?? 0,
+  }));
+  expect(Math.abs(after.left - before.left)).toBeLessThan(0.5);
+  expect(after.scrollLeft).toBe(before.scrollLeft);
 });

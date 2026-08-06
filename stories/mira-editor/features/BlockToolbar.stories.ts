@@ -120,6 +120,63 @@ async function runBlockToolbarAcceptance({
   canvasElement: HTMLElement;
   step: (name: string, run: () => Promise<void>) => Promise<void>;
 }): Promise<void> {
+  const root = storyRoot(canvasElement);
+
+  if (root.querySelector(".markdown-live-preview-mode")) {
+    await step(
+      "keep the task-type picker clear of the compact block trigger",
+      async () => {
+        // Keep the task inactive so Live Preview renders its checkbox and
+        // task-type control while the contextual gutter remains enabled.
+        await setupBlock(canvasElement, fixture, { line: 8, ch: 4 });
+        const taskLine = await waitFor(() => {
+          const line = root.querySelector<HTMLElement>(".cm-task-line");
+          expect(line).not.toBeNull();
+          return line!;
+        });
+        const taskTrigger = within(taskLine).getByRole("button", {
+          name: "Change task type",
+        });
+
+        const taskRect = taskTrigger.getBoundingClientRect();
+        const blockTrigger = Array.from(
+          root.querySelectorAll<HTMLButtonElement>(
+            ".mira-block-toolbar-trigger",
+          ),
+        ).find(
+          (candidate) =>
+            Math.abs(candidate.getBoundingClientRect().top - taskRect.top) < 4,
+        );
+        expect(blockTrigger).not.toBeUndefined();
+        const blockRect = blockTrigger!.getBoundingClientRect();
+        expect(blockRect.width).toBeGreaterThanOrEqual(19);
+        expect(blockRect.width).toBeLessThanOrEqual(21);
+        expect(taskRect.left - blockRect.right).toBeGreaterThanOrEqual(2);
+
+        const contentLeft = taskLine.getBoundingClientRect().left;
+        taskTrigger.click();
+        const taskMenu = await waitFor(() =>
+          within(canvasElement.ownerDocument.body).getByRole("radiogroup", {
+            name: "Task type",
+          }),
+        );
+        await userEvent.click(
+          within(taskMenu).getByRole("radio", { name: "In progress" }),
+        );
+        await expectMarkdown(
+          canvasElement,
+          fixture.replace("- [?] Custom task", "- [/] Custom task"),
+        );
+        const updatedTaskLine =
+          root.querySelector<HTMLElement>(".cm-task-line");
+        expect(updatedTaskLine).not.toBeNull();
+        expect(
+          Math.abs(updatedTaskLine!.getBoundingClientRect().left - contentLeft),
+        ).toBeLessThan(0.5);
+      },
+    );
+  }
+
   await step(
     "convert paragraphs to every default structural type",
     async () => {
@@ -271,8 +328,8 @@ export const OpenMenu: Story = {
         expect(Math.abs(triggerRect.width - triggerRect.height)).toBeLessThan(
           0.5,
         );
-        expect(triggerRect.width).toBeLessThanOrEqual(25);
-        expect(triggerRect.width).toBeGreaterThanOrEqual(23);
+        expect(triggerRect.width).toBeLessThanOrEqual(21);
+        expect(triggerRect.width).toBeGreaterThanOrEqual(19);
         expect(
           Number.parseFloat(getComputedStyle(trigger).borderRadius),
         ).toBeGreaterThan(triggerRect.width / 2 - 1);
@@ -289,8 +346,8 @@ export const OpenMenu: Story = {
           Number.parseFloat(getComputedStyle(line!).lineHeight) * 1.5,
         );
         expect(triggerRect.right).toBeLessThanOrEqual(lineRect.left + 0.5);
-        expect(lineRect.left - triggerRect.right).toBeGreaterThanOrEqual(17);
-        expect(lineRect.left - triggerRect.right).toBeLessThanOrEqual(19);
+        expect(lineRect.left - triggerRect.right).toBeGreaterThanOrEqual(27);
+        expect(lineRect.left - triggerRect.right).toBeLessThanOrEqual(29);
 
         const headingLine = Array.from(
           root.querySelectorAll<HTMLElement>(".cm-line"),
