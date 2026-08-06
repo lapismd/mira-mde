@@ -33,6 +33,66 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+const headingSizes = [1.802, 1.602, 1.424, 1.266, 1.125, 1] as const;
+const headingLineHeights = [1.2, 1.2, 1.3, 1.4, 1.5, 1.5] as const;
+const headingWeights = [700, 600, 600, 600, 600, 600] as const;
+
+function numberValue(value: string): number {
+  const result = Number.parseFloat(value);
+  if (!Number.isFinite(result))
+    throw new Error(`Expected a number, got ${value}`);
+  return result;
+}
+
+async function expectLapisHeadingScale(
+  canvasElement: HTMLElement,
+  surface: "editor" | "preview",
+): Promise<void> {
+  const body = canvasElement.querySelector<HTMLElement>(
+    surface === "editor" ? ".cm-content" : ".markdown-rendered",
+  );
+  if (!body) throw new Error(`${surface} heading body did not render`);
+
+  const bodyStyle = getComputedStyle(body);
+  const bodySize = numberValue(bodyStyle.fontSize);
+
+  for (let index = 0; index < 6; index += 1) {
+    const level = index + 1;
+    const heading = canvasElement.querySelector<HTMLElement>(
+      surface === "editor"
+        ? `.cm-line.cm-header-${level}`
+        : `.markdown-rendered h${level}`,
+    );
+    if (!heading) throw new Error(`Heading ${level} did not render`);
+
+    const content =
+      surface === "editor"
+        ? Array.from(heading.querySelectorAll<HTMLElement>(".cm-heading")).find(
+            (element) => element.textContent?.includes(`Heading ${level}`),
+          )
+        : heading;
+    if (!content) throw new Error(`Heading ${level} content did not render`);
+
+    const headingStyle = getComputedStyle(heading);
+    const contentStyle = getComputedStyle(content);
+    const headingSize = numberValue(headingStyle.fontSize);
+
+    await expect(contentStyle.color).toBe(bodyStyle.color);
+    await expect(numberValue(contentStyle.fontWeight)).toBe(
+      headingWeights[index],
+    );
+    await expect(
+      Math.abs(headingSize / bodySize - headingSizes[index]),
+    ).toBeLessThan(0.002);
+    await expect(
+      Math.abs(
+        numberValue(headingStyle.lineHeight) / headingSize -
+          headingLineHeights[index],
+      ),
+    ).toBeLessThan(0.002);
+  }
+}
+
 export const Preview: Story = {
   tags: [
     "visual-approved",
@@ -50,6 +110,11 @@ export const Preview: Story = {
       align: "canvas",
       placement: "right",
     },
+  },
+  play: async ({ canvasElement, step }) => {
+    await step("use the Lapis heading scale in reading mode", async () => {
+      await expectLapisHeadingScale(canvasElement, "preview");
+    });
   },
 };
 
@@ -215,6 +280,11 @@ export const LivePreview: Story = {
       },
     },
   },
+  play: async ({ canvasElement, step }) => {
+    await step("use the Lapis heading scale in live preview", async () => {
+      await expectLapisHeadingScale(canvasElement, "editor");
+    });
+  },
 };
 
 export const SourceMode: Story = {
@@ -249,5 +319,10 @@ export const SourceMode: Story = {
         code: markdownEditorDocsSource("headingsMarkdown", "source"),
       },
     },
+  },
+  play: async ({ canvasElement, step }) => {
+    await step("use the Lapis heading scale in source mode", async () => {
+      await expectLapisHeadingScale(canvasElement, "editor");
+    });
   },
 };

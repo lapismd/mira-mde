@@ -29,6 +29,10 @@ export const headingsMarkdown = String.raw`# Heading 1
 
 #### Heading 4
 
+##### Heading 5
+
+###### Heading 6
+
 Headings create the document outline used by reading and editor surfaces.
 `;
 
