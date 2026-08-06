@@ -61,6 +61,12 @@ tarballs rather than repacking mutable workspace source. Stable releases are the
 only supported channel in this slice; prerelease and canary releases remain out
 of scope.
 
+The publish command accepts only a manifest whose commit, package versions,
+graph order, paths, changelog entries, and tarball digests still match the
+workspace and artifact. It runs only with the explicit approved-CI guard. A
+rerun skips an exact npm version only when the registry integrity equals the
+verified tarball; any disagreement fails without publishing later dependants.
+
 Repository-only tools such as `@lapismd/storybook-addon-visual-delta` belong in
 the private root manifest. They are not part of the six-package public release
 set and MUST NOT appear in packed consumer dependency graphs. The root consumes

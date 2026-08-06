@@ -80,6 +80,13 @@ registry planning, and publication order so those gates cannot drift into
 different product sets. Release tooling may mutate versions and changelogs, but
 it is not a runtime dependency and cannot enter a public package tarball.
 
+The planner is read-only against npm and writes ignored local evidence. It
+classifies each exact stable version as publishable or already published, fails
+when the workspace is behind the registry, and identifies the special
+never-published bootstrap state. Preparation then packs only the selected nodes
+in graph order and records their commit, SHA-512 integrity, order, and exact
+changelog entry in one transferable manifest.
+
 The root owns the Vitest 4 Storybook project and its Chromium browser provider;
 package-local Vitest configurations continue to own pure unit tests. The
 consolidated Mira workspace owns the former subsystem suites so package test

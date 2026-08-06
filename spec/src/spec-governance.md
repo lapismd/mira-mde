@@ -75,6 +75,13 @@ beyond `0.0.1`. Boundary regression tests accept later stable versions, reject
 prereleases, and require every declared public graph edge to use
 `workspace:~`.
 
+Focused release tests cover registry selection, local-behind rejection,
+artifact path and integrity validation, graph-ordered publication, safe reruns,
+integrity disagreement, scoped npm provenance PURLs, and release-intent
+classification. Post-publish verification performs a clean exact-version
+install and validates npm signatures plus SLSA provenance before the release
+notes command may create commit-bound package tags and GitHub releases.
+
 Rename-aware working-copy validation evaluates both the removed and added path
 of a Jujutsu or Git rename. Consolidating a protected workspace therefore
 requires every chapter mapped to its former subsystem and its new public
