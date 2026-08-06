@@ -67,6 +67,11 @@ workspace and artifact. It runs only with the explicit approved-CI guard. A
 rerun skips an exact npm version only when the registry integrity equals the
 verified tarball; any disagreement fails without publishing later dependants.
 
+Package release tags use the unscoped package name plus exact version, for
+example `mira-editor@0.2.0`. Tags target the commit recorded in the artifact and
+their GitHub release body is the exact package changelog entry. Existing tags or
+releases are accepted on a rerun only when their commit and notes agree.
+
 Repository-only tools such as `@lapismd/storybook-addon-visual-delta` belong in
 the private root manifest. They are not part of the six-package public release
 set and MUST NOT appear in packed consumer dependency graphs. The root consumes

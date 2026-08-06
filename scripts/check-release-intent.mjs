@@ -53,6 +53,7 @@ function parseArgs(argv) {
   const options = { files: [] };
   for (let index = 0; index < argv.length; index += 1) {
     const argument = argv[index];
+    if (argument === "--") continue;
     if (argument === "--base") options.base = argv[++index];
     else if (argument === "--head") options.head = argv[++index];
     else if (argument === "--file") options.files.push(argv[++index]);

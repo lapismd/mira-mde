@@ -82,6 +82,15 @@ classification. Post-publish verification performs a clean exact-version
 install and validates npm signatures plus SLSA provenance before the release
 notes command may create commit-bound package tags and GitHub releases.
 
+Pull-request CI runs the canonical specification and release-intent gates,
+repository/package validation, packed-consumer checks, a static Storybook build,
+and focused browser acceptance. On `main`, the Changesets action uses the
+GitHub API to maintain one Version Packages pull request without receiving npm
+credentials. Only a commit with no pending Changesets advances to artifact
+planning. Production and bootstrap publishing are separate jobs and protected
+environments; both download the already verified artifact and neither checks
+out or rebuilds package source after approval.
+
 Rename-aware working-copy validation evaluates both the removed and added path
 of a Jujutsu or Git rename. Consolidating a protected workspace therefore
 requires every chapter mapped to its former subsystem and its new public

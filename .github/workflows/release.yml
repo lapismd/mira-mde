@@ -1,0 +1,337 @@
+name: Release public packages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      bootstrap:
+        description: Use the one-time npm bootstrap environment
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mira-public-release
+  cancel-in-progress: false
+
+jobs:
+  version:
+    name: Update Version Packages pull request
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    outputs:
+      has_changesets: ${{ steps.changesets.outputs.hasChangesets || 'false' }}
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Create or update Version Packages pull request
+        id: changesets
+        if: github.event_name == 'push'
+        uses: changesets/action@v1.8.0
+        with:
+          version: pnpm release:version
+          commit: Version public packages
+          title: Version Packages
+          commitMode: github-api
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  artifact:
+    name: Build verified release artifact
+    needs: version
+    if: needs.version.outputs.has_changesets != 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      artifact_name: ${{ steps.mode.outputs.artifact_name }}
+      bootstrap_required: ${{ steps.mode.outputs.bootstrap_required }}
+      package_count: ${{ steps.mode.outputs.package_count }}
+      should_publish: ${{ steps.mode.outputs.should_publish }}
+    steps:
+      - name: Check out the release commit
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install mdBook
+        uses: taiki-e/install-action@v2
+        with:
+          tool: mdbook@0.5.4
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Require the public canonical repository
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: test "$(gh api "repos/${GITHUB_REPOSITORY}" --jq .visibility)" = public
+
+      - name: Revalidate release source
+        run: |
+          pnpm spec:check
+          pnpm catalog:check
+          pnpm packages:check
+          pnpm check:all
+          pnpm packages:pack
+
+      - name: Plan exact unpublished versions
+        run: pnpm release:plan
+
+      - name: Select protected publication mode
+        id: mode
+        env:
+          BOOTSTRAP_REQUESTED: ${{ github.event_name == 'workflow_dispatch' && inputs.bootstrap && 'true' || 'false' }}
+        run: |
+          node --input-type=module <<'NODE'
+          import { appendFileSync, readFileSync } from "node:fs";
+          const plan = JSON.parse(readFileSync(".release/release-plan.json", "utf8"));
+          if (process.env.GITHUB_REF !== "refs/heads/main") {
+            throw new Error("Releases must run from refs/heads/main");
+          }
+          const bootstrap = process.env.BOOTSTRAP_REQUESTED === "true";
+          if (bootstrap && plan.selected.length > 0 && !plan.bootstrapRequired) {
+            throw new Error("Bootstrap was requested for established npm packages");
+          }
+          const shouldPublish =
+            plan.selected.length > 0 && bootstrap === plan.bootstrapRequired;
+          const output = [
+            `artifact_name=mira-release-${process.env.GITHUB_SHA}`,
+            `bootstrap_required=${plan.bootstrapRequired}`,
+            `package_count=${plan.selected.length}`,
+            `should_publish=${shouldPublish}`,
+          ].join("\n");
+          appendFileSync(process.env.GITHUB_OUTPUT, `${output}\n`);
+          if (plan.bootstrapRequired && !bootstrap) {
+            console.log("::notice::Initial packages require a manual bootstrap run.");
+          }
+          NODE
+
+      - name: Prepare immutable package tarballs
+        if: steps.mode.outputs.should_publish == 'true'
+        run: pnpm release:prepare
+
+      - name: Upload verified release artifact
+        if: steps.mode.outputs.should_publish == 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ steps.mode.outputs.artifact_name }}
+          path: |
+            .release/release-manifest.json
+            .release/tarballs/*.tgz
+          if-no-files-found: error
+          retention-days: 14
+
+  publish-production:
+    name: Publish with npm trusted publishing
+    needs: artifact
+    if: >-
+      needs.artifact.outputs.should_publish == 'true' &&
+      needs.artifact.outputs.bootstrap_required == 'false'
+    runs-on: ubuntu-latest
+    environment:
+      name: npm-production
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Check out the release commit
+        uses: actions/checkout@v5
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies and current npm
+        run: |
+          pnpm install --frozen-lockfile
+          npm install --global npm@12.0.2
+
+      - name: Download verified tarballs
+        uses: actions/download-artifact@v8
+        with:
+          name: ${{ needs.artifact.outputs.artifact_name }}
+          path: .release
+
+      - name: Publish exact verified tarballs
+        env:
+          MIRA_RELEASE_APPROVED: "1"
+        run: pnpm release:publish .release/release-manifest.json
+
+  publish-bootstrap:
+    name: Publish first versions with temporary token
+    needs: artifact
+    if: >-
+      needs.artifact.outputs.should_publish == 'true' &&
+      needs.artifact.outputs.bootstrap_required == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: npm-bootstrap
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Check out the release commit
+        uses: actions/checkout@v5
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies and current npm
+        run: |
+          pnpm install --frozen-lockfile
+          npm install --global npm@12.0.2
+
+      - name: Download verified tarballs
+        uses: actions/download-artifact@v8
+        with:
+          name: ${{ needs.artifact.outputs.artifact_name }}
+          path: .release
+
+      - name: Configure temporary bootstrap authentication
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_BOOTSTRAP_TOKEN }}
+        run: |
+          test -n "$NODE_AUTH_TOKEN"
+          umask 077
+          bootstrap_npmrc="$RUNNER_TEMP/mira-bootstrap.npmrc"
+          printf '%s\n' "//registry.npmjs.org/:_authToken=\${NODE_AUTH_TOKEN}" > "$bootstrap_npmrc"
+          printf 'NPM_CONFIG_USERCONFIG=%s\n' "$bootstrap_npmrc" >> "$GITHUB_ENV"
+
+      - name: Publish exact first-version tarballs
+        env:
+          MIRA_RELEASE_APPROVED: "1"
+          MIRA_RELEASE_BOOTSTRAP: "1"
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_BOOTSTRAP_TOKEN }}
+        run: pnpm release:publish .release/release-manifest.json
+
+  verify:
+    name: Verify installed packages and provenance
+    needs:
+      - artifact
+      - publish-production
+      - publish-bootstrap
+    if: >-
+      always() &&
+      needs.artifact.outputs.should_publish == 'true' &&
+      (needs.publish-production.result == 'success' ||
+       needs.publish-bootstrap.result == 'success')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check out the release commit
+        uses: actions/checkout@v5
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies and current npm
+        run: |
+          pnpm install --frozen-lockfile
+          npm install --global npm@12.0.2
+
+      - name: Download verified tarballs
+        uses: actions/download-artifact@v8
+        with:
+          name: ${{ needs.artifact.outputs.artifact_name }}
+          path: .release
+
+      - name: Verify clean install, integrity, and provenance
+        run: >-
+          pnpm release:verify
+          .release/release-manifest.json
+          .release/npm-signatures.json
+
+      - name: Retain npm signature evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: npm-signatures-${{ github.sha }}
+          path: .release/npm-signatures.json
+          if-no-files-found: warn
+          retention-days: 90
+
+  notes:
+    name: Create package tags and GitHub releases
+    needs:
+      - artifact
+      - verify
+    if: needs.verify.result == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Check out the release commit
+        uses: actions/checkout@v5
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Download verified release manifest
+        uses: actions/download-artifact@v8
+        with:
+          name: ${{ needs.artifact.outputs.artifact_name }}
+          path: .release
+
+      - name: Create retry-safe package releases
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: pnpm release:notes .release/release-manifest.json

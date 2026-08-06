@@ -87,6 +87,13 @@ never-published bootstrap state. Preparation then packs only the selected nodes
 in graph order and records their commit, SHA-512 integrity, order, and exact
 changelog entry in one transferable manifest.
 
+GitHub Actions keeps three trust levels distinct: pull-request validation has
+read-only repository access, the Changesets job can update the Version Packages
+pull request but receives no npm credential, and publish jobs receive OIDC or
+the one-time bootstrap token only after their named environment approval. The
+post-publish job consumes the artifact again for clean-install and provenance
+checks before a final repository-write job creates tags and release notes.
+
 The root owns the Vitest 4 Storybook project and its Chromium browser provider;
 package-local Vitest configurations continue to own pure unit tests. The
 consolidated Mira workspace owns the former subsystem suites so package test

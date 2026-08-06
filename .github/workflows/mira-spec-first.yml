@@ -1,17 +1,24 @@
-name: Mira Spec First
+name: Mira CI
 
 on:
   pull_request:
+  push:
+    branches:
+      - main
 
 permissions:
   contents: read
 
+concurrency:
+  group: mira-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  validate:
-    name: Validate Mira specification
+  governance:
+    name: Specification and release intent
     runs-on: ubuntu-latest
     steps:
-      - name: Check out the pull request
+      - name: Check out the exact change set
         uses: actions/checkout@v5
         with:
           fetch-depth: 0
@@ -37,7 +44,73 @@ jobs:
         run: pnpm spec:lint && pnpm spec:validate && pnpm spec:build && pnpm spec:test
 
       - name: Enforce specification-first changes
+        if: github.event_name == 'pull_request'
         run: >-
           pnpm spec:first --
           --base "${{ github.event.pull_request.base.sha }}"
           --head "${{ github.event.pull_request.head.sha }}"
+
+      - name: Enforce public package release intent
+        if: >-
+          github.event_name == 'pull_request' &&
+          github.head_ref != 'changeset-release/main'
+        run: >-
+          pnpm release:intent --
+          --base "${{ github.event.pull_request.base.sha }}"
+          --head "${{ github.event.pull_request.head.sha }}"
+
+  packages:
+    name: Packages and repository gates
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v5
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate catalog and package contracts
+        run: pnpm catalog:check && pnpm packages:check
+
+      - name: Run full non-browser validation
+        run: pnpm check:all
+
+      - name: Validate packed public consumers
+        run: pnpm packages:pack
+
+  storybook:
+    name: Storybook build and browser acceptance
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v5
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Build static Storybook
+        run: pnpm build-storybook
+
+      - name: Run Storybook acceptance
+        run: pnpm test:e2e

@@ -19,9 +19,10 @@ preview, language, and UI behavior.
 | `@lapismd/mira-react`          | React components for `Mira`, `MiraEditor`, and `MiraEditorToolbar`.    |
 | `@lapismd/mira-vanilla`        | Plain JavaScript `createMira` and `createMiraEditor` mounting helpers. |
 
-All public packages are currently prepared at `0.0.1`; this repository does
-not publish them as part of normal validation. Vue and Solid remain private
-placeholders under `internal/adapters`.
+All public packages begin at `0.0.1` and then version independently. Normal
+validation never publishes; the protected release workflow publishes only
+verified exact-version tarballs. See [Releasing Mira packages](RELEASING.md).
+Vue and Solid remain private placeholders under `internal/adapters`.
 
 ### Pre-release migration
 
