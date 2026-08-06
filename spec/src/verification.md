@@ -71,7 +71,7 @@ authorized baseline regeneration migrations are complete.
 | MIRA-UI-015, MIRA-CSS-023, MIRA-CAT-013                                                                 | Narrow toolbar overflow, touch CSS, and keyboard/browser interactions      | Implemented by responsive-toolbar slice         |
 | MIRA-UI-014, MIRA-CSS-024                                                                               | Combined block/task trigger clearance, sizing, and click interactions      | Implemented by contextual-control clearance     |
 | MIRA-CSS-025                                                                                            | Reading/live blockquote/embed accent and border geometry assertions        | Implemented by blockquote accent repair         |
-| MIRA-CSS-026                                                                                            | Line-number font, numeral, color, and column-alignment assertions          | Planned by line-number gutter typography        |
+| MIRA-CSS-026                                                                                            | Line-number font, numeral, color, and column-alignment assertions          | Implemented by line-number gutter typography    |
 
 The selective-release slice defines the exact six-package graph once, configures
 independent Changesets versions and package-owned changelogs, and uses
@@ -661,14 +661,17 @@ Mira tests, package check and build with publint, `pnpm spec:check`,
 Existing approved visual baselines remain unchanged until the intentional color
 difference is separately reviewed.
 
-The line-number gutter typography slice introduces MIRA-CSS-026. The current
-gutter inherits the editor's proportional prose font and does not request
-tabular numerals. The repair will scope the public monospace bridge,
-`tabular-nums`, and theme-aware faint foreground to the CodeMirror line-number
-column while retaining its existing end alignment, synchronized line height,
-and gutter measurements. Focused unit, Storybook, and browser assertions will
-cover source and live-preview modes without refreshing approved visual
-baselines.
+The line-number gutter typography slice implements MIRA-CSS-026 by scoping the
+public monospace bridge, `tabular-nums`, and theme-aware faint foreground to the
+CodeMirror line-number column while retaining its existing end alignment,
+synchronized line height, and gutter measurements. The focused unit regression
+passes, and six Comprehensive Storybook tests cover the resolved font, color,
+numeric variant, and a shared right edge across digit widths in Source and Live
+Preview. An Obsidian-theme browser inspection resolved Source Code Pro,
+`tabular-nums`, a 70%-faint foreground, and identical right-edge geometry for
+the visible three-digit rows. The 304 Mira tests, package check and build with
+publint, `pnpm spec:check`, `pnpm catalog:check`, `pnpm check:all`, and the
+static Storybook build pass. Approved visual baselines remain unchanged.
 
 The portable parity audit recorded 59 present features, six consumer-adapter
 boundaries, six Lapis-only behaviors, and no remaining portable P0-P2 gaps at
