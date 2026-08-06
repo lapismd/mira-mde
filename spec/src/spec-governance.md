@@ -69,6 +69,12 @@ manually dispatched job under the distinct `npm-bootstrap` environment may use
 the temporary `NPM_BOOTSTRAP_TOKEN`, after which maintainers configure trusted
 publishers and remove that credential. Neither path automatically unpublishes.
 
+The initial pipeline change carries an explicit empty Changeset so it can add
+governance and packaging machinery without moving any first-release package
+beyond `0.0.1`. Boundary regression tests accept later stable versions, reject
+prereleases, and require every declared public graph edge to use
+`workspace:~`.
+
 Rename-aware working-copy validation evaluates both the removed and added path
 of a Jujutsu or Git rename. Consolidating a protected workspace therefore
 requires every chapter mapped to its former subsystem and its new public

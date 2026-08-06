@@ -34,3 +34,8 @@ consume only built public roots or documented subpath exports. They do not link
 to the consolidated workspace's private source directories. React exports
 components only; the `createMira` and `createMiraEditor` DOM factories are owned
 by `@lapismd/mira-vanilla`.
+
+Mira Editor, React, and Vanilla each version independently and ship their own
+changelog. The editor's release version command synchronizes
+`MIRA_EDITOR_VERSION` from `packages/mira-editor/package.json`; source and UI
+tests consume the exported constant instead of duplicating a release literal.

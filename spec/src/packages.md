@@ -47,6 +47,12 @@ not force an unrelated package release. When an internal dependency must move,
 Changesets updates its dependants according to the public graph and the
 pre-1.0-compatible `workspace:~` ranges.
 
+The canonical graph in `scripts/public-packages.mjs` supplies the exact package
+set, directories, dependency edges, and topological order to every release and
+package-validation command. Package manifests include their changelog in the
+shipped file list, while the private root remains free to use `workspace:*` for
+local Storybook composition.
+
 Release planning compares every local public version with npm. An exact version
 that already exists is skipped, an unpublished exact version is selected, and a
 local version behind the registry fails closed. Selected packages are built and

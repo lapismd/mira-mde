@@ -16,6 +16,7 @@
   "svelte": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "files": [
+    "CHANGELOG.md",
     "dist"
   ],
   "exports": {
@@ -37,8 +38,8 @@
   },
   "dependencies": {
     "@lucide/svelte": "^0.525.0",
-    "@lapismd/mira": "workspace:*",
-    "@lapismd/mira-plugin-mermaid": "workspace:*"
+    "@lapismd/mira": "workspace:~",
+    "@lapismd/mira-plugin-mermaid": "workspace:~"
   },
   "peerDependencies": {
     "svelte": "^5.0.0"

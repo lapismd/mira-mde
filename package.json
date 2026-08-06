@@ -11,6 +11,7 @@
   "scripts": {
     "build": "turbo run build",
     "build-storybook": "pnpm build && node -e \"require('node:fs').mkdirSync('.visual-delta/cache',{recursive:true})\" && NODE_OPTIONS=--max-old-space-size=4096 storybook build --stats-json .visual-delta/cache",
+    "changeset": "changeset",
     "catalog:check": "node ./scripts/check-catalog.mjs && node --test ./scripts/check-catalog.spec.mjs",
     "check": "pnpm check:format && turbo run check",
     "check:all": "pnpm check && pnpm lint && pnpm test && pnpm build",
@@ -22,6 +23,7 @@
     "lint": "eslint .",
     "packages:check": "node ./scripts/check-package-boundaries.mjs && node --test ./scripts/check-package-boundaries.spec.mjs",
     "packages:pack": "pnpm build && node ./scripts/check-package-tarballs.mjs",
+    "release:version": "changeset version && pnpm install --lockfile-only && node ./scripts/sync-release-versions.mjs --write && prettier packages/*/package.json packages/*/CHANGELOG.md packages/mira-editor/src/version.ts --write",
     "storybook": "WATCHPACK_POLLING=250 node scripts/storybook-run.mjs --no-open",
     "storybook:restart": "bash scripts/storybook-restart.sh",
     "storybook:check": "pnpm catalog:check && pnpm build-storybook && pnpm test:visual",
@@ -50,6 +52,8 @@
     "@lapismd/mira-vanilla": "workspace:*"
   },
   "devDependencies": {
+    "@changesets/changelog-github": "^0.7.0",
+    "@changesets/cli": "^2.31.1",
     "@eslint/js": "^9.39.2",
     "@lapismd/storybook-addon-visual-delta": "^0.0.6",
     "@lucide/svelte": "^0.525.0",
@@ -85,6 +89,7 @@
     "publint": "^0.3.15",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "semver": "^7.8.5",
     "storybook": "^10.5.6",
     "storybook-addon-tag-badges": "^3.1.0",
     "svelte": "^5.46.1",

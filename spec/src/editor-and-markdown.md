@@ -82,3 +82,7 @@ The public composable Svelte surface is named `Mira`, with `MiraProps` and
 `MiraHandle`; its semantic shell hooks begin with `.mira`. Removed `Mde` names
 and `.mira-mde*` hooks are neither exported nor retained as compatibility
 selectors.
+
+Packaging and release metadata do not change this portable behavior boundary.
+The `@lapismd/mira` runtime versions independently, begins at `0.0.1`, and
+records consumer-visible changes in its package-owned changelog.

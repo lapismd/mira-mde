@@ -13,18 +13,12 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { PUBLIC_PACKAGE_GRAPH } from "./public-packages.mjs";
+
 const REPO_ROOT = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "..",
 );
-const PACKAGE_DIRECTORIES = [
-  "mira",
-  "mira-editor",
-  "mira-plugin-ai",
-  "mira-plugin-mermaid",
-  "mira-react",
-  "mira-vanilla",
-];
 const FORBIDDEN_OUTPUT =
   /@mira-mde\/|@mira-internal\/|@lapismd\/mira\/internal(?:\/|["'])/;
 
@@ -64,7 +58,7 @@ function main() {
 
   try {
     const tarballs = new Map();
-    for (const directory of PACKAGE_DIRECTORIES) {
+    for (const { directory } of PUBLIC_PACKAGE_GRAPH) {
       const packageDirectory = path.join(REPO_ROOT, "packages", directory);
       const before = new Set(readdirSync(tarballDirectory));
       run(

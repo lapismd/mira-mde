@@ -74,6 +74,12 @@ the static host and canonical container capture do not depend on stale local
 `dist` output. Its explicit 4 GB Node heap ceiling fits within the pinned
 capture profile while accommodating the complete catalog bundle.
 
+The private root also owns Changesets and release orchestration. One shared
+public-package graph supplies package-boundary validation, tarball validation,
+registry planning, and publication order so those gates cannot drift into
+different product sets. Release tooling may mutate versions and changelogs, but
+it is not a runtime dependency and cannot enter a public package tarball.
+
 The root owns the Vitest 4 Storybook project and its Chromium browser provider;
 package-local Vitest configurations continue to own pure unit tests. The
 consolidated Mira workspace owns the former subsystem suites so package test

@@ -13,6 +13,7 @@
   "sideEffects": false,
   "types": "./dist/index.d.ts",
   "files": [
+    "CHANGELOG.md",
     "dist"
   ],
   "exports": {
@@ -31,7 +32,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@lapismd/mira": "workspace:*"
+    "@lapismd/mira": "workspace:~"
   },
   "peerDependencies": {
     "@codemirror/state": "^6.5.2",

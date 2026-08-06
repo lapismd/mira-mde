@@ -9,6 +9,7 @@ import {
   type MiraFeatureFlags,
 } from "./features";
 import type { MiraEditorToolbarProps } from "./types";
+import { MIRA_EDITOR_VERSION } from "./version";
 
 const noInsertItems: MiraFeatureFlags = {
   [MiraFeature.Formatting]: false,
@@ -217,7 +218,7 @@ describe("toolbar About dialog", () => {
     const dialog = document.body.querySelector<HTMLElement>('[role="dialog"]');
     expect(dialog?.getAttribute("aria-labelledby")).toBeTruthy();
     expect(dialog?.textContent).toContain("About Mira");
-    expect(dialog?.textContent).toContain("Version 0.0.1");
+    expect(dialog?.textContent).toContain(`Version ${MIRA_EDITOR_VERSION}`);
     expect(
       dialog?.querySelector<HTMLImageElement>('img[alt="Mira MDE logo"]'),
     ).toBeTruthy();

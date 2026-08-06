@@ -30,11 +30,11 @@ function createFixture(mutate) {
           description: `${packageName} fixture`,
           license: "AGPL-3.0-or-later",
           repository: { type: "git", url: "git+https://example.test/mira.git" },
-          files: ["dist"],
+          files: ["CHANGELOG.md", "dist"],
           exports: { ".": "./dist/index.js" },
           sideEffects: false,
           dependencies: Object.fromEntries(
-            [...dependencies].map((dependency) => [dependency, "workspace:*"]),
+            [...dependencies].map((dependency) => [dependency, "workspace:~"]),
           ),
           publishConfig: { access: "public" },
         },
@@ -45,6 +45,10 @@ function createFixture(mutate) {
     writeFileSync(
       path.join(packageDirectory, "src", "index.ts"),
       "export {};\n",
+    );
+    writeFileSync(
+      path.join(packageDirectory, "CHANGELOG.md"),
+      `# ${packageName}\n`,
     );
   }
   const adapterDirectory = path.join(repoRoot, "internal/adapters/vue");
@@ -72,6 +76,20 @@ test("accepts the six-package public graph and private adapters", () => {
     assert.equal(result.stats.publicPackages, 6);
     assert.equal(result.stats.internalAdapters, 1);
   });
+});
+
+test("accepts independent stable versions after the first release", () => {
+  withFixture(
+    (repoRoot) => {
+      const manifestPath = path.join(repoRoot, "packages/mira/package.json");
+      const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
+      manifest.version = "0.3.2";
+      writeFileSync(manifestPath, `${JSON.stringify(manifest)}\n`);
+    },
+    (result) => {
+      assert.equal(result.ok, true);
+    },
+  );
 });
 
 test("rejects unapproved packages and dependency direction", () => {
@@ -112,6 +130,26 @@ test("rejects legacy names and internal implementation exports", () => {
       assert.match(result.errors.join("\n"), /src\/internal/);
       assert.match(result.errors.join("\n"), /legacy @mira-mde import/);
       assert.match(result.errors.join("\n"), /legacy public symbol/);
+    },
+  );
+});
+
+test("rejects prereleases and broad public workspace ranges", () => {
+  withFixture(
+    (repoRoot) => {
+      const manifestPath = path.join(
+        repoRoot,
+        "packages/mira-editor/package.json",
+      );
+      const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
+      manifest.version = "0.1.0-next.1";
+      manifest.dependencies["@lapismd/mira"] = "workspace:*";
+      writeFileSync(manifestPath, `${JSON.stringify(manifest)}\n`);
+    },
+    (result) => {
+      assert.equal(result.ok, false);
+      assert.match(result.errors.join("\n"), /stable Semantic Version/);
+      assert.match(result.errors.join("\n"), /must use workspace:~/);
     },
   );
 });

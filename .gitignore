@@ -10,6 +10,7 @@ test-results
 .DS_Store
 storybook-static
 storybook-static-check
+.release/
 spec/book
 .visual-delta/artifacts/
 .visual-delta/cache/

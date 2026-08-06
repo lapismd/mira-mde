@@ -4,27 +4,15 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
+import {
+  isStableVersion,
+  PUBLIC_PACKAGE_DEPENDENCIES,
+} from "./public-packages.mjs";
+
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 export const DEFAULT_REPO_ROOT = path.resolve(SCRIPT_DIR, "..");
 
-export const PUBLIC_PACKAGES = new Map([
-  ["@lapismd/mira", new Set()],
-  ["@lapismd/mira-plugin-ai", new Set(["@lapismd/mira"])],
-  ["@lapismd/mira-plugin-mermaid", new Set(["@lapismd/mira"])],
-  [
-    "@lapismd/mira-editor",
-    new Set(["@lapismd/mira", "@lapismd/mira-plugin-mermaid"]),
-  ],
-  [
-    "@lapismd/mira-react",
-    new Set([
-      "@lapismd/mira",
-      "@lapismd/mira-editor",
-      "@lapismd/mira-plugin-mermaid",
-    ]),
-  ],
-  ["@lapismd/mira-vanilla", new Set(["@lapismd/mira", "@lapismd/mira-editor"])],
-]);
+export const PUBLIC_PACKAGES = PUBLIC_PACKAGE_DEPENDENCIES;
 
 const TEXT_EXTENSIONS = new Set([
   ".css",
@@ -124,8 +112,10 @@ export function validatePackageBoundaries({
 
     if (manifest.private === true)
       errors.push(`${manifest.name}: approved public package is private`);
-    if (manifest.version !== "0.0.1")
-      errors.push(`${manifest.name}: version must be 0.0.1`);
+    if (!isStableVersion(manifest.version))
+      errors.push(
+        `${manifest.name}: version must be a stable Semantic Version`,
+      );
     for (const field of [
       "description",
       "license",
@@ -139,6 +129,10 @@ export function validatePackageBoundaries({
       errors.push(`${manifest.name}: missing sideEffects`);
     if (manifest.publishConfig?.access !== "public")
       errors.push(`${manifest.name}: publishConfig.access must be public`);
+    if (!manifest.files?.includes("CHANGELOG.md"))
+      errors.push(`${manifest.name}: CHANGELOG.md must be shipped`);
+    if (!existsSync(path.join(packageDirectory, "CHANGELOG.md")))
+      errors.push(`${manifest.name}: missing CHANGELOG.md`);
 
     const exportedTargets = JSON.stringify(manifest.exports ?? {});
     if (/dist\/internal(?:\/|["'])/.test(exportedTargets))
@@ -158,6 +152,11 @@ export function validatePackageBoundaries({
         errors.push(
           `${manifest.name}: invalid public dependency on ${dependencyName}`,
         );
+      }
+    }
+    for (const dependencyName of allowedDependencies) {
+      if (runtimeDependencies[dependencyName] !== "workspace:~") {
+        errors.push(`${manifest.name}: ${dependencyName} must use workspace:~`);
       }
     }
 
