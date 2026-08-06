@@ -19,6 +19,7 @@ runtime dependency.
 | MIRA-CAT-009 | Storybook MUST expose independent built-in-palette and light/dark globals, render ordinary stories through inherited page appearance, and provide fixed built-in, system, custom-extension, and targeted-overlay verification stories.                                                                    |
 | MIRA-CAT-010 | Storybook's Visual Delta host MUST format every staged story-source mutation with Mira's repository Prettier configuration before the addon writes it. A formatter failure MUST leave the affected story source and static index unchanged rather than introducing a format-gate regression.              |
 | MIRA-CAT-011 | The comprehensive demo MUST enable every first-party public plugin and opt-in authoring extension through deterministic local adapters in both editor shells. Its editable views MUST expose the selection toolbar and contextual block toolbar without requiring network access or consumer credentials. |
+| MIRA-CAT-012 | The focused Live Preview divider story MUST exercise seed reroll and explicit family selection through the rendered widget controls, asserting the authored seed, rendered family, menu semantics, and source-edit control remain synchronized.                                                           |
 
 Ordinary README prose points to Storybook and the specification. It must not
 become a parallel behavioral reference.
@@ -105,7 +106,9 @@ expected policy failure.
 
 The focused divider page covers Source, Live Preview, Reading, custom variants,
 the frozen v1 gallery, a 24-divider review page, and a story-only refresh
-control. All divider stories remain `visual-pending`; their interactions verify
+control. The Live Preview story additionally exercises the shipped inline reroll
+and family picker beside the source-edit control. All divider stories remain
+`visual-pending`; their interactions verify
 semantic native rules, hidden decorative SVGs, source fallback, deterministic
 families, nested rules, and explicit migration without creating baselines.
 

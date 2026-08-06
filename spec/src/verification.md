@@ -67,6 +67,7 @@ authorized baseline regeneration migrations are complete.
 | MIRA-MD-019, MIRA-CSS-020                                                                               | Grid-table keymap, serialization, selection, and computed typography       | Implemented by grid-table parity                |
 | MIRA-MD-020                                                                                             | Block metadata, safe conversion, undo, selection, and geometry tests       | Implemented by contextual block toolbar core    |
 | MIRA-MD-021, MIRA-CSS-021                                                                               | Seed lifecycle, SVG determinism, logical-block, and Storybook acceptance   | Implemented: 299 Mira, 146 Storybook, 44 E2E    |
+| MIRA-MD-022, MIRA-CSS-022, MIRA-CAT-012                                                                 | Live Preview divider reroll, family picker, and layout acceptance          | Planned by divider authoring controls           |
 
 The selective-release slice defines the exact six-package graph once, configures
 independent Changesets versions and package-owned changelogs, and uses
