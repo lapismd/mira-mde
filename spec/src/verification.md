@@ -69,7 +69,7 @@ authorized baseline regeneration migrations are complete.
 | MIRA-MD-021, MIRA-CSS-021                                                                               | Seed lifecycle, SVG determinism, logical-block, and Storybook acceptance   | Implemented: 299 Mira, 146 Storybook, 44 E2E    |
 | MIRA-MD-022, MIRA-CSS-022, MIRA-CAT-012                                                                 | Live Preview divider reroll, family picker, and layout acceptance          | Implemented by divider-control slice            |
 | MIRA-UI-015, MIRA-CSS-023, MIRA-CAT-013                                                                 | Narrow toolbar overflow, touch CSS, and keyboard/browser interactions      | Implemented by responsive-toolbar slice         |
-| MIRA-UI-014, MIRA-CSS-024                                                                               | Combined block/task trigger clearance, sizing, and click interactions      | Planned by contextual-control clearance repair  |
+| MIRA-UI-014, MIRA-CSS-024                                                                               | Combined block/task trigger clearance, sizing, and click interactions      | Implemented by contextual-control clearance     |
 
 The selective-release slice defines the exact six-package graph once, configures
 independent Changesets versions and package-owned changelogs, and uses
@@ -632,14 +632,19 @@ the new story and 146 of 147 interactions; its sole failure is the existing
 doodle-divider menu-visibility interaction, outside this toolbar slice. The new
 story remains `visual-pending`, and no visual baseline was created or refreshed.
 
-The contextual-control clearance repair strengthens MIRA-UI-014 and introduces
-MIRA-CSS-024. Reproduction in Comprehensive Live Preview measures the existing
-contextual trigger at `24px`, the shared post-gutter allowance at `18px`, and
-the top-level task-type trigger extending `7.49px` into the contextual gutter's
-painted column. The repair will reduce the contextual trigger, enlarge the
-shared allowance, and add focused story and Chromium assertions that both
-controls remain separated, fully visible, and independently clickable without
-changing content geometry while either menu is used.
+The contextual-control clearance repair strengthens MIRA-UI-014 and implements
+MIRA-CSS-024. Reproduction measured the previous contextual trigger at `24px`,
+the shared post-gutter allowance at `18px`, and the top-level task-type trigger
+extending `7.49px` into the contextual gutter's painted column. The repaired
+geometry uses a `20px` contextual trigger, a `38px` dedicated gutter, and a
+`28px` shared allowance; direct Chromium inspection measures `2.51px` of clear
+space between the contextual and task hit areas. The focused Source, Live
+Preview, and open-menu Storybook interactions pass, and the Comprehensive
+Chromium interaction opens the real task picker, changes its marker, and keeps
+the content column and horizontal scroll position stable. The 302 Mira tests,
+`pnpm spec:check`, `pnpm catalog:check`, `pnpm check:all`, the Mira package
+build with publint, and the static Storybook build pass. No visual baseline was
+created or refreshed.
 
 The portable parity audit recorded 59 present features, six consumer-adapter
 boundaries, six Lapis-only behaviors, and no remaining portable P0-P2 gaps at
