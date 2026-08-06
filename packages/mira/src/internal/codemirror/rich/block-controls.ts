@@ -1578,11 +1578,12 @@ const blockControlsTheme = EditorView.theme({
     width: "1.25rem",
   },
   "&.mira-block-toolbar-enabled .cm-gutter.mira-block-controls-gutter": {
-    minWidth: "2.625rem",
-    width: "2.625rem",
+    minWidth: "2.375rem",
+    overflow: "visible",
+    width: "2.375rem",
   },
   "&.mira-block-toolbar-enabled .cm-gutters": {
-    marginInlineEnd: "1.125rem",
+    marginInlineEnd: "1.75rem",
   },
   ".mira-block-controls-gutter .cm-gutterElement": {
     // Stay on the first visual line when a block wraps (not mid-block).
@@ -1594,18 +1595,18 @@ const blockControlsTheme = EditorView.theme({
   },
   "&.mira-block-toolbar-enabled .mira-block-controls-gutter .cm-gutterElement":
     {
-      minWidth: "2.625rem",
-      width: "2.625rem",
+      minWidth: "2.375rem",
+      width: "2.375rem",
     },
   ".mira-block-controls-row": {
     alignItems: "center",
     display: "inline-flex",
     gap: "0.125rem",
-    height: "1.5rem",
+    height: "1.25rem",
     justifyContent: "center",
     lineHeight: "inherit",
-    marginTop: "max(0px, calc((1lh - 1.5rem) / 2))",
-    width: "2.625rem",
+    marginTop: "max(0px, calc((1lh - 1.25rem) / 2))",
+    width: "2.375rem",
   },
   ".mira-block-handle-spacer": {
     display: "block",
@@ -1675,8 +1676,8 @@ const blockControlsTheme = EditorView.theme({
     color: "var(--mira-muted-foreground)",
     cursor: "pointer",
     display: "inline-flex",
-    flex: "0 0 1.5rem",
-    height: "1.5rem",
+    flex: "0 0 1.25rem",
+    height: "1.25rem",
     justifyContent: "center",
     lineHeight: "1",
     opacity: "0",
@@ -1684,7 +1685,7 @@ const blockControlsTheme = EditorView.theme({
     pointerEvents: "none",
     transition:
       "background-color 120ms ease, border-color 120ms ease, color 120ms ease, opacity 120ms ease",
-    width: "1.5rem",
+    width: "1.25rem",
   },
   ".mira-block-controls-gutter .cm-gutterElement:hover .mira-block-toolbar-trigger, .mira-block-toolbar-trigger--active, .mira-block-toolbar-trigger--selected, .mira-block-toolbar-trigger--open, .mira-block-toolbar-trigger:focus-visible":
     {
@@ -1704,17 +1705,17 @@ const blockControlsTheme = EditorView.theme({
   },
   ".mira-block-toolbar__icon-svg": {
     fill: "none",
-    height: "0.875rem",
+    height: "0.75rem",
     pointerEvents: "none",
     stroke: "currentColor",
     strokeLinecap: "round",
     strokeLinejoin: "round",
     strokeWidth: "2",
-    width: "0.875rem",
+    width: "0.75rem",
   },
   ".mira-block-toolbar__icon-text": {
     fontFamily: "var(--mira-font-sans)",
-    fontSize: "0.6875rem",
+    fontSize: "0.625rem",
     fontWeight: "650",
     letterSpacing: "-0.04em",
     pointerEvents: "none",

@@ -110,7 +110,16 @@ describe("block controls", () => {
       getComputedStyle(
         parent.querySelector<HTMLElement>(".mira-block-controls-gutter")!,
       ).width,
-    ).not.toBe("1.25rem");
+    ).toBe("2.375rem");
+    expect(
+      getComputedStyle(parent.querySelector<HTMLElement>(".cm-gutters")!)
+        .marginInlineEnd,
+    ).toBe("1.75rem");
+    expect(
+      getComputedStyle(
+        parent.querySelector<HTMLElement>(".mira-block-toolbar-trigger")!,
+      ).width,
+    ).toBe("1.25rem");
 
     view.destroy();
     parent.remove();
