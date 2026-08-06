@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/svelte-vite";
+import { expect, waitFor } from "storybook/test";
 import EditorModeStory from "../_shared/EditorModeStory.svelte";
 import MarkdownPreviewStory from "../_shared/MarkdownPreviewStory.svelte";
 import {
@@ -30,7 +31,35 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+async function expectThemePrimaryBorder({
+  canvasElement,
+}: {
+  canvasElement: HTMLElement;
+}): Promise<void> {
+  const border = await waitFor(() => {
+    const rendered = canvasElement.querySelector<HTMLElement>("blockquote");
+    const source = canvasElement.querySelector<HTMLElement>(
+      ".cm-line.cm-blockquote",
+    );
+    const element = rendered ?? source;
+    expect(element).not.toBeNull();
+    return {
+      color: getComputedStyle(element!, rendered ? undefined : "::before")
+        .borderInlineStartColor,
+      element: element!,
+    };
+  });
+  const probe = canvasElement.ownerDocument.createElement("span");
+  probe.style.color = "var(--interactive-accent)";
+  border.element.append(probe);
+  const primary = getComputedStyle(probe).color;
+  probe.remove();
+
+  expect(border.color).toBe(primary);
+}
+
 export const Preview: Story = {
+  play: expectThemePrimaryBorder,
   tags: [
     "visual-approved",
     "!visual-pending",
@@ -58,6 +87,7 @@ export const LivePreview: Story = {
     "!visual-failed",
   ],
   name: "Live Preview",
+  play: expectThemePrimaryBorder,
   render: (args) => ({
     Component: EditorModeStory,
     props: {

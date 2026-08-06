@@ -128,7 +128,7 @@
   --blockquote-font-style: normal;
   --blockquote-background-color: transparent;
   --blockquote-border-thickness: 3px;
-  --blockquote-border-color: var(--mira-border-strong);
+  --blockquote-border-color: var(--interactive-accent);
   --code-background: var(--mira-code-background);
   --code-normal: var(--mira-code-foreground);
   --code-comment: var(--mira-syntax-comment);

@@ -61,4 +61,16 @@ describe("Mira theme CSS contract", () => {
     expect(manifest.exports).toHaveProperty("./themes/obsidian.css");
     expect(manifest.exports).toHaveProperty("./themes.css");
   });
+
+  it("uses the theme-primary embed accent for blockquote guides", () => {
+    const tokens = read("../preview/styles/tokens.css");
+    const embeds = read("../preview/styles/links-embeds-tags.css");
+
+    expect(tokens).toContain(
+      "--blockquote-border-color: var(--interactive-accent)",
+    );
+    expect(embeds).toContain(
+      "border-inline-start: 2px solid var(--interactive-accent)",
+    );
+  });
 });
