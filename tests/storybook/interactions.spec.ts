@@ -260,7 +260,7 @@ test("table chrome supports pointer reordering, mutation, and source reveal", as
     .first();
   await scrollEditorUntilVisible(page, widget);
   const rows = widget.locator("tbody tr");
-  await expect(rows).toHaveCount(4);
+  await expect(rows).toHaveCount(5);
 
   const rowBefore = await rows.nth(1).innerText();
   const nextRowBefore = await rows.nth(2).innerText();

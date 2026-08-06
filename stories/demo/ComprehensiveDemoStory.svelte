@@ -1,17 +1,25 @@
 <script lang="ts">
+  import SparklesIcon from "@lucide/svelte/icons/sparkles";
   import {
     MiraEditor,
     MiraFeature,
+    type MiraEditorFeatureConfigs,
     type MiraFeatureFlags,
     type MiraOutlineVariant,
+    type MiraEditorToolbarDefinition,
   } from "@lapismd/mira-editor";
   import {
     doodleDividersExtension,
     selectionToolbarExtension,
+    type MiraBlockControlsOptions,
     type MiraColorMode,
     type MiraMode,
     type MiraTheme,
   } from "@lapismd/mira/extensions";
+  import {
+    aiExtension,
+    createMiraAiToolbarAction,
+  } from "@lapismd/mira-plugin-ai";
   import { mermaidExtension } from "@lapismd/mira-plugin-mermaid";
   import { Mira } from "@lapismd/mira";
   import { storyFileAdapter } from "../markdown/_shared/file-adapter";
@@ -50,15 +58,43 @@
 
   const selectionToolbar = selectionToolbarExtension();
   const doodleDividers = doodleDividersExtension();
-  const defaultExtensions = [selectionToolbar, doodleDividers];
+  const ai = aiExtension({
+    run: async () =>
+      "Mira comprehensive demo: deterministic local AI response.",
+  });
+  const defaultExtensions = [selectionToolbar, doodleDividers, ai];
   const extensions = $derived([
     selectionToolbar,
     doodleDividers,
+    ai,
     ...(mermaidEnabled ? [mermaidExtension()] : []),
   ]);
   const features = $derived({
     [MiraFeature.Mermaid]: mermaidEnabled,
   } satisfies MiraFeatureFlags);
+  const featureConfigs = {
+    [MiraFeature.BlockControls]: { toolbar: true },
+  } satisfies MiraEditorFeatureConfigs;
+  const blockControls = {
+    enabled: true,
+    toolbar: true,
+  } satisfies MiraBlockControlsOptions;
+  const aiToolbarAction = {
+    ...createMiraAiToolbarAction({
+      icon: SparklesIcon,
+      label: "Ask AI",
+      tooltip: "Open the deterministic AI plugin demo",
+    }),
+    disabled: ({ mode, readonly }) => readonly || mode === "preview",
+  };
+  const pluginToolbars = [
+    {
+      id: "comprehensive-plugins",
+      label: "Plugins",
+      align: "end",
+      items: [aiToolbarAction],
+    },
+  ] satisfies MiraEditorToolbarDefinition[];
   const wordCount = $derived(value.trim().split(/\s+/).filter(Boolean).length);
 </script>
 
@@ -68,6 +104,8 @@
   class:light={colorMode === "light"}
   class:theme-light={colorMode === "light"}
   class="mira-comprehensive"
+  data-mira-comprehensive-extensions="selection-toolbar doodle-dividers"
+  data-mira-comprehensive-plugins={mermaidEnabled ? "ai mermaid" : "ai"}
   data-mira-theme={theme?.trim() ? theme : undefined}
   data-mira-color-mode={colorMode === "inherit" ? undefined : colorMode}
 >
@@ -107,6 +145,8 @@
         {outline}
         {outlineVariant}
         {features}
+        {featureConfigs}
+        toolbars={pluginToolbars}
         extensions={defaultExtensions}
         {indentGuides}
         {indentWithTabs}
@@ -124,6 +164,7 @@
         {outline}
         {outlineVariant}
         {extensions}
+        {blockControls}
         {indentGuides}
         {indentWithTabs}
         {indentWidth}

@@ -54,7 +54,7 @@ authorized baseline regeneration migrations are complete.
 | MIRA-CAT-008                                                                                            | Focused outline story and comprehensive outline control                    | Implemented                                     |
 | MIRA-CAT-009                                                                                            | Theme globals, fixed appearance stories, and browser assertions            | Implemented by extensible theme slice           |
 | MIRA-CAT-010                                                                                            | Visual Delta host formatter configuration and source mutation regression   | Implemented                                     |
-| MIRA-CAT-011                                                                                            | Comprehensive all-plugin audit and contextual-toolbar Storybook assertions | Planned by comprehensive plugin audit           |
+| MIRA-CAT-011                                                                                            | Comprehensive all-plugin audit and contextual-toolbar Storybook assertions | Implemented by comprehensive plugin audit       |
 | MIRA-GOV-001, MIRA-GOV-002, MIRA-GOV-003, MIRA-GOV-004, MIRA-GOV-005, MIRA-GOV-006, MIRA-GOV-007        | `pnpm spec:check`, checker tests, pull-request workflow                    | Implemented by governance slice                 |
 | MIRA-GOV-008                                                                                            | Package-boundary checker and tarball leak tests                            | Implemented                                     |
 | MIRA-GOV-009, MIRA-GOV-010, MIRA-GOV-011                                                                | Changeset intent gate, protected release workflow, and post-publish checks | Implemented; external environment setup pending |
@@ -580,6 +580,22 @@ offset and exact `-240px` dark translation. The package
 check, 22 unit tests, build/publint, six-package tarball consumer validation,
 canonical spec and catalog gates, `pnpm check:all`, and the static Storybook
 build pass. No visual baseline was created or refreshed.
+
+The comprehensive all-plugin audit implements MIRA-CAT-011. Catalog discovery
+finds both public first-party plugin packages, AI and Mermaid, and requires the
+demo to import them alongside the selection toolbar and doodle-divider opt-ins.
+Both the batteries-included and composable editor shells expose the contextual
+block toolbar; editable views expose the selection toolbar, while a deterministic
+local AI adapter exercises the plugin without credentials or network access.
+Validation passes the canonical specification and catalog gates, all 146
+Storybook tests, both focused Chromium acceptance tests, `pnpm check:all`, the
+static Storybook build, and direct static-runtime smoke checks for both editor
+shells. The full browser suite passes 43 of 45 tests; its two failures are the
+pre-existing indentation cases for inactive unordered markers and the
+preformatted continuation caret state. Compare-only Visual Delta captures all
+six comprehensive stories successfully and reports the expected approved-image
+differences of 1–3 percent after enabling the new UI. It creates or refreshes no
+baseline and does not change story review status.
 
 The portable parity audit recorded 59 present features, six consumer-adapter
 boundaries, six Lapis-only behaviors, and no remaining portable P0-P2 gaps at

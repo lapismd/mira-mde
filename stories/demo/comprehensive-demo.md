@@ -18,10 +18,10 @@ related:
 # Mira comprehensive playground
 
 This Storybook-owned fixture exercises the portable Markdown, editor, preview,
-Mermaid, adapter, and Mira Editor contracts against identical content in all four
-supported views. It adapts the portable parts of Lapis's Markdown Feature Tour;
-vault, workspace, registry, persistence, and application navigation behavior are
-deliberately excluded.
+AI, Mermaid, adapter, and Mira Editor contracts against identical content in all
+four supported views. It adapts the portable parts of Lapis's Markdown Feature
+Tour; vault, workspace, registry, persistence, and application navigation
+behavior are deliberately excluded.
 
 For geometry-specific coverage, use the separate CodeMirror Layout Showcase.
 
@@ -124,6 +124,7 @@ Heading and block-reference embeds:
 | :----------------------------- | :--------: | -----: |
 | `@lapismd/mira/core`           | controller |  ready |
 | `@lapismd/mira/preview`        |  reading   |  ready |
+| `@lapismd/mira-plugin-ai`      |  commands  |  ready |
 | `@lapismd/mira-plugin-mermaid` |  diagrams  |  ready |
 
 MultiMarkdown spans:

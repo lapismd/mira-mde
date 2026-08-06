@@ -105,6 +105,24 @@ async function expectRenderedDoodleDivider(
   ).toHaveLength(1);
 }
 
+async function expectComprehensivePluginConfiguration(
+  canvasElement: HTMLElement,
+  { editor = true }: { editor?: boolean } = {},
+): Promise<void> {
+  const root = canvasElement.querySelector<HTMLElement>(".mira-comprehensive");
+  if (!root) throw new Error("Comprehensive story root did not render");
+  expect(root).toHaveAttribute(
+    "data-mira-comprehensive-extensions",
+    "selection-toolbar doodle-dividers",
+  );
+  expect(root).toHaveAttribute("data-mira-comprehensive-plugins", "ai mermaid");
+  await waitFor(() => {
+    expect(
+      canvasElement.querySelectorAll(".mira-block-toolbar-enabled"),
+    ).toHaveLength(editor ? 1 : 0);
+  });
+}
+
 export const Playground: Story = {
   tags: [
     "visual-approved",
@@ -128,6 +146,56 @@ export const Playground: Story = {
 
     await step("render the seeded doodle divider", async () => {
       await expectRenderedDoodleDivider(canvasElement);
+    });
+
+    await step(
+      "enable every first-party plugin and contextual toolbar",
+      async () => {
+        await expectComprehensivePluginConfiguration(canvasElement);
+        await expect(
+          canvas.getByRole("button", { name: "Ask AI" }),
+        ).toBeEnabled();
+      },
+    );
+
+    await step("show the inline toolbar for selected text", async () => {
+      const content = canvasElement.querySelector<HTMLElement>(".cm-content");
+      if (!content)
+        throw new Error("Comprehensive CodeMirror content is missing");
+      content.focus();
+      await userEvent.keyboard("{Shift>}{ArrowRight}{/Shift}");
+      await expect(
+        canvas.getByRole("toolbar", { name: "Text formatting" }),
+      ).toBeVisible();
+      await userEvent.keyboard("{ArrowLeft}");
+      await waitFor(() => {
+        expect(
+          canvas.queryByRole("toolbar", { name: "Text formatting" }),
+        ).not.toBeInTheDocument();
+      });
+    });
+
+    await step("run the deterministic local AI plugin", async () => {
+      await userEvent.click(canvas.getByRole("button", { name: "Ask AI" }));
+      const dialog = canvas.getByRole("dialog", { name: "Ask AI" });
+      await expect(dialog).toBeVisible();
+      await userEvent.type(
+        within(dialog).getByRole("textbox", { name: "AI prompt" }),
+        "Demonstrate the comprehensive plugin",
+      );
+      await userEvent.click(
+        within(dialog).getByRole("button", { name: "Run" }),
+      );
+      await expect(within(dialog).getByText("Ready")).toBeVisible();
+      await expect(
+        within(dialog).getByText(
+          "Mira comprehensive demo: deterministic local AI response.",
+        ),
+      ).toBeVisible();
+      await userEvent.click(
+        within(dialog).getByRole("button", { name: "Discard" }),
+      );
+      await expect(dialog).not.toBeInTheDocument();
     });
 
     await step("switch between full editor views", async () => {
@@ -207,6 +275,7 @@ export const LivePreview: Story = {
   name: "Live Preview",
   args: { mode: "live-preview" },
   play: async ({ canvasElement }) => {
+    await expectComprehensivePluginConfiguration(canvasElement);
     await expectRenderedDoodleDivider(canvasElement);
   },
 };
@@ -229,6 +298,7 @@ export const Source: Story = {
   },
   args: { mode: "source" },
   play: async ({ canvasElement }) => {
+    await expectComprehensivePluginConfiguration(canvasElement);
     expect(
       canvasElement.querySelector("svg.mira-doodle-divider"),
     ).not.toBeInTheDocument();
@@ -257,6 +327,12 @@ export const ReadingPreview: Story = {
   name: "Reading / Preview",
   args: { mode: "preview" },
   play: async ({ canvasElement }) => {
+    await expectComprehensivePluginConfiguration(canvasElement, {
+      editor: false,
+    });
+    await expect(
+      within(canvasElement).getByRole("button", { name: "Ask AI" }),
+    ).toBeDisabled();
     await expectRenderedDoodleDivider(canvasElement);
   },
 };
@@ -298,6 +374,7 @@ export const Composable: Story = {
   },
   args: { editorShell: "composable", mode: "live-preview" },
   play: async ({ canvasElement }) => {
+    await expectComprehensivePluginConfiguration(canvasElement);
     await expectRenderedDoodleDivider(canvasElement);
   },
 };

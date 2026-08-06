@@ -78,3 +78,50 @@ for (const view of views) {
     ).toHaveCount(view.preview ? 1 : 0);
   });
 }
+
+test("the comprehensive demo enables every first-party plugin and contextual toolbar", async ({
+  page,
+}) => {
+  await page.goto(
+    "/iframe.html?id=demo-comprehensive--live-preview&viewMode=story",
+  );
+  const root = page.locator(".mira-comprehensive");
+  await expect(root).toHaveAttribute(
+    "data-mira-comprehensive-extensions",
+    "selection-toolbar doodle-dividers",
+  );
+  await expect(root).toHaveAttribute(
+    "data-mira-comprehensive-plugins",
+    "ai mermaid",
+  );
+  await expect(
+    root.locator(".cm-editor.mira-block-toolbar-enabled"),
+  ).toHaveCount(1);
+  await expect(page.getByRole("button", { name: "Ask AI" })).toBeEnabled();
+
+  const content = root.locator(".cm-content");
+  await content.focus();
+  await page.keyboard.down("Shift");
+  await page.keyboard.press("ArrowRight");
+  await page.keyboard.up("Shift");
+  await expect(
+    page.getByRole("toolbar", { name: "Text formatting" }),
+  ).toBeVisible();
+  await page.keyboard.press("ArrowLeft");
+  await expect(
+    page.getByRole("toolbar", { name: "Text formatting" }),
+  ).toHaveCount(0);
+
+  await page.goto(
+    "/iframe.html?id=demo-comprehensive--composable&viewMode=story",
+  );
+  const composable = page.locator(".mira-comprehensive");
+  await expect(
+    composable.locator(".cm-editor.mira-block-toolbar-enabled"),
+  ).toHaveCount(1);
+  const composableContent = composable.locator(".cm-content");
+  await composableContent.focus();
+  await page.keyboard.press("Control+End");
+  await page.keyboard.type("\n/ask");
+  await expect(page.getByRole("option", { name: /Ask AI/ })).toBeVisible();
+});
