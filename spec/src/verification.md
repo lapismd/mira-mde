@@ -69,11 +69,15 @@ safe reruns, provenance, version synchronization, and package tags. A live
 read-only npm plan selects the six unpublished `0.0.1` packages in dependency
 order and marks the run as bootstrap-only; preparation produces six verified
 tarballs, while a local publish attempt stops at the approved-CI guard.
-`actionlint` validates both CI workflows. Activating the pipeline still requires
-the external public repository, protected `npm-bootstrap` and `npm-production`
-environments, the one-time token, and six npm trusted-publisher registrations
-described in `RELEASING.md`; repository implementation is not evidence that
-those external controls are configured.
+`actionlint` validates both CI workflows. Final repository validation passes
+`pnpm spec:check`, `pnpm catalog:check`, `pnpm packages:pack`, `pnpm check:all`,
+`pnpm build-storybook`, and all 44 `pnpm test:e2e` browser tests against a fresh
+Storybook host. No package was published and no visual baseline was created or
+refreshed. Activating the pipeline still requires the external public
+repository, protected `npm-bootstrap` and `npm-production` environments, the
+one-time token, and six npm trusted-publisher registrations described in
+`RELEASING.md`; repository implementation is not evidence that those external
+controls are configured.
 
 The context-aware toolbar action slice adds one shared CodeMirror engine for
 ten action identifiers and exposes it through the Mira, Mira Editor, React, and

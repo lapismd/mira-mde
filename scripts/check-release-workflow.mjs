@@ -62,7 +62,7 @@ export function validateReleaseWorkflows({ releaseSource, ciSource }) {
     errors.push("workflow must publish only through release:publish");
   }
   const production = releaseSource.match(
-    /publish-production:[\s\S]*?(?=\n  publish-bootstrap:)/,
+    /publish-production:[\s\S]*?(?=\n {2}publish-bootstrap:)/,
   )?.[0];
   if (!production) errors.push("missing publish-production job");
   else if (/NPM_BOOTSTRAP_TOKEN|NODE_AUTH_TOKEN/.test(production)) {
