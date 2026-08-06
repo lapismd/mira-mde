@@ -220,6 +220,18 @@ const semanticTokens = [
     "CodeMirror list and continuation indent widgets.",
   ),
   token(
+    "--mira-doodle-divider-height",
+    "Rendered doodle-divider height.",
+    "32px",
+    "Seeded doodle-divider SVGs in reading and live-preview surfaces.",
+  ),
+  token(
+    "--mira-doodle-divider-stroke-width",
+    "Rendered doodle-divider stroke width.",
+    "2.35",
+    "Seeded doodle-divider SVG paths.",
+  ),
+  token(
     "--mira-editor-padding",
     "Inline editor content padding.",
     "2rem",
@@ -429,6 +441,8 @@ const markdownTokens = [
   "--mira-widget-shadow",
   "--mira-markdown-font-size",
   "--mira-markdown-line-height",
+  "--mira-doodle-divider-height",
+  "--mira-doodle-divider-stroke-width",
   "--mira-outline-level",
   ...calloutTokens.map((entry) => entry.name),
   ...headingTokens.map((entry) => entry.name),

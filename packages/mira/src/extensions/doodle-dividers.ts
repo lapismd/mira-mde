@@ -441,7 +441,7 @@ function visitMdastParents(parent: MdastParent): void {
       typeof previous.value === "string"
     ) {
       const parsed = parseMiraDoodleDividerCommentLine(previous.value);
-      if (parsed && parsed.prefix === "") {
+      if (parsed) {
         node.data = {
           ...(node.data ?? {}),
           hProperties: {
@@ -512,16 +512,22 @@ function variant(
 }
 
 function drawScribble({ random }: MiraDoodleDividerDrawContext): string {
-  const points = [`M 6 ${number(15 + jitter(random, 1))}`];
-  let high = false;
-  for (let x = 9; x <= 168; x += 6) {
-    high = !high;
-    points.push(
-      `L ${number(x + jitter(random, 1.2))} ${number((high ? 7 : 24) + jitter(random, 2))}`,
+  const parts = [`M 6 ${number(23 + jitter(random, 1))}`];
+  let x = 6;
+  for (let index = 0; index < 18; index += 1) {
+    const width = 10.2 + jitter(random, 1.15);
+    const peakY = 5.5 + jitter(random, 1.8);
+    const troughY = 24.5 + jitter(random, 1.7);
+    const peakX = x + width * (0.42 + jitter(random, 0.035));
+    const endX = x + width;
+    parts.push(
+      `C ${number(x + width * 0.12)} ${number(21 + jitter(random, 1.2))} ${number(peakX - width * 0.12)} ${number(peakY + 1.5)} ${number(peakX)} ${number(peakY)}`,
+      `C ${number(peakX + width * 0.13)} ${number(peakY - 0.5)} ${number(endX - width * 0.16)} ${number(troughY - 1)} ${number(endX)} ${number(troughY)}`,
     );
+    x = endX;
   }
-  points.push(tail(170, 16 + jitter(random, 1), random));
-  return points.join(" ");
+  parts.push(tail(x, 16 + jitter(random, 1), random));
+  return parts.join(" ");
 }
 
 function drawWaves({ random }: MiraDoodleDividerDrawContext): string {
@@ -605,7 +611,13 @@ function drawPlain({ random }: MiraDoodleDividerDrawContext): string {
 }
 
 function tail(startX: number, startY: number, random: () => number): string {
-  return `C ${number(startX + 190)} ${number(14 + jitter(random, 1.1))} ${number(735)} ${number(13 + jitter(random, 1.1))} 994 ${number(17 + jitter(random, 1))}`;
+  const settledY = 17 + jitter(random, 0.45);
+  const middleY = settledY - 0.3 + jitter(random, 0.15);
+  const endY = settledY + 0.2 + jitter(random, 0.2);
+  return [
+    `C ${number(startX + 18)} ${number(startY)} ${number(startX + 38)} ${number(settledY)} ${number(startX + 68)} ${number(settledY)}`,
+    `C ${number(startX + 290)} ${number(middleY)} 748 ${number(middleY)} 994 ${number(endY)}`,
+  ].join(" ");
 }
 
 function mixSeed(seed: number, salt: number): number {

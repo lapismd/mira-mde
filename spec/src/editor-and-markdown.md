@@ -56,7 +56,9 @@ migration helper rather than an editor-mount side effect.
 The implementation recognizes thematic breaks through Mira's shared syntax
 tree, carries the stored seed through the sanitized preview pipeline, and keeps
 the authored pair inside the existing block-widget source fallback rather than
-introducing a second Markdown syntax or renderer.
+introducing a second Markdown syntax or renderer. Indented live-preview
+fragments retain their matching list or quote prefix when the seed is bridged
+to the rendered thematic break.
 
 The table extension decorates every raw pipe-table row with `cm-table` and
 `cm-formatting-table`. Shipped CSS scopes the monospaced, preformatted row

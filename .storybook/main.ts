@@ -68,6 +68,7 @@ const config: StorybookConfig = {
           "@lucide/svelte/icons/move",
           "@lucide/svelte/icons/plus",
           "@lucide/svelte/icons/repeat-2",
+          "@lucide/svelte/icons/refresh-cw",
           "@lucide/svelte/icons/rows-3",
           "@lucide/svelte/icons/strikethrough",
           "@lucide/svelte/icons/space",

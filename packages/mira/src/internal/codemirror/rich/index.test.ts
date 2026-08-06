@@ -60,6 +60,40 @@ After`;
     parent.remove();
   });
 
+  it("renders an indented seeded divider inside a list item", async () => {
+    const parent = document.createElement("div");
+    document.body.append(parent);
+    const source = `- Parent item
+
+  <!-- mira-divider:v1:00000004 -->
+  ---
+
+  Content after the divider`;
+    const doodles = doodleDividersExtension();
+    const view = new EditorView({
+      doc: source,
+      selection: { anchor: 0 },
+      extensions: [
+        createMarkdownCodeMirrorExtensions(),
+        createRichEditorExtensions({
+          livePreview: true,
+          extensions: [doodles],
+        }),
+      ],
+      parent,
+    });
+    await nextFrame();
+    await nextFrame();
+
+    expect(
+      parent.querySelector<SVGElement>(".mira-doodle-divider")?.dataset.seed,
+    ).toBe("00000004");
+    expect(parent.textContent).not.toContain("mira-divider:v1");
+
+    view.destroy();
+    parent.remove();
+  });
+
   it("keeps source mode free of live-preview hide/replace decorations", async () => {
     const nonempty = (
       extensions: ReturnType<typeof createRichEditorExtensions>,

@@ -49,7 +49,9 @@ forwards the Svelte editor contract unchanged.
 The doodle-divider feature follows the same portable extension boundary. Its
 factory, default gallery, customization types, and explicit migration helper
 ship from `/extensions`; the implementation does not create a seventh public
-package or require a framework adapter.
+package or require a framework adapter. Storybook exercises those exports
+through the same package subpath rather than importing internal draw or parser
+helpers.
 
 ## Release model
 

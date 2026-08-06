@@ -179,7 +179,8 @@ Paragraph
     const view = createEditor("Alpha\n\n---\n", () => 9);
     const command = extension.commands?.find(
       (candidate) => candidate.id === "mira-doodle-dividers-materialize",
-    )!;
+    );
+    if (!command) throw new Error("Materialize command was not contributed");
     const scrollTop = 18;
     view.scrollDOM.scrollTop = scrollTop;
 
@@ -206,7 +207,8 @@ Paragraph
 describe("doodle divider rendering", () => {
   it("enhances only a rule immediately preceded by a valid seed comment", () => {
     const extension = doodleDividersExtension();
-    const processor = extension.postProcessors?.[0]!;
+    const processor = extension.postProcessors?.[0];
+    if (!processor) throw new Error("Doodle postprocessor was not contributed");
     const parent = document.createElement("div");
     const hr = document.createElement("hr");
     parent.append(hr);
@@ -234,10 +236,13 @@ describe("doodle divider rendering", () => {
   });
 
   it("falls back to the native rule for bare rules and invalid drawings", () => {
-    const bare = doodleDividersExtension().postProcessors?.[0]!;
+    const bare = doodleDividersExtension().postProcessors?.[0];
     const invalid = doodleDividersExtension({
       variants: [{ id: "invalid", draw: () => "M NaN Infinity" }],
-    }).postProcessors?.[0]!;
+    }).postProcessors?.[0];
+    if (!bare || !invalid) {
+      throw new Error("Doodle postprocessors were not contributed");
+    }
 
     for (const [processor, previous] of [
       [bare, { type: "text", value: "ordinary" }],
@@ -290,9 +295,32 @@ describe("doodle divider rendering", () => {
       paths.every(({ path }) => !String(path).match(/NaN|Infinity/u)),
     ).toBe(true);
     expect(paths.map(({ path }) => stableHash(String(path)))).toEqual([
-      130672128, 416521323, 3443166597, 3285835217, 218412563, 1401374405,
-      4002757954, 1422833353,
+      1800713089, 582965354, 1904425823, 2348662072, 1740792941, 1779022722,
+      395463394, 1422833353,
     ]);
+  });
+
+  it("keeps the long divider tails close to horizontal", () => {
+    const paths = defaultMiraDoodleDividerVariants.slice(0, -1).map((entry) =>
+      String(
+        entry.draw({
+          seed: 0x12345678,
+          width: 1000,
+          height: 32,
+          random: createMiraDoodleDividerRandom(0x12345678),
+        }),
+      ),
+    );
+
+    for (const path of paths) {
+      const tail = path.match(/C [\d.]+ ([\d.]+) 748 ([\d.]+) 994 ([\d.]+)$/u);
+      expect(tail, path).not.toBeNull();
+      const controlY = Number(tail?.[1]);
+      const secondControlY = Number(tail?.[2]);
+      const endY = Number(tail?.[3]);
+      expect(Math.abs(controlY - secondControlY)).toBeLessThan(0.01);
+      expect(Math.abs(controlY - endY)).toBeLessThan(1.5);
+    }
   });
 });
 

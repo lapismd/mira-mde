@@ -1,0 +1,90 @@
+import { Meta, Canvas, Primary, Source } from "@storybook/addon-docs/blocks";
+import * as DividersStories from "./Dividers.stories";
+
+<Meta of={DividersStories} />
+
+# Doodle dividers
+
+The opt-in `doodleDividersExtension` renders only seeded thematic breaks as
+responsive SVG doodles. The native horizontal rule remains in the document as
+the accessible separator, and an unseeded rule remains visually unchanged.
+
+## Usage
+
+```svelte
+<script lang="ts">
+  import { MiraEditor } from "@lapismd/mira-editor";
+  import { doodleDividersExtension } from "@lapismd/mira/extensions";
+
+  let value = $state(`<!-- mira-divider:v1:4f32a91c -->
+---`);
+</script>
+
+<MiraEditor
+  bind:value
+  mode="live-preview"
+  extensions={[doodleDividersExtension()]}
+/>
+```
+
+<Primary />
+
+## Live Preview
+
+The comment and rule collapse into one editable block. Clicking the doodle
+reveals both authored source lines; moving, deleting, and duplicating the block
+operate on the pair.
+
+<Canvas of={DividersStories.LivePreview} meta={DividersStories} />
+
+## Source
+
+Source mode keeps the versioned comment and ordinary Markdown rule visible.
+
+<Canvas of={DividersStories.Source} meta={DividersStories} />
+
+## Custom gallery and explicit migration
+
+Consumers can replace the fixed variant set and palette. Existing bare rules
+are converted only by the pure helper or the
+`mira-doodle-dividers-materialize` command.
+
+```ts
+import {
+  doodleDividersExtension,
+  materializeDoodleDividerSeeds,
+} from "@lapismd/mira/extensions";
+
+const markdownWithIds = materializeDoodleDividerSeeds(markdown, {
+  createSeed: ({ line }) => 0xc0ffee00 + line,
+});
+
+const extension = doodleDividersExtension({
+  variants: [customVariant],
+  palette: ["#e11d48", "#7c3aed"],
+});
+```
+
+<Canvas of={DividersStories.CustomGallery} meta={DividersStories} />
+
+## Fixed v1 gallery
+
+The built-in selection order and drawing algorithms are versioned and remain
+stable for stored v1 seeds.
+
+<Canvas of={DividersStories.FixedV1Gallery} meta={DividersStories} />
+
+## 24-divider page
+
+The dedicated full gallery provides enough samples to review repeated family,
+color, and path-jitter combinations at the page width.
+
+<Canvas of={DividersStories.TwentyFourDividerGallery} meta={DividersStories} />
+
+## Refreshable divider
+
+This story-only component cycles the authored seed through all eight built-in
+families. It demonstrates a future reroll interaction without adding implicit
+mutation or toolbar chrome to the extension itself.
+
+<Canvas of={DividersStories.RefreshableDivider} meta={DividersStories} />
