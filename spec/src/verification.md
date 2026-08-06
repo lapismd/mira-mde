@@ -69,6 +69,7 @@ authorized baseline regeneration migrations are complete.
 | MIRA-MD-021, MIRA-CSS-021                                                                               | Seed lifecycle, SVG determinism, logical-block, and Storybook acceptance   | Implemented: 299 Mira, 146 Storybook, 44 E2E    |
 | MIRA-MD-022, MIRA-CSS-022, MIRA-CAT-012                                                                 | Live Preview divider reroll, family picker, and layout acceptance          | Implemented by divider-control slice            |
 | MIRA-UI-015, MIRA-CSS-023, MIRA-CAT-013                                                                 | Narrow toolbar overflow, touch CSS, and keyboard/browser interactions      | Implemented by responsive-toolbar slice         |
+| MIRA-UI-014, MIRA-CSS-024                                                                               | Combined block/task trigger clearance, sizing, and click interactions      | Planned by contextual-control clearance repair  |
 
 The selective-release slice defines the exact six-package graph once, configures
 independent Changesets versions and package-owned changelogs, and uses
@@ -630,6 +631,15 @@ confirms a compact scrollbar-free toolbar. The complete Storybook run passes
 the new story and 146 of 147 interactions; its sole failure is the existing
 doodle-divider menu-visibility interaction, outside this toolbar slice. The new
 story remains `visual-pending`, and no visual baseline was created or refreshed.
+
+The contextual-control clearance repair strengthens MIRA-UI-014 and introduces
+MIRA-CSS-024. Reproduction in Comprehensive Live Preview measures the existing
+contextual trigger at `24px`, the shared post-gutter allowance at `18px`, and
+the top-level task-type trigger extending `7.49px` into the contextual gutter's
+painted column. The repair will reduce the contextual trigger, enlarge the
+shared allowance, and add focused story and Chromium assertions that both
+controls remain separated, fully visible, and independently clickable without
+changing content geometry while either menu is used.
 
 The portable parity audit recorded 59 present features, six consumer-adapter
 boundaries, six Lapis-only behaviors, and no remaining portable P0-P2 gaps at
