@@ -21,7 +21,6 @@
   --mira-preview-background: light-dark(#ffffff, #1e1e1e);
   --mira-code-background: light-dark(#f6f6f6, #242424);
   --mira-code-foreground: var(--mira-foreground);
-  --mira-heading-color: var(--mira-foreground);
   --mira-syntax-heading: light-dark(#7852ee, #a882ff);
   --mira-syntax-link: light-dark(#086ddd, #027aff);
   --mira-syntax-comment: light-dark(#707070, #999999);

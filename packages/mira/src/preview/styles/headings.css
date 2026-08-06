@@ -88,6 +88,19 @@
   line-height: var(--markdown-h6-line-height);
 }
 
+/* CodeMirror's generic heading syntax class is accent-colored for language
+   highlighting. Markdown heading content follows the authored level instead;
+   raw heading delimiters retain their separate muted formatting treatment. */
+.markdown-editor-surface .cm-line.cm-header-1 .cm-heading:not(.cm-meta),
+.markdown-editor-surface .cm-line.cm-header-2 .cm-heading:not(.cm-meta),
+.markdown-editor-surface .cm-line.cm-header-3 .cm-heading:not(.cm-meta),
+.markdown-editor-surface .cm-line.cm-header-4 .cm-heading:not(.cm-meta),
+.markdown-editor-surface .cm-line.cm-header-5 .cm-heading:not(.cm-meta),
+.markdown-editor-surface .cm-line.cm-header-6 .cm-heading:not(.cm-meta) {
+  color: inherit;
+  font-weight: inherit;
+}
+
 .markdown-rendered :is(p, h1, h2, h3, h4, h5, h6),
 .markdown-preview-surface .markdown :is(p, h1, h2, h3, h4, h5, h6) {
   margin-block: 1rem;

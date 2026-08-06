@@ -73,4 +73,50 @@ describe("Mira theme CSS contract", () => {
       "border-inline-start: 2px solid var(--interactive-accent)",
     );
   });
+
+  it("exposes the complete Lapis-compatible per-level heading contract", () => {
+    const contract = read("./_contract.css");
+    const tokens = read("../preview/styles/tokens.css");
+    const headings = read("../preview/styles/headings.css");
+    const sizes = [
+      "1.802em",
+      "1.602em",
+      "1.424em",
+      "1.266em",
+      "1.125em",
+      "1em",
+    ];
+    const lineHeights = ["1.2", "1.2", "1.3", "1.4", "1.5", "1.5"];
+    const weights = ["700", "600", "600", "600", "600", "600"];
+
+    expect(contract).toContain("--mira-heading-color: var(--mira-foreground)");
+
+    for (let index = 0; index < 6; index += 1) {
+      const level = index + 1;
+
+      expect(contract).toContain(
+        `--mira-h${level}-color: var(--mira-heading-color)`,
+      );
+      expect(contract).toContain(
+        `--mira-h${level}-font: var(--mira-font-sans)`,
+      );
+      expect(contract).toContain(`--mira-h${level}-size: ${sizes[index]}`);
+      expect(contract).toContain(
+        `--mira-h${level}-line-height: ${lineHeights[index]}`,
+      );
+      expect(contract).toContain(`--mira-h${level}-style: normal`);
+      expect(contract).toContain(`--mira-h${level}-variant: normal`);
+      expect(contract).toContain(`--mira-h${level}-weight: ${weights[index]}`);
+      expect(tokens).toContain(
+        `--h${level}-color: var(--mira-h${level}-color)`,
+      );
+      expect(tokens).toContain(
+        `--h${level}-weight: var(--mira-h${level}-weight)`,
+      );
+    }
+
+    expect(headings).toContain(".cm-heading:not(.cm-meta)");
+    expect(headings).toContain("color: inherit");
+    expect(headings).toContain("font-weight: inherit");
+  });
 });

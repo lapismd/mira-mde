@@ -194,34 +194,67 @@ export const miraRichEditorTheme = EditorView.theme({
   },
   ".cm-header": {
     fontFamily: "var(--mira-font-sans)",
-    fontWeight: "700",
     lineHeight: "var(--cm-block-line-height)",
   },
   ".cm-header-1": {
     "--cm-block-line-height": "var(--mira-h1-line-height, 1.2)",
+    color:
+      "var(--mira-h1-color, var(--mira-heading-color, var(--mira-foreground)))",
+    fontFamily: "var(--mira-h1-font, var(--mira-font-sans))",
     fontSize: "var(--mira-h1-size, 1.802em)",
+    fontStyle: "var(--mira-h1-style, normal)",
+    fontVariant: "var(--mira-h1-variant, normal)",
+    fontWeight: "var(--mira-h1-weight, 700)",
   },
   ".cm-header-2": {
     "--cm-block-line-height": "var(--mira-h2-line-height, 1.2)",
+    color:
+      "var(--mira-h2-color, var(--mira-heading-color, var(--mira-foreground)))",
+    fontFamily: "var(--mira-h2-font, var(--mira-font-sans))",
     fontSize: "var(--mira-h2-size, 1.602em)",
+    fontStyle: "var(--mira-h2-style, normal)",
+    fontVariant: "var(--mira-h2-variant, normal)",
+    fontWeight: "var(--mira-h2-weight, 600)",
   },
   ".cm-header-3": {
     "--cm-block-line-height": "var(--mira-h3-line-height, 1.3)",
+    color:
+      "var(--mira-h3-color, var(--mira-heading-color, var(--mira-foreground)))",
+    fontFamily: "var(--mira-h3-font, var(--mira-font-sans))",
     fontSize: "var(--mira-h3-size, 1.424em)",
+    fontStyle: "var(--mira-h3-style, normal)",
+    fontVariant: "var(--mira-h3-variant, normal)",
+    fontWeight: "var(--mira-h3-weight, 600)",
   },
   ".cm-header-4": {
     "--cm-block-line-height": "var(--mira-h4-line-height, 1.4)",
+    color:
+      "var(--mira-h4-color, var(--mira-heading-color, var(--mira-foreground)))",
+    fontFamily: "var(--mira-h4-font, var(--mira-font-sans))",
     fontSize: "var(--mira-h4-size, 1.266em)",
+    fontStyle: "var(--mira-h4-style, normal)",
+    fontVariant: "var(--mira-h4-variant, normal)",
+    fontWeight: "var(--mira-h4-weight, 600)",
   },
   ".cm-header-5": {
-    "--cm-block-line-height":
-      "var(--mira-h5-line-height, var(--mira-line-height))",
+    "--cm-block-line-height": "var(--mira-h5-line-height, 1.5)",
+    color:
+      "var(--mira-h5-color, var(--mira-heading-color, var(--mira-foreground)))",
+    fontFamily: "var(--mira-h5-font, var(--mira-font-sans))",
     fontSize: "var(--mira-h5-size, 1.125em)",
+    fontStyle: "var(--mira-h5-style, normal)",
+    fontVariant: "var(--mira-h5-variant, normal)",
+    fontWeight: "var(--mira-h5-weight, 600)",
   },
   ".cm-header-6": {
-    "--cm-block-line-height":
-      "var(--mira-h6-line-height, var(--mira-line-height))",
+    "--cm-block-line-height": "var(--mira-h6-line-height, 1.5)",
+    color:
+      "var(--mira-h6-color, var(--mira-heading-color, var(--mira-foreground)))",
+    fontFamily: "var(--mira-h6-font, var(--mira-font-sans))",
     fontSize: "var(--mira-h6-size, 1em)",
+    fontStyle: "var(--mira-h6-style, normal)",
+    fontVariant: "var(--mira-h6-variant, normal)",
+    fontWeight: "var(--mira-h6-weight, 600)",
   },
   ".cm-gutters .cm-gutterElement.cm-gutterHeader": {
     display: "inline-flex",
@@ -240,11 +273,9 @@ export const miraRichEditorTheme = EditorView.theme({
     "--cm-block-line-height": "var(--mira-h4-line-height, 1.4)",
   },
   ".cm-gutters .cm-gutterElement.cm-gutterHeader-5": {
-    "--cm-block-line-height":
-      "var(--mira-h5-line-height, var(--mira-line-height))",
+    "--cm-block-line-height": "var(--mira-h5-line-height, 1.5)",
   },
   ".cm-gutters .cm-gutterElement.cm-gutterHeader-6": {
-    "--cm-block-line-height":
-      "var(--mira-h6-line-height, var(--mira-line-height))",
+    "--cm-block-line-height": "var(--mira-h6-line-height, 1.5)",
   },
 });

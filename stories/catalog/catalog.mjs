@@ -322,25 +322,63 @@ const calloutTokens = Object.entries(calloutDefaults).map(([name, value]) =>
 );
 
 const headingDefaults = {
-  1: ["1.802em", "1.2"],
-  2: ["1.602em", "1.2"],
-  3: ["1.424em", "1.3"],
-  4: ["1.266em", "1.4"],
-  5: ["1.125em", "var(--mira-line-height)"],
-  6: ["1em", "var(--mira-line-height)"],
+  1: { size: "1.802em", lineHeight: "1.2", weight: "700" },
+  2: { size: "1.602em", lineHeight: "1.2", weight: "600" },
+  3: { size: "1.424em", lineHeight: "1.3", weight: "600" },
+  4: { size: "1.266em", lineHeight: "1.4", weight: "600" },
+  5: {
+    size: "1.125em",
+    lineHeight: "1.5",
+    weight: "600",
+  },
+  6: {
+    size: "1em",
+    lineHeight: "1.5",
+    weight: "600",
+  },
 };
 const headingTokens = Object.entries(headingDefaults).flatMap(
   ([level, values]) => [
     token(
+      /** @type {`--mira-${string}`} */ (`--mira-h${level}-color`),
+      `Heading ${level} foreground.`,
+      "var(--mira-heading-color)",
+      `Level ${level} headings in editor and preview.`,
+    ),
+    token(
+      /** @type {`--mira-${string}`} */ (`--mira-h${level}-font`),
+      `Heading ${level} font family.`,
+      "var(--mira-font-sans)",
+      `Level ${level} headings in editor and preview.`,
+    ),
+    token(
       /** @type {`--mira-${string}`} */ (`--mira-h${level}-size`),
       `Heading ${level} font size.`,
-      values[0],
+      values.size,
       `Level ${level} headings in editor and preview.`,
     ),
     token(
       /** @type {`--mira-${string}`} */ (`--mira-h${level}-line-height`),
       `Heading ${level} line height.`,
-      values[1],
+      values.lineHeight,
+      `Level ${level} headings in editor and preview.`,
+    ),
+    token(
+      /** @type {`--mira-${string}`} */ (`--mira-h${level}-style`),
+      `Heading ${level} font style.`,
+      "normal",
+      `Level ${level} headings in editor and preview.`,
+    ),
+    token(
+      /** @type {`--mira-${string}`} */ (`--mira-h${level}-variant`),
+      `Heading ${level} font variant.`,
+      "normal",
+      `Level ${level} headings in editor and preview.`,
+    ),
+    token(
+      /** @type {`--mira-${string}`} */ (`--mira-h${level}-weight`),
+      `Heading ${level} font weight.`,
+      values.weight,
       `Level ${level} headings in editor and preview.`,
     ),
   ],
