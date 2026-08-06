@@ -72,7 +72,7 @@ authorized baseline regeneration migrations are complete.
 | MIRA-UI-014, MIRA-CSS-024                                                                               | Combined block/task trigger clearance, sizing, and click interactions      | Implemented by contextual-control clearance     |
 | MIRA-CSS-025                                                                                            | Reading/live blockquote/embed accent and border geometry assertions        | Implemented by blockquote accent repair         |
 | MIRA-CSS-026                                                                                            | Line-number font, numeral, color, and column-alignment assertions          | Implemented by line-number gutter typography    |
-| MIRA-CSS-027                                                                                            | Theme-contract tests plus computed H1-H6 reading/editor Storybook styles   | Specified; implementation in progress           |
+| MIRA-CSS-027                                                                                            | Theme-contract tests plus computed H1-H6 reading/editor Storybook styles   | Implemented; 305 Mira tests and 5 stories pass  |
 
 The selective-release slice defines the exact six-package graph once, configures
 independent Changesets versions and package-owned changelogs, and uses
@@ -673,6 +673,24 @@ Preview. An Obsidian-theme browser inspection resolved Source Code Pro,
 the visible three-digit rows. The 304 Mira tests, package check and build with
 publint, `pnpm spec:check`, `pnpm catalog:check`, `pnpm check:all`, and the
 static Storybook build pass. Approved visual baselines remain unchanged.
+
+The heading theme-contract slice implements MIRA-CSS-027 with explicit
+`--mira-h1-*` through `--mira-h6-*` color, font, size, style, variant, weight,
+and line-height variables. Each level color defaults through
+`--mira-heading-color`, whose default is the body foreground, and the shipped
+sizes, weights, and line heights now match Lapis exactly. The Obsidian-compatible
+heading aliases, reading surfaces, and Source and Live Preview CodeMirror lines
+all resolve through the same contract while raw Markdown delimiters retain their
+separate muted treatment. The catalog documents all 42 level tokens and passes
+with 115 documented tokens. The six theme-contract tests, complete 305-test
+Mira suite, and five focused Chromium heading stories pass. Direct Chrome
+inspection under the Obsidian theme confirms body-colored H1-H6 content and the
+Lapis scale in Reading, Source, and Live Preview. `pnpm spec:check`, package
+checks and builds with publint, the sequential 11-package test gate, and the
+static Storybook build pass. The default concurrent `pnpm check:all` reaches its
+test phase after passing checks and lint but exhausts test-runner resources when
+all Vitest packages start together; the same packages pass sequentially. No
+visual baseline was created or refreshed.
 
 The portable parity audit recorded 59 present features, six consumer-adapter
 boundaries, six Lapis-only behaviors, and no remaining portable P0-P2 gaps at
