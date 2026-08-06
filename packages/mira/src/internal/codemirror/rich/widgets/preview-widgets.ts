@@ -1,3 +1,4 @@
+import { Transaction } from "@codemirror/state";
 import { EditorView, WidgetType } from "@codemirror/view";
 import {
   createMarkdownGridTableWidget,
@@ -5,6 +6,13 @@ import {
 } from "@lapismd/mira/tables";
 import { MarkdownPreview } from "@lapismd/mira/preview";
 import { mount, unmount } from "svelte";
+import {
+  collectMiraDoodleDividerRules,
+  formatMiraDoodleDividerSeed,
+  MIRA_DOODLE_DIVIDER_CONTROL_EVENT,
+  resolveMiraDoodleDividerController,
+  type MiraDoodleDividerControlAction,
+} from "../../../doodle-dividers";
 import type { MiraRichEditorOptions } from "../types";
 import {
   shouldActivateEditablePreview,
@@ -42,7 +50,8 @@ export class BlockPreviewWidget extends WidgetType {
         JSON.stringify(other.config.markdownIndentedLineStarts) &&
       this.config.nodeName === other.config.nodeName &&
       this.config.options.frontmatterOpen ===
-        other.config.options.frontmatterOpen
+        other.config.options.frontmatterOpen &&
+      this.config.options.readonly === other.config.options.readonly
     );
   }
 
@@ -59,6 +68,9 @@ export class BlockPreviewWidget extends WidgetType {
       "markdown-rendered",
     ].join(" ");
     container.dataset.node = this.config.nodeName;
+    if (this.config.options.readonly) {
+      container.dataset.readonly = "true";
+    }
 
     if (
       this.config.nodeName === "Table" ||
@@ -130,6 +142,15 @@ export class BlockPreviewWidget extends WidgetType {
     });
     previewWidgetMounts.set(container, component as Record<string, unknown>);
 
+    if (this.config.nodeName === "HorizontalRule") {
+      container.addEventListener(MIRA_DOODLE_DIVIDER_CONTROL_EVENT, (event) => {
+        this.handleDoodleDividerControl(
+          view,
+          event as CustomEvent<MiraDoodleDividerControlAction>,
+        );
+      });
+    }
+
     const selectSource = (event: MouseEvent) => {
       const target = event.target instanceof Element ? event.target : null;
       const interactiveTarget = target?.closest(PREVIEW_INTERACTIVE_SELECTOR);
@@ -188,6 +209,62 @@ export class BlockPreviewWidget extends WidgetType {
       },
       scrollIntoView: true,
     });
+  }
+
+  private handleDoodleDividerControl(
+    view: EditorView,
+    event: CustomEvent<MiraDoodleDividerControlAction>,
+  ): void {
+    const controller = resolveMiraDoodleDividerController(
+      this.config.options.extensions,
+    );
+    const rule = collectMiraDoodleDividerRules(view.state, [
+      { from: this.config.from, to: this.config.to },
+    ]).find(
+      (candidate) =>
+        candidate.pair?.from === this.config.from &&
+        candidate.pair.to === this.config.to,
+    );
+    if (!controller || !rule?.pair) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+    const context = {
+      sourcePath: this.config.options.sourcePath,
+      line: rule.line,
+      offset: rule.from,
+    };
+    const nextSeed =
+      event.detail.action === "reroll"
+        ? controller.rerollSeed(rule.pair.seed, context)
+        : controller.selectVariantSeed(
+            rule.pair.seed,
+            event.detail.variantId,
+            context,
+          );
+    if (nextSeed === null || nextSeed === rule.pair.seed) {
+      return;
+    }
+
+    const scrollTop = view.scrollDOM.scrollTop;
+    const scrollLeft = view.scrollDOM.scrollLeft;
+    view.dispatch({
+      changes: {
+        from: rule.pair.seedFrom,
+        to: rule.pair.seedTo,
+        insert: formatMiraDoodleDividerSeed(nextSeed),
+      },
+      annotations: Transaction.userEvent.of(
+        event.detail.action === "reroll"
+          ? "input.doodle-divider.reroll"
+          : "input.doodle-divider.variant",
+      ),
+    });
+    view.focus();
+    view.scrollDOM.scrollTop = scrollTop;
+    view.scrollDOM.scrollLeft = scrollLeft;
   }
 
   override destroy(dom: HTMLElement): void {

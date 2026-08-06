@@ -135,6 +135,7 @@ export function createMiraCodeMirrorExtensions(
       blockControls: mode !== "preview" && !readonly ? blockControls : false,
       insertImage: (view) => runtimeContext(view).insertImage?.(),
       livePreview: mode === "live-preview",
+      readonly,
       indentGuides,
       extensions,
       sourcePath,

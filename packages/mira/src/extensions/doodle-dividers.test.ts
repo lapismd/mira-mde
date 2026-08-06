@@ -228,6 +228,7 @@ describe("doodle divider rendering", () => {
     expect(svg?.getAttribute("aria-hidden")).toBe("true");
     expect(svg?.dataset.seed).toBe("4f32a91c");
     expect(svg?.querySelectorAll("path").length).toBeGreaterThan(0);
+    expect(parent.querySelector(".mira-doodle-divider__controls")).toBeNull();
 
     expect(cleanup).toBeTypeOf("function");
     cleanup?.();

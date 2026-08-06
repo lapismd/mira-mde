@@ -61,6 +61,14 @@ introducing a second Markdown syntax or renderer. Indented live-preview
 fragments retain their matching list or quote prefix when the seed is bridged
 to the rendered thematic break.
 
+Writable Live Preview horizontal-rule widgets keep the source-edit button and
+add adjacent refresh and family controls. Both actions resolve a replacement
+seed through the owning doodle-divider extension, change only the stored seed
+field, and then remount the same logical widget. The refresh search skips the
+current family when alternatives exist; the family action searches for the
+first valid seed mapped to the requested configured variant. `controls: false`
+suppresses this authoring surface without changing Reading output.
+
 The table extension decorates every raw pipe-table row with `cm-table` and
 `cm-formatting-table`. Shipped CSS scopes the monospaced, preformatted row
 treatment to source mode and the raw Markdown fallback revealed from a

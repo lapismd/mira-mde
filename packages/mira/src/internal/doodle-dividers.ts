@@ -32,6 +32,54 @@ export type MiraDoodleDividerRule = {
   pair: MiraDoodleDividerPair | null;
 };
 
+export type MiraDoodleDividerControlAction =
+  | { action: "reroll" }
+  | { action: "variant"; variantId: string };
+
+export type MiraDoodleDividerControlSeedContext = {
+  sourcePath?: string;
+  line: number;
+  offset: number;
+};
+
+export type MiraDoodleDividerController = {
+  rerollSeed: (
+    currentSeed: number,
+    context: MiraDoodleDividerControlSeedContext,
+  ) => number | null;
+  selectVariantSeed: (
+    currentSeed: number,
+    variantId: string,
+    context: MiraDoodleDividerControlSeedContext,
+  ) => number | null;
+};
+
+export const MIRA_DOODLE_DIVIDER_CONTROL_EVENT = "mira-doodle-divider-control";
+
+const doodleDividerControllers = new WeakMap<
+  object,
+  MiraDoodleDividerController
+>();
+
+export function registerMiraDoodleDividerController(
+  extension: object,
+  controller: MiraDoodleDividerController,
+): void {
+  doodleDividerControllers.set(extension, controller);
+}
+
+export function resolveMiraDoodleDividerController(
+  extensions: readonly object[] | undefined,
+): MiraDoodleDividerController | null {
+  for (const extension of extensions ?? []) {
+    const controller = doodleDividerControllers.get(extension);
+    if (controller) {
+      return controller;
+    }
+  }
+  return null;
+}
+
 /** New-document range for the block created by the duplicate command. */
 export const miraDuplicatedBlockRange = Annotation.define<{
   from: number;

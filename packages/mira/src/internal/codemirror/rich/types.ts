@@ -12,6 +12,7 @@ import type { EditorView } from "@codemirror/view";
 export type MiraRichEditorOptions = {
   enabled?: boolean;
   livePreview?: boolean;
+  readonly?: boolean;
   blockControls?: boolean | MiraBlockControlsOptions;
   blockActions?: MiraBlockAction[];
   indentGuides?: boolean;

@@ -51,7 +51,9 @@ factory, default gallery, customization types, and explicit migration helper
 ship from `/extensions`; the implementation does not create a seventh public
 package or require a framework adapter. Storybook exercises those exports
 through the same package subpath rather than importing internal draw or parser
-helpers.
+helpers. Its options also expose a `controls` switch, while custom seed factories
+receive explicit `reroll` and `variant` reasons for Live Preview authoring
+actions.
 
 ## Release model
 

@@ -39,6 +39,12 @@ uses the native separator's available inline size, a fixed normalized view box,
 and inherited theme-aware color; the owned source rule is visually hidden only
 after a valid SVG has been generated successfully.
 
+The Live Preview authoring controls are absolutely positioned to the inline
+start of the existing source-edit button, so their hover and open states do not
+alter the rule's box, the content column, or CodeMirror gutter measurements.
+Each family row renders a compact path sample and uses the same popover, border,
+focus-ring, muted-foreground, and accent tokens as Mira's other editor menus.
+
 List-highlight triggers reserve one fixed marker slot inside their existing
 inline footprint. Inline-start and inline-end padding provide separation
 without CSS margins; the ghost chrome is inset inside that footprint so its

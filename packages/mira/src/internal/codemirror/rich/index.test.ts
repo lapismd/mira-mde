@@ -1,4 +1,5 @@
-import { describe, expect, it } from "vitest";
+import { history, undo } from "@codemirror/commands";
+import { describe, expect, it, vi } from "vitest";
 import { EditorView } from "@codemirror/view";
 import {
   defineMiraExtension,
@@ -55,6 +56,177 @@ After`;
     expect(view.state.selection.main.from).toBe(0);
     expect(view.state.selection.main.to).toBe(source.indexOf("\n\nAfter"));
     expect(parent.textContent).toContain("mira-divider:v1:4f32a91c");
+
+    view.destroy();
+    parent.remove();
+  });
+
+  it("rerolls and selects a seeded divider family from its Live Preview controls", async () => {
+    const parent = document.createElement("div");
+    document.body.append(parent);
+    const source = `<!-- mira-divider:v1:00000008 -->
+---
+
+After`;
+    const createSeed = vi
+      .fn()
+      .mockReturnValueOnce(0x00000008)
+      .mockReturnValue(0);
+    const doodles = doodleDividersExtension({ createSeed });
+    const view = new EditorView({
+      doc: source,
+      selection: { anchor: source.length },
+      extensions: [
+        history(),
+        createMarkdownCodeMirrorExtensions(),
+        createRichEditorExtensions({
+          livePreview: true,
+          sourcePath: "notes/dividers.md",
+          extensions: [doodles],
+        }),
+      ],
+      parent,
+    });
+    await nextFrame();
+    await nextFrame();
+
+    const initialVariant = parent.querySelector<SVGElement>(
+      ".mira-doodle-divider",
+    )?.dataset.variant;
+    const refresh = parent.querySelector<HTMLButtonElement>(
+      'button[aria-label="Refresh divider style"]',
+    );
+    expect(initialVariant).toBe("scribble");
+    expect(refresh).not.toBeNull();
+    refresh?.click();
+    await nextFrame();
+    await nextFrame();
+
+    expect(view.state.doc.toString()).not.toContain(
+      "<!-- mira-divider:v1:00000008 -->",
+    );
+    expect(
+      parent.querySelector<SVGElement>(".mira-doodle-divider")?.dataset.variant,
+    ).not.toBe("scribble");
+    expect(view.state.selection.main.anchor).toBe(source.length);
+    expect(createSeed).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({
+        line: 2,
+        reason: "reroll",
+        sourcePath: "notes/dividers.md",
+      }),
+    );
+
+    expect(undo(view)).toBe(true);
+    await nextFrame();
+    await nextFrame();
+    expect(view.state.doc.toString()).toBe(source);
+
+    const picker = parent.querySelector<HTMLButtonElement>(
+      'button[aria-label="Choose divider style"]',
+    );
+    picker?.click();
+    const menu = parent.querySelector<HTMLElement>(
+      '[role="menu"][aria-label="Divider style"]',
+    );
+    expect(picker?.getAttribute("aria-expanded")).toBe("true");
+    expect(menu?.hidden).toBe(false);
+    expect(menu?.querySelectorAll('[role="menuitemradio"]')).toHaveLength(8);
+    expect(
+      menu?.querySelector('[role="menuitemradio"][aria-checked="true"]')
+        ?.textContent,
+    ).toContain("Scribble");
+
+    await nextFrame();
+    const plain = [
+      ...(menu?.querySelectorAll<HTMLButtonElement>("button") ?? []),
+    ].find((button) => button.textContent?.includes("Plain"));
+    menu?.dispatchEvent(
+      new KeyboardEvent("keydown", { bubbles: true, key: "End" }),
+    );
+    expect(document.activeElement).toBe(plain);
+    menu?.dispatchEvent(
+      new KeyboardEvent("keydown", { bubbles: true, key: "Escape" }),
+    );
+    expect(menu?.hidden).toBe(true);
+    expect(document.activeElement).toBe(picker);
+
+    picker?.click();
+    await nextFrame();
+    document.body.dispatchEvent(new Event("pointerdown", { bubbles: true }));
+    expect(menu?.hidden).toBe(true);
+
+    picker?.click();
+    plain?.click();
+    await nextFrame();
+    await nextFrame();
+
+    expect(
+      parent.querySelector<SVGElement>(".mira-doodle-divider")?.dataset.variant,
+    ).toBe("plain");
+    expect(view.state.doc.toString()).not.toContain("00000008");
+    expect(createSeed).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({
+        line: 2,
+        reason: "variant",
+        sourcePath: "notes/dividers.md",
+      }),
+    );
+    expect(undo(view)).toBe(true);
+    expect(view.state.doc.toString()).toBe(source);
+
+    view.destroy();
+    parent.remove();
+  });
+
+  it("allows consumers to disable Live Preview divider controls", async () => {
+    const parent = document.createElement("div");
+    document.body.append(parent);
+    const doodles = doodleDividersExtension({ controls: false });
+    const view = new EditorView({
+      doc: "<!-- mira-divider:v1:00000008 -->\n---",
+      extensions: [
+        createMarkdownCodeMirrorExtensions(),
+        createRichEditorExtensions({
+          livePreview: true,
+          extensions: [doodles],
+        }),
+      ],
+      parent,
+    });
+    await nextFrame();
+    await nextFrame();
+
+    expect(parent.querySelector(".mira-doodle-divider")).not.toBeNull();
+    expect(parent.querySelector(".mira-doodle-divider__controls")).toBeNull();
+
+    view.destroy();
+    parent.remove();
+  });
+
+  it("keeps readonly Live Preview dividers decorative", async () => {
+    const parent = document.createElement("div");
+    document.body.append(parent);
+    const doodles = doodleDividersExtension();
+    const view = new EditorView({
+      doc: "<!-- mira-divider:v1:00000008 -->\n---",
+      extensions: [
+        createMarkdownCodeMirrorExtensions(),
+        createRichEditorExtensions({
+          livePreview: true,
+          readonly: true,
+          extensions: [doodles],
+        }),
+      ],
+      parent,
+    });
+    await nextFrame();
+    await nextFrame();
+
+    expect(parent.querySelector(".mira-doodle-divider")).not.toBeNull();
+    expect(parent.querySelector(".mira-doodle-divider__controls")).toBeNull();
 
     view.destroy();
     parent.remove();
