@@ -23,7 +23,17 @@
   min-height: 36px;
   overflow-x: auto;
   overflow-y: hidden;
+  overscroll-behavior-x: contain;
   padding: 0.2rem 0.35rem;
+  scrollbar-width: none;
+  touch-action: pan-x;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mira-editor__toolbar::-webkit-scrollbar {
+  display: none;
+  height: 0;
+  width: 0;
 }
 
 .mira-editor__separator {
@@ -70,6 +80,18 @@
   height: 0.9rem;
   margin-left: auto;
   width: 0.9rem;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .mira-editor__toolbar {
+    min-height: 52px;
+  }
+
+  .mira-editor__toolbar
+    :is(.mira-toolbar__button, .mira-toolbar__group-item, .mira-toolbar__link) {
+    height: 2.75rem;
+    width: 2.75rem;
+  }
 }
 
 .mira-editor-about-dialog {
