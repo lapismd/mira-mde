@@ -68,6 +68,7 @@ authorized baseline regeneration migrations are complete.
 | MIRA-MD-020                                                                                             | Block metadata, safe conversion, undo, selection, and geometry tests       | Implemented by contextual block toolbar core    |
 | MIRA-MD-021, MIRA-CSS-021                                                                               | Seed lifecycle, SVG determinism, logical-block, and Storybook acceptance   | Implemented: 299 Mira, 146 Storybook, 44 E2E    |
 | MIRA-MD-022, MIRA-CSS-022, MIRA-CAT-012                                                                 | Live Preview divider reroll, family picker, and layout acceptance          | Implemented by divider-control slice            |
+| MIRA-UI-015, MIRA-CSS-023, MIRA-CAT-013                                                                 | Narrow toolbar overflow, touch CSS, and keyboard/browser interactions      | Planned by responsive-toolbar slice             |
 
 The selective-release slice defines the exact six-package graph once, configures
 independent Changesets versions and package-owned changelogs, and uses

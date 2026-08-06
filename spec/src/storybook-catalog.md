@@ -20,6 +20,7 @@ runtime dependency.
 | MIRA-CAT-010 | Storybook's Visual Delta host MUST format every staged story-source mutation with Mira's repository Prettier configuration before the addon writes it. A formatter failure MUST leave the affected story source and static index unchanged rather than introducing a format-gate regression.              |
 | MIRA-CAT-011 | The comprehensive demo MUST enable every first-party public plugin and opt-in authoring extension through deterministic local adapters in both editor shells. Its editable views MUST expose the selection toolbar and contextual block toolbar without requiring network access or consumer credentials. |
 | MIRA-CAT-012 | The focused Live Preview divider story MUST exercise seed reroll and explicit family selection through the rendered widget controls, asserting the authored seed, rendered family, menu semantics, and source-edit control remain synchronized.                                                           |
+| MIRA-CAT-013 | A focused narrow Mira Editor story MUST prove that the main toolbar overflows horizontally without visible scrollbar chrome, preserves its single-row geometry and action order, scrolls through direct horizontal input, and brings its first and last controls into view through keyboard navigation.   |
 
 Ordinary README prose points to Storybook and the specification. It must not
 become a parallel behavioral reference.
