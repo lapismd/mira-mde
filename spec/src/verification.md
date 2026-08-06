@@ -115,7 +115,9 @@ refreshed.
 Final validation passes `pnpm spec:check`, `pnpm catalog:check`, the affected
 Mira, Mira Editor, React, and Vanilla check/test/build gates, `pnpm
 build-storybook`, `pnpm packages:pack`, and `pnpm check:all`. The focused
-Storybook Chromium project passes both Source and Live Preview interactions.
+Storybook Chromium project passes both Source and Live Preview interactions,
+and the full Storybook browser suite passes all 136 indexed stories, including
+the default and active-formatting selection-toolbar states.
 The compare-only Visual Delta fallback captures all 132 eligible stories
 successfully in 4.2 minutes; strict mode reports the expected review-required
 toolbar-width deltas, while the two new interaction stories remain
