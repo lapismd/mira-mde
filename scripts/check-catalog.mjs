@@ -9,6 +9,10 @@ import { catalogRegistry } from "../stories/catalog/catalog.mjs";
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
 export const DEFAULT_REPO_ROOT = path.resolve(SCRIPT_DIR, "..");
 export const INTERNAL_STYLE_TOKENS = new Set(["--mira-property-depth"]);
+export const COMPREHENSIVE_OPT_IN_EXTENSIONS = [
+  "doodleDividersExtension",
+  "selectionToolbarExtension",
+];
 
 export const PUBLIC_SURFACES = [
   {
@@ -318,18 +322,88 @@ export function validateUiPrimitiveStoryCoverage({
   };
 }
 
+export function validateComprehensivePluginCoverage({
+  repoRoot = DEFAULT_REPO_ROOT,
+  storyFile = "stories/demo/ComprehensiveDemoStory.svelte",
+} = {}) {
+  const absoluteStoryFile = path.join(repoRoot, storyFile);
+  const errors = [];
+  const packageDirectory = path.join(repoRoot, "packages");
+  const pluginPackages = existsSync(packageDirectory)
+    ? readdirSync(packageDirectory, { withFileTypes: true })
+        .filter(
+          (entry) =>
+            entry.isDirectory() && entry.name.startsWith("mira-plugin-"),
+        )
+        .map((entry) => {
+          const manifestPath = path.join(
+            packageDirectory,
+            entry.name,
+            "package.json",
+          );
+          return existsSync(manifestPath)
+            ? JSON.parse(readFileSync(manifestPath, "utf8")).name
+            : null;
+        })
+        .filter(Boolean)
+        .sort()
+    : [];
+
+  if (!existsSync(absoluteStoryFile)) {
+    errors.push(`Comprehensive demo is missing: ${storyFile}`);
+  } else {
+    const source = readFileSync(absoluteStoryFile, "utf8");
+    for (const packageName of pluginPackages) {
+      if (!source.includes(`from "${packageName}"`)) {
+        errors.push(
+          `Comprehensive demo does not import first-party plugin: ${packageName}`,
+        );
+      }
+    }
+    for (const extension of COMPREHENSIVE_OPT_IN_EXTENSIONS) {
+      if (!new RegExp(`\\b${extension}\\s*\\(`).test(source)) {
+        errors.push(
+          `Comprehensive demo does not enable opt-in extension: ${extension}`,
+        );
+      }
+    }
+    if (
+      !source.includes("[MiraFeature.BlockControls]: { toolbar: true }") ||
+      !source.includes("{blockControls}")
+    ) {
+      errors.push(
+        "Comprehensive demo does not enable the contextual block toolbar in both editor shells",
+      );
+    }
+  }
+
+  return {
+    ok: errors.length === 0,
+    errors,
+    stats: {
+      optInExtensions: COMPREHENSIVE_OPT_IN_EXTENSIONS.length,
+      pluginPackages: pluginPackages.length,
+    },
+  };
+}
+
 function main() {
   const result = validateCatalog();
   const storyCoverage = validateUiPrimitiveStoryCoverage();
-  if (!result.ok || !storyCoverage.ok) {
+  const comprehensiveCoverage = validateComprehensivePluginCoverage();
+  if (!result.ok || !storyCoverage.ok || !comprehensiveCoverage.ok) {
     console.error("Mira catalog validation failed:");
-    for (const error of [...result.errors, ...storyCoverage.errors])
+    for (const error of [
+      ...result.errors,
+      ...storyCoverage.errors,
+      ...comprehensiveCoverage.errors,
+    ])
       console.error(`  - ${error}`);
     process.exitCode = 1;
     return;
   }
   console.log(
-    `Mira catalog validated: ${result.stats.entries} entries, ${result.stats.tokens} documented tokens, ${result.stats.publicSurfaces} public surface families, ${storyCoverage.stats.families} rendered UI primitive families.`,
+    `Mira catalog validated: ${result.stats.entries} entries, ${result.stats.tokens} documented tokens, ${result.stats.publicSurfaces} public surface families, ${storyCoverage.stats.families} rendered UI primitive families, ${comprehensiveCoverage.stats.pluginPackages} comprehensive plugins, ${comprehensiveCoverage.stats.optInExtensions} comprehensive opt-in extensions.`,
   );
 }
 

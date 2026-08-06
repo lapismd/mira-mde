@@ -103,7 +103,10 @@ omitted from the public token registry. It also cross-checks every `ui-*`
 catalog family against the rendered primitive story module so exported UI
 families cannot remain metadata-only. Newly exported compound families, such as
 Popover, MUST be registered as public subpath surfaces and represented by a
-focused story before the catalog gate passes.
+focused story before the catalog gate passes. The same checker discovers every
+first-party `mira-plugin-*` package and requires the comprehensive demo to import
+it alongside Mira's enumerated opt-in authoring extensions and both contextual
+toolbars.
 
 ## Agent workflow
 

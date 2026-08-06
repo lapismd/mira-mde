@@ -6,6 +6,7 @@ import test from "node:test";
 
 import {
   validateCatalog,
+  validateComprehensivePluginCoverage,
   validateUiPrimitiveStoryCoverage,
 } from "./check-catalog.mjs";
 
@@ -111,6 +112,55 @@ test("requires rendered stories for every UI primitive family", () => {
     const missing = validateUiPrimitiveStoryCoverage({ repoRoot, registry });
     assert.equal(missing.ok, false);
     assert.match(missing.errors.join("\n"), /ui-dialog/);
+  } finally {
+    rmSync(repoRoot, { recursive: true, force: true });
+  }
+});
+
+test("requires every first-party plugin and opt-in toolbar in the comprehensive demo", () => {
+  const repoRoot = fixture();
+  const storyPath = path.join(
+    repoRoot,
+    "stories/demo/ComprehensiveDemoStory.svelte",
+  );
+  for (const name of ["ai", "mermaid"]) {
+    const packagePath = path.join(
+      repoRoot,
+      `packages/mira-plugin-${name}/package.json`,
+    );
+    mkdirSync(path.dirname(packagePath), { recursive: true });
+    writeFileSync(
+      packagePath,
+      JSON.stringify({ name: `@lapismd/mira-plugin-${name}` }),
+    );
+  }
+  mkdirSync(path.dirname(storyPath), { recursive: true });
+  writeFileSync(
+    storyPath,
+    `import { aiExtension } from "@lapismd/mira-plugin-ai";
+import { mermaidExtension } from "@lapismd/mira-plugin-mermaid";
+doodleDividersExtension();
+selectionToolbarExtension();
+const featureConfigs = { [MiraFeature.BlockControls]: { toolbar: true } };
+<Mira {blockControls} />;
+`,
+  );
+
+  try {
+    const valid = validateComprehensivePluginCoverage({ repoRoot });
+    assert.equal(valid.ok, true);
+    assert.equal(valid.stats.pluginPackages, 2);
+    assert.equal(valid.stats.optInExtensions, 2);
+
+    writeFileSync(
+      storyPath,
+      'import { aiExtension } from "@lapismd/mira-plugin-ai";\n',
+    );
+    const missing = validateComprehensivePluginCoverage({ repoRoot });
+    assert.equal(missing.ok, false);
+    assert.match(missing.errors.join("\n"), /mira-plugin-mermaid/);
+    assert.match(missing.errors.join("\n"), /selectionToolbarExtension/);
+    assert.match(missing.errors.join("\n"), /contextual block toolbar/);
   } finally {
     rmSync(repoRoot, { recursive: true, force: true });
   }
