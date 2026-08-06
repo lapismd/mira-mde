@@ -6,9 +6,18 @@ import type {
 } from "@lapismd/mira/core";
 import {
   createSlashSnippet,
+  miraBlockToolbarItemIds,
+  type MiraBlockControlsOptions,
+  type MiraBlockToolbarConfig,
+  type MiraBlockToolbarItemId,
   type MiraExtension,
+  type MiraMarkdownBlockHandle,
+  type MiraMarkdownBlockRange,
   type MiraMode,
   type MiraSlashCommand,
+  type MiraTemplateSelection,
+  type MiraTextRange,
+  type MiraToolbarPlacement,
 } from "@lapismd/mira/extensions";
 
 export type MiraEditorEditMode = Extract<MiraMode, "live-preview" | "source">;
@@ -81,7 +90,18 @@ export type MiraEditorToolbarActionContext = {
   setMode: (mode: MiraMode) => void;
   setReadonly: (readonly: boolean) => void;
   setSelection: (selection: MiraEditorSelection) => void;
+  block?: MiraMarkdownBlockRange;
+  blocks?: MiraMarkdownBlockRange[];
+  handle?: MiraMarkdownBlockHandle;
+  affectedRange?: MiraMarkdownBlockRange;
+  replaceRange?: (
+    markdown: string,
+    range: MiraTextRange,
+    selection?: MiraTemplateSelection,
+  ) => void;
 };
+
+export type MiraEditorToolbarPlacement = MiraToolbarPlacement;
 
 type MiraEditorToolbarDynamicBoolean =
   | boolean
@@ -119,6 +139,9 @@ export type MiraEditorToolbarButtonAction = {
   id: string;
   label: string;
   icon: Component<Record<string, unknown>>;
+  group?: string;
+  placements?: readonly MiraEditorToolbarPlacement[];
+  shortcut?: string;
   tooltip?: string;
   disabled?: MiraEditorToolbarDynamicBoolean;
   pressed?: MiraEditorToolbarDynamicBoolean;
@@ -158,6 +181,7 @@ export type MiraEditorMermaidConfig = {
 
 export type MiraEditorBlockControlsConfig = {
   enabled?: boolean;
+  toolbar?: boolean | MiraBlockToolbarConfig;
 };
 
 export type MiraEditorSlashCommandId =
@@ -354,6 +378,35 @@ export function resolveMiraEditorFeatures(
   };
 }
 
+export function resolveMiraEditorBlockControls({
+  featureConfigs = {},
+  features = {},
+}: {
+  featureConfigs?: MiraEditorFeatureConfigs;
+  features?: MiraFeatureFlags;
+} = {}): boolean | MiraBlockControlsOptions {
+  const resolvedFeatures = resolveMiraEditorFeatures(features);
+  const config = featureConfigs[MiraFeature.BlockControls];
+  if (
+    !resolvedFeatures[MiraFeature.BlockControls] ||
+    config?.enabled === false
+  ) {
+    return false;
+  }
+  if (!config?.toolbar) {
+    return true;
+  }
+
+  const toolbar = config.toolbar === true ? {} : config.toolbar;
+  const items = (toolbar.items ?? miraBlockToolbarItemIds).filter((item) =>
+    isBlockToolbarItemAvailable(item, resolvedFeatures),
+  );
+  return {
+    enabled: true,
+    toolbar: { ...toolbar, items },
+  };
+}
+
 export function createMiraEditorExtensions({
   featureConfigs = {},
   features = {},
@@ -483,6 +536,28 @@ export function resolveMiraEditorEditMode(
     return "source";
   }
   return defaultMiraEditorEditMode;
+}
+
+function isBlockToolbarItemAvailable(
+  item: MiraBlockToolbarItemId,
+  features: ResolvedMiraEditorFeatures,
+): boolean {
+  switch (item) {
+    case "heading1":
+    case "heading2":
+    case "heading3":
+      return features[MiraFeature.Headings];
+    case "task":
+    case "bulletList":
+    case "numberedList":
+    case "quote":
+      return features[MiraFeature.Lists];
+    case "image":
+      return features[MiraFeature.Images];
+    case "paragraph":
+    case "divider":
+      return true;
+  }
 }
 
 function isToolbarItemAvailable(

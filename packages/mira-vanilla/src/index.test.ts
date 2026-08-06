@@ -11,6 +11,7 @@ vi.mock("svelte", async (importOriginal) => ({
   mount: vi.fn(() => componentHandle),
   unmount: vi.fn(),
 }));
+import { mount } from "svelte";
 import { createMira, createMiraEditor } from ".";
 
 describe("createMira", () => {
@@ -39,6 +40,30 @@ describe("createMira", () => {
     expect(editor.getMarkdown()).toBe("_word_");
     expect(componentHandle.setSelection).toHaveBeenCalledWith(selection);
     expect(componentHandle.applyMarkdownAction).toHaveBeenCalledWith("italic");
+    editor.destroy();
+  });
+
+  it("forwards contextual block toolbar configuration and action placements", () => {
+    const host = document.createElement("div");
+    const action = {
+      id: "vanilla-block-action",
+      label: "Vanilla block action",
+      icon: (() => null) as never,
+      placements: ["block-menu"] as const,
+      run: vi.fn(),
+    };
+    const editor = createMiraEditor({
+      root: host,
+      featureConfigs: { "block-controls": { toolbar: true } },
+      toolbarActions: [action],
+    });
+
+    expect(vi.mocked(mount).mock.lastCall?.[1]).toMatchObject({
+      props: {
+        featureConfigs: { "block-controls": { toolbar: true } },
+        toolbarActions: [action],
+      },
+    });
     editor.destroy();
   });
 });

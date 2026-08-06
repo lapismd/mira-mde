@@ -76,6 +76,26 @@ function actionContext(
 }
 
 describe("default Markdown toolbar actions", () => {
+  it("renders only actions explicitly placed in the top toolbar", async () => {
+    const toolbar = await renderToolbar({
+      toolbarActions: [
+        { ...toolbarAction("block only"), placements: ["block-menu"] },
+        {
+          ...toolbarAction("both places"),
+          placements: ["toolbar", "block-menu"],
+        },
+      ],
+    });
+
+    expect(
+      toolbar.target.querySelector('[aria-label="block only"]'),
+    ).toBeNull();
+    expect(
+      toolbar.target.querySelector('[aria-label="both places"]'),
+    ).toBeTruthy();
+    toolbar.destroy();
+  });
+
   it("delegates smart actions through an integrated editor context", async () => {
     const applyMarkdownAction = vi.fn(() => true);
     const insertMarkdown = vi.fn();

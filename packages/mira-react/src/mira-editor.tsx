@@ -6,6 +6,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { createRoot } from "react-dom/client";
 import {
   Check,
   Code,
@@ -24,7 +25,9 @@ import type {
   MiraMarkdownActionId,
 } from "@lapismd/mira/core";
 import {
+  defineMiraExtension,
   resolveMiraExtensions,
+  type MiraBlockActionContext,
   type MiraMode,
   type MiraToolbarIconName,
 } from "@lapismd/mira/extensions";
@@ -33,9 +36,12 @@ import {
   createMiraEditorExtensions,
   defaultMiraEditorEditMode,
   MiraFeature,
+  resolveMiraEditorBlockControls,
   resolveMiraEditorFeatures,
   resolveMiraEditorEditMode,
   resolveMiraEditorModes,
+  resolveMiraEditorToolbarActions,
+  resolveMiraEditorToolbarDefinitions,
 } from "./features";
 import { cx } from "./hooks";
 import { Mira } from "./mira";
@@ -48,6 +54,7 @@ import type {
   MiraEditorHandle,
   MiraEditorProps,
   MiraEditorToolbarActionContext,
+  MiraEditorToolbarButtonAction,
   MiraEditorToolbarDefinition,
   MiraHandle,
   MiraReactIcon,
@@ -66,6 +73,20 @@ const extensionToolbarIcons: Record<MiraToolbarIconName, MiraReactIcon> = {
   table: Table2,
   "wand-sparkles": WandSparkles,
 };
+
+type FrameworkBlockMenuAction = {
+  action: MiraEditorToolbarButtonAction;
+  group: string;
+};
+
+function isBlockMenuButton(
+  action: import("./types").MiraEditorToolbarAction,
+): action is MiraEditorToolbarButtonAction {
+  return (
+    action.type !== "dropdown" &&
+    action.placements?.includes("block-menu") === true
+  );
+}
 
 export const MiraEditor = forwardRef<MiraEditorHandle, MiraEditorProps>(
   function MiraEditor(
@@ -117,6 +138,9 @@ export const MiraEditor = forwardRef<MiraEditorHandle, MiraEditorProps>(
     ref,
   ) {
     const editorRef = useRef<MiraHandle | null>(null);
+    const toolbarContextRef = useRef<MiraEditorToolbarActionContext | null>(
+      null,
+    );
     const [uncontrolledValue, setUncontrolledValue] = useState(defaultValue);
     const [uncontrolledMode, setUncontrolledMode] = useState(defaultMode);
     const [uncontrolledReadonly, setUncontrolledReadonly] =
@@ -144,12 +168,85 @@ export const MiraEditor = forwardRef<MiraEditorHandle, MiraEditorProps>(
       () => resolveMiraEditorEditMode(defaultEditMode, modeOptions),
       [defaultEditMode, modeOptions],
     );
+    const frameworkBlockMenuActions = useMemo<FrameworkBlockMenuAction[]>(
+      () => [
+        ...resolveMiraEditorToolbarActions({
+          featureConfigs,
+          toolbarActions,
+        })
+          .filter(isBlockMenuButton)
+          .map((action) => ({ action, group: action.group ?? "Actions" })),
+        ...resolveMiraEditorToolbarDefinitions({
+          featureConfigs,
+          toolbars,
+        }).flatMap((toolbar) =>
+          toolbar.items.filter(isBlockMenuButton).map((action) => ({
+            action,
+            group: action.group ?? toolbar.label ?? "Actions",
+          })),
+        ),
+      ],
+      [featureConfigs, toolbarActions, toolbars],
+    );
+    const frameworkBlockMenuExtension = useMemo(
+      () =>
+        frameworkBlockMenuActions.length > 0
+          ? defineMiraExtension({
+              name: "mira-editor-react-block-menu-actions",
+              blockActions: frameworkBlockMenuActions.map(
+                ({ action, group }) => ({
+                  id: `mira-editor-${action.id}`,
+                  label: action.label,
+                  group,
+                  placements: ["block-menu"],
+                  shortcut: action.shortcut,
+                  disabled(context) {
+                    const base = toolbarContextRef.current;
+                    if (!base) {
+                      return true;
+                    }
+                    const disabled = action.disabled;
+                    const actionContext = createBlockToolbarActionContext(
+                      base,
+                      context,
+                    );
+                    return typeof disabled === "function"
+                      ? disabled(actionContext)
+                      : (disabled ?? false);
+                  },
+                  renderIcon(target) {
+                    const root = createRoot(target);
+                    const Icon = action.icon;
+                    root.render(
+                      <Icon aria-hidden="true" className="mira-editor__icon" />,
+                    );
+                    return () => root.unmount();
+                  },
+                  run(context) {
+                    const base = toolbarContextRef.current;
+                    if (base) {
+                      action.run(
+                        createBlockToolbarActionContext(base, context),
+                      );
+                    }
+                  },
+                }),
+              ),
+            })
+          : null,
+      [frameworkBlockMenuActions],
+    );
     const activeExtensions = useMemo(
       () => [
         ...createMiraEditorExtensions({ featureConfigs, features }),
+        ...(frameworkBlockMenuExtension ? [frameworkBlockMenuExtension] : []),
         ...extensions,
       ],
-      [extensions, featureConfigs, features],
+      [extensions, featureConfigs, features, frameworkBlockMenuExtension],
+    );
+    const blockControls = useMemo(
+      () => resolveMiraEditorBlockControls({ featureConfigs, features }),
+      [featureConfigs, features],
     );
     const resolvedExtensionContributions = useMemo(
       () =>
@@ -164,6 +261,9 @@ export const MiraEditor = forwardRef<MiraEditorHandle, MiraEditorProps>(
       const groups = new Map<string, MiraEditorToolbarDefinition>();
 
       for (const item of resolvedExtensionContributions.toolbarItems) {
+        if (item.placements && !item.placements.includes("toolbar")) {
+          continue;
+        }
         const align = item.align ?? "start";
         const label = item.group ?? "Extensions";
         const key = `${align}:${label}`;
@@ -326,6 +426,7 @@ export const MiraEditor = forwardRef<MiraEditorHandle, MiraEditorProps>(
         value,
       ],
     );
+    toolbarContextRef.current = toolbarContext;
 
     useImperativeHandle(
       ref,
@@ -421,10 +522,7 @@ export const MiraEditor = forwardRef<MiraEditorHandle, MiraEditorProps>(
           <Mira
             assetResolver={assetResolver}
             authoring={authoring}
-            blockControls={
-              resolvedFeatures[MiraFeature.BlockControls] &&
-              featureConfigs[MiraFeature.BlockControls]?.enabled !== false
-            }
+            blockControls={blockControls}
             className={editorClassName}
             defaultMode={defaultMode}
             defaultReadonly={defaultReadonly}
@@ -469,6 +567,20 @@ export const MiraEditor = forwardRef<MiraEditorHandle, MiraEditorProps>(
 );
 
 MiraEditor.displayName = "MiraEditor";
+
+function createBlockToolbarActionContext(
+  base: MiraEditorToolbarActionContext,
+  context: MiraBlockActionContext,
+): MiraEditorToolbarActionContext {
+  return {
+    ...base,
+    block: context.block,
+    blocks: context.blocks,
+    handle: context.handle,
+    affectedRange: context.affectedRange,
+    replaceRange: context.replaceRange,
+  };
+}
 
 function slugify(value: string): string {
   return (

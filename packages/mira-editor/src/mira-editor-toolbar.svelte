@@ -94,10 +94,17 @@
     resolveMiraEditorToolbarItems({ features, featureConfigs }),
   );
   const customToolbarActions = $derived(
-    resolveMiraEditorToolbarActions({ featureConfigs, toolbarActions }),
+    resolveMiraEditorToolbarActions({ featureConfigs, toolbarActions }).filter(
+      hasTopToolbarPlacement,
+    ),
   );
   const customToolbars = $derived(
-    resolveMiraEditorToolbarDefinitions({ featureConfigs, toolbars }),
+    resolveMiraEditorToolbarDefinitions({ featureConfigs, toolbars }).map(
+      (toolbar) => ({
+        ...toolbar,
+        items: toolbar.items.filter(hasTopToolbarPlacement),
+      }),
+    ),
   );
   const startToolbars = $derived(
     customToolbars.filter((toolbar) => toolbar.align !== "end"),
@@ -127,6 +134,14 @@
 
   let lastNonSplitMode = $state<MiraMode | null>(null);
   let aboutDialogOpen = $state(false);
+
+  function hasTopToolbarPlacement(action: MiraEditorToolbarAction): boolean {
+    return (
+      action.type === "dropdown" ||
+      !action.placements ||
+      action.placements.includes("toolbar")
+    );
+  }
 
   const modeIcons = {
     source: FileCodeIcon,

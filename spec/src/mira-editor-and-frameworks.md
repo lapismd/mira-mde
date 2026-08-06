@@ -46,7 +46,9 @@ retain their current placement unless they explicitly opt into `block-menu`.
 The existing required action `label` is the menu title rather than a second,
 competing `title` contract. Framework adapters mount their native action icons
 through the shared descriptor and release those mounts whenever the menu closes
-or rebuilds.
+or rebuilds. Button actions may opt into either or both placements; dropdown
+actions remain top-toolbar-only, and disabled editor features remove their
+corresponding default contextual rows.
 
 The batteries-included editor, plugins, React adapter, and Vanilla adapter
 consume only built public roots or documented subpath exports. They do not link

@@ -6,6 +6,7 @@ import {
   createMiraEditorExtensions,
   defaultMiraEditorEditMode,
   MiraFeature,
+  resolveMiraEditorBlockControls,
   resolveMiraEditorEditMode,
   resolveMiraEditorFeatures,
   resolveMiraEditorModes,
@@ -44,6 +45,36 @@ describe("Mira Editor feature resolution", () => {
         },
       }),
     ).not.toEqual(expect.arrayContaining(["mermaid", "table"]));
+  });
+
+  it("keeps block controls compatible and filters contextual items by feature", () => {
+    expect(resolveMiraEditorBlockControls()).toBe(true);
+    expect(
+      resolveMiraEditorBlockControls({
+        featureConfigs: {
+          [MiraFeature.BlockControls]: { toolbar: true },
+        },
+        features: {
+          [MiraFeature.Headings]: false,
+          [MiraFeature.Images]: false,
+        },
+      }),
+    ).toMatchObject({
+      enabled: true,
+      toolbar: {
+        items: expect.not.arrayContaining([
+          "heading1",
+          "heading2",
+          "heading3",
+          "image",
+        ]),
+      },
+    });
+    expect(
+      resolveMiraEditorBlockControls({
+        features: { [MiraFeature.BlockControls]: false },
+      }),
+    ).toBe(false);
   });
 
   it("includes every smart action in the default toolbar", () => {

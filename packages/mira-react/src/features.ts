@@ -1,5 +1,6 @@
 import { mermaidExtension } from "@lapismd/mira-plugin-mermaid";
 import {
+  resolveMiraEditorBlockControls as resolveBaseMiraEditorBlockControls,
   resolveMiraEditorSlashCommands as resolveBaseMiraEditorSlashCommands,
   type MiraEditorFeatureConfigs as BaseMiraEditorFeatureConfigs,
   type MiraFeatureFlags as BaseMiraFeatureFlags,
@@ -93,6 +94,23 @@ export function resolveMiraEditorFeatures(
     ...defaultMiraEditorFeatures,
     ...features,
   };
+}
+
+export function resolveMiraEditorBlockControls(
+  options: {
+    featureConfigs?: MiraEditorFeatureConfigs;
+    features?: MiraFeatureFlags;
+  } = {},
+) {
+  const blockConfig = options.featureConfigs?.[MiraFeature.BlockControls];
+  return resolveBaseMiraEditorBlockControls({
+    features: options.features as BaseMiraFeatureFlags,
+    featureConfigs: blockConfig
+      ? ({
+          [MiraFeature.BlockControls]: blockConfig,
+        } satisfies BaseMiraEditorFeatureConfigs)
+      : undefined,
+  });
 }
 
 export function createMiraEditorExtensions({

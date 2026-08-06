@@ -4,6 +4,8 @@ import type {
 } from "@lapismd/mira/core";
 import type {
   MiraAssetResolver,
+  MiraBlockControlsOptions,
+  MiraBlockToolbarConfig,
   MiraCommand,
   MiraExtension,
   MiraFileAdapter,
@@ -11,9 +13,13 @@ import type {
   MiraLinkResolver,
   MiraMarkdownAuthoringConfig,
   MiraMode,
+  MiraMarkdownBlockHandle,
+  MiraMarkdownBlockRange,
   MiraColorMode,
   MiraTheme,
   MiraTemplateSelection,
+  MiraTextRange,
+  MiraToolbarPlacement,
 } from "@lapismd/mira/extensions";
 import type {
   MiraEditorSlashCommandConfig,
@@ -63,7 +69,7 @@ export type MiraProps = {
   placeholder?: string;
   lineWrapping?: boolean;
   spellcheck?: boolean;
-  blockControls?: boolean;
+  blockControls?: boolean | MiraBlockControlsOptions;
   indentGuides?: boolean;
   indentWithTabs?: boolean;
   indentWidth?: number;
@@ -158,7 +164,18 @@ export type MiraEditorToolbarActionContext = {
   setMode: (mode: MiraMode) => void;
   setReadonly: (readonly: boolean) => void;
   setSelection: (selection: MiraEditorSelection) => void;
+  block?: MiraMarkdownBlockRange;
+  blocks?: MiraMarkdownBlockRange[];
+  handle?: MiraMarkdownBlockHandle;
+  affectedRange?: MiraMarkdownBlockRange;
+  replaceRange?: (
+    markdown: string,
+    range: MiraTextRange,
+    selection?: MiraTemplateSelection,
+  ) => void;
 };
+
+export type MiraEditorToolbarPlacement = MiraToolbarPlacement;
 
 export type MiraEditorToolbarDynamicBoolean =
   | boolean
@@ -196,6 +213,9 @@ export type MiraEditorToolbarButtonAction = {
   id: string;
   label: string;
   icon: MiraReactIcon;
+  group?: string;
+  placements?: readonly MiraEditorToolbarPlacement[];
+  shortcut?: string;
   tooltip?: string;
   disabled?: MiraEditorToolbarDynamicBoolean;
   pressed?: MiraEditorToolbarDynamicBoolean;
@@ -235,6 +255,7 @@ export type MiraEditorMermaidConfig = {
 
 export type MiraEditorBlockControlsConfig = {
   enabled?: boolean;
+  toolbar?: boolean | MiraBlockToolbarConfig;
 };
 
 export type MiraEditorFeatureConfigs = {

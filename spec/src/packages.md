@@ -40,6 +40,11 @@ The Markdown action identifier is exported additively from Mira and re-exported
 by the editor, React, and Vanilla entry points. Their handles delegate to Mira's
 controller so every framework uses the same transaction semantics.
 
+Block-control toolbar configuration and explicit action placements follow the
+same graph. Mira Editor filters default contextual items through its feature
+flags, React adapts native icons without replacing the core menu, and Vanilla
+forwards the Svelte editor contract unchanged.
+
 ## Release model
 
 The six public packages version independently. Changesets record release intent

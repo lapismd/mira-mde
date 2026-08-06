@@ -16,12 +16,15 @@
     MiraMarkdownActionId,
   } from "@lapismd/mira/core";
   import {
+    defineMiraExtension,
     resolveMiraExtensions,
+    type MiraBlockActionContext,
+    type MiraExtension,
     type MiraMode,
     type MiraTemplateSelection,
     type MiraToolbarIconName,
   } from "@lapismd/mira/extensions";
-  import type { Component } from "svelte";
+  import { mount, unmount, type Component } from "svelte";
   import {
     miraColorModeAttribute,
     miraColorModeClassName,
@@ -33,9 +36,13 @@
     createMiraEditorExtensions,
     defaultMiraEditorEditMode,
     MiraFeature,
+    resolveMiraEditorBlockControls,
     resolveMiraEditorFeatures,
     resolveMiraEditorEditMode,
     resolveMiraEditorModes,
+    resolveMiraEditorToolbarActions,
+    resolveMiraEditorToolbarDefinitions,
+    type MiraEditorToolbarButtonAction,
     type MiraEditorToolbarActionContext,
     type MiraEditorToolbarDefinition,
   } from "./features";
@@ -104,8 +111,15 @@
   const resolvedDefaultEditMode = $derived(
     resolveMiraEditorEditMode(defaultEditMode, modeOptions),
   );
+  const frameworkBlockMenuActions = $derived.by(
+    resolveFrameworkBlockMenuActions,
+  );
+  const frameworkBlockMenuExtension = $derived(
+    createFrameworkBlockMenuExtension(frameworkBlockMenuActions),
+  );
   const activeExtensions = $derived([
     ...createMiraEditorExtensions({ features, featureConfigs }),
+    ...(frameworkBlockMenuExtension ? [frameworkBlockMenuExtension] : []),
     ...extensions,
   ]);
   const resolvedExtensionContributions = $derived(
@@ -120,6 +134,95 @@
 
   const toolbarVisible = $derived(resolvedFeatures[MiraFeature.Toolbar]);
   const toolbarContext = $derived(createToolbarActionContext());
+  const blockControls = $derived(
+    resolveMiraEditorBlockControls({ featureConfigs, features }),
+  );
+
+  type FrameworkBlockMenuAction = {
+    action: MiraEditorToolbarButtonAction;
+    group: string;
+  };
+
+  function resolveFrameworkBlockMenuActions(): FrameworkBlockMenuAction[] {
+    const actions = resolveMiraEditorToolbarActions({
+      featureConfigs,
+      toolbarActions,
+    })
+      .filter(isBlockMenuButton)
+      .map((action) => ({ action, group: action.group ?? "Actions" }));
+    const definitions = resolveMiraEditorToolbarDefinitions({
+      featureConfigs,
+      toolbars,
+    }).flatMap((toolbar) =>
+      toolbar.items.filter(isBlockMenuButton).map((action) => ({
+        action,
+        group: action.group ?? toolbar.label ?? "Actions",
+      })),
+    );
+    return [...actions, ...definitions];
+  }
+
+  function isBlockMenuButton(
+    action: import("./features").MiraEditorToolbarAction,
+  ): action is MiraEditorToolbarButtonAction {
+    return (
+      action.type !== "dropdown" &&
+      action.placements?.includes("block-menu") === true
+    );
+  }
+
+  function createFrameworkBlockMenuExtension(
+    actions: FrameworkBlockMenuAction[],
+  ): MiraExtension | null {
+    if (actions.length === 0) {
+      return null;
+    }
+    return defineMiraExtension({
+      name: "mira-editor-block-menu-actions",
+      blockActions: actions.map(({ action, group }) => ({
+        id: `mira-editor-${action.id}`,
+        label: action.label,
+        group,
+        placements: ["block-menu"],
+        shortcut: action.shortcut,
+        disabled(context) {
+          const disabled = action.disabled;
+          const actionContext = createBlockToolbarActionContext(context);
+          return typeof disabled === "function"
+            ? disabled(actionContext)
+            : (disabled ?? false);
+        },
+        renderIcon(target) {
+          const component = mount(action.icon, {
+            target,
+            props: {
+              class: "mira-editor__icon",
+              "aria-hidden": "true",
+            },
+          });
+          return () => {
+            void unmount(component);
+          };
+        },
+        run(context) {
+          action.run(createBlockToolbarActionContext(context));
+        },
+      })),
+    });
+  }
+
+  function createBlockToolbarActionContext(
+    context: MiraBlockActionContext,
+  ): MiraEditorToolbarActionContext {
+    return {
+      ...createToolbarActionContext(),
+      block: context.block,
+      blocks: context.blocks,
+      handle: context.handle,
+      affectedRange: context.affectedRange,
+      replaceRange: context.replaceRange,
+    };
+  }
 
   function handleChange(nextValue: string): void {
     value = nextValue;
@@ -251,6 +354,9 @@
     const groups = new Map<string, MiraEditorToolbarDefinition>();
 
     for (const item of resolvedExtensionContributions.toolbarItems) {
+      if (item.placements && !item.placements.includes("toolbar")) {
+        continue;
+      }
       const align = item.align ?? "start";
       const label = item.group ?? "Extensions";
       const key = `${align}:${label}`;
@@ -363,8 +469,7 @@
       {theme}
       {colorMode}
       {sourcePath}
-      blockControls={resolvedFeatures[MiraFeature.BlockControls] &&
-        featureConfigs[MiraFeature.BlockControls]?.enabled !== false}
+      {blockControls}
       toolbar={false}
       extensions={activeExtensions}
       {linkResolver}

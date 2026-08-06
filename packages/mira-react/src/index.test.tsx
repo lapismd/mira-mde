@@ -11,6 +11,7 @@ import {
   MiraEditor,
   MiraFeature,
   Mira,
+  resolveMiraEditorBlockControls,
   resolveMiraEditorFeatures,
   type MiraEditorHandle,
 } from ".";
@@ -18,6 +19,99 @@ import {
 describe("@lapismd/mira-react", () => {
   it("exports the editor component", () => {
     expect(Mira).toBeTruthy();
+  });
+
+  it("shares contextual block-control feature resolution", () => {
+    expect(
+      resolveMiraEditorBlockControls({
+        featureConfigs: { "block-controls": { toolbar: true } },
+        features: { headings: false },
+      }),
+    ).toMatchObject({
+      toolbar: {
+        items: expect.not.arrayContaining(["heading1", "heading2", "heading3"]),
+      },
+    });
+  });
+
+  it("keeps block-only buttons out of the top toolbar", () => {
+    const host = document.createElement("div");
+    const root = createRoot(host);
+    act(() => {
+      root.render(
+        <MiraEditorToolbar
+          toolbarActions={[
+            {
+              id: "block-only",
+              label: "Block only",
+              icon: Bold,
+              placements: ["block-menu"],
+              run: () => undefined,
+            },
+            {
+              id: "both",
+              label: "Both places",
+              icon: Bold,
+              placements: ["toolbar", "block-menu"],
+              run: () => undefined,
+            },
+          ]}
+        />,
+      );
+    });
+
+    expect(host.querySelector('[aria-label="Block only"]')).toBeNull();
+    expect(host.querySelector('[aria-label="Both places"]')).not.toBeNull();
+    act(() => root.unmount());
+  });
+
+  it("normalizes React block-menu buttons with targeted metadata", async () => {
+    const host = document.createElement("div");
+    document.body.append(host);
+    const root = createRoot(host);
+    const run = vi.fn();
+    await act(async () => {
+      root.render(
+        <MiraEditor
+          featureConfigs={{ "block-controls": { toolbar: true } }}
+          mode="source"
+          toolbarActions={[
+            {
+              id: "inspect-block",
+              label: "Inspect React block",
+              icon: Bold,
+              placements: ["block-menu"],
+              shortcut: "⌘I",
+              run,
+            },
+          ]}
+          value="Paragraph"
+        />,
+      );
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+    });
+
+    await act(async () => {
+      host
+        .querySelector<HTMLButtonElement>(".mira-block-toolbar-trigger")
+        ?.click();
+      await new Promise((resolve) => requestAnimationFrame(resolve));
+    });
+    const action = document.body.querySelector<HTMLButtonElement>(
+      '[data-block-toolbar-item="mira-editor-inspect-block"]',
+    );
+    expect(action?.textContent).toContain("Inspect React block");
+    expect(action?.querySelector("svg")).not.toBeNull();
+    act(() => action?.click());
+    expect(run).toHaveBeenCalledWith(
+      expect.objectContaining({
+        block: expect.objectContaining({ text: "Paragraph" }),
+        replaceRange: expect.any(Function),
+      }),
+    );
+
+    act(() => root.unmount());
+    host.remove();
   });
 
   it("passes open-ended theme tokens and color mode to React surfaces", () => {

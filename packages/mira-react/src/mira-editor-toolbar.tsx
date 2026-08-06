@@ -147,7 +147,7 @@ export function MiraEditorToolbar({
       resolveMiraEditorToolbarActions({
         featureConfigs,
         toolbarActions,
-      }),
+      }).filter(hasTopToolbarPlacement),
     [featureConfigs, toolbarActions],
   );
   const customToolbars = useMemo(
@@ -155,9 +155,20 @@ export function MiraEditorToolbar({
       resolveMiraEditorToolbarDefinitions({
         featureConfigs,
         toolbars,
-      }),
+      }).map((toolbar) => ({
+        ...toolbar,
+        items: toolbar.items.filter(hasTopToolbarPlacement),
+      })),
     [featureConfigs, toolbars],
   );
+
+  function hasTopToolbarPlacement(action: MiraEditorToolbarAction): boolean {
+    return (
+      action.type === "dropdown" ||
+      !action.placements ||
+      action.placements.includes("toolbar")
+    );
+  }
   const startToolbars = useMemo(
     () => customToolbars.filter((toolbar) => toolbar.align !== "end"),
     [customToolbars],
