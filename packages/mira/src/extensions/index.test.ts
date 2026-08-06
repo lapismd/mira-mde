@@ -13,6 +13,7 @@ import {
   parseMiraFileTarget,
   resolveMiraExtensions,
   resolveMiraListCallouts,
+  selectionToolbarExtension,
 } from ".";
 
 describe("resolveMiraExtensions", () => {
@@ -137,6 +138,32 @@ describe("resolveMiraExtensions", () => {
       "@",
     ]);
     expect(resolved.postProcessors).toEqual([firstProcessor, secondProcessor]);
+  });
+});
+
+describe("selectionToolbarExtension", () => {
+  it("contributes only to editable authoring surfaces", () => {
+    const extension = selectionToolbarExtension({
+      actions: ["bold", "inlineCode"],
+      placement: "above",
+    });
+
+    expect(extension.name).toBe("selection-toolbar");
+    expect(
+      extension.codeMirror?.({ mode: "source", readonly: false }),
+    ).not.toBeNull();
+    expect(
+      extension.codeMirror?.({ mode: "live-preview", readonly: false }),
+    ).not.toBeNull();
+    expect(
+      extension.codeMirror?.({ mode: "split", readonly: false }),
+    ).not.toBeNull();
+    expect(
+      extension.codeMirror?.({ mode: "preview", readonly: false }),
+    ).toBeNull();
+    expect(
+      extension.codeMirror?.({ mode: "source", readonly: true }),
+    ).toBeNull();
   });
 });
 

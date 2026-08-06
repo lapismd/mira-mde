@@ -61,6 +61,14 @@ export {
   search,
   type MiraSearchConfig,
 } from "./search";
+export {
+  createSelectionToolbarExtension,
+  defaultMiraSelectionToolbarActions,
+  miraSelectionToolbarActionIds,
+  type MiraSelectionToolbarActionId,
+  type MiraSelectionToolbarConfig,
+  type MiraSelectionToolbarPlacement,
+} from "./selection-toolbar";
 import { createMiraSearchExtension, type MiraSearchConfig } from "./search";
 
 export type MiraCodeMirrorOptions = {

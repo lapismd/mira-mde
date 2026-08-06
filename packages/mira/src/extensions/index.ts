@@ -4,6 +4,15 @@ import { keymap, type EditorView, type KeyBinding } from "@codemirror/view";
 import type { Component } from "svelte";
 import type { Pluggable } from "unified";
 
+export {
+  selectionToolbarExtension,
+  defaultMiraSelectionToolbarActions,
+  miraSelectionToolbarActionIds,
+  type MiraSelectionToolbarActionId,
+  type MiraSelectionToolbarConfig,
+  type MiraSelectionToolbarPlacement,
+} from "./selection-toolbar";
+
 export type MiraRendererComponent =
   | Component<any, any, any>
   | string
