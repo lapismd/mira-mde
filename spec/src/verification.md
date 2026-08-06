@@ -70,6 +70,7 @@ authorized baseline regeneration migrations are complete.
 | MIRA-MD-022, MIRA-CSS-022, MIRA-CAT-012                                                                 | Live Preview divider reroll, family picker, and layout acceptance          | Implemented by divider-control slice            |
 | MIRA-UI-015, MIRA-CSS-023, MIRA-CAT-013                                                                 | Narrow toolbar overflow, touch CSS, and keyboard/browser interactions      | Implemented by responsive-toolbar slice         |
 | MIRA-UI-014, MIRA-CSS-024                                                                               | Combined block/task trigger clearance, sizing, and click interactions      | Implemented by contextual-control clearance     |
+| MIRA-CSS-025                                                                                            | Cross-surface blockquote/embed accent and border geometry assertions       | Planned by blockquote accent repair             |
 
 The selective-release slice defines the exact six-package graph once, configures
 independent Changesets versions and package-owned changelogs, and uses
@@ -645,6 +646,15 @@ the content column and horizontal scroll position stable. The 302 Mira tests,
 `pnpm spec:check`, `pnpm catalog:check`, `pnpm check:all`, the Mira package
 build with publint, and the static Storybook build pass. No visual baseline was
 created or refreshed.
+
+The blockquote accent repair introduces MIRA-CSS-025. The current default
+blockquote guide resolves through `--mira-border-strong`, while embed guides
+resolve through the theme-primary `--interactive-accent`. The repair will make
+the shared blockquote border default use that same accent without changing the
+existing consumer override, thickness, nesting, or editable-source geometry,
+and will add computed-style assertions across reading, source, and live
+preview. Existing approved visual baselines will remain unchanged until the
+resulting intentional color difference is separately reviewed.
 
 The portable parity audit recorded 59 present features, six consumer-adapter
 boundaries, six Lapis-only behaviors, and no remaining portable P0-P2 gaps at
