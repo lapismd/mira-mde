@@ -4,6 +4,7 @@ import {
   EditorState,
   Transaction,
   type ChangeSpec,
+  type SelectionRange,
 } from "@codemirror/state";
 import type { SyntaxNode } from "@lezer/common";
 import type { EditorView } from "@codemirror/view";
@@ -79,6 +80,30 @@ export function applyMiraMarkdownAction(
   return true;
 }
 
+/**
+ * Report whether the current selection would be unwrapped by an inline
+ * Markdown action. Line actions do not expose a binary active state.
+ */
+export function isMiraMarkdownActionActive(
+  state: EditorState,
+  action: MiraMarkdownActionId,
+): boolean {
+  if (!isInlineAction(action)) {
+    return false;
+  }
+
+  const selection = state.selection.main;
+  const existing = findExistingInlineRange(
+    state,
+    action,
+    selection.from,
+    selection.to,
+  );
+  return Boolean(
+    existing && selectionMatchesInlineRange(action, selection, existing),
+  );
+}
+
 function isInlineAction(
   action: MiraMarkdownActionId,
 ): action is InlineActionId {
@@ -97,14 +122,8 @@ function createInlineEdit(
 ): MarkdownEdit | null {
   const range = state.selection.main;
   const existing = findExistingInlineRange(state, action, range.from, range.to);
-  const exactExisting =
-    existing &&
-    (range.empty ||
-      action === "link" ||
-      (range.from === existing.from && range.to === existing.to) ||
-      (range.from === existing.contentFrom && range.to === existing.contentTo));
 
-  if (existing && exactExisting) {
+  if (existing && selectionMatchesInlineRange(action, range, existing)) {
     return removeInlineRange(state, existing);
   }
 
@@ -118,6 +137,20 @@ function createInlineEdit(
   }
 
   return insertEmptyInlineTemplate(state, action, range.head);
+}
+
+function selectionMatchesInlineRange(
+  action: InlineActionId,
+  selection: SelectionRange,
+  existing: InlineRange,
+): boolean {
+  return (
+    selection.empty ||
+    action === "link" ||
+    (selection.from === existing.from && selection.to === existing.to) ||
+    (selection.from === existing.contentFrom &&
+      selection.to === existing.contentTo)
+  );
 }
 
 function findExistingInlineRange(
@@ -281,8 +314,19 @@ function findDelimitedRange(
   for (const delimiter of delimiters) {
     let opening = markdown.lastIndexOf(delimiter, from);
     while (opening >= lineStart) {
+      if (!isExactDelimiterRun(markdown, opening, delimiter)) {
+        opening = markdown.lastIndexOf(delimiter, opening - 1);
+        continue;
+      }
       const contentFrom = opening + delimiter.length;
-      const closing = markdown.indexOf(delimiter, Math.max(contentFrom, to));
+      let closing = markdown.indexOf(delimiter, Math.max(contentFrom, to));
+      while (
+        closing !== -1 &&
+        closing <= lineEnd &&
+        !isExactDelimiterRun(markdown, closing, delimiter)
+      ) {
+        closing = markdown.indexOf(delimiter, closing + delimiter.length);
+      }
       if (
         closing !== -1 &&
         closing <= lineEnd &&
@@ -306,6 +350,20 @@ function findDelimitedRange(
   }
 
   return best;
+}
+
+function isExactDelimiterRun(
+  markdown: string,
+  at: number,
+  delimiter: string,
+): boolean {
+  const marker = delimiter[0];
+  return (
+    marker !== undefined &&
+    markdown.slice(at, at + delimiter.length) === delimiter &&
+    markdown[at - 1] !== marker &&
+    markdown[at + delimiter.length] !== marker
+  );
 }
 
 function findDelimitedLink(

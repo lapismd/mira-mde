@@ -21,6 +21,7 @@ import {
 } from "./markdown-actions";
 export {
   applyMiraMarkdownAction,
+  isMiraMarkdownActionActive,
   miraMarkdownActionIds,
   type MiraMarkdownActionId,
 } from "./markdown-actions";

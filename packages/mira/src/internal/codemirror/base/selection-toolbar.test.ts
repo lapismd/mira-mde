@@ -15,15 +15,19 @@ function createEditor({
   labels,
   placement,
   readonly = false,
+  doc = "Format this text",
+  selection = EditorSelection.single(7, 11),
 }: Parameters<typeof createSelectionToolbarExtension>[0] & {
+  doc?: string;
   readonly?: boolean;
+  selection?: EditorSelection;
 } = {}) {
   const parent = document.createElement("div");
   document.body.append(parent);
   const view = new EditorView({
     state: EditorState.create({
-      doc: "Format this text",
-      selection: EditorSelection.single(7, 11),
+      doc,
+      selection,
       extensions: [
         createMarkdownCodeMirrorExtensions({ sourceMode: true }),
         EditorState.readOnly.of(readonly),
@@ -88,6 +92,12 @@ describe("createSelectionToolbarExtension", () => {
         icon: "true",
       },
     ]);
+    expect(
+      Array.from(
+        selectionToolbar?.querySelectorAll<HTMLButtonElement>("button") ?? [],
+        (button) => button.getAttribute("aria-pressed"),
+      ),
+    ).toEqual(["false", "false", "false", "false"]);
     expect(editor.view.state.doc.toString()).toBe("Format this text");
 
     editor.destroy();
@@ -105,6 +115,42 @@ describe("createSelectionToolbarExtension", () => {
     expect(editor.view.state.selection.main.from).toBe(9);
     expect(editor.view.state.selection.main.to).toBe(13);
     expect(toolbar(editor.parent)).not.toBeNull();
+    expect(
+      editor.parent
+        .querySelector('[data-mira-selection-action="bold"]')
+        ?.getAttribute("aria-pressed"),
+    ).toBe("true");
+
+    editor.parent
+      .querySelector<HTMLButtonElement>('[data-mira-selection-action="bold"]')
+      ?.click();
+
+    expect(editor.view.state.doc.toString()).toBe("Format this text");
+    expect(
+      editor.parent
+        .querySelector('[data-mira-selection-action="bold"]')
+        ?.getAttribute("aria-pressed"),
+    ).toBe("false");
+
+    editor.destroy();
+  });
+
+  it("marks an existing exact formatting span as selected", () => {
+    const editor = createEditor({
+      doc: "Format __this__ text",
+      selection: EditorSelection.single(9, 13),
+    });
+
+    expect(
+      editor.parent
+        .querySelector('[data-mira-selection-action="bold"]')
+        ?.getAttribute("aria-pressed"),
+    ).toBe("true");
+    expect(
+      editor.parent
+        .querySelector('[data-mira-selection-action="italic"]')
+        ?.getAttribute("aria-pressed"),
+    ).toBe("false");
 
     editor.destroy();
   });

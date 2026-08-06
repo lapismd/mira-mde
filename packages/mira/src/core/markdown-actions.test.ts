@@ -3,7 +3,7 @@ import { redo, undo } from "@codemirror/commands";
 import { describe, expect, it } from "vitest";
 import { createBaseCodeMirrorExtensions } from "../internal/codemirror/base";
 import { createMarkdownCodeMirrorExtensions } from "../internal/codemirror/markdown";
-import { MiraEditorController } from ".";
+import { isMiraMarkdownActionActive, MiraEditorController } from ".";
 import type { MiraMarkdownActionId } from "./markdown-actions";
 
 function createController(
@@ -55,6 +55,23 @@ function apply(
 }
 
 describe("inline Markdown toolbar actions", () => {
+  it("reports an exact formatted selection as active", () => {
+    const controller = createController("A **bold** word");
+
+    select(controller, 4, 8);
+    expect(isMiraMarkdownActionActive(controller.view.state, "bold")).toBe(
+      true,
+    );
+    expect(isMiraMarkdownActionActive(controller.view.state, "italic")).toBe(
+      false,
+    );
+
+    select(controller, 5, 8);
+    expect(isMiraMarkdownActionActive(controller.view.state, "bold")).toBe(
+      false,
+    );
+  });
+
   it.each([
     ["bold", "word", "**word**"],
     ["italic", "word", "_word_"],

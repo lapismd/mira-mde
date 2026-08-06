@@ -10,9 +10,11 @@ import {
   showTooltip,
   type Tooltip,
   type TooltipView,
+  type ViewUpdate,
 } from "@codemirror/view";
 import {
   applyMiraMarkdownAction,
+  isMiraMarkdownActionActive,
   type MiraMarkdownActionId,
 } from "../../../core/markdown-actions";
 
@@ -84,7 +86,6 @@ const selectionToolbarTheme = EditorView.baseTheme({
       "var(--popover, var(--mira-popover, var(--mira-widget-background)))",
     border: "1px solid var(--border, var(--mira-border))",
     borderRadius: "999px",
-    boxShadow: "var(--mira-widget-shadow)",
     boxSizing: "border-box",
     color:
       "var(--popover-foreground, var(--mira-popover-foreground, var(--mira-foreground)))",
@@ -92,6 +93,9 @@ const selectionToolbarTheme = EditorView.baseTheme({
     gap: "0.125rem",
     minHeight: "2.5rem",
     padding: "0.25rem 0.375rem",
+    /* Keep the lower edge distinct from the drop shadow in light themes. */
+    boxShadow:
+      "inset 0 -1px 0 var(--border, var(--mira-border)), var(--mira-widget-shadow)",
     transform: "translateX(-50%)",
   },
   ".mira-selection-toolbar__button": {
@@ -99,7 +103,7 @@ const selectionToolbarTheme = EditorView.baseTheme({
     appearance: "none",
     background: "transparent",
     border: "1px solid transparent",
-    borderRadius: "0.5rem",
+    borderRadius: "999px",
     color: "var(--muted-foreground, var(--mira-muted-foreground))",
     cursor: "pointer",
     display: "inline-flex",
@@ -114,6 +118,12 @@ const selectionToolbarTheme = EditorView.baseTheme({
       "var(--accent, var(--background-modifier-hover, var(--mira-accent-soft)))",
     borderColor: "var(--border, var(--mira-border))",
     color: "var(--accent-foreground, var(--mira-foreground))",
+  },
+  '.mira-selection-toolbar__button[aria-pressed="true"]': {
+    backgroundColor:
+      "var(--mira-accent-soft, var(--background-modifier-hover, var(--accent)))",
+    borderColor: "var(--mira-accent, var(--interactive-accent))",
+    color: "var(--mira-accent, var(--interactive-accent))",
   },
   ".mira-selection-toolbar__button:focus-visible": {
     backgroundColor:
@@ -240,6 +250,12 @@ class SelectionToolbarTooltipView implements TooltipView {
     for (const action of config.actions) {
       this.dom.append(this.createButton(ownerDocument, action, config));
     }
+    this.syncActionStates();
+    this.syncActiveState();
+  }
+
+  update(_update: ViewUpdate): void {
+    this.syncActionStates();
     this.syncActiveState();
   }
 
@@ -307,6 +323,19 @@ class SelectionToolbarTooltipView implements TooltipView {
         this.dom.contains(activeElement)),
     );
     this.dom.dataset.editorActive = active ? "true" : "false";
+  }
+
+  private syncActionStates(): void {
+    for (const button of this.dom.querySelectorAll<HTMLButtonElement>(
+      ".mira-selection-toolbar__button",
+    )) {
+      const action = button.dataset
+        .miraSelectionAction as MiraSelectionToolbarActionId;
+      button.setAttribute(
+        "aria-pressed",
+        String(isMiraMarkdownActionActive(this.view.state, action)),
+      );
+    }
   }
 
   private handleKeydown(event: KeyboardEvent): void {
