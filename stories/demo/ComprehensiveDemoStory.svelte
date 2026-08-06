@@ -6,6 +6,7 @@
     type MiraOutlineVariant,
   } from "@lapismd/mira-editor";
   import {
+    doodleDividersExtension,
     selectionToolbarExtension,
     type MiraColorMode,
     type MiraMode,
@@ -48,9 +49,11 @@
   }: Props = $props();
 
   const selectionToolbar = selectionToolbarExtension();
-  const defaultExtensions = [selectionToolbar];
+  const doodleDividers = doodleDividersExtension();
+  const defaultExtensions = [selectionToolbar, doodleDividers];
   const extensions = $derived([
     selectionToolbar,
+    doodleDividers,
     ...(mermaidEnabled ? [mermaidExtension()] : []),
   ]);
   const features = $derived({

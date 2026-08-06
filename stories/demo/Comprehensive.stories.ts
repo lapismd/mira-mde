@@ -88,6 +88,23 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+async function expectRenderedDoodleDivider(
+  canvasElement: HTMLElement,
+): Promise<void> {
+  await waitFor(() => {
+    expect(
+      canvasElement.querySelectorAll(
+        'svg.mira-doodle-divider[data-seed="00000008"]',
+      ),
+    ).toHaveLength(1);
+  });
+  expect(
+    canvasElement.querySelectorAll(
+      'hr.mira-doodle-divider__native[data-mira-doodle-divider="true"]',
+    ),
+  ).toHaveLength(1);
+}
+
 export const Playground: Story = {
   tags: [
     "visual-approved",
@@ -108,6 +125,10 @@ export const Playground: Story = {
     const canvas = within(canvasElement);
     const editor = canvasElement.querySelector<HTMLElement>(".mira");
     if (!editor) throw new Error("Comprehensive editor did not render");
+
+    await step("render the seeded doodle divider", async () => {
+      await expectRenderedDoodleDivider(canvasElement);
+    });
 
     await step("switch between full editor views", async () => {
       await userEvent.click(canvas.getByRole("button", { name: "Split" }));
@@ -185,6 +206,9 @@ export const LivePreview: Story = {
   },
   name: "Live Preview",
   args: { mode: "live-preview" },
+  play: async ({ canvasElement }) => {
+    await expectRenderedDoodleDivider(canvasElement);
+  },
 };
 
 export const Source: Story = {
@@ -204,6 +228,14 @@ export const Source: Story = {
     },
   },
   args: { mode: "source" },
+  play: async ({ canvasElement }) => {
+    expect(
+      canvasElement.querySelector("svg.mira-doodle-divider"),
+    ).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(canvasElement.textContent).toContain("mira-divider:v1:00000008");
+    });
+  },
 };
 
 export const ReadingPreview: Story = {
@@ -224,6 +256,9 @@ export const ReadingPreview: Story = {
   },
   name: "Reading / Preview",
   args: { mode: "preview" },
+  play: async ({ canvasElement }) => {
+    await expectRenderedDoodleDivider(canvasElement);
+  },
 };
 
 export const Split: Story = {
@@ -262,4 +297,7 @@ export const Composable: Story = {
     },
   },
   args: { editorShell: "composable", mode: "live-preview" },
+  play: async ({ canvasElement }) => {
+    await expectRenderedDoodleDivider(canvasElement);
+  },
 };

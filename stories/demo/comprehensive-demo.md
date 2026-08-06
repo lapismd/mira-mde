@@ -34,6 +34,8 @@ Inline **bold**, _italic_, **_both_**, ~~strikethrough~~, `inline code`,
 automatic links such as https://example.com, [[Daily Note|wikilinks]], tags such
 as #mira/editor, and inline math $E = mc^2$ render in preview and live preview.
 
+<!-- prettier-ignore -->
+<!-- mira-divider:v1:00000008 -->
 ---
 
 > Plain blockquotes remain blockquotes and are not converted into callouts.
