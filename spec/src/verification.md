@@ -68,7 +68,7 @@ authorized baseline regeneration migrations are complete.
 | MIRA-MD-020                                                                                             | Block metadata, safe conversion, undo, selection, and geometry tests       | Implemented by contextual block toolbar core    |
 | MIRA-MD-021, MIRA-CSS-021                                                                               | Seed lifecycle, SVG determinism, logical-block, and Storybook acceptance   | Implemented: 299 Mira, 146 Storybook, 44 E2E    |
 | MIRA-MD-022, MIRA-CSS-022, MIRA-CAT-012                                                                 | Live Preview divider reroll, family picker, and layout acceptance          | Implemented by divider-control slice            |
-| MIRA-UI-015, MIRA-CSS-023, MIRA-CAT-013                                                                 | Narrow toolbar overflow, touch CSS, and keyboard/browser interactions      | Planned by responsive-toolbar slice             |
+| MIRA-UI-015, MIRA-CSS-023, MIRA-CAT-013                                                                 | Narrow toolbar overflow, touch CSS, and keyboard/browser interactions      | Implemented by responsive-toolbar slice         |
 
 The selective-release slice defines the exact six-package graph once, configures
 independent Changesets versions and package-owned changelogs, and uses
@@ -614,6 +614,22 @@ divider story and Comprehensive Live Preview. Compare-only Visual Delta reports
 the new pending divider story as missing its intentionally uncreated baseline
 and retains the known 26,404-pixel Comprehensive difference; it creates or
 refreshes no baseline and changes no review status.
+
+The responsive main-toolbar slice implements MIRA-UI-015, MIRA-CSS-023, and
+MIRA-CAT-013. Its shipped CSS keeps the toolbar in one native horizontal scroll
+row, hides standards and WebKit scrollbar chrome, contains horizontal
+overscroll, enables touch panning and momentum, and expands coarse-pointer hit
+targets to 44 CSS pixels without changing fine-pointer geometry. The focused
+narrow Storybook interaction verifies overflow, single-row geometry, computed
+scroll and touch properties, and Home/End focus scrolling. Two focused Chromium
+tests pass real horizontal-wheel input, keyboard traversal through the trailing
+view controls, and a mobile coarse-pointer context. The 32 Mira Editor tests,
+302 Mira tests, `pnpm spec:check`, `pnpm catalog:check`, `pnpm check:all`, package
+builds with publint, and the static Storybook build pass. Direct Chromium review
+confirms a compact scrollbar-free toolbar. The complete Storybook run passes
+the new story and 146 of 147 interactions; its sole failure is the existing
+doodle-divider menu-visibility interaction, outside this toolbar slice. The new
+story remains `visual-pending`, and no visual baseline was created or refreshed.
 
 The portable parity audit recorded 59 present features, six consumer-adapter
 boundaries, six Lapis-only behaviors, and no remaining portable P0-P2 gaps at

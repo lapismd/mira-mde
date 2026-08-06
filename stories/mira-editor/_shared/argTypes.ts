@@ -20,6 +20,7 @@ export type MiraEditorStoryProps = {
   frontmatterOpen?: boolean;
   htmlPolicy?: "trusted" | "safe";
   height?: string;
+  width?: string;
 };
 
 export const defaultEditorArgs: MiraEditorStoryProps = {
@@ -39,6 +40,7 @@ export const defaultEditorArgs: MiraEditorStoryProps = {
   frontmatterOpen: true,
   htmlPolicy: "trusted",
   height: "34rem",
+  width: "100%",
 };
 
 /** Full public API snippet shown in docs instead of `<MiraEditorStory />`. */
@@ -96,7 +98,12 @@ export const defaultEditorArgTypes = {
   height: {
     control: "text",
     description: "CSS height for the story chrome around the editor.",
-    table: { category: "Appearance" },
+    table: { category: "Layout" },
+  },
+  width: {
+    control: "text",
+    description: "CSS width for constrained responsive editor stories.",
+    table: { category: "Layout" },
   },
   readonly: {
     control: "boolean",

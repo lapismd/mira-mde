@@ -66,6 +66,8 @@
     toolbars?: MiraEditorToolbarDefinition[];
     /** CSS height for the story chrome around the editor. */
     height?: string;
+    /** CSS width for constrained responsive editor stories. */
+    width?: string;
   };
 
   let {
@@ -94,6 +96,7 @@
     authoring,
     toolbars = [],
     height = "34rem",
+    width = "100%",
   }: Props = $props();
 </script>
 
@@ -122,6 +125,7 @@
     {authoring}
     {toolbars}
     {height}
+    {width}
   />
 {/snippet}
 

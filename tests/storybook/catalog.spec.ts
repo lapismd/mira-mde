@@ -223,3 +223,97 @@ test("Live Preview doodle dividers reroll and select a family beside the source 
     page.getByRole("button", { name: "Refresh divider style" }),
   ).toHaveCount(0);
 });
+
+test("the narrow main toolbar scrolls without scrollbar chrome", async ({
+  page,
+}) => {
+  await page.goto(
+    "/iframe.html?id=mira-editor-features--narrow-scrollable-toolbar&viewMode=story",
+  );
+  const toolbar = page.getByRole("toolbar", {
+    name: "Markdown editor toolbar",
+  });
+  await expect(toolbar).toBeVisible();
+  await expect
+    .poll(() =>
+      toolbar.evaluate((element) => element.scrollWidth > element.clientWidth),
+    )
+    .toBe(true);
+  await expect
+    .poll(() =>
+      toolbar.evaluate((element) => ({
+        overflowX: getComputedStyle(element).overflowX,
+        overflowY: getComputedStyle(element).overflowY,
+        scrollbarWidth: getComputedStyle(element).scrollbarWidth,
+        touchAction: getComputedStyle(element).touchAction,
+      })),
+    )
+    .toEqual({
+      overflowX: "auto",
+      overflowY: "hidden",
+      scrollbarWidth: "none",
+      touchAction: "pan-x",
+    });
+
+  await toolbar.evaluate((element) => {
+    element.scrollLeft = 0;
+  });
+  await toolbar.hover();
+  await page.mouse.wheel(240, 0);
+  await expect
+    .poll(() => toolbar.evaluate((element) => element.scrollLeft))
+    .toBeGreaterThan(0);
+
+  const toolbarItems = toolbar.locator("[data-toolbar-item]");
+  const firstButton = toolbarItems.first();
+  const lastToolbarItem = toolbarItems.last();
+  const finalButton = toolbar.getByRole("button", { name: "View options" });
+  await firstButton.focus();
+  await page.keyboard.press("End");
+  await expect(lastToolbarItem).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(finalButton).toBeFocused();
+  await expect
+    .poll(() => toolbar.evaluate((element) => element.scrollLeft))
+    .toBeGreaterThan(0);
+  await page.keyboard.press("Shift+Tab");
+  await expect(lastToolbarItem).toBeFocused();
+  await page.keyboard.press("Home");
+  await expect(firstButton).toBeFocused();
+  await expect
+    .poll(() => toolbar.evaluate((element) => element.scrollLeft))
+    .toBeLessThan(2);
+});
+
+test("the narrow main toolbar exposes coarse-pointer touch targets", async ({
+  browser,
+}) => {
+  const context = await browser.newContext({
+    baseURL: "http://127.0.0.1:7007",
+    hasTouch: true,
+    isMobile: true,
+    viewport: { width: 360, height: 740 },
+  });
+  const page = await context.newPage();
+  try {
+    await page.goto(
+      "/iframe.html?id=mira-editor-features--narrow-scrollable-toolbar&viewMode=story",
+    );
+    const toolbar = page.getByRole("toolbar", {
+      name: "Markdown editor toolbar",
+    });
+    const firstButton = toolbar.getByRole("button").first();
+    await expect(toolbar).toBeVisible();
+    await expect
+      .poll(async () => {
+        const box = await firstButton.boundingBox();
+        return box ? Math.min(box.width, box.height) : 0;
+      })
+      .toBeGreaterThanOrEqual(44);
+    await expect
+      .poll(() => toolbar.evaluate((element) => element.clientHeight))
+      .toBeGreaterThanOrEqual(52);
+  } finally {
+    await context.close();
+  }
+});
