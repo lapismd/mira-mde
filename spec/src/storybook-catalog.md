@@ -81,12 +81,15 @@ explicitly reviewed baseline refresh rather than a looser local override.
 The add-on writes each committed baseline URL into the owning story's
 `parameters.visualDelta` metadata and marks regenerated stories
 `visual-pending`; Storybook MUST NOT infer a second URL scheme at preview time.
-The current catalog contains 134 indexed stories. The two deterministic
+The current catalog contains 135 indexed stories. The two deterministic
 Markdown-toolbar action stories are tagged `skip-visual` because they are
-interaction harnesses rather than stable visual references. The remaining 132
-stories retain their existing Visual Delta metadata: 122 have committed
-baseline images, and ten focused indentation stories remain `visual-pending`
-without baseline mutation until their separate human review. The visual gate
+interaction harnesses rather than stable visual references; they also exercise
+the opt-in selection toolbar in source and live-preview modes. A dedicated
+selection-toolbar story keeps the selected-text popover and its unique border
+visible for visual review. The remaining 133 stories retain their existing
+Visual Delta metadata: 122 have committed baseline images, and eleven focused
+stories remain `visual-pending` without baseline mutation until their separate
+human review. The visual gate
 intentionally exposes missing baselines for new pending stories rather than
 silently treating them as approved. Once baselines exist, `pnpm test:visual`
 invokes the affected preflight in the add-on's clean Docker stage. Valid

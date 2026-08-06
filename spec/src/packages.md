@@ -92,8 +92,8 @@ entry point.
 - The package root exports `Mira`, `MiraProps`, and `MiraHandle` and defaults to
   the `Mira` Svelte component.
 - `core` exports controller APIs and the shared CodeMirror composition factory.
-- `extensions` exports extension contracts, commands, resolvers, and
-  plugin-author helpers.
+- `extensions` exports extension contracts, commands, resolvers,
+  plugin-author helpers, and the opt-in selection-toolbar extension.
 - `codemirror` exports the supported low-level extension factories, including
   `measuredIndentExtension` and `syncMeasuredIndentStyles`; internal layout
   repairs MUST preserve those exports. Indentation-guide, continuation, and
