@@ -127,7 +127,9 @@ entry point.
   on an active editable line; this remains shipped CSS behavior and MUST NOT
   require a consumer option. The internal CodeMirror document theme MUST honor
   the public Markdown sans token for ordinary prose while the shipped
-  code-specific hooks continue to select the monospaced token. Source-mode
+  code-specific hooks continue to select the monospaced token. The line-number
+  gutter MUST use the same public monospace bridge with tabular numerals and the
+  theme-aware faint foreground without changing other gutter columns. Source-mode
   pipe-table line hooks MUST also select that monospaced token and preserve
   non-wrapping preformatted row geometry so authored delimiters remain aligned.
   Internal task marker ranges MUST account for authored blockquote prefixes
