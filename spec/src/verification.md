@@ -64,6 +64,7 @@ authorized baseline regeneration migrations are complete.
 | MIRA-CSS-019                                                                                            | Consecutive live-preview callout painted-gap and zero-margin acceptance    | Implemented by comprehensive repair             |
 | MIRA-MD-019, MIRA-CSS-020                                                                               | Grid-table keymap, serialization, selection, and computed typography       | Implemented by grid-table parity                |
 | MIRA-MD-020                                                                                             | Block metadata, safe conversion, undo, selection, and geometry tests       | Implemented by contextual block toolbar core    |
+| MIRA-MD-021, MIRA-CSS-021                                                                               | Seed lifecycle, SVG determinism, logical-block, and Storybook acceptance    | In progress: deterministic doodle-divider slice |
 
 The selective-release slice defines the exact six-package graph once, configures
 independent Changesets versions and package-owned changelogs, and uses
