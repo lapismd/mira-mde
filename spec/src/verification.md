@@ -30,7 +30,7 @@ authorized baseline regeneration migrations are complete.
 | MIRA-UI-011                                                                                             | Version-sync unit test and toolbar About dialog Storybook interaction      | Implemented by About dialog slice               |
 | MIRA-UI-012                                                                                             | Core action-engine tests and focused source/live-preview toolbar stories   | Implemented by toolbar-action slice             |
 | MIRA-UI-013                                                                                             | Selection-toolbar unit, contract, and focused Storybook interactions       | Implemented by selection-toolbar slice          |
-| MIRA-UI-014                                                                                             | Block classification, conversion, framework, and Storybook interactions    | Core and adapters implemented; stories pending  |
+| MIRA-UI-014                                                                                             | Block classification, conversion, framework, and Storybook interactions    | Implemented by contextual block-toolbar slice   |
 | MIRA-CSS-001, MIRA-CSS-002                                                                              | Package stylesheet exports, no-Tailwind package checks                     | Implemented                                     |
 | MIRA-CSS-003, MIRA-CSS-004, MIRA-CSS-005, MIRA-CSS-006                                                  | Public surface/token registry and catalog checker                          | Implemented by catalog/token slice              |
 | MIRA-CSS-007, MIRA-CSS-008, MIRA-CSS-009, MIRA-CSS-010                                                  | Theme CSS contracts, component tests, and portaled-overlay stories         | Implemented by extensible theme slice           |
@@ -115,30 +115,37 @@ radius, `8px` selection gap, and less than `0.001px` selection-center delta. The
 dedicated stories remain `visual-pending`; no visual baseline was created or
 refreshed.
 
-The contextual block-toolbar slice starts from the existing first-row drag
-gutter and block-range model. Implementation is complete when the opt-in trigger
+The contextual block-toolbar slice extends the existing first-row drag gutter
+and block-range model without changing its default geometry. The opt-in trigger
 uses authored block semantics, the anchored menu performs content-preserving
-single-block conversions in one transaction, explicit custom placements work
-through Svelte, React, and Vanilla, and focused Source and Live Preview stories
-cover wrapped geometry, keyboard access, and custom actions without updating a
-visual baseline.
+single-block conversions in one transaction, and explicit custom placements
+work through Svelte, React, and Vanilla. Core tests cover classification,
+custom tasks, every safe structural conversion, rich-block exclusions,
+keyboard/focus behavior, readonly and multi-selection gating, undo, and portal
+cleanup. Focused Source, Live Preview, and open-menu Storybook interactions all
+pass. Live browser inspection measures a `24px` circular trigger, an `18px`
+page-wide post-gutter allowance, less than `0.01px` wrapped first-row delta,
+and a zero-width `16px` collapse control contained by that allowance. Heading
+and ordinary block line boxes retain the same content column. The
+body-level themed menu remains fully inside the viewport with an `8px` edge
+gap in light and dark modes. All three stories remain `visual-pending`; no
+visual baseline was created or refreshed.
 
 Final validation passes `pnpm spec:check`, `pnpm catalog:check`, the affected
 Mira, Mira Editor, React, and Vanilla check/test/build gates, `pnpm
 build-storybook`, `pnpm packages:pack`, and `pnpm check:all`. The focused
-Storybook Chromium project passes both Source and Live Preview interactions,
-and the full Storybook browser suite passes all 136 indexed stories, including
-the default and active-formatting selection-toolbar states.
-The compare-only Visual Delta fallback captures all 132 eligible stories
-successfully in 4.2 minutes; strict mode reports the expected review-required
-toolbar-width deltas, while the two new interaction stories remain
-`skip-visual` and no baselines are created or updated. A clean Storybook
-restart clears two transient full-E2E host-readiness failures; the remaining
-two failures are the unrelated indentation caret-placement assertions for
-inactive bullet markers and preformatted list indentation. The requested live
-Carta comparison remains manual because the configured Chrome bridge is not
-available in this environment; automated Chromium acceptance covers the Mira
-interaction contract.
+Storybook Chromium project passes the Source, Live Preview, and deterministic
+open-menu stories. The full Storybook browser suite passes 42 of 44 cases; its
+two remaining failures are the unrelated indentation assertions for inactive
+list-marker classes and caret-state preformatted indentation.
+
+The compare-only Visual Delta fallback captures all 137 browser cases in 3.9
+minutes without mutating repository files. Its strict policy reports seven
+missing baselines: the three new `visual-pending` block-toolbar stories plus
+four pre-existing pending stories. It also reports the unrelated established
+`Demo/Comprehensive/Playground` and grid-table Source-mode mismatches. The other
+130 result records pass policy, and no baseline or approval state is created or
+updated.
 
 The source-table parity slice ports Lapis's `cm-table` source treatment through
 Mira's existing monospace token and verifies five padded pipe-table rows against

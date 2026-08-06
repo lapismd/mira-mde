@@ -1,0 +1,36 @@
+import { Meta, Canvas, Source } from "@storybook/addon-docs/blocks";
+import * as BlockToolbarStories from "./BlockToolbar.stories";
+
+<Meta of={BlockToolbarStories} />
+
+# Context-aware block toolbar
+
+Enable the optional block toolbar through the existing block-controls feature.
+The legacy `blockControls={true}` contract continues to enable drag handles
+without adding the contextual trigger.
+
+<Source
+  language="html"
+  code={`<MiraEditor
+  featureConfigs={{
+    "block-controls": { toolbar: true },
+  }}
+/>`}
+/>
+
+The trigger reflects the active block type and opens a non-modal menu for safe
+structural conversion. Button actions can use `placements: ["block-menu"]` or
+`["toolbar", "block-menu"]`; their required `label` is reused as the visible
+menu title and accessible name.
+
+## Source
+
+<Canvas of={BlockToolbarStories.Source} meta={BlockToolbarStories} />
+
+## Live preview
+
+<Canvas of={BlockToolbarStories.LivePreview} meta={BlockToolbarStories} />
+
+## Open menu surface
+
+<Canvas of={BlockToolbarStories.OpenMenu} meta={BlockToolbarStories} />
