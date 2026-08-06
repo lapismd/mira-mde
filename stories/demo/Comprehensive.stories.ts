@@ -123,6 +123,45 @@ async function expectComprehensivePluginConfiguration(
   });
 }
 
+async function expectLineNumberGutterTypography(
+  canvasElement: HTMLElement,
+): Promise<void> {
+  const gutter = await waitFor(() => {
+    const element = canvasElement.querySelector<HTMLElement>(
+      ".cm-gutter.cm-lineNumbers",
+    );
+    expect(element).not.toBeNull();
+    return element!;
+  });
+  const number = gutter.querySelector<HTMLElement>(".cm-gutterElement");
+  expect(number).not.toBeNull();
+
+  const probe = canvasElement.ownerDocument.createElement("span");
+  probe.style.color = "var(--text-faint, var(--mira-muted-foreground))";
+  probe.style.fontFamily = "var(--font-monospace, var(--mira-font-mono))";
+  gutter.append(probe);
+  const expectedColor = getComputedStyle(probe).color;
+  const expectedFont = getComputedStyle(probe).fontFamily;
+  probe.remove();
+
+  const gutterStyle = getComputedStyle(gutter);
+  expect(gutterStyle.color).toBe(expectedColor);
+  expect(gutterStyle.fontFamily).toBe(expectedFont);
+  expect(gutterStyle.fontVariantNumeric).toContain("tabular-nums");
+  expect(getComputedStyle(number!).justifyContent).toBe("end");
+
+  const visibleNumbers = Array.from(
+    gutter.querySelectorAll<HTMLElement>(".cm-gutterElement"),
+  ).filter((element) => element.getBoundingClientRect().width > 0);
+  expect(visibleNumbers.some((element) => element.innerText.length > 1)).toBe(
+    true,
+  );
+  const rightEdges = visibleNumbers.map(
+    (element) => element.getBoundingClientRect().right,
+  );
+  expect(Math.max(...rightEdges) - Math.min(...rightEdges)).toBeLessThan(0.5);
+}
+
 export const Playground: Story = {
   tags: [
     "visual-approved",
@@ -157,6 +196,10 @@ export const Playground: Story = {
         ).toBeEnabled();
       },
     );
+
+    await step("align muted monospaced line numbers", async () => {
+      await expectLineNumberGutterTypography(canvasElement);
+    });
 
     await step("show the inline toolbar for selected text", async () => {
       const content = canvasElement.querySelector<HTMLElement>(".cm-content");
@@ -277,6 +320,7 @@ export const LivePreview: Story = {
   play: async ({ canvasElement }) => {
     await expectComprehensivePluginConfiguration(canvasElement);
     await expectRenderedDoodleDivider(canvasElement);
+    await expectLineNumberGutterTypography(canvasElement);
   },
 };
 
@@ -299,6 +343,7 @@ export const Source: Story = {
   args: { mode: "source" },
   play: async ({ canvasElement }) => {
     await expectComprehensivePluginConfiguration(canvasElement);
+    await expectLineNumberGutterTypography(canvasElement);
     expect(
       canvasElement.querySelector("svg.mira-doodle-divider"),
     ).not.toBeInTheDocument();

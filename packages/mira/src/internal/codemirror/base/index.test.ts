@@ -128,6 +128,37 @@ describe("createBaseCodeMirrorExtensions", () => {
   it("returns a non-empty extension set", () => {
     expect(createBaseCodeMirrorExtensions()).not.toHaveLength(0);
   });
+
+  it("uses muted monospaced tabular line numbers", () => {
+    const parent = document.createElement("div");
+    document.body.append(parent);
+
+    const view = new EditorView({
+      doc: Array.from({ length: 12 }, (_, index) => `Line ${index + 1}`).join(
+        "\n",
+      ),
+      extensions: createBaseCodeMirrorExtensions(),
+      parent,
+    });
+    const gutter = parent.querySelector<HTMLElement>(
+      ".cm-gutter.cm-lineNumbers",
+    );
+    const number = gutter?.querySelector<HTMLElement>(".cm-gutterElement");
+
+    expect(gutter).not.toBeNull();
+    expect(number).not.toBeNull();
+    expect(getComputedStyle(gutter!).fontFamily).toBe(
+      "var(--font-monospace, var(--mira-font-mono))",
+    );
+    expect(getComputedStyle(gutter!).fontVariantNumeric).toBe("tabular-nums");
+    expect(getComputedStyle(gutter!).color).toBe(
+      "var(--text-faint, var(--mira-muted-foreground))",
+    );
+    expect(getComputedStyle(number!).justifyContent).toBe("end");
+
+    view.destroy();
+    parent.remove();
+  });
 });
 
 describe("createSlashCommandExtensions", () => {

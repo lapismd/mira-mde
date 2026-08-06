@@ -171,6 +171,11 @@ export const miraEditorTheme = EditorView.theme({
     lineHeight: "var(--cm-block-line-height)",
     marginInlineEnd: "24px",
   },
+  ".cm-gutter.cm-lineNumbers": {
+    color: "var(--text-faint, var(--mira-muted-foreground))",
+    fontFamily: "var(--font-monospace, var(--mira-font-mono))",
+    fontVariantNumeric: "tabular-nums",
+  },
   ".cm-gutters .cm-lineNumbers .cm-gutterElement": {
     alignItems: "start",
     display: "inline-flex",
