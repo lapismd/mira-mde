@@ -72,6 +72,7 @@ authorized baseline regeneration migrations are complete.
 | MIRA-UI-014, MIRA-CSS-024                                                                               | Combined block/task trigger clearance, sizing, and click interactions      | Implemented by contextual-control clearance     |
 | MIRA-CSS-025                                                                                            | Reading/live blockquote/embed accent and border geometry assertions        | Implemented by blockquote accent repair         |
 | MIRA-CSS-026                                                                                            | Line-number font, numeral, color, and column-alignment assertions          | Implemented by line-number gutter typography    |
+| MIRA-CSS-027                                                                                            | Theme-contract tests plus computed H1-H6 reading/editor Storybook styles   | Specified; implementation in progress           |
 
 The selective-release slice defines the exact six-package graph once, configures
 independent Changesets versions and package-owned changelogs, and uses
