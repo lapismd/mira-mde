@@ -177,6 +177,10 @@ grammar of every public token. In particular, RGB-channel tokens and complete
 shadow declarations remain valid after packaging in inherited, explicit, and
 system color modes.
 
+The shipped preview token bridge MUST use the theme-primary interactive accent
+for both embed and blockquote guides by default while preserving the public
+blockquote border override for consumers.
+
 Source beneath a package's `src/internal` directory is not a public entry point
 and MUST NOT appear in a package export map. Tests and Storybook may exercise
 internal behavior through public surfaces but MUST NOT teach consumers to
