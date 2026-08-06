@@ -18,6 +18,7 @@ runtime dependency.
 | MIRA-CAT-008 | Public opt-in preview surfaces MUST have a discoverable focused story, and the comprehensive demo MUST expose the same option wherever it materially changes a supported view.                                                                                                               |
 | MIRA-CAT-009 | Storybook MUST expose independent built-in-palette and light/dark globals, render ordinary stories through inherited page appearance, and provide fixed built-in, system, custom-extension, and targeted-overlay verification stories.                                                       |
 | MIRA-CAT-010 | Storybook's Visual Delta host MUST format every staged story-source mutation with Mira's repository Prettier configuration before the addon writes it. A formatter failure MUST leave the affected story source and static index unchanged rather than introducing a format-gate regression. |
+| MIRA-CAT-011 | The comprehensive demo MUST enable every first-party public plugin and opt-in authoring extension through deterministic local adapters in both editor shells. Its editable views MUST expose the selection toolbar and contextual block toolbar without requiring network access or consumer credentials.                       |
 
 Ordinary README prose points to Storybook and the specification. It must not
 become a parallel behavioral reference.
@@ -114,8 +115,10 @@ The repository does not ship a separate documentation or demo application.
 `pnpm dev` starts the root Storybook, and `tests/storybook` targets published
 Storybook entries. `stories/demo/comprehensive-demo.md` is the full portable
 feature fixture; all four fixed view stories import that same file. The
-comprehensive default and composable shells both enable the opt-in doodle-divider
-extension against one seeded thematic break, retaining authored comment and rule
-source in Source mode while exercising the rendered SVG in Live Preview and
-Reading modes. Focused fixtures under `stories/markdown` remain the smaller
-debugging surfaces.
+comprehensive default and composable shells both enable the selection-toolbar
+and doodle-divider extensions plus the public AI and Mermaid plugins. They use a
+deterministic local AI callback, expose the contextual block toolbar in editable
+views, and require no credentials or network access. The seeded thematic break
+retains authored comment and rule source in Source mode while exercising the
+rendered SVG in Live Preview and Reading modes. Focused fixtures under
+`stories/markdown` remain the smaller debugging surfaces.
