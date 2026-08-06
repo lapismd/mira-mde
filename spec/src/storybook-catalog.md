@@ -113,5 +113,9 @@ families, nested rules, and explicit migration without creating baselines.
 The repository does not ship a separate documentation or demo application.
 `pnpm dev` starts the root Storybook, and `tests/storybook` targets published
 Storybook entries. `stories/demo/comprehensive-demo.md` is the full portable
-feature fixture; all four fixed view stories import that same file. Focused
-fixtures under `stories/markdown` remain the smaller debugging surfaces.
+feature fixture; all four fixed view stories import that same file. The
+comprehensive default and composable shells both enable the opt-in doodle-divider
+extension against one seeded thematic break, retaining authored comment and rule
+source in Source mode while exercising the rendered SVG in Live Preview and
+Reading modes. Focused fixtures under `stories/markdown` remain the smaller
+debugging surfaces.
