@@ -346,6 +346,22 @@
   }
 }
 
+@container (max-width: 249.99px) {
+  .metadata-property-key,
+  .metadata-property-value {
+    flex-basis: 100%;
+    width: 100%;
+  }
+
+  .metadata-property-key {
+    min-width: 100%;
+  }
+
+  .metadata-property-value {
+    padding-inline-start: 1.25rem;
+  }
+}
+
 .metadata-property-children {
   flex-basis: 100%;
   padding-inline-start: 1.5rem;

@@ -51,6 +51,10 @@ export function useMarkdownContext(): MarkdownContext {
   return getContext<MarkdownContext>(MARKDOWN_CONTEXT);
 }
 
+export function tryUseMarkdownContext(): MarkdownContext | null {
+  return getContext<MarkdownContext | undefined>(MARKDOWN_CONTEXT) ?? null;
+}
+
 export const useMarkdown = useMarkdownContext;
 
 export function setAstNodeContext(context: AstNodeContext): AstNodeContext {

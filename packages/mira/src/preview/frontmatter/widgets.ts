@@ -28,7 +28,7 @@ export function frontmatterPropertyIcon(
     null: "lucide-file-question",
     number: "lucide-binary",
     object: "lucide-braces",
-    tags: "lucide-tags",
+    tags: "lucide-hash",
     text: "lucide-text",
     unknown: "lucide-file-question",
   };

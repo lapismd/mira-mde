@@ -25,6 +25,7 @@
     "copy",
     "file-question",
     "flame",
+    "hash",
     "info",
     "list",
     "list-tree",
@@ -71,6 +72,11 @@
     />
     <path d="M16 8h.01" />
     <path d="M6 6l-4 4 6 6" />
+  {:else if icon === "hash"}
+    <path d="M4 9h16" />
+    <path d="M4 15h16" />
+    <path d="M10 3 8 21" />
+    <path d="m16 3-2 18" />
   {:else if icon === "at-sign"}
     <circle cx="12" cy="12" r="4" />
     <path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-4 8" />

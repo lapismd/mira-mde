@@ -4,7 +4,9 @@ import type { Element, Root } from "hast";
 import { createParser } from "../renderer/utils";
 import {
   coerceFrontmatterValue,
+  createFrontmatterPropertyManager,
   createFrontmatterReplacement,
+  FrontmatterController,
   frontmatterProperties,
   mergeFrontmatterRecordProperties,
   parseFrontmatterYaml,
@@ -57,7 +59,7 @@ describe("frontmatter utilities", () => {
       ],
     );
     expect(properties.find((property) => property.key === "tags")?.icon).toBe(
-      "lucide-tags",
+      "lucide-hash",
     );
     expect(
       properties.find((property) => property.key === "nested")?.children[0]
@@ -165,5 +167,84 @@ describe("frontmatter utilities", () => {
     expect(frontmatter?.properties?.value).toBe("title: Demo");
     expect(frontmatter?.properties?.["data-offset"]).toBe(0);
     expect(frontmatter?.properties?.["data-offset-end"]).toBe(19);
+  });
+
+  it("creates a property manager that resolves widgets and setType", () => {
+    const manager = createFrontmatterPropertyManager({
+      types: {
+        status: {
+          type: "workflow-state",
+          label: "Workflow",
+          icon: "lucide-workflow",
+          fallbackKind: "text",
+        },
+      },
+      widgets: [
+        {
+          type: "workflow-state",
+          fallbackKind: "text",
+          validate: (value) => typeof value === "string",
+        },
+      ],
+    });
+
+    expect(manager.resolveType("status", "status", "draft")).toBe(
+      "workflow-state",
+    );
+    expect(manager.resolveWidget("workflow-state")?.label).toBeUndefined();
+    expect(manager.typeOptions().some((option) => option.type === "text")).toBe(
+      true,
+    );
+
+    manager.setType("priority", "number");
+    expect(manager.resolveType("priority", "priority", "1")).toBe("number");
+  });
+
+  it("commits controller record mutations through onRecordChange", async () => {
+    const commits: Array<Record<string, unknown>> = [];
+    const controller = new FrontmatterController({
+      record: { title: "Demo", count: 1 },
+      onRecordChange(commit) {
+        commits.push(commit.record);
+      },
+    });
+
+    controller.updateProperty(["title"], "Updated");
+    expect(controller.getRecord().title).toBe("Updated");
+    expect(commits.at(-1)).toEqual({ title: "Updated", count: 1 });
+
+    const added = controller.addProperty("text");
+    expect(added).toBeTruthy();
+    expect(Object.keys(controller.getRecord())).toContain(added);
+
+    controller.renameProperty([added!], "subtitle");
+    expect(controller.getRecord()).toHaveProperty("subtitle");
+    expect(controller.getRecord()).not.toHaveProperty(added!);
+
+    const title = controller.propertyManager
+      .properties(controller.getRecord())
+      .find((property) => property.key === "title");
+    expect(title).toBeTruthy();
+    controller.changePropertyKind(title!, "checkbox");
+    expect(controller.getRecord().title).toBe(true);
+    expect(commits.length).toBeGreaterThan(3);
+  });
+
+  it("splices YAML into markdown through controller document adapters", () => {
+    const markdown = "---\ntitle: Demo\n---\n\nBody\n";
+    let nextValue = markdown;
+    const controller = new FrontmatterController({
+      yaml: "title: Demo",
+      getMarkdown: () => markdown,
+      dataOffset: 0,
+      dataOffsetEnd: 19,
+      onFrontmatterChange(_yaml, value) {
+        nextValue = value;
+      },
+    });
+
+    controller.updateProperty(["title"], "Updated");
+    expect(nextValue).toContain("title: Updated");
+    expect(nextValue).toContain("Body");
   });
 });

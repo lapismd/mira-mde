@@ -1,120 +1,138 @@
 <script lang="ts">
   import {
-    addFrontmatterRecordProperty,
-    coerceFrontmatterValue,
-    createFrontmatterReplacement,
     formatFrontmatterValue,
-    frontmatterProperties,
     frontmatterPropertyLabel,
     frontmatterPropertyIcon,
-    frontmatterTypeOptions,
     parseFrontmatterValue,
-    parseFrontmatterYaml,
     parseFrontmatterPillWikilink,
-    mergeFrontmatterRecordProperties,
-    removeFrontmatterRecordProperty,
-    resolveFrontmatterWidget,
-    renameFrontmatterRecordProperty,
+    parseFrontmatterYaml,
     serializeFrontmatterRecord,
     toBuiltinFrontmatterKind,
-    updateFrontmatterRecord,
+    FrontmatterController,
+    createFrontmatterPropertyManager,
     type FrontmatterProperty,
     type FrontmatterPropertyKind,
+    type FrontmatterPropertyManager,
   } from "./frontmatter-utils";
   import ChevronRight from "@lucide/svelte/icons/chevron-right";
   import Icon from "./icon.svelte";
   import Link from "./link.svelte";
   import FrontmatterPropertyNameInput from "./frontmatter-property-name-input.svelte";
-  import { useMarkdownContext } from "../renderer/context.svelte";
+  import { tryUseMarkdownContext } from "../renderer/context.svelte";
 
   type Props = {
+    controller?: FrontmatterController;
+    propertyManager?: FrontmatterPropertyManager;
     frontmatter?: string;
     value?: string;
+    open?: boolean;
+    showChrome?: boolean;
     ref?: HTMLElement | null;
     "data-offset"?: string | number;
     "data-offset-end"?: string | number;
   };
 
   let {
+    controller: controllerProp,
+    propertyManager: managerProp,
     frontmatter = "",
     value: valueProp = "",
+    open: openProp,
+    showChrome = true,
     ref = $bindable(null),
     "data-offset": dataOffset,
     "data-offset-end": dataOffsetEnd,
   }: Props = $props();
 
-  const markdown = useMarkdownContext();
+  const markdown = tryUseMarkdownContext();
+  const localController = new FrontmatterController();
+  const fallbackManager = createFrontmatterPropertyManager({
+    ...(markdown?.frontmatterConfig ?? {}),
+    sourcePath: markdown?.sourcePath,
+  });
+  const controller = $derived(controllerProp ?? localController);
+  const manager = $derived(
+    managerProp ?? controller.propertyManager ?? fallbackManager,
+  );
+
   let rawDraft = $state("");
-  let frontmatterOpen = $state(markdown.frontmatterOpen);
+  let frontmatterOpen = $state(markdown?.frontmatterOpen ?? true);
   let opened = $state<Record<string, boolean>>({});
   let listDrafts = $state<Record<string, string>>({});
   let typeMenuPath = $state<string | null>(null);
   let newPropertyPath = $state<string | null>(null);
-  const parsed = $derived(parseFrontmatterYaml(frontmatter || valueProp));
-  const rows = $derived(
-    parsed.ok
-      ? frontmatterProperties(parsed.value, markdown.frontmatterConfig)
-      : [],
-  );
-  const typeOptions = $derived(
-    frontmatterTypeOptions(markdown.frontmatterConfig),
-  );
 
   $effect(() => {
-    rawDraft = frontmatter || valueProp;
+    const nextOpen = openProp ?? markdown?.frontmatterOpen ?? true;
+    if (frontmatterOpen !== nextOpen) {
+      frontmatterOpen = nextOpen;
+    }
   });
 
-  function emitYaml(nextYaml: string): void {
-    const replacement = createFrontmatterReplacement(nextYaml);
-    const from = toNumber(dataOffset);
-    const to = toNumber(dataOffsetEnd);
-    if (from === null || to === null) {
+  $effect(() => {
+    if (controllerProp) {
+      if (managerProp && controllerProp.propertyManager !== managerProp) {
+        controllerProp.update({ propertyManager: managerProp });
+      }
+      const nextDraft = controllerProp.getYaml();
+      if (rawDraft !== nextDraft) {
+        rawDraft = nextDraft;
+      }
       return;
     }
 
-    const nextMarkdown = `${markdown.markdown.slice(0, from)}${replacement}${markdown.markdown.slice(to)}`;
-    markdown.onChange?.(replacement, from, to);
-    markdown.onFrontmatterChange?.(nextYaml, nextMarkdown);
-  }
+    const yaml = frontmatter || valueProp;
+    localController.update({
+      propertyManager: managerProp ?? fallbackManager,
+      sourcePath: markdown?.sourcePath,
+      getMarkdown: markdown ? () => markdown.markdown : undefined,
+      dataOffset: toNumber(dataOffset),
+      dataOffsetEnd: toNumber(dataOffsetEnd),
+      onChange: markdown?.onChange,
+      onFrontmatterChange: markdown?.onFrontmatterChange,
+    });
+    localController.syncYaml(yaml, { commit: false });
+    if (rawDraft !== yaml) {
+      rawDraft = yaml;
+    }
+  });
+
+  const parseError = $derived(controller.parseError);
+  const rows = $derived.by(() => {
+    controller.revision;
+    if (controller.parseError) {
+      return [] as FrontmatterProperty[];
+    }
+    return manager.properties(controller.getRecord());
+  });
+  const typeOptions = $derived.by(() => {
+    controller.revision;
+    return manager.typeOptions();
+  });
+  const sourcePath = $derived(
+    controller.sourcePath ?? manager.sourcePath ?? markdown?.sourcePath,
+  );
+  const config = $derived(manager.config);
 
   function updateProperty(
     property: FrontmatterProperty,
     nextValue: unknown,
   ): void {
-    if (!parsed.ok) {
-      return;
-    }
-
-    emitYaml(
-      serializeFrontmatterRecord(
-        updateFrontmatterRecord(parsed.value, property.path, nextValue),
-      ),
-    );
-  }
-
-  function updateRecord(nextRecord: Record<string, unknown>): void {
-    emitYaml(serializeFrontmatterRecord(nextRecord));
+    controller.updateProperty(property.path, nextValue);
   }
 
   function addProperty(): void {
-    if (!parsed.ok) {
-      return;
+    const nextName = controller.addProperty("text");
+    if (nextName) {
+      newPropertyPath = nextName;
     }
-
-    const next = addFrontmatterRecordProperty(
-      parsed.value,
-      "text",
-      markdown.frontmatterConfig,
-    );
-    newPropertyPath = next.name;
-    updateRecord(next.value);
   }
 
-  function renameProperty(
+  async function renameProperty(
     nextPropertyName: string,
     property: FrontmatterProperty,
-  ): void {
-    if (!parsed.ok || !canRename(property)) {
+  ): Promise<void> {
+    if (!canRename(property)) {
       return;
     }
 
@@ -123,34 +141,44 @@
       return;
     }
 
-    const nextRecord = renameFrontmatterRecordProperty(
-      parsed.value,
-      property.path,
-      nextKey,
-    );
-    if (nextRecord === parsed.value) {
-      return;
-    }
+    const prevKey =
+      property.path.length === 1 && typeof property.path[0] === "string"
+        ? property.path[0]
+        : null;
 
     if (newPropertyPath === property.pathString) {
       newPropertyPath = nextKey;
     }
-    updateRecord(nextRecord);
+
+    if (prevKey && manager.rename) {
+      try {
+        const result = await manager.rename(prevKey, nextKey);
+        if (result.failedFiles.length) {
+          return;
+        }
+        // Host rename already persisted vault files; refresh local view only.
+        const nextRecord = {
+          ...controller.getRecord(),
+        };
+        if (Object.prototype.hasOwnProperty.call(nextRecord, prevKey)) {
+          nextRecord[nextKey] = nextRecord[prevKey];
+          delete nextRecord[prevKey];
+        }
+        controller.syncRecord(nextRecord, { commit: false });
+        return;
+      } catch {
+        return;
+      }
+    }
+
+    controller.renameProperty(property.path, nextKey);
   }
 
   function changePropertyKind(
     property: FrontmatterProperty,
     kind: FrontmatterPropertyKind,
   ): void {
-    updateProperty(
-      property,
-      coerceFrontmatterValue(
-        property.value,
-        kind,
-        markdown.frontmatterConfig,
-        property,
-      ),
-    );
+    controller.changePropertyKind(property, kind);
     typeMenuPath = null;
   }
 
@@ -200,7 +228,7 @@
 
   function clipboardApi() {
     return (
-      markdown.frontmatterConfig?.clipboard ??
+      config.clipboard ??
       (typeof navigator === "undefined" ? undefined : navigator.clipboard)
     );
   }
@@ -233,7 +261,7 @@
   }
 
   async function pasteProperties(property: FrontmatterProperty): Promise<void> {
-    if (!parsed.ok) {
+    if (parseError) {
       return;
     }
     const clipboard = clipboardApi();
@@ -247,13 +275,7 @@
       if (!pasted.ok) {
         throw new Error(pasted.error);
       }
-      updateRecord(
-        mergeFrontmatterRecordProperties(
-          parsed.value,
-          property.path.slice(0, -1),
-          pasted.value,
-        ),
-      );
+      controller.mergeProperties(property.path.slice(0, -1), pasted.value);
     } catch (error) {
       handleActionError(error, "paste");
     } finally {
@@ -262,13 +284,8 @@
   }
 
   function removeProperty(property: FrontmatterProperty): void {
-    if (!parsed.ok) {
-      return;
-    }
     try {
-      updateRecord(
-        removeFrontmatterRecordProperty(parsed.value, property.path),
-      );
+      controller.removeProperty(property.path);
     } catch (error) {
       handleActionError(error, "remove");
     } finally {
@@ -280,7 +297,7 @@
     error: unknown,
     action: "copy" | "cut" | "paste" | "remove",
   ): void {
-    markdown.frontmatterConfig?.onActionError?.(error, action);
+    config.onActionError?.(error, action);
   }
 
   function updateTextProperty(
@@ -454,10 +471,7 @@
   }
 
   function hasCustomWidget(property: FrontmatterProperty): boolean {
-    return Boolean(
-      resolveFrontmatterWidget(markdown.frontmatterConfig, property.kind)
-        ?.render,
-    );
+    return Boolean(manager.resolveWidget(property.kind)?.render);
   }
 
   function renderCustomWidget(
@@ -468,12 +482,9 @@
 
     function mountWidget(nextProperty: FrontmatterProperty) {
       cleanup?.();
-      cleanup = resolveFrontmatterWidget(
-        markdown.frontmatterConfig,
-        nextProperty.kind,
-      )?.render?.(element, {
+      cleanup = manager.resolveWidget(nextProperty.kind)?.render?.(element, {
         property: nextProperty,
-        sourcePath: markdown.sourcePath,
+        sourcePath,
         setValue(nextValue) {
           updateProperty(nextProperty, nextValue);
         },
@@ -491,36 +502,50 @@
       },
     };
   }
+
+  function emitRawYaml(nextYaml: string): void {
+    controller.commitYaml(nextYaml);
+  }
 </script>
 
-<div bind:this={ref} class="md-frontmatter" data-editable-markdown-ignore-click>
+<div
+  bind:this={ref}
+  class="md-frontmatter"
+  class:md-frontmatter--panel={!showChrome}
+  data-editable-markdown-ignore-click
+  data-testid="mira-frontmatter-editor"
+>
   <div
     class="md-frontmatter__collapsible"
-    data-state={frontmatterOpen ? "open" : "closed"}
+    data-state={frontmatterOpen || !showChrome ? "open" : "closed"}
   >
-    <button
-      type="button"
-      class="md-frontmatter__trigger"
-      aria-label={frontmatterOpen ? "Collapse properties" : "Expand properties"}
-      aria-expanded={frontmatterOpen}
-      onmousedown={(event) => {
-        event.preventDefault();
-        event.stopPropagation();
-      }}
-      onclick={(event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        frontmatterOpen = !frontmatterOpen;
-      }}
-    >
-      <ChevronRight class="md-frontmatter__chevron" aria-hidden="true" />
-      <span class="md-frontmatter__title">Properties</span>
-    </button>
+    {#if showChrome}
+      <button
+        type="button"
+        class="md-frontmatter__trigger"
+        aria-label={frontmatterOpen
+          ? "Collapse properties"
+          : "Expand properties"}
+        aria-expanded={frontmatterOpen}
+        onmousedown={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+        }}
+        onclick={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          frontmatterOpen = !frontmatterOpen;
+        }}
+      >
+        <ChevronRight class="md-frontmatter__chevron" aria-hidden="true" />
+        <span class="md-frontmatter__title">Properties</span>
+      </button>
+    {/if}
 
-    {#if frontmatterOpen}
+    {#if frontmatterOpen || !showChrome}
       <div class="md-frontmatter__content">
         <div class="mira-frontmatter metadata-container @container p-1 text-sm">
-          {#if parsed.ok}
+          {#if !parseError}
             <div class="metadata-properties" data-empty={rows.length === 0}>
               {#if rows.length === 0}
                 <p class="metadata-empty mira-frontmatter__empty">
@@ -542,12 +567,12 @@
             </div>
           {:else}
             <div class="mira-frontmatter__raw">
-              <p class="mira-frontmatter__error">{parsed.error}</p>
+              <p class="mira-frontmatter__error">{parseError}</p>
               <textarea
                 class="metadata-input metadata-input-longtext mira-frontmatter__textarea mira-frontmatter__textarea--raw"
                 bind:value={rawDraft}
                 rows="6"
-                onblur={() => emitYaml(rawDraft)}
+                onblur={() => emitRawYaml(rawDraft)}
               ></textarea>
             </div>
           {/if}
@@ -596,11 +621,11 @@
         </span>
         <FrontmatterPropertyNameInput
           value={property.key}
-          config={markdown.frontmatterConfig}
+          {config}
           excludedNames={siblingPropertyNames(property)}
           title={property.pathString}
           readonly={!canRename(property)}
-          onCommit={(value) => renameProperty(value, property)}
+          onCommit={(value) => void renameProperty(value, property)}
         />
       </div>
     </div>
@@ -642,12 +667,12 @@
         </span>
         <FrontmatterPropertyNameInput
           value={property.key}
-          config={markdown.frontmatterConfig}
+          {config}
           excludedNames={siblingPropertyNames(property)}
           title={property.pathString}
           readonly={!canRename(property)}
           autofocus={newPropertyPath === property.pathString}
-          onCommit={(value) => renameProperty(value, property)}
+          onCommit={(value) => void renameProperty(value, property)}
         />
       </div>
 
@@ -763,16 +788,11 @@
         onclick={() => changePropertyKind(property, option.type)}
       >
         <Icon
-          name={option.icon ??
-            frontmatterPropertyIcon(option.type, markdown.frontmatterConfig)}
+          name={option.icon ?? frontmatterPropertyIcon(option.type, config)}
           class="size-3.5"
         />
         <span
-          >{option.label ??
-            frontmatterPropertyLabel(
-              option.type,
-              markdown.frontmatterConfig,
-            )}</span
+          >{option.label ?? frontmatterPropertyLabel(option.type, config)}</span
         >
         {#if property.kind === option.type}
           <Icon name="check" class="metadata-property-type-menu__check" />
@@ -837,7 +857,7 @@
       <Link
         id={wikilink.target}
         text={wikilink.text}
-        sourcePath={markdown.sourcePath}
+        {sourcePath}
         class="metadata-property-pill-link"
       />
     {:else}

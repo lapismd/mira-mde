@@ -7,3 +7,9 @@ export * from "./suggestions";
 export * from "./types";
 export * from "./values";
 export * from "./widgets";
+export * from "./manager";
+export {
+  FrontmatterController,
+  type FrontmatterControllerCommit,
+  type FrontmatterControllerOptions,
+} from "./controller.svelte";

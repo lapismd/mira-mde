@@ -42,6 +42,10 @@
       "svelte": "./dist/preview/index.js",
       "import": "./dist/preview/index.js"
     },
+    "./preview/frontmatter": {
+      "types": "./dist/preview/frontmatter/index.d.ts",
+      "import": "./dist/preview/frontmatter/index.js"
+    },
     "./tables": {
       "types": "./dist/tables/index.d.ts",
       "svelte": "./dist/tables/index.js",
