@@ -7,13 +7,14 @@ batteries-included editor, and thin framework adapters.
 
 ## Requirements
 
-| ID            | Requirement                                                                                                                                                    |
-| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| MIRA-ARCH-001 | Packages MUST preserve their documented public entrypoints unless a breaking change is explicitly authorized.                                                  |
-| MIRA-ARCH-002 | Portable packages MUST NOT depend on Lapis vault, workspace, route, sidebar, metadata-worker, settings-persistence, or plugin-registry services.               |
-| MIRA-ARCH-003 | Extensions MUST integrate through Mira callbacks, resolvers, adapters, commands, renderer hooks, and CodeMirror extensions rather than application singletons. |
-| MIRA-ARCH-004 | Every workspace package MUST expose deterministic check, test where applicable, and build behavior compatible with root orchestration.                         |
-| MIRA-ARCH-005 | Storybook MUST be the only repository application used for browsable documentation, demos, component examples, and interaction scenarios.                      |
+| ID            | Requirement                                                                                                                                                                                  |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| MIRA-ARCH-001 | Packages MUST preserve their documented public entrypoints unless a breaking change is explicitly authorized.                                                                                |
+| MIRA-ARCH-002 | Portable packages MUST NOT depend on Lapis vault, workspace, route, sidebar, metadata-worker, settings-persistence, or plugin-registry services.                                             |
+| MIRA-ARCH-003 | Extensions MUST integrate through Mira callbacks, resolvers, adapters, commands, renderer hooks, and CodeMirror extensions rather than application singletons.                               |
+| MIRA-ARCH-004 | Every workspace package MUST expose deterministic check, test where applicable, and build behavior compatible with root orchestration.                                                       |
+| MIRA-ARCH-005 | Storybook MUST be the only repository application used for browsable documentation, demos, component examples, and interaction scenarios.                                                    |
+| MIRA-ARCH-020 | Root Storybook tooling MUST resolve `@lapismd/storybook-addon-visual-delta` through `link:../storybook-addon-visual-delta`; the dependency MUST remain outside the six-package public graph. |
 
 ## Package boundary
 
@@ -36,12 +37,12 @@ workspace dependencies so clean Vite builds do not rely on transitive package
 resolution.
 
 Storybook infrastructure dependencies are root-only development tools and MUST
-NOT leak into a public package manifest or emitted package output. The reviewed
-Visual Delta release is upgraded independently from Mira's six-package runtime
-graph and remains subject to the catalog's build and compare-only gates. Mira
-consumes the reviewed published `0.0.6` release through a root-only semver
-dependency; sibling source links MUST NOT enter the canonical install or any
-public package graph. The Visual Delta package MUST own the clean-stage worker
+NOT leak into a public package manifest or emitted package output. Visual Delta
+is developed independently from Mira's six-package runtime graph and remains
+subject to the catalog's build and compare-only gates. Mira resolves the sibling
+checkout through a root-only `link:../storybook-addon-visual-delta` dependency;
+that source link MUST NOT enter any public package graph. The Visual Delta
+package MUST own the clean-stage worker
 fallback, generated-cache exclusions, canonical build identity, and runner
 behavior required by those gates; Mira does not maintain a downstream pnpm
 patch for behavior available in the reviewed upstream release.
