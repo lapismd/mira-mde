@@ -36,6 +36,7 @@
   let previewMarkdown = $state<string | null>(null);
   let previewAssetUrl = $state<string | null>(null);
   let targetRevision = $state(0);
+  let previewRequested = $state(false);
 
   const target = $derived(id || href);
   const displayText = $derived(text || label || target);
@@ -103,6 +104,9 @@
   $effect(() => {
     const adapter = markdown.fileAdapter;
     const file = resolvedFile;
+    if (!previewRequested) {
+      return;
+    }
     previewMarkdown = null;
     previewAssetUrl = null;
 
@@ -160,6 +164,10 @@
     event.stopPropagation();
   }
 
+  function requestPreview(): void {
+    previewRequested = true;
+  }
+
   function isExternalHref(value: string): boolean {
     return /^((https?|ftps?|ssh):)?\/\//i.test(value.trim());
   }
@@ -181,6 +189,8 @@
       data-mira-internal-link="true"
       data-invalid={resolvedFile ? undefined : "true"}
       {title}
+      onpointerenter={requestPreview}
+      onfocus={requestPreview}
       onclick={resolvedFile ? openInternalLink : stopUnresolvedLinkInteraction}
       onmousedown={resolvedFile ? undefined : stopUnresolvedLinkInteraction}
     >
@@ -208,8 +218,10 @@
             value={previewMarkdown}
             sourcePath={resolvedFile.path}
           />
-        {:else}
+        {:else if previewRequested}
           <span class="mira-link-preview__empty">No preview available</span>
+        {:else}
+          <span class="mira-link-preview__empty">Loading preview…</span>
         {/if}
       {:else}
         <span class="mira-link-preview__title">Unresolved link</span>

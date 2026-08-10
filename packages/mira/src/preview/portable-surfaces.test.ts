@@ -81,6 +81,36 @@ describe("portable preview surfaces", () => {
     await unmount(link);
   });
 
+  it("loads internal-link preview content only after interaction", async () => {
+    const target = document.createElement("div");
+    const readMarkdown = vi.fn(() => "[[notes/portable.md|Nested link]]");
+    const component = mount(NoteLink, {
+      target,
+      props: {
+        id: "notes/portable.md",
+        text: "Portable note",
+        fileAdapter: { ...fileAdapter, readMarkdown },
+      },
+    });
+    await settle();
+
+    expect(readMarkdown).not.toHaveBeenCalled();
+    expect(target.querySelectorAll("[data-link-preview-trigger]")).toHaveLength(
+      1,
+    );
+
+    target
+      .querySelector<HTMLElement>("[data-link-preview-trigger]")
+      ?.dispatchEvent(new PointerEvent("pointerenter"));
+    await settle();
+
+    expect(readMarkdown).toHaveBeenCalledOnce();
+    expect(target.querySelectorAll("[data-link-preview-trigger]")).toHaveLength(
+      2,
+    );
+    await unmount(component);
+  });
+
   it("falls back to portable Markdown when a custom embed renderer declines", async () => {
     const target = document.createElement("div");
     const renderEmbed = vi.fn(() => false as const);
