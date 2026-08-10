@@ -136,6 +136,37 @@ describe("portable preview surfaces", () => {
     await unmount(component);
   });
 
+  it("keeps rendered frontmatter chrome locally collapsible", async () => {
+    const target = document.createElement("div");
+    const component = mount(MarkdownPreview, {
+      target,
+      props: {
+        value: "---\ntitle: Portable\n---\n\n# Note",
+      },
+    });
+    await settle();
+
+    const collapse = target.querySelector<HTMLButtonElement>(
+      ".md-frontmatter__trigger",
+    );
+    expect(collapse?.getAttribute("aria-label")).toBe("Collapse properties");
+    expect(target.querySelector(".md-frontmatter__content")).not.toBeNull();
+
+    collapse?.click();
+    await settle();
+    expect(collapse?.getAttribute("aria-label")).toBe("Expand properties");
+    expect(collapse?.getAttribute("aria-expanded")).toBe("false");
+    expect(target.querySelector(".md-frontmatter__content")).toBeNull();
+
+    collapse?.click();
+    await settle();
+    expect(collapse?.getAttribute("aria-label")).toBe("Collapse properties");
+    expect(collapse?.getAttribute("aria-expanded")).toBe("true");
+    expect(target.querySelector(".md-frontmatter__content")).not.toBeNull();
+
+    await unmount(component);
+  });
+
   it("keeps read-only list callouts passive and makes editable markers selectable", async () => {
     const readOnlyTarget = document.createElement("div");
     const editableTarget = document.createElement("div");

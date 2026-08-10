@@ -63,10 +63,7 @@
   let newPropertyPath = $state<string | null>(null);
 
   $effect(() => {
-    const nextOpen = openProp ?? markdown?.frontmatterOpen ?? true;
-    if (frontmatterOpen !== nextOpen) {
-      frontmatterOpen = nextOpen;
-    }
+    frontmatterOpen = openProp ?? markdown?.frontmatterOpen ?? true;
   });
 
   $effect(() => {
