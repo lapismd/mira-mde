@@ -585,7 +585,7 @@
 {#snippet Tree({ property }: { property: FrontmatterProperty })}
   {#if property.children.length}
     <div
-      class="metadata-property metadata-property--parent focus-within:ring-border relative flex flex-row flex-wrap overflow-hidden border-b focus-within:rounded-sm focus-within:border focus-within:ring-2 @[250px]:flex-nowrap"
+      class="metadata-property metadata-property--parent focus-within:ring-border relative flex overflow-hidden border-b focus-within:rounded-sm focus-within:border focus-within:ring-2"
       data-property={property.pathString}
       data-state={isOpen(property.pathString) ? "open" : "closed"}
       style={`--mira-property-depth: ${property.depth}`}
@@ -642,14 +642,14 @@
     {/if}
   {:else}
     <div
-      class="metadata-property focus-within:ring-border relative flex flex-row flex-wrap overflow-hidden border-b focus-within:rounded-sm focus-within:border focus-within:ring-2 @[260px]:flex-nowrap"
+      class="metadata-property focus-within:ring-border relative flex overflow-hidden border-b focus-within:rounded-sm focus-within:border focus-within:ring-2"
       data-property={property.pathString}
       data-property-type={property.type}
       data-valid={property.valid}
       style={`--mira-property-depth: ${property.depth}`}
     >
       <div
-        class="metadata-property-key focus-within:bg-secondary text-muted-foreground flex w-[9em] min-w-[9em] shrink-0 flex-row self-stretch"
+        class="metadata-property-key focus-within:bg-secondary text-muted-foreground flex shrink-0 self-stretch"
       >
         <span class="metadata-property-icon flex items-center py-1 pl-1">
           <button
@@ -677,7 +677,7 @@
       </div>
 
       <div
-        class="focus-within:bg-secondary metadata-property-value flex min-h-[29px] min-w-0 shrink grow items-center gap-1 self-stretch ps-[20px] @[250px]:ps-0"
+        class="focus-within:bg-secondary metadata-property-value flex min-h-[29px] min-w-0 shrink grow items-center gap-1 self-stretch"
       >
         {#if hasCustomWidget(property)}
           <div

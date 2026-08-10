@@ -1,4 +1,6 @@
 .mira-frontmatter.metadata-container {
+  --metadata-property-label-start: 2rem;
+
   container-type: inline-size;
   font-family: var(--font-interface);
   font-size: 0.875rem;
@@ -358,7 +360,7 @@
   }
 
   .metadata-property-value {
-    padding-inline-start: 1.25rem;
+    padding-inline-start: var(--metadata-property-label-start);
   }
 }
 
