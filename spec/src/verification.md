@@ -82,6 +82,8 @@ authorized baseline regeneration migrations are complete.
 | MIRA-CSS-028                                                                                            | Shipped CSS plus Lapis breakpoint/no-overflow assertions                            | Implemented by responsive frontmatter alignment |
 | MIRA-MD-024                                                                                             | Portable preview component collapse/expand interaction plus linked Lapis acceptance | Implemented by frontmatter disclosure repair    |
 | MIRA-ARCH-022                                                                                           | Public preview package build plus portable frontmatter disclosure interaction       | Implemented by frontmatter disclosure repair    |
+| MIRA-MD-025, MIRA-CSS-029                                                                               | Owner-document portal, lazy preview, focus, collision, and cross-pane hit testing   | Implemented by internal-link overlay repair     |
+| MIRA-ARCH-023                                                                                           | Public preview package build plus linked Lapis split-pane acceptance                | Implemented by internal-link overlay repair     |
 
 The selective-release slice defines the exact six-package graph once, configures
 independent Changesets versions and package-owned changelogs, and uses

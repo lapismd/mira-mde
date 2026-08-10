@@ -85,26 +85,18 @@
   border-radius: var(--radius-m);
   box-shadow: 0 18px 50px rgb(0 0 0 / 14%);
   color: var(--popover-foreground);
-  display: none;
+  display: grid;
+  gap: 0.35rem;
   font-family: var(--font-interface);
   font-size: 0.85rem;
-  inline-size: min(28rem, 75vw);
-  inset-block-start: calc(100% + 0.45rem);
-  inset-inline-start: 0;
+  inline-size: min(28rem, calc(100vw - 1rem));
   line-height: 1.45;
-  max-block-size: 22rem;
+  max-block-size: min(22rem, calc(100vh - 1rem));
   overflow: auto;
   padding: 0.75rem;
-  position: absolute;
   text-decoration: none;
   white-space: normal;
   z-index: var(--layer-tooltip);
-}
-
-.mira-link-preview:hover .mira-link-preview__card,
-.mira-link-preview:focus-within .mira-link-preview__card {
-  display: grid;
-  gap: 0.35rem;
 }
 
 .mira-link-preview__title {

@@ -1,9 +1,21 @@
 <script lang="ts">
-  import type { Snippet } from "svelte";
+  import { LinkPreview as HoverCardPrimitive } from "bits-ui";
+  import { getContext, type Snippet } from "svelte";
   import {
     parseMiraFileTarget,
     type MiraFileRef,
   } from "@lapismd/mira/extensions";
+  import {
+    miraAppearanceContextKey,
+    miraColorModeAttribute,
+    miraColorModeClassName,
+    normalizeMiraTheme,
+    type MiraAppearanceContext,
+  } from "../../internal/appearance-context.js";
+  import {
+    disableOverlayPortalContextKey,
+    resolveOverlayPortalProps,
+  } from "../../ui/internal/overlay-portal-context.js";
   import { useMarkdownContext } from "../renderer/context.svelte";
   import EmbeddedMarkdownPreview from "./embedded-markdown-preview.svelte";
 
@@ -31,6 +43,11 @@
     ref = $bindable(null),
   }: Props = $props();
   const markdown = useMarkdownContext();
+  const disablePortals =
+    getContext<boolean | undefined>(disableOverlayPortalContextKey) ?? false;
+  const appearance = getContext<MiraAppearanceContext | undefined>(
+    miraAppearanceContextKey,
+  );
 
   let resolvedFile = $state<MiraFileRef | null>(null);
   let previewMarkdown = $state<string | null>(null);
@@ -50,6 +67,20 @@
       label: displayText,
       sourcePath: activeSourcePath,
     }) ?? target,
+  );
+  const portalProps = $derived.by(() =>
+    resolveOverlayPortalProps(
+      { portalTarget: ref?.ownerDocument.body ?? null },
+      undefined,
+      disablePortals,
+    ),
+  );
+  const appearanceTheme = $derived(normalizeMiraTheme(appearance?.theme));
+  const appearanceMode = $derived(
+    miraColorModeAttribute(appearance?.colorMode),
+  );
+  const appearanceClass = $derived(
+    miraColorModeClassName(appearance?.colorMode),
   );
 
   $effect(() => {
@@ -174,61 +205,86 @@
 </script>
 
 {#if hasFileAdapter && !isExternal}
-  <span
-    class={`mira-link-preview ${className}`.trim()}
-    data-link-preview-state={resolvedFile ? "resolved" : "unresolved"}
-    data-link-preview-path={target}
-  >
-    <button
-      bind:this={ref}
-      type="button"
-      class="mira-link-preview__trigger"
-      data-link-preview-trigger
+  <HoverCardPrimitive.Root>
+    <span
+      class={`mira-link-preview ${className}`.trim()}
       data-link-preview-state={resolvedFile ? "resolved" : "unresolved"}
       data-link-preview-path={target}
-      data-mira-internal-link="true"
-      data-invalid={resolvedFile ? undefined : "true"}
-      {title}
-      onpointerenter={requestPreview}
-      onfocus={requestPreview}
-      onclick={resolvedFile ? openInternalLink : stopUnresolvedLinkInteraction}
-      onmousedown={resolvedFile ? undefined : stopUnresolvedLinkInteraction}
     >
-      {#if children}
-        {@render children()}
-      {:else}
-        {displayText}
-      {/if}
-    </button>
-    <span class="mira-link-preview__card" role="tooltip">
-      {#if resolvedFile}
-        <span class="mira-link-preview__title">
-          {resolvedFile.name || displayText}
-        </span>
-        <span class="mira-link-preview__path">{resolvedFile.path}</span>
-        {#if previewAssetUrl}
-          <img
-            class="mira-link-preview__asset"
-            src={previewAssetUrl}
-            alt={resolvedFile.name || displayText}
-          />
-        {:else if previewMarkdown}
-          <EmbeddedMarkdownPreview
-            class="mira-link-preview__markdown"
-            value={previewMarkdown}
-            sourcePath={resolvedFile.path}
-          />
-        {:else if previewRequested}
-          <span class="mira-link-preview__empty">No preview available</span>
-        {:else}
-          <span class="mira-link-preview__empty">Loading preview…</span>
-        {/if}
-      {:else}
-        <span class="mira-link-preview__title">Unresolved link</span>
-        <span class="mira-link-preview__path">{target}</span>
-      {/if}
+      <HoverCardPrimitive.Trigger
+        bind:ref
+        onpointerenter={requestPreview}
+        onfocus={requestPreview}
+      >
+        {#snippet child({ props })}
+          <button
+            {...props}
+            type="button"
+            class="mira-link-preview__trigger"
+            data-link-preview-trigger
+            data-link-preview-state={resolvedFile ? "resolved" : "unresolved"}
+            data-link-preview-path={target}
+            data-mira-internal-link="true"
+            data-invalid={resolvedFile ? undefined : "true"}
+            {title}
+            onclick={resolvedFile
+              ? openInternalLink
+              : stopUnresolvedLinkInteraction}
+            onmousedown={resolvedFile
+              ? undefined
+              : stopUnresolvedLinkInteraction}
+          >
+            {#if children}
+              {@render children()}
+            {:else}
+              {displayText}
+            {/if}
+          </button>
+        {/snippet}
+      </HoverCardPrimitive.Trigger>
     </span>
-  </span>
+    <HoverCardPrimitive.Portal {...portalProps}>
+      <HoverCardPrimitive.Content
+        class={`mira-link-preview__card ${appearanceClass ?? ""}`.trim()}
+        data-mira-link-preview-content
+        data-link-preview-state={resolvedFile ? "resolved" : "unresolved"}
+        data-link-preview-path={target}
+        data-mira-overlay
+        data-mira-theme={appearanceTheme}
+        data-mira-color-mode={appearanceMode}
+        align="start"
+        sideOffset={8}
+        collisionPadding={8}
+      >
+        {#if resolvedFile}
+          <span class="mira-link-preview__title">
+            {resolvedFile.name || displayText}
+          </span>
+          <span class="mira-link-preview__path">{resolvedFile.path}</span>
+          {#if previewAssetUrl}
+            <img
+              class="mira-link-preview__asset"
+              src={previewAssetUrl}
+              alt={resolvedFile.name || displayText}
+            />
+          {:else if previewMarkdown}
+            <EmbeddedMarkdownPreview
+              class="mira-link-preview__markdown"
+              value={previewMarkdown}
+              sourcePath={resolvedFile.path}
+            />
+          {:else if previewRequested}
+            <span class="mira-link-preview__empty">No preview available</span>
+          {:else}
+            <span class="mira-link-preview__empty">Loading preview…</span>
+          {/if}
+        {:else}
+          <span class="mira-link-preview__title">Unresolved link</span>
+          <span class="mira-link-preview__path">{target}</span>
+        {/if}
+      </HoverCardPrimitive.Content>
+    </HoverCardPrimitive.Portal>
+  </HoverCardPrimitive.Root>
 {:else}
   <a
     bind:this={ref}

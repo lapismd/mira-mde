@@ -83,6 +83,7 @@ describe("portable preview surfaces", () => {
 
   it("loads internal-link preview content only after interaction", async () => {
     const target = document.createElement("div");
+    document.body.append(target);
     const readMarkdown = vi.fn(() => "[[notes/portable.md|Nested link]]");
     const component = mount(NoteLink, {
       target,
@@ -98,6 +99,11 @@ describe("portable preview surfaces", () => {
     expect(target.querySelectorAll("[data-link-preview-trigger]")).toHaveLength(
       1,
     );
+    expect(
+      target
+        .querySelector("[data-link-preview-trigger]")
+        ?.getAttribute("aria-haspopup"),
+    ).toBe("dialog");
 
     target
       .querySelector<HTMLElement>("[data-link-preview-trigger]")
@@ -105,10 +111,19 @@ describe("portable preview surfaces", () => {
     await settle();
 
     expect(readMarkdown).toHaveBeenCalledOnce();
-    expect(target.querySelectorAll("[data-link-preview-trigger]")).toHaveLength(
-      2,
+    await new Promise((resolve) => setTimeout(resolve, 750));
+    await settle();
+
+    const preview = document.body.querySelector<HTMLElement>(
+      "[data-mira-link-preview-content][data-link-preview-path='notes/portable.md']",
     );
+    expect(preview).not.toBeNull();
+    expect(target.contains(preview)).toBe(false);
+    expect(
+      preview?.querySelectorAll("[data-link-preview-trigger]"),
+    ).toHaveLength(1);
     await unmount(component);
+    target.remove();
   });
 
   it("falls back to portable Markdown when a custom embed renderer declines", async () => {
