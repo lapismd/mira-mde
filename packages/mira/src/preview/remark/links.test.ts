@@ -33,8 +33,10 @@ describe("link parity plugins", () => {
 
     expect(wikilink?.properties?.id).toBe("Project Plan");
     expect(wikilink?.properties?.text).toBe("Plan");
+    expect(wikilink?.children).toEqual([{ type: "text", value: "Plan" }]);
     expect(embed?.properties?.id).toBe("Image Asset");
     expect(embed?.properties?.text).toBe("Diagram");
+    expect(embed?.children).toEqual([]);
   });
 
   it("preserves compound embed labels and dimensions", () => {

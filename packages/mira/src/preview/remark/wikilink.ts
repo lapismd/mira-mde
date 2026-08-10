@@ -21,7 +21,7 @@ export const remarkWikiLinks: Plugin<[], Root> = () => {
             label,
             text: label,
           },
-          hChildren: [{ type: "text", value: label }],
+          hChildren: isEmbed ? [] : [{ type: "text", value: label }],
         },
       } as unknown as MarkdownInlineNode;
     });
