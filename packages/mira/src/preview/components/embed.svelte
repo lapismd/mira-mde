@@ -138,6 +138,9 @@
       },
       host,
     );
+    if (cleanup === false) {
+      return;
+    }
     customRendered = true;
 
     return () => {
@@ -198,7 +201,12 @@
   data-embed-fragment={parsedTarget.fragment?.kind}
 >
   <figcaption>{displayText}</figcaption>
-  <div bind:this={embedHost} class="mira-embed__content">
+  <div class="mira-embed__content">
+    <div
+      bind:this={embedHost}
+      class="mira-embed__custom"
+      hidden={!customRendered}
+    ></div>
     {#if !customRendered}
       {#if previewAssetUrl}
         <img

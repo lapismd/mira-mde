@@ -81,6 +81,24 @@ describe("portable preview surfaces", () => {
     await unmount(link);
   });
 
+  it("falls back to portable Markdown when a custom embed renderer declines", async () => {
+    const target = document.createElement("div");
+    const renderEmbed = vi.fn(() => false as const);
+    const component = mount(FileEmbed, {
+      target,
+      props: {
+        id: "notes/portable.md",
+        fileAdapter: { ...fileAdapter, renderEmbed },
+      },
+    });
+    await settle();
+
+    expect(renderEmbed).toHaveBeenCalledOnce();
+    expect(target.querySelector("[data-markdown-embed]")).toBeTruthy();
+    expect(target.textContent).toContain("Portable content");
+    await unmount(component);
+  });
+
   it("runs and cleans up extension postprocessors", async () => {
     const cleanup = vi.fn();
     const target = document.createElement("div");
