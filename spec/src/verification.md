@@ -92,6 +92,7 @@ authorized baseline regeneration migrations are complete.
 | MIRA-MD-030, MIRA-ARCH-028                                                                              | Default and base-free composition tests plus public package type and build verification                                | Implemented by portable composition control     |
 | MIRA-MD-031, MIRA-ARCH-029                                                                              | Pipe-table Enter regression preserves the active column without a runtime binding error                                | Implemented by table Enter repair               |
 | MIRA-UI-018, MIRA-CSS-033, MIRA-ARCH-030, MIRA-MD-032, MIRA-CAT-014, MIRA-GOV-012                       | Public shell unit tests, internal adoption, catalog contract, package checks/build, and linked Design Core acceptance  | Implemented by generic CodeMirror shell slice   |
+| MIRA-MD-033, MIRA-ARCH-031, MIRA-CSS-034, MIRA-CAT-015                                                  | Search-panel structure and query tests, focused catalog interaction, package build, and linked Lapis acceptance        | Implemented by compact Find and Replace slice   |
 
 The selective-release slice defines the exact six-package graph once, configures
 independent Changesets versions and package-owned changelogs, and uses

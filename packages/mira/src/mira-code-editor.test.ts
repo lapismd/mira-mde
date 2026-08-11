@@ -40,7 +40,13 @@ describe("MiraCodeEditor", () => {
     );
     expect(searchPanel).toContain("--mira-code-editor-search-focus-ring");
     expect(searchPanel).toMatch(
-      /__input:focus-visible,[\s\S]*?__button:focus-visible\s*\{[\s\S]*?border-color:\s*transparent/,
+      /__search-field:focus-within,[\s\S]*?__button:focus-visible\s*\{[\s\S]*?border-color:\s*transparent/,
+    );
+    expect(searchPanel).toMatch(
+      /--mira-code-editor-search-radius,[\s\S]*?999px/,
+    );
+    expect(searchPanel).toMatch(
+      /\.cm-panels-top:has\(\.mira-search-panel-host\)[\s\S]*?border-bottom:\s*0/,
     );
   });
 

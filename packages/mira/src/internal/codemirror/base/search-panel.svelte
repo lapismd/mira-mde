@@ -19,6 +19,7 @@
   import Regex from "@lucide/svelte/icons/regex";
   import Replace from "@lucide/svelte/icons/replace";
   import ReplaceAll from "@lucide/svelte/icons/replace-all";
+  import SearchIcon from "@lucide/svelte/icons/search";
   import TextSelect from "@lucide/svelte/icons/text-select";
   import WholeWord from "@lucide/svelte/icons/whole-word";
   import X from "@lucide/svelte/icons/x";
@@ -134,46 +135,6 @@
 
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions (delegates CodeMirror key handling from the interactive controls) -->
 <div class="mira-search-panel" role="search" onkeydown={handleKeydown}>
-  <div
-    class="mira-search-panel__toggles"
-    role="group"
-    aria-label="Search options"
-  >
-    <button
-      type="button"
-      class="mira-search-panel__button mira-search-panel__toggle"
-      class:mira-search-panel__toggle--active={caseSensitive}
-      aria-label="Case sensitive"
-      aria-pressed={caseSensitive}
-      title="Case sensitive"
-      onclick={toggleCaseSensitive}
-    >
-      <CaseSensitive aria-hidden="true" />
-    </button>
-    <button
-      type="button"
-      class="mira-search-panel__button mira-search-panel__toggle"
-      class:mira-search-panel__toggle--active={wholeWord}
-      aria-label="Match whole word"
-      aria-pressed={wholeWord}
-      title="Match whole word"
-      onclick={toggleWholeWord}
-    >
-      <WholeWord aria-hidden="true" />
-    </button>
-    <button
-      type="button"
-      class="mira-search-panel__button mira-search-panel__toggle"
-      class:mira-search-panel__toggle--active={regexp}
-      aria-label="Use regular expression"
-      aria-pressed={regexp}
-      title="Use regular expression"
-      onclick={toggleRegexp}
-    >
-      <Regex aria-hidden="true" />
-    </button>
-  </div>
-
   <div class="mira-search-panel__body">
     {#if !readOnly}
       <button
@@ -194,19 +155,65 @@
 
     <div class="mira-search-panel__fields">
       <div class="mira-search-panel__row">
-        <input
-          bind:this={searchField}
-          class="mira-search-panel__input mira-search-panel__search-input"
-          class:mira-search-panel__input--invalid={noMatches}
-          type="text"
-          name="search"
-          form=""
-          value={searchValue}
-          placeholder="Find"
-          aria-label="Find"
-          aria-invalid={noMatches}
-          oninput={updateSearchValue}
-        />
+        <div
+          class="mira-search-panel__search-field"
+          class:mira-search-panel__search-field--invalid={noMatches}
+        >
+          <span class="mira-search-panel__find-icon">
+            <SearchIcon aria-hidden="true" />
+          </span>
+          <input
+            bind:this={searchField}
+            class="mira-search-panel__input mira-search-panel__search-input"
+            type="text"
+            name="search"
+            form=""
+            value={searchValue}
+            placeholder="Find"
+            aria-label="Find"
+            aria-invalid={noMatches}
+            oninput={updateSearchValue}
+          />
+          <div
+            class="mira-search-panel__toggles"
+            role="group"
+            aria-label="Search options"
+          >
+            <button
+              type="button"
+              class="mira-search-panel__button mira-search-panel__toggle"
+              class:mira-search-panel__toggle--active={caseSensitive}
+              aria-label="Case sensitive"
+              aria-pressed={caseSensitive}
+              title="Case sensitive"
+              onclick={toggleCaseSensitive}
+            >
+              <CaseSensitive aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              class="mira-search-panel__button mira-search-panel__toggle"
+              class:mira-search-panel__toggle--active={wholeWord}
+              aria-label="Match whole word"
+              aria-pressed={wholeWord}
+              title="Match whole word"
+              onclick={toggleWholeWord}
+            >
+              <WholeWord aria-hidden="true" />
+            </button>
+            <button
+              type="button"
+              class="mira-search-panel__button mira-search-panel__toggle"
+              class:mira-search-panel__toggle--active={regexp}
+              aria-label="Use regular expression"
+              aria-pressed={regexp}
+              title="Use regular expression"
+              onclick={toggleRegexp}
+            >
+              <Regex aria-hidden="true" />
+            </button>
+          </div>
+        </div>
         <button
           type="button"
           class="mira-search-panel__button"
@@ -308,28 +315,9 @@
 
   .mira-search-panel__toggles {
     align-items: center;
-    background: var(
-      --mira-code-editor-search-options-background,
-      var(
-        --mira-code-editor-background,
-        var(--background-secondary, var(--mira-muted))
-      )
-    );
-    border: 1px solid
-      var(
-        --mira-code-editor-search-options-border,
-        var(
-          --mira-code-editor-border,
-          var(--background-modifier-border, var(--mira-border))
-        )
-      );
-    border-radius: var(
-      --mira-code-editor-search-radius,
-      var(--mira-code-editor-radius, var(--radius-s, var(--mira-radius)))
-    );
     display: inline-flex;
     gap: 2px;
-    padding: 2px;
+    padding-inline-end: 0.25rem;
   }
 
   .mira-search-panel__body,
@@ -376,10 +364,7 @@
           var(--background-modifier-border, var(--mira-border))
         )
       );
-    border-radius: var(
-      --mira-code-editor-search-radius,
-      var(--mira-code-editor-radius, var(--radius-s, var(--mira-radius)))
-    );
+    border-radius: var(--mira-code-editor-search-radius, 999px);
     box-sizing: border-box;
     color: var(
       --mira-code-editor-search-input-foreground,
@@ -395,6 +380,58 @@
     width: min(22rem, 42vw);
   }
 
+  .mira-search-panel__search-field {
+    align-items: center;
+    background: var(
+      --mira-code-editor-search-input-background,
+      var(
+        --mira-code-editor-background,
+        var(--background-primary, var(--mira-editor-background))
+      )
+    );
+    border: 1px solid
+      var(
+        --mira-code-editor-search-input-border,
+        var(
+          --mira-code-editor-border,
+          var(--background-modifier-border, var(--mira-border))
+        )
+      );
+    border-radius: var(--mira-code-editor-search-radius, 999px);
+    box-sizing: border-box;
+    display: flex;
+    height: 2rem;
+    min-width: 10rem;
+    padding-inline-start: 0.5rem;
+    width: min(22rem, 42vw);
+  }
+
+  .mira-search-panel__find-icon {
+    align-items: center;
+    color: var(
+      --mira-code-editor-search-muted,
+      var(--text-muted, var(--mira-muted-foreground))
+    );
+    display: inline-flex;
+    flex: 0 0 auto;
+  }
+
+  .mira-search-panel__find-icon :global(svg) {
+    height: 1rem;
+    width: 1rem;
+  }
+
+  .mira-search-panel__search-input {
+    background: transparent;
+    border: 0;
+    flex: 1 1 auto;
+    height: 100%;
+    min-width: 0;
+    padding-inline-start: 0.375rem;
+    padding-inline-end: 0.25rem;
+    width: auto;
+  }
+
   .mira-search-panel__input::placeholder {
     color: var(
       --mira-code-editor-search-muted,
@@ -402,14 +439,16 @@
     );
   }
 
-  .mira-search-panel__input:hover {
+  .mira-search-panel__input:not(.mira-search-panel__search-input):hover,
+  .mira-search-panel__search-field:hover {
     border-color: var(
       --mira-code-editor-search-input-hover-border,
       var(--background-modifier-border-hover, var(--mira-border-strong))
     );
   }
 
-  .mira-search-panel__input:focus-visible,
+  .mira-search-panel__input:not(.mira-search-panel__search-input):focus-visible,
+  .mira-search-panel__search-field:focus-within,
   .mira-search-panel__button:focus-visible {
     border-color: transparent;
     box-shadow: 0 0 0 2px
@@ -428,24 +467,22 @@
     outline: none;
   }
 
-  .mira-search-panel__input--invalid {
+  .mira-search-panel__search-input:focus-visible {
+    box-shadow: none;
+    outline: none;
+  }
+
+  .mira-search-panel__search-field--invalid {
     border-color: rgb(var(--mira-callout-error, 220, 38, 38));
   }
 
   .mira-search-panel__button {
     align-items: center;
     background: var(--mira-code-editor-search-button-background, transparent);
-    border: 1px solid
-      var(
-        --mira-code-editor-search-button-border,
-        var(
-          --mira-code-editor-border,
-          var(--background-modifier-border, var(--mira-border))
-        )
-      );
+    border: 1px solid var(--mira-code-editor-search-button-border, transparent);
     border-radius: var(
-      --mira-code-editor-search-radius,
-      var(--mira-code-editor-radius, var(--radius-s, var(--mira-radius)))
+      --mira-code-editor-radius,
+      var(--radius-s, var(--mira-radius))
     );
     color: var(
       --mira-code-editor-search-button-foreground,
@@ -474,10 +511,7 @@
     );
     border-color: var(
       --mira-code-editor-search-button-hover-border,
-      var(
-        --mira-code-editor-search-focus-ring,
-        var(--mira-code-editor-focus-ring, var(--mira-accent))
-      )
+      transparent
     );
     color: var(
       --mira-code-editor-search-button-hover-foreground,
@@ -490,19 +524,25 @@
 
   .mira-search-panel__toggle {
     border-color: transparent;
-    height: 1.75rem;
-    width: 1.75rem;
+    border-radius: 0.375rem;
+    height: 1.5rem;
+    width: 1.5rem;
   }
 
   .mira-search-panel__toggle--active {
     background: var(
       --mira-code-editor-search-active-background,
       var(
-        --mira-code-editor-background,
-        var(--background-primary, var(--mira-editor-background))
+        --mira-code-editor-active-line,
+        var(--background-modifier-hover, var(--mira-accent-soft))
       )
     );
-    box-shadow: 0 1px 2px rgb(0 0 0 / 8%);
+    border-color: transparent;
+    box-shadow: none;
+  }
+
+  :global(.cm-panels-top:has(.mira-search-panel-host)) {
+    border-bottom: 0;
   }
 
   .mira-search-panel__button :global(svg) {
@@ -527,10 +567,6 @@
       padding-inline: 0.5rem;
     }
 
-    .mira-search-panel__toggles {
-      align-self: center;
-    }
-
     .mira-search-panel__body {
       align-items: flex-start;
     }
@@ -539,7 +575,8 @@
       flex-wrap: wrap;
     }
 
-    .mira-search-panel__input {
+    .mira-search-panel__search-field,
+    .mira-search-panel__replace-row .mira-search-panel__input {
       flex: 1 1 100%;
       width: 100%;
     }

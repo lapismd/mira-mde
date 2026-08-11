@@ -356,21 +356,9 @@ const codeEditorTokens = [
   ),
   token(
     "--mira-code-editor-search-radius",
-    "Search input, button, and option-group radius.",
-    "var(--mira-code-editor-radius)",
-    "MiraCodeEditor Find and Replace controls.",
-  ),
-  token(
-    "--mira-code-editor-search-options-background",
-    "Search option-group background.",
-    "var(--mira-code-editor-background)",
-    "MiraCodeEditor Find and Replace option toggles.",
-  ),
-  token(
-    "--mira-code-editor-search-options-border",
-    "Search option-group border.",
-    "var(--mira-code-editor-border)",
-    "MiraCodeEditor Find and Replace option toggles.",
+    "Find and Replace field radius.",
+    "999px",
+    "MiraCodeEditor Find and Replace field shells.",
   ),
   token(
     "--mira-code-editor-search-input-background",
@@ -417,7 +405,7 @@ const codeEditorTokens = [
   token(
     "--mira-code-editor-search-button-border",
     "Search button resting border.",
-    "var(--mira-code-editor-border)",
+    "transparent",
     "MiraCodeEditor Find and Replace buttons.",
   ),
   token(
@@ -435,13 +423,13 @@ const codeEditorTokens = [
   token(
     "--mira-code-editor-search-button-hover-border",
     "Search button hover border.",
-    "var(--mira-code-editor-focus-ring)",
+    "transparent",
     "Hovered MiraCodeEditor Find and Replace buttons.",
   ),
   token(
     "--mira-code-editor-search-active-background",
     "Search option active background.",
-    "var(--mira-code-editor-background)",
+    "var(--mira-code-editor-active-line)",
     "Active MiraCodeEditor Find and Replace option toggles.",
   ),
   token(

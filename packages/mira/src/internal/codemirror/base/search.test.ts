@@ -72,6 +72,18 @@ describe("Mira search extension", () => {
     expect(
       editor.parent.querySelector('[aria-label="Use regular expression"]'),
     ).not.toBeNull();
+    const searchField = editor.parent.querySelector(
+      ".mira-search-panel__search-field",
+    );
+    const searchOptions = editor.parent.querySelector(
+      '[role="group"][aria-label="Search options"]',
+    );
+    expect(searchField?.contains(searchInput)).toBe(true);
+    expect(searchField?.contains(searchOptions)).toBe(true);
+    expect(searchOptions?.parentElement).toBe(searchField);
+    expect(
+      searchField?.querySelector(".mira-search-panel__find-icon svg"),
+    ).not.toBeNull();
     expect(
       editor.parent.querySelector('[aria-label="Select all matches"]'),
     ).not.toBeNull();
