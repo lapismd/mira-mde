@@ -542,6 +542,7 @@
   }
 
   :global(.cm-panels-top:has(.mira-search-panel-host)) {
+    background: transparent;
     border-bottom: 0;
   }
 

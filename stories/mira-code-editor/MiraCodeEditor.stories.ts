@@ -66,7 +66,7 @@ export const FindAndReplace: Story = {
     docs: {
       description: {
         story:
-          "Opens Mira's real CodeMirror search surface with pill-shaped fields and query options embedded in the Find field.",
+          "Opens Mira's real CodeMirror search surface with pill-shaped fields, query options embedded in Find, and no independent panel background.",
       },
     },
   },
@@ -82,8 +82,12 @@ export const FindAndReplace: Story = {
     const find = canvas.getByRole("textbox", { name: "Find" });
     const options = canvas.getByRole("group", { name: "Search options" });
     const searchField = find.closest(".mira-search-panel__search-field");
+    const panel = find.closest(".cm-panels-top");
     await expect(find).toBeVisible();
     await expect(searchField).toContainElement(options);
+    await expect(getComputedStyle(panel as Element).backgroundColor).toBe(
+      "rgba(0, 0, 0, 0)",
+    );
 
     const wholeWord = canvas.getByRole("button", { name: "Match whole word" });
     await expect(wholeWord).toHaveAttribute("aria-pressed", "false");

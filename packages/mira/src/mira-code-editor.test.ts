@@ -46,7 +46,7 @@ describe("MiraCodeEditor", () => {
       /--mira-code-editor-search-radius,[\s\S]*?999px/,
     );
     expect(searchPanel).toMatch(
-      /\.cm-panels-top:has\(\.mira-search-panel-host\)[\s\S]*?border-bottom:\s*0/,
+      /\.cm-panels-top:has\(\.mira-search-panel-host\)[\s\S]*?background:\s*transparent;[\s\S]*?border-bottom:\s*0/,
     );
   });
 
