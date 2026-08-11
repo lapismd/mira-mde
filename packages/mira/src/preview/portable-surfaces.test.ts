@@ -6,6 +6,7 @@ import {
   type MiraFileAdapter,
 } from "@lapismd/mira/extensions";
 import FileEmbed from "./file-embed.svelte";
+import EditableMarkdownPreview from "./editable-markdown-preview.svelte";
 import MarkdownEmbed from "./markdown-embed.svelte";
 import MarkdownPreview from "./markdown-preview.svelte";
 import NoteLink from "./note-link.svelte";
@@ -31,6 +32,67 @@ async function settle(): Promise<void> {
 }
 
 describe("portable preview surfaces", () => {
+  it("keeps adapters without writeMarkdown read-only", async () => {
+    const target = document.createElement("div");
+    const component = mount(EditableMarkdownPreview, {
+      target,
+      props: {
+        file: {
+          kind: "markdown",
+          name: "Portable",
+          path: "notes/portable.md",
+        },
+        fileAdapter,
+      },
+    });
+    await settle();
+
+    target
+      .querySelector<HTMLElement>(
+        '[data-editable-markdown-preview] [role="button"]',
+      )
+      ?.click();
+    await settle();
+    expect(target.querySelector("[data-editable-markdown-editor]")).toBeNull();
+    expect(
+      target
+        .querySelector("[data-editable-markdown-preview]")
+        ?.getAttribute("data-editing"),
+    ).toBe("false");
+    await unmount(component);
+  });
+
+  it("enters a live-preview editor only for writable Markdown adapters", async () => {
+    const target = document.createElement("div");
+    const component = mount(EditableMarkdownPreview, {
+      target,
+      props: {
+        file: {
+          kind: "markdown",
+          name: "Portable",
+          path: "notes/portable.md",
+        },
+        fileAdapter: { ...fileAdapter, writeMarkdown: vi.fn() },
+      },
+    });
+    await settle();
+
+    target
+      .querySelector<HTMLElement>(
+        '[data-editable-markdown-preview] [role="button"]',
+      )
+      ?.click();
+    await settle();
+    expect(
+      target.querySelector("[data-editable-markdown-editor]"),
+    ).toBeTruthy();
+    expect(target.querySelector(".cm-editor")).toBeTruthy();
+    expect(target.querySelector(".cm-activeLine")?.textContent).toContain(
+      "Embedded note",
+    );
+    await unmount(component);
+  });
+
   it("renders standalone Markdown embeds", async () => {
     const target = document.createElement("div");
     const component = mount(MarkdownEmbed, {
@@ -122,6 +184,45 @@ describe("portable preview surfaces", () => {
     expect(
       preview?.querySelectorAll("[data-link-preview-trigger]"),
     ).toHaveLength(1);
+    await unmount(component);
+    target.remove();
+  });
+
+  it("keeps a writable internal-link card open while its preview is editing", async () => {
+    const target = document.createElement("div");
+    document.body.append(target);
+    const component = mount(NoteLink, {
+      target,
+      props: {
+        id: "notes/portable.md",
+        text: "Portable note",
+        fileAdapter: { ...fileAdapter, writeMarkdown: vi.fn() },
+      },
+    });
+    await settle();
+
+    const trigger = target.querySelector<HTMLElement>(
+      "[data-link-preview-trigger]",
+    );
+    trigger?.dispatchEvent(new PointerEvent("pointerenter"));
+    await new Promise((resolve) => setTimeout(resolve, 750));
+    await settle();
+
+    const selector =
+      "[data-mira-link-preview-content][data-link-preview-path='notes/portable.md']";
+    const preview = document.body.querySelector<HTMLElement>(selector);
+    preview?.querySelector("p")?.click();
+    await settle();
+    expect(
+      preview?.querySelector("[data-editable-markdown-editor]"),
+    ).toBeTruthy();
+
+    trigger?.dispatchEvent(new PointerEvent("pointerleave"));
+    await new Promise((resolve) => setTimeout(resolve, 350));
+    await settle();
+    expect(document.body.querySelector(selector)).toBe(preview);
+    expect(preview?.querySelector('[data-editing="true"]')).toBeTruthy();
+
     await unmount(component);
     target.remove();
   });

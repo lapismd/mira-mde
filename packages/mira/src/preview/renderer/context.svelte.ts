@@ -1,6 +1,7 @@
 import { getContext, setContext } from "svelte";
 import type {
   MiraAssetResolver,
+  MiraExtension,
   MiraFileAdapter,
   MiraLinkResolver,
   MiraRendererComponents,
@@ -21,6 +22,7 @@ const AST_NODE_CONTEXT = Symbol("mira-ast-node-context");
 export type MarkdownContext = {
   markdown: string;
   sourcePath?: string;
+  extensions: MiraExtension[];
   remarkPlugins: Pluggable[];
   rehypePlugins: Pluggable[];
   remarkRehypeOptions: RemarkRehypeOptions;

@@ -497,6 +497,7 @@ export type MiraFileAdapter = {
     target: MiraFileTarget,
   ) => MiraFileRef | null | Promise<MiraFileRef | null>;
   readMarkdown?: (file: MiraFileRef) => string | null | Promise<string | null>;
+  writeMarkdown?: (file: MiraFileRef, value: string) => void | Promise<void>;
   readAssetUrl?: (file: MiraFileRef) => string | null | Promise<string | null>;
   openFile?: (file: MiraFileRef, event?: MouseEvent) => void | Promise<void>;
   renderEmbed?: (

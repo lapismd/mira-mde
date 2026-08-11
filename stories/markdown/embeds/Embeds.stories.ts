@@ -8,6 +8,7 @@ import {
 } from "../_shared/docs-source";
 import { embedsMarkdown } from "../fixtures";
 import AdapterInvalidationStory from "./AdapterInvalidationStory.svelte";
+import EditablePreviewStory from "./EditablePreviewStory.svelte";
 import PortableSurfacesStory from "./PortableSurfacesStory.svelte";
 
 const meta = {
@@ -215,5 +216,65 @@ export const PortableSurfaces: Story = {
 <MarkdownEmbed value="## Embedded Markdown" />`,
       },
     },
+  },
+};
+
+export const EditablePreview: Story = {
+  name: "Editable Markdown preview",
+  render: () => ({
+    Component: EditablePreviewStory,
+  }),
+  tags: [
+    "visual-pending",
+    "!visual-approved",
+    "!visual-ready",
+    "!visual-failed",
+  ],
+  parameters: {
+    docs: {
+      source: {
+        language: "svelte",
+        type: "code",
+        code: `<script lang="ts">
+  import { EditableMarkdownPreview } from "@lapismd/mira/preview";
+</script>
+
+<EditableMarkdownPreview {file} {fileAdapter} bind:editing />`,
+      },
+    },
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+
+    await step("activate the writable rendered preview", async () => {
+      await userEvent.click(
+        canvas.getByText(
+          "Click this rendered paragraph to edit the note in place.",
+        ),
+      );
+      await expect(
+        canvasElement.querySelector("[data-editable-markdown-editor]"),
+      ).toBeInTheDocument();
+      await expect(canvas.getByText("Editing is pinned open")).toBeVisible();
+    });
+
+    await step("edit and autosave after 500ms", async () => {
+      const editor = canvasElement.querySelector<HTMLElement>(".cm-content");
+      await expect(editor).toBeInTheDocument();
+      await userEvent.click(editor as HTMLElement);
+      await userEvent.keyboard("{Control>}a{/Control}# Saved Preview");
+      await new Promise((resolve) => setTimeout(resolve, 550));
+      await expect(
+        canvas.getByLabelText("Persisted Markdown"),
+      ).toHaveTextContent("# Saved Preview");
+    });
+
+    await step("Escape flushes and returns to rendered preview", async () => {
+      await userEvent.keyboard("{Escape}");
+      await expect(canvas.getByText("Rendered preview")).toBeVisible();
+      await expect(
+        canvas.getByRole("heading", { name: "Saved Preview" }),
+      ).toBeVisible();
+    });
   },
 };

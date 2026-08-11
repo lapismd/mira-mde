@@ -1,6 +1,7 @@
 <script module lang="ts">
   import type {
     MiraAssetResolver,
+    MiraExtension,
     MiraFileAdapter,
     MiraResolvedListCallout,
     MiraLinkResolver,
@@ -14,6 +15,7 @@
   export type MarkdownProps = {
     value: string;
     sourcePath?: string;
+    extensions?: MiraExtension[];
     remarkPlugins?: Pluggable[];
     rehypePlugins?: Pluggable[];
     remarkRehypeOptions?: RemarkRehypeOptions;
@@ -40,6 +42,7 @@
   let {
     value,
     sourcePath,
+    extensions = [],
     remarkPlugins = [],
     rehypePlugins = [],
     remarkRehypeOptions = { allowDangerousHtml: true },
@@ -64,6 +67,7 @@
   let contextState = $state<MarkdownContext>({
     markdown: "",
     sourcePath: undefined,
+    extensions: [],
     remarkPlugins: [],
     rehypePlugins: [],
     remarkRehypeOptions: { allowDangerousHtml: true },
@@ -84,6 +88,7 @@
   $effect.pre(() => {
     context.markdown = value;
     context.sourcePath = sourcePath;
+    context.extensions = extensions;
     context.remarkPlugins = remarkPlugins;
     context.rehypePlugins = rehypePlugins;
     context.remarkRehypeOptions = remarkRehypeOptions;

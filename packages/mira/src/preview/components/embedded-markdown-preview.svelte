@@ -31,6 +31,7 @@
       <Markdown
         {value}
         sourcePath={activeSourcePath}
+        extensions={markdown.extensions}
         remarkPlugins={markdown.remarkPlugins}
         rehypePlugins={markdown.rehypePlugins}
         remarkRehypeOptions={markdown.remarkRehypeOptions}

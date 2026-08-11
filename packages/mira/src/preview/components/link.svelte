@@ -17,6 +17,7 @@
     resolveOverlayPortalProps,
   } from "../../ui/internal/overlay-portal-context.js";
   import { useMarkdownContext } from "../renderer/context.svelte";
+  import EditableMarkdownSurface from "../editable-markdown-preview/editable-markdown-surface.svelte";
   import EmbeddedMarkdownPreview from "./embedded-markdown-preview.svelte";
 
   type Props = {
@@ -54,6 +55,8 @@
   let previewAssetUrl = $state<string | null>(null);
   let targetRevision = $state(0);
   let previewRequested = $state(false);
+  let previewOpen = $state(false);
+  let editing = $state(false);
 
   const target = $derived(id || href);
   const displayText = $derived(text || label || target);
@@ -82,6 +85,17 @@
   const appearanceClass = $derived(
     miraColorModeClassName(appearance?.colorMode),
   );
+  const writePreviewMarkdown = $derived(
+    resolvedFile &&
+      markdown.fileAdapter?.writeMarkdown &&
+      (resolvedFile.kind === undefined || resolvedFile.kind === "markdown")
+      ? (value: string) =>
+          markdown.fileAdapter?.writeMarkdown?.(
+            resolvedFile as MiraFileRef,
+            value,
+          )
+      : undefined,
+  );
 
   $effect(() => {
     const adapter = markdown.fileAdapter;
@@ -102,6 +116,11 @@
     ).then(
       (file) => {
         if (!cancelled) {
+          if (resolvedFile?.path !== file?.path) {
+            previewMarkdown = null;
+            previewAssetUrl = null;
+            editing = false;
+          }
           resolvedFile = file;
         }
       },
@@ -138,8 +157,7 @@
     if (!previewRequested) {
       return;
     }
-    previewMarkdown = null;
-    previewAssetUrl = null;
+    targetRevision;
 
     if (!adapter || !file) {
       return;
@@ -170,7 +188,9 @@
     );
 
     const stopWatching = adapter.watchFile?.(file, () => {
-      resolvedFile = { ...file };
+      if (!editing) {
+        targetRevision += 1;
+      }
     });
 
     return () => {
@@ -199,13 +219,28 @@
     previewRequested = true;
   }
 
+  function handlePreviewOpenChange(nextOpen: boolean): void {
+    if (!nextOpen && editing) {
+      previewOpen = true;
+      return;
+    }
+    previewOpen = nextOpen;
+  }
+
+  function closeAfterEditing(): void {
+    previewOpen = false;
+  }
+
   function isExternalHref(value: string): boolean {
     return /^((https?|ftps?|ssh):)?\/\//i.test(value.trim());
   }
 </script>
 
 {#if hasFileAdapter && !isExternal}
-  <HoverCardPrimitive.Root>
+  <HoverCardPrimitive.Root
+    open={previewOpen}
+    onOpenChange={handlePreviewOpenChange}
+  >
     <span
       class={`mira-link-preview ${className}`.trim()}
       data-link-preview-state={resolvedFile ? "resolved" : "unresolved"}
@@ -268,10 +303,29 @@
               alt={resolvedFile.name || displayText}
             />
           {:else if previewMarkdown}
-            <EmbeddedMarkdownPreview
-              class="mira-link-preview__markdown"
+            {#snippet renderedPreview(value: string)}
+              <EmbeddedMarkdownPreview
+                class="mira-link-preview__markdown"
+                {value}
+                sourcePath={resolvedFile?.path ?? activeSourcePath}
+              />
+            {/snippet}
+            <EditableMarkdownSurface
               value={previewMarkdown}
+              preview={renderedPreview}
+              writeMarkdown={writePreviewMarkdown}
+              bind:editing
+              extensions={markdown.extensions}
               sourcePath={resolvedFile.path}
+              linkResolver={markdown.linkResolver}
+              assetResolver={markdown.assetResolver}
+              fileAdapter={markdown.fileAdapter}
+              frontmatterOpen={markdown.frontmatterOpen}
+              frontmatterConfig={markdown.frontmatterConfig}
+              class="mira-link-preview__editable"
+              label={`Edit ${resolvedFile.name || resolvedFile.path}`}
+              onPersisted={(value) => (previewMarkdown = value)}
+              onEscape={closeAfterEditing}
             />
           {:else if previewRequested}
             <span class="mira-link-preview__empty">No preview available</span>

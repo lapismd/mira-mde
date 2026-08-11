@@ -452,6 +452,7 @@
   <Markdown
     {value}
     {sourcePath}
+    {extensions}
     {remarkPlugins}
     {rehypePlugins}
     {remarkRehypeOptions}
@@ -477,6 +478,7 @@
         <Markdown
           {value}
           {sourcePath}
+          {extensions}
           {remarkPlugins}
           {rehypePlugins}
           {remarkRehypeOptions}

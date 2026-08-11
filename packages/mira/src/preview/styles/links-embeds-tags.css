@@ -99,6 +99,13 @@
   z-index: var(--layer-tooltip);
 }
 
+.mira-link-preview__card:has(
+  .mira-link-preview__editable[data-editing="true"]
+) {
+  grid-template-rows: auto auto minmax(0, 1fr);
+  overflow: hidden;
+}
+
 .mira-link-preview__title {
   color: var(--text-normal);
   font-weight: 600;
@@ -121,6 +128,59 @@
   overflow: auto;
   padding: 0;
   white-space: normal;
+}
+
+.mira-editable-markdown-preview {
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-block-size: 0;
+  min-inline-size: 0;
+}
+
+.mira-editable-markdown-preview__preview {
+  min-block-size: 0;
+  min-inline-size: 0;
+}
+
+.mira-editable-markdown-preview__preview[role="button"]:focus-visible {
+  border-radius: var(--radius-s);
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.mira-editable-markdown-preview__editor-shell {
+  block-size: min(18rem, calc(100vh - 6rem));
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  min-block-size: min(12rem, calc(100vh - 6rem));
+  min-inline-size: 0;
+  overflow: hidden;
+}
+
+.mira-editable-markdown-preview__editor,
+.mira-editable-markdown-preview__editor-host,
+.mira-editable-markdown-preview__editor .cm-editor,
+.mira-editable-markdown-preview__editor .cm-scroller {
+  block-size: 100%;
+  min-block-size: 0;
+  min-inline-size: 0;
+}
+
+.mira-editable-markdown-preview__editor {
+  overflow: hidden;
+}
+
+.mira-editable-markdown-preview__editor-host {
+  overflow: hidden;
+}
+
+.mira-editable-markdown-preview__error {
+  background: color-mix(in srgb, var(--destructive) 10%, transparent);
+  color: var(--destructive);
+  font-family: var(--font-interface);
+  font-size: var(--font-smaller);
+  margin: 0;
+  padding: var(--size-4-2) var(--size-4-3);
 }
 
 .mira-link-preview__asset {

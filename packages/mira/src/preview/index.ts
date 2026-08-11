@@ -5,8 +5,10 @@ import FileEmbed from "./file-embed.svelte";
 import MarkdownEmbed from "./markdown-embed.svelte";
 import NoteLink from "./note-link.svelte";
 import FrontmatterEditor from "./components/frontmatter.svelte";
+import EditableMarkdownPreview from "./editable-markdown-preview.svelte";
 
 export {
+  EditableMarkdownPreview,
   FileEmbed,
   FrontmatterEditor,
   Markdown,
