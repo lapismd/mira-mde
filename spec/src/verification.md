@@ -90,6 +90,7 @@ authorized baseline regeneration migrations are complete.
 | MIRA-MD-028, MIRA-CSS-032, MIRA-ARCH-026                                                                | Portaled internal-link previews retain inherited trigger theme and color-mode attributes                               | Implemented by effective-appearance propagation |
 | MIRA-MD-029, MIRA-ARCH-027                                                                              | Captioned adapter-backed image embeds avoid duplicate nested image alternatives                                        | Implemented by embed accessibility repair       |
 | MIRA-MD-030, MIRA-ARCH-028                                                                              | Default and base-free composition tests plus public package type and build verification                                | Implemented by portable composition control     |
+| MIRA-MD-031, MIRA-ARCH-029                                                                              | Pipe-table Enter regression preserves the active column without a runtime binding error                                | Implemented by table Enter repair               |
 
 The selective-release slice defines the exact six-package graph once, configures
 independent Changesets versions and package-owned changelogs, and uses

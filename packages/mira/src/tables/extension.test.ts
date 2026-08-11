@@ -6,8 +6,15 @@ import { createMarkdownCodeMirrorExtensions } from "../internal/codemirror/markd
 import {
   gridTableExtension,
   gridTableTabAction,
+  tableEnterAction,
   tableExtension,
 } from "./extension";
+
+const markdownTable = [
+  "| Feature | Behavior |",
+  "| --- | --- |",
+  "| Handles | Actions |",
+].join("\n");
 
 const gridTableMarkdown = [
   "+---------+----------+",
@@ -55,6 +62,29 @@ describe("table extension", () => {
     ).toBe(" Behavior ");
     expect(view.state.doc.toString()).not.toMatch(/^\s+\| Feature/m);
     expect(syntaxTree(view.state).toString()).toContain("GridTable");
+
+    view.destroy();
+  });
+
+  it("moves to the same column on the next pipe-table row with Enter", () => {
+    const parent = document.createElement("div");
+    document.body.append(parent);
+    const view = new EditorView({
+      parent,
+      state: EditorState.create({
+        doc: markdownTable,
+        extensions: [createMarkdownCodeMirrorExtensions({ sourceMode: true })],
+        selection: { anchor: markdownTable.indexOf("Behavior") },
+      }),
+    });
+
+    expect(tableEnterAction(view)).toBe(true);
+    expect(
+      view.state.sliceDoc(
+        view.state.selection.main.from,
+        view.state.selection.main.to,
+      ),
+    ).toContain("Actions");
 
     view.destroy();
   });

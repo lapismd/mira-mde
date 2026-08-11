@@ -39,6 +39,7 @@ resolvers, extension contributions, source fallback, and shipped plain CSS.
 
 | MIRA-MD-029 | Adapter-backed image embeds MUST expose one accessible description without duplicating their visible figure caption through the nested image alternative. The figure caption retains the resolved display label, while the image inside that already-captioned figure uses an empty `alt`; ordinary standalone Markdown images retain their authored alternative text. |
 | MIRA-MD-030 | When `includeBaseExtensions` is `false`, `createMiraCodeMirrorExtensions` MUST omit only `createBaseCodeMirrorExtensions`. Slash commands, command keymaps, Markdown parsing, tables, image handling, authoring helpers, rich editing, block controls, and extension-contributed CodeMirror behavior MUST remain composed. |
+| MIRA-MD-031 | The pipe-table Enter command MUST preserve the active column while moving selection to the next row, including when it appends a missing row. It MUST NOT reference an undeclared column binding. |
 
 ## Lapis reference boundary
 

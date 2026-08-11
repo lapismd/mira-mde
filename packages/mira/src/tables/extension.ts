@@ -144,37 +144,7 @@ export function tableExtension({
   if (bindEnter) {
     keymaps.push({
       key: "Enter",
-      run: (view: EditorView): boolean => {
-        const [tableNode, coords] = getTableNode(view);
-        if (!tableNode) {
-          return false;
-        }
-        const cell = tableNode.coordsAt(coords.pos);
-        if (!cell) {
-          return false;
-        }
-
-        const [row] = cell;
-        if (row + 1 >= tableNode.getRowCount()) {
-          tableNode.insertRowAt(row + 1);
-        }
-
-        const pos = tableNode.rerender().position(row + 1, col);
-        if (pos) {
-          const head = coords.from + pos.start.offset!;
-          const anchor = coords.from + pos.end.offset!;
-          view.dispatch({
-            selection: { head, anchor },
-            changes: {
-              insert: tableNode.toMarkdown().trim(),
-              from: coords.from,
-              to: coords.to,
-            },
-          });
-          return true;
-        }
-        return false;
-      },
+      run: tableEnterAction,
       shift: (view: EditorView): boolean => {
         const [tableNode, coords] = getTableNode(view);
         if (!tableNode) {
@@ -222,6 +192,39 @@ export function tableExtension({
       decorations: (v) => v.decorations,
     }),
   ];
+}
+
+export function tableEnterAction(view: EditorView): boolean {
+  const [tableNode, coords] = getTableNode(view);
+  if (!tableNode) {
+    return false;
+  }
+  const cell = tableNode.coordsAt(coords.pos);
+  if (!cell) {
+    return false;
+  }
+
+  const [row, col] = cell;
+  if (row + 1 >= tableNode.getRowCount()) {
+    tableNode.insertRowAt(row + 1);
+  }
+
+  const pos = tableNode.rerender().position(row + 1, col);
+  if (!pos) {
+    return false;
+  }
+
+  const head = coords.from + pos.start.offset!;
+  const anchor = coords.from + pos.end.offset!;
+  view.dispatch({
+    selection: { head, anchor },
+    changes: {
+      insert: tableNode.toMarkdown().trim(),
+      from: coords.from,
+      to: coords.to,
+    },
+  });
+  return true;
 }
 
 export function createTableExtensions(): Extension[] {
