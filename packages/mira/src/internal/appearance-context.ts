@@ -13,10 +13,39 @@ export function normalizeMiraTheme(
   return theme?.trim() ? theme : undefined;
 }
 
+export function resolveMiraThemeAttribute(
+  theme: string | null | undefined,
+  source?: Element | null,
+): string | undefined {
+  return (
+    normalizeMiraTheme(theme) ??
+    normalizeMiraTheme(
+      source
+        ?.closest<HTMLElement>("[data-mira-theme]")
+        ?.getAttribute("data-mira-theme"),
+    )
+  );
+}
+
 export function miraColorModeAttribute(
   colorMode: MiraColorMode | undefined,
 ): Exclude<MiraColorMode, "inherit"> | undefined {
   return colorMode && colorMode !== "inherit" ? colorMode : undefined;
+}
+
+export function resolveMiraColorModeAttribute(
+  colorMode: MiraColorMode | undefined,
+  source?: Element | null,
+): Exclude<MiraColorMode, "inherit"> | undefined {
+  const explicit = miraColorModeAttribute(colorMode);
+  if (explicit) return explicit;
+
+  const inherited = source
+    ?.closest<HTMLElement>("[data-mira-color-mode]")
+    ?.getAttribute("data-mira-color-mode");
+  return inherited === "system" || inherited === "dark" || inherited === "light"
+    ? inherited
+    : undefined;
 }
 
 export function miraColorModeClassName(

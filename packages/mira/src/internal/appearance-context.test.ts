@@ -3,6 +3,8 @@ import {
   miraColorModeAttribute,
   miraColorModeClassName,
   normalizeMiraTheme,
+  resolveMiraColorModeAttribute,
+  resolveMiraThemeAttribute,
 } from "./appearance-context";
 
 describe("Mira appearance attributes", () => {
@@ -25,5 +27,20 @@ describe("Mira appearance attributes", () => {
     expect(miraColorModeClassName("dark")).toBe("dark theme-dark");
     expect(miraColorModeClassName("light")).toBe("light theme-light");
     expect(miraColorModeClassName("system")).toBeUndefined();
+  });
+
+  it("resolves an omitted appearance from the nearest themed host", () => {
+    const host = document.createElement("div");
+    const trigger = document.createElement("button");
+    host.dataset.miraTheme = "obsidian company-brand";
+    host.dataset.miraColorMode = "dark";
+    host.append(trigger);
+
+    expect(resolveMiraThemeAttribute(undefined, trigger)).toBe(
+      "obsidian company-brand",
+    );
+    expect(resolveMiraColorModeAttribute("inherit", trigger)).toBe("dark");
+    expect(resolveMiraThemeAttribute("mira", trigger)).toBe("mira");
+    expect(resolveMiraColorModeAttribute("light", trigger)).toBe("light");
   });
 });

@@ -7,9 +7,9 @@
   } from "@lapismd/mira/extensions";
   import {
     miraAppearanceContextKey,
-    miraColorModeAttribute,
     miraColorModeClassName,
-    normalizeMiraTheme,
+    resolveMiraColorModeAttribute,
+    resolveMiraThemeAttribute,
     type MiraAppearanceContext,
   } from "../../internal/appearance-context.js";
   import {
@@ -83,9 +83,11 @@
       disablePortals,
     ),
   );
-  const appearanceTheme = $derived(normalizeMiraTheme(appearance?.theme));
+  const appearanceTheme = $derived(
+    resolveMiraThemeAttribute(appearance?.theme, ref),
+  );
   const appearanceMode = $derived(
-    miraColorModeAttribute(appearance?.colorMode),
+    resolveMiraColorModeAttribute(appearance?.colorMode, ref),
   );
   const appearanceClass = $derived(
     miraColorModeClassName(appearance?.colorMode),

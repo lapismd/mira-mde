@@ -172,6 +172,8 @@ describe("portable preview surfaces", () => {
 
   it("loads internal-link preview content only after interaction", async () => {
     const target = document.createElement("div");
+    target.dataset.miraTheme = "obsidian company-brand";
+    target.dataset.miraColorMode = "dark";
     document.body.append(target);
     const readMarkdown = vi.fn(() => "[[notes/portable.md|Nested link]]");
     const component = mount(NoteLink, {
@@ -208,6 +210,8 @@ describe("portable preview surfaces", () => {
     );
     expect(preview).not.toBeNull();
     expect(target.contains(preview)).toBe(false);
+    expect(preview?.dataset.miraTheme).toBe("obsidian company-brand");
+    expect(preview?.dataset.miraColorMode).toBe("dark");
     expect(
       preview?.querySelectorAll("[data-link-preview-trigger]"),
     ).toHaveLength(1);

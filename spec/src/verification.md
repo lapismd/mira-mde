@@ -87,6 +87,7 @@ authorized baseline regeneration migrations are complete.
 | MIRA-MD-026, MIRA-CSS-030                                                                               | Editable-preview activation, offsets, persistence lifecycle, error retention, scroll ownership, and hover-card pinning | Implemented by editable-preview slice           |
 | MIRA-ARCH-024                                                                                           | Public adapter and preview exports, package tests, Storybook interaction, and linked Lapis persistence acceptance      | Implemented by editable-preview slice           |
 | MIRA-MD-027, MIRA-CSS-031, MIRA-ARCH-025                                                                | Minimal padded card paint, two-pixel editing border, focus/hover pinning, and persistence-safe outside-click dismissal | Implemented by editable-preview card alignment  |
+| MIRA-MD-028, MIRA-CSS-032, MIRA-ARCH-026                                                                | Portaled internal-link previews retain inherited trigger theme and color-mode attributes                               | Implemented by effective-appearance propagation |
 
 The selective-release slice defines the exact six-package graph once, configures
 independent Changesets versions and package-owned changelogs, and uses
