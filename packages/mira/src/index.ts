@@ -1,6 +1,14 @@
 import Mira from "./mira.svelte";
+import MiraCodeEditor from "./mira-code-editor.svelte";
 
-export { Mira };
+export { Mira, MiraCodeEditor };
+export type {
+  MiraCodeEditorHandle,
+  MiraCodeEditorHeight,
+  MiraCodeEditorProps,
+  MiraCodeEditorSurface,
+  MiraCodeEditorVariant,
+} from "./mira-code-editor";
 export type {
   MiraFrontmatterConfig,
   MiraHandle,

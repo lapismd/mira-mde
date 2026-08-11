@@ -1,11 +1,10 @@
 <script lang="ts">
-  import { onMount, setContext, tick } from "svelte";
+  import { setContext, tick } from "svelte";
   import type { Extension } from "@codemirror/state";
   import {
+    applyMiraMarkdownAction,
     createMiraCodeMirrorExtensions,
-    createMiraEditorController,
     openImageFilePicker,
-    type MiraEditorController,
     type MiraMarkdownActionId,
   } from "@lapismd/mira/core";
   import {
@@ -22,6 +21,8 @@
   import { Button } from "@lapismd/mira/ui/button";
   import { Separator } from "@lapismd/mira/ui/separator";
   import * as ToggleGroup from "@lapismd/mira/ui/toggle-group";
+  import MiraCodeEditor from "./mira-code-editor.svelte";
+  import type { MiraCodeEditorHandle } from "./mira-code-editor";
   import type { MiraProps } from "./types";
   import {
     miraAppearanceContextKey,
@@ -71,9 +72,8 @@
     onFrontmatterChange,
   }: MiraProps = $props();
 
-  let editorHost: HTMLDivElement | null = $state(null);
   let previewPane: HTMLElement | null = $state(null);
-  let controller: MiraEditorController | null = $state(null);
+  let codeEditor: MiraCodeEditorHandle | null = $state(null);
   let cleanupExtensionMounts: Array<() => void> = [];
   let previousMode = $state<MiraMode>(mode);
   let pendingModePosition = $state<MiraModeSwitchPosition | null>(null);
@@ -145,6 +145,7 @@
 
   function buildCodeMirrorExtensions(): Extension[] {
     return createMiraCodeMirrorExtensions({
+      includeBaseExtensions: false,
       mode,
       readonly,
       placeholder,
@@ -163,10 +164,11 @@
       authoring,
       frontmatterOpen,
       frontmatterConfig,
-      runtimeContext: (view) => createExtensionRuntimeContext(controller, view),
+      runtimeContext: (view) => createExtensionRuntimeContext(codeEditor, view),
       onChange(replacement, from, to, nextValue) {
-        if (controller) {
-          controller.view.dispatch({
+        const view = codeEditor?.getView();
+        if (view) {
+          view.dispatch({
             changes: { from, to, insert: replacement },
           });
         } else {
@@ -178,13 +180,23 @@
     });
   }
 
-  function runExtensionMounts(activeController: MiraEditorController): void {
+  const codeMirrorExtensions = $derived.by(() => {
+    extensionSignature;
+    authoring;
+    fileAdapter;
+    return buildCodeMirrorExtensions();
+  });
+
+  function runExtensionMounts(activeEditor: MiraCodeEditorHandle): void {
     cleanupExtensionMounts.forEach((cleanup) => cleanup());
     cleanupExtensionMounts = [];
 
+    const view = activeEditor.getView();
+    if (!view) return;
+
     for (const mountExtension of resolvedExtensions.onMount) {
       const cleanup = mountExtension(
-        createExtensionRuntimeContext(activeController, activeController.view),
+        createExtensionRuntimeContext(activeEditor, view),
       );
       if (typeof cleanup === "function") {
         cleanupExtensionMounts.push(cleanup);
@@ -193,16 +205,16 @@
   }
 
   export function focus(): void {
-    controller?.focus();
+    codeEditor?.focus();
   }
 
   export function getMarkdown(): string {
-    return controller?.getValue() ?? value;
+    return codeEditor?.getValue() ?? value;
   }
 
   export function setMarkdown(markdown: string): void {
     value = markdown;
-    controller?.setValue(markdown);
+    codeEditor?.setValue(markdown);
   }
 
   export function getMode(): MiraMode {
@@ -217,7 +229,7 @@
     const command = findCommand(commandId);
     return Boolean(
       command &&
-      isMiraCommandEnabled(command, createExtensionRuntimeContext(controller)),
+      isMiraCommandEnabled(command, createExtensionRuntimeContext(codeEditor)),
     );
   }
 
@@ -225,7 +237,7 @@
     return executeMiraCommand(
       resolvedExtensions.commands,
       commandId,
-      createExtensionRuntimeContext(controller),
+      createExtensionRuntimeContext(codeEditor),
     );
   }
 
@@ -238,69 +250,39 @@
   }
 
   export function getSelection(): ReturnType<
-    MiraEditorController["getSelection"]
-  > | null {
-    return controller?.getSelection() ?? null;
+    MiraCodeEditorHandle["getSelection"]
+  > {
+    return codeEditor?.getSelection() ?? null;
   }
 
   export function setSelection(
-    selection: ReturnType<MiraEditorController["getSelection"]>,
+    selection: NonNullable<ReturnType<MiraCodeEditorHandle["getSelection"]>>,
   ): void {
-    controller?.setSelection(selection);
+    codeEditor?.setSelection(selection);
   }
 
   export function insertMarkdown(
     markdown: string,
     selection?: MiraTemplateSelection,
   ): void {
-    controller?.replaceSelection(markdown, selection);
-    controller?.focus();
+    codeEditor?.replaceSelection(markdown, selection);
+    codeEditor?.focus();
   }
 
   export function applyMarkdownAction(action: MiraMarkdownActionId): boolean {
     if (readonly || mode === "preview") {
       return false;
     }
-    return controller?.applyMarkdownAction(action) ?? false;
+    const view = codeEditor?.getView();
+    return view ? applyMiraMarkdownAction(view, action) : false;
   }
 
   export function insertImage(): void {
-    if (controller) {
-      openImageFilePicker(controller.view, imageConfig);
+    const view = codeEditor?.getView();
+    if (view) {
+      openImageFilePicker(view, imageConfig);
     }
   }
-
-  onMount(() => {
-    if (!editorHost) {
-      return;
-    }
-
-    const activeController = createMiraEditorController({
-      value,
-      codeMirrorExtensions: buildCodeMirrorExtensions(),
-      onChange(next) {
-        value = next;
-        onChange?.(next);
-      },
-    });
-
-    activeController.mount(editorHost);
-    controller = activeController;
-    runExtensionMounts(activeController);
-
-    return () => {
-      cleanupExtensionMounts.forEach((cleanup) => cleanup());
-      cleanupExtensionMounts = [];
-      activeController.destroy();
-      controller = null;
-    };
-  });
-
-  $effect(() => {
-    if (controller && value !== controller.getValue()) {
-      controller.setValue(value);
-    }
-  });
 
   $effect(() => {
     return mountMiraExtensionStyles(resolvedExtensions.styles);
@@ -309,22 +291,22 @@
   $effect(() => {
     resolvedExtensions;
     extensionSignature;
-    authoring;
-    fileAdapter;
-    if (controller) {
-      controller.update({
-        codeMirrorExtensions: buildCodeMirrorExtensions(),
-      });
-      runExtensionMounts(controller);
-    }
+    codeMirrorExtensions;
+    const activeEditor = codeEditor;
+    if (activeEditor) runExtensionMounts(activeEditor);
+    return () => {
+      cleanupExtensionMounts.forEach((cleanup) => cleanup());
+      cleanupExtensionMounts = [];
+    };
   });
 
   $effect(() => {
-    if (mode !== "split" || !controller || !previewPane) {
+    const view = codeEditor?.getView();
+    if (mode !== "split" || !view || !previewPane) {
       return;
     }
 
-    return syncSplitScroll(controller.view.scrollDOM, previewPane);
+    return syncSplitScroll(view.scrollDOM, previewPane);
   });
 
   $effect.pre(() => {
@@ -338,7 +320,7 @@
     pendingModePosition = captureModeSwitchPosition(
       previousMode,
       nextMode,
-      controller?.view ?? null,
+      codeEditor?.getView() ?? null,
       previewScroller,
     );
     previousMode = nextMode;
@@ -346,20 +328,21 @@
 
   $effect(() => {
     mode;
-    controller;
+    codeEditor;
     previewPane;
     const position = pendingModePosition;
-    if (!position || !controller) {
+    if (!position || !codeEditor) {
       return;
     }
 
     let cancelled = false;
     void tick().then(() => {
-      if (cancelled || pendingModePosition !== position || !controller) {
+      const view = codeEditor?.getView();
+      if (cancelled || pendingModePosition !== position || !view) {
         return;
       }
       if (position.target === "editor") {
-        restoreEditorPosition(controller.view, position);
+        restoreEditorPosition(view, position);
       } else {
         const previewScroller =
           previewPane?.querySelector<HTMLElement>(".mira-markdown-preview") ??
@@ -419,20 +402,20 @@
   }
 
   function createExtensionRuntimeContext(
-    activeController: MiraEditorController | null,
-    view: unknown = activeController?.view,
+    activeEditor: MiraCodeEditorHandle | null,
+    view: unknown = activeEditor?.getView(),
   ): MiraExtensionRuntimeContext {
     return {
       view,
       mode,
       readonly,
       sourcePath,
-      getValue: () => activeController?.getValue() ?? value,
+      getValue: () => activeEditor?.getValue() ?? value,
       setValue(nextValue) {
         value = nextValue;
-        activeController?.setValue(nextValue);
+        activeEditor?.setValue(nextValue);
       },
-      focus: () => activeController?.focus(),
+      focus: () => activeEditor?.focus(),
       insertMarkdown,
       insertImage,
     };
@@ -535,7 +518,24 @@
       aria-hidden={showEditor ? "false" : "true"}
     >
       <div class="mira__editor-scroll">
-        <div bind:this={editorHost} class="mira__editor-host"></div>
+        <MiraCodeEditor
+          bind:this={codeEditor}
+          bind:value
+          extensions={codeMirrorExtensions}
+          {readonly}
+          {placeholder}
+          {lineWrapping}
+          {spellcheck}
+          {indentWithTabs}
+          {indentWidth}
+          ariaLabel="Markdown editor"
+          variant="document"
+          surface="frameless"
+          height="fill"
+          minHeight="100%"
+          class="mira__editor-host"
+          onChange={(next) => onChange?.(next)}
+        />
       </div>
     </section>
 

@@ -74,6 +74,8 @@ import { createMiraSearchExtension, type MiraSearchConfig } from "./search";
 export type MiraCodeMirrorOptions = {
   readonly?: boolean;
   placeholder?: string;
+  ariaLabel?: string;
+  contentAttributes?: Record<string, string>;
   lineWrapping?: boolean;
   spellcheck?: boolean;
   indentWithTabs?: boolean;
@@ -585,8 +587,9 @@ export function createBaseCodeMirrorExtensions(
     EditorState.readOnly.of(readonly),
     EditorView.editable.of(!readonly),
     EditorView.contentAttributes.of({
-      "aria-label": "Markdown editor",
+      "aria-label": options.ariaLabel ?? "Markdown editor",
       spellcheck: String(options.spellcheck ?? true),
+      ...options.contentAttributes,
     }),
     indentOnInput(),
     syntaxHighlighting(miraClassHighlighter),

@@ -18,7 +18,7 @@ export const PUBLIC_SURFACES = [
   {
     entryId: "mira",
     files: ["packages/mira/src/index.ts"],
-    exports: ["Mira"],
+    exports: ["Mira", "MiraCodeEditor"],
   },
   {
     entryId: "mira-editor",

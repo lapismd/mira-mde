@@ -1,11 +1,10 @@
 <script lang="ts">
-  import { onMount, tick } from "svelte";
+  import { tick } from "svelte";
   import type { Extension } from "@codemirror/state";
+  import { EditorView } from "@codemirror/view";
   import {
     createMiraCodeMirrorExtensions,
-    createMiraEditorController,
     fromOffset,
-    type MiraEditorController,
   } from "@lapismd/mira/core";
   import {
     mountMiraExtensionStyles,
@@ -18,6 +17,8 @@
     type MiraLinkResolver,
     type MiraMarkdownAuthoringConfig,
   } from "@lapismd/mira/extensions";
+  import MiraCodeEditor from "../../mira-code-editor.svelte";
+  import type { MiraCodeEditorHandle } from "../../mira-code-editor";
 
   type Props = {
     value: string;
@@ -55,9 +56,9 @@
     onEscape,
   }: Props = $props();
 
-  let host: HTMLDivElement | null = $state(null);
-  let controller: MiraEditorController | null = $state(null);
+  let codeEditor: MiraCodeEditorHandle | null = $state(null);
   let cleanupExtensionMounts: Array<() => void> = [];
+  let placedInitialSelection = false;
 
   const resolvedExtensions = $derived(
     resolveMiraExtensions(extensions, {
@@ -78,29 +79,30 @@
   );
 
   function runtimeContext(
-    activeController: MiraEditorController | null,
-    view: unknown = activeController?.view,
+    activeEditor: MiraCodeEditorHandle | null,
+    view: unknown = activeEditor?.getView(),
   ): MiraExtensionRuntimeContext {
     return {
       view,
       mode: "live-preview",
       readonly: false,
       sourcePath,
-      getValue: () => activeController?.getValue() ?? value,
+      getValue: () => activeEditor?.getValue() ?? value,
       setValue(nextValue) {
-        activeController?.setValue(nextValue);
+        activeEditor?.setValue(nextValue);
         onChange?.(nextValue);
       },
-      focus: () => activeController?.focus(),
+      focus: () => activeEditor?.focus(),
       insertMarkdown(markdown, selection) {
-        activeController?.replaceSelection(markdown, selection);
-        activeController?.focus();
+        activeEditor?.replaceSelection(markdown, selection);
+        activeEditor?.focus();
       },
     };
   }
 
   function buildExtensions(): Extension[] {
     return createMiraCodeMirrorExtensions({
+      includeBaseExtensions: false,
       mode: "live-preview",
       readonly: false,
       lineWrapping: true,
@@ -118,40 +120,55 @@
       authoring,
       frontmatterOpen,
       frontmatterConfig,
-      runtimeContext: (view) => runtimeContext(controller, view),
+      runtimeContext: (view) => runtimeContext(codeEditor, view),
       onChange(replacement, from, to) {
-        controller?.view.dispatch({
+        codeEditor?.getView()?.dispatch({
           changes: { from, to, insert: replacement },
         });
       },
       onFrontmatterChange,
-    });
+    }).concat(
+      EditorView.domEventHandlers({
+        keydown: (event) => {
+          handleKeydown(event);
+          return event.defaultPrevented;
+        },
+      }),
+    );
   }
 
-  function runExtensionMounts(activeController: MiraEditorController): void {
+  const codeMirrorExtensions = $derived.by(() => {
+    extensionSignature;
+    linkResolver;
+    assetResolver;
+    fileAdapter;
+    return buildExtensions();
+  });
+
+  function runExtensionMounts(activeEditor: MiraCodeEditorHandle): void {
     cleanupExtensionMounts.forEach((cleanup) => cleanup());
     cleanupExtensionMounts = [];
 
+    const view = activeEditor.getView();
+    if (!view) return;
+
     for (const mountExtension of resolvedExtensions.onMount) {
-      const cleanup = mountExtension(
-        runtimeContext(activeController, activeController.view),
-      );
+      const cleanup = mountExtension(runtimeContext(activeEditor, view));
       if (typeof cleanup === "function") {
         cleanupExtensionMounts.push(cleanup);
       }
     }
   }
 
-  function placeInitialSelection(activeController: MiraEditorController): void {
+  function placeInitialSelection(activeEditor: MiraCodeEditorHandle): void {
+    const view = activeEditor.getView();
+    if (!view) return;
     if (selectionOffset !== null) {
-      const position = fromOffset(
-        activeController.view.state.doc,
-        selectionOffset,
-      );
-      activeController.setSelection({ anchor: position, head: position });
+      const position = fromOffset(view.state.doc, selectionOffset);
+      activeEditor.setSelection({ anchor: position, head: position });
     }
     if (focusOnMount) {
-      activeController.focus();
+      activeEditor.focus();
     }
   }
 
@@ -164,50 +181,25 @@
     onEscape?.();
   }
 
-  onMount(() => {
-    if (!host) {
-      return;
-    }
+  $effect(() => mountMiraExtensionStyles(resolvedExtensions.styles));
 
-    const activeController = createMiraEditorController({
-      value,
-      codeMirrorExtensions: buildExtensions(),
-      onChange(nextValue) {
-        onChange?.(nextValue);
-      },
-    });
-    activeController.mount(host);
-    activeController.view.dom.addEventListener("keydown", handleKeydown);
-    controller = activeController;
-    runExtensionMounts(activeController);
-    void tick().then(() => placeInitialSelection(activeController));
-
+  $effect(() => {
+    resolvedExtensions;
+    extensionSignature;
+    codeMirrorExtensions;
+    const activeEditor = codeEditor;
+    if (activeEditor) runExtensionMounts(activeEditor);
     return () => {
       cleanupExtensionMounts.forEach((cleanup) => cleanup());
       cleanupExtensionMounts = [];
-      activeController.view.dom.removeEventListener("keydown", handleKeydown);
-      activeController.destroy();
-      controller = null;
     };
   });
 
   $effect(() => {
-    if (controller && value !== controller.getValue()) {
-      controller.setValue(value);
-    }
-  });
-
-  $effect(() => mountMiraExtensionStyles(resolvedExtensions.styles));
-
-  $effect(() => {
-    extensionSignature;
-    linkResolver;
-    assetResolver;
-    fileAdapter;
-    if (controller) {
-      controller.update({ codeMirrorExtensions: buildExtensions() });
-      runExtensionMounts(controller);
-    }
+    const activeEditor = codeEditor;
+    if (!activeEditor || placedInitialSelection) return;
+    placedInitialSelection = true;
+    void tick().then(() => placeInitialSelection(activeEditor));
   });
 </script>
 
@@ -217,8 +209,20 @@
   role="application"
   aria-label="Markdown editor"
 >
-  <div
-    bind:this={host}
+  <MiraCodeEditor
+    bind:this={codeEditor}
+    {value}
+    extensions={codeMirrorExtensions}
+    lineWrapping={true}
+    spellcheck={true}
+    indentWithTabs={true}
+    indentWidth={4}
+    ariaLabel="Markdown editor"
+    variant="document"
+    surface="frameless"
+    height="fill"
+    minHeight="100%"
     class="mira-editable-markdown-preview__editor-host"
-  ></div>
+    onChange={(nextValue) => onChange?.(nextValue)}
+  />
 </div>

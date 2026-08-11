@@ -7,14 +7,15 @@ batteries-included editor, and thin framework adapters.
 
 ## Requirements
 
-| ID            | Requirement                                                                                                                                                                                  |
-| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| MIRA-ARCH-001 | Packages MUST preserve their documented public entrypoints unless a breaking change is explicitly authorized.                                                                                |
-| MIRA-ARCH-002 | Portable packages MUST NOT depend on Lapis vault, workspace, route, sidebar, metadata-worker, settings-persistence, or plugin-registry services.                                             |
-| MIRA-ARCH-003 | Extensions MUST integrate through Mira callbacks, resolvers, adapters, commands, renderer hooks, and CodeMirror extensions rather than application singletons.                               |
-| MIRA-ARCH-004 | Every workspace package MUST expose deterministic check, test where applicable, and build behavior compatible with root orchestration.                                                       |
-| MIRA-ARCH-005 | Storybook MUST be the only repository application used for browsable documentation, demos, component examples, and interaction scenarios.                                                    |
-| MIRA-ARCH-020 | Root Storybook tooling MUST resolve `@lapismd/storybook-addon-visual-delta` through `link:../storybook-addon-visual-delta`; the dependency MUST remain outside the six-package public graph. |
+| ID            | Requirement                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| MIRA-ARCH-001 | Packages MUST preserve their documented public entrypoints unless a breaking change is explicitly authorized.                                                                                                                                                                                                                                                                                                                                             |
+| MIRA-ARCH-002 | Portable packages MUST NOT depend on Lapis vault, workspace, route, sidebar, metadata-worker, settings-persistence, or plugin-registry services.                                                                                                                                                                                                                                                                                                          |
+| MIRA-ARCH-003 | Extensions MUST integrate through Mira callbacks, resolvers, adapters, commands, renderer hooks, and CodeMirror extensions rather than application singletons.                                                                                                                                                                                                                                                                                            |
+| MIRA-ARCH-004 | Every workspace package MUST expose deterministic check, test where applicable, and build behavior compatible with root orchestration.                                                                                                                                                                                                                                                                                                                    |
+| MIRA-ARCH-005 | Storybook MUST be the only repository application used for browsable documentation, demos, component examples, and interaction scenarios.                                                                                                                                                                                                                                                                                                                 |
+| MIRA-ARCH-020 | Root Storybook tooling MUST resolve `@lapismd/storybook-addon-visual-delta` through `link:../storybook-addon-visual-delta`; the dependency MUST remain outside the six-package public graph.                                                                                                                                                                                                                                                              |
+| MIRA-ARCH-030 | The `@lapismd/mira` root MUST export `MiraCodeEditor`, `MiraCodeEditorProps`, and `MiraCodeEditorHandle`. Mira's primary Markdown surface and editable preview editor MUST consume that shell, while downstream packages MAY supply language and domain extensions through the public CodeMirror extension prop and bridge their theme from an ancestor through the shell's inheritable public background, focus-ring, search-control, and syntax tokens. |
 
 ## Package boundary
 
@@ -29,6 +30,12 @@ tables, UI primitives, theme, and composable Svelte surface are implemented in
 the single `packages/mira` workspace. Its internal source layout may remain
 modular, but downstream workspaces resolve it only through the supported
 `@lapismd/mira` export map.
+
+`MiraCodeEditor` is the canonical CodeMirror lifecycle boundary. It builds and
+reconfigures the `EditorView`, controlled document synchronization, selection,
+focus, history, accessibility, sizing, and base chrome. The Markdown editor and
+editable preview reuse that boundary, while downstream packages retain
+language parsers, linting, review decorations, and other domain extensions.
 
 The root Storybook may compose every package for documentation and acceptance,
 but package source must not import Storybook-owned catalog data. Packages used

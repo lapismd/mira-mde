@@ -289,9 +289,15 @@
 <style>
   .mira-search-panel {
     align-items: center;
-    background: var(--background-primary, var(--mira-editor-background));
+    background: var(
+      --mira-code-editor-background,
+      var(--background-primary, var(--mira-editor-background))
+    );
     box-sizing: border-box;
-    color: var(--text-normal, var(--mira-foreground));
+    color: var(
+      --mira-code-editor-foreground,
+      var(--text-normal, var(--mira-foreground))
+    );
     display: flex;
     flex-direction: column;
     font-family: var(--font-interface, var(--mira-font-sans));
@@ -302,9 +308,25 @@
 
   .mira-search-panel__toggles {
     align-items: center;
-    background: var(--background-secondary, var(--mira-muted));
-    border: 1px solid var(--background-modifier-border, var(--mira-border));
-    border-radius: var(--radius-s, var(--mira-radius));
+    background: var(
+      --mira-code-editor-search-options-background,
+      var(
+        --mira-code-editor-background,
+        var(--background-secondary, var(--mira-muted))
+      )
+    );
+    border: 1px solid
+      var(
+        --mira-code-editor-search-options-border,
+        var(
+          --mira-code-editor-border,
+          var(--background-modifier-border, var(--mira-border))
+        )
+      );
+    border-radius: var(
+      --mira-code-editor-search-radius,
+      var(--mira-code-editor-radius, var(--radius-s, var(--mira-radius)))
+    );
     display: inline-flex;
     gap: 2px;
     padding: 2px;
@@ -339,11 +361,33 @@
   }
 
   .mira-search-panel__input {
-    background: var(--background-primary, var(--mira-editor-background));
-    border: 1px solid var(--background-modifier-border, var(--mira-border));
-    border-radius: var(--radius-s, var(--mira-radius));
+    background: var(
+      --mira-code-editor-search-input-background,
+      var(
+        --mira-code-editor-background,
+        var(--background-primary, var(--mira-editor-background))
+      )
+    );
+    border: 1px solid
+      var(
+        --mira-code-editor-search-input-border,
+        var(
+          --mira-code-editor-border,
+          var(--background-modifier-border, var(--mira-border))
+        )
+      );
+    border-radius: var(
+      --mira-code-editor-search-radius,
+      var(--mira-code-editor-radius, var(--radius-s, var(--mira-radius)))
+    );
     box-sizing: border-box;
-    color: var(--text-normal, var(--mira-foreground));
+    color: var(
+      --mira-code-editor-search-input-foreground,
+      var(
+        --mira-code-editor-foreground,
+        var(--text-normal, var(--mira-foreground))
+      )
+    );
     font: inherit;
     height: 2rem;
     min-width: 10rem;
@@ -352,23 +396,33 @@
   }
 
   .mira-search-panel__input::placeholder {
-    color: var(--text-muted, var(--mira-muted-foreground));
+    color: var(
+      --mira-code-editor-search-muted,
+      var(--text-muted, var(--mira-muted-foreground))
+    );
   }
 
   .mira-search-panel__input:hover {
     border-color: var(
-      --background-modifier-border-hover,
-      var(--mira-border-strong)
+      --mira-code-editor-search-input-hover-border,
+      var(--background-modifier-border-hover, var(--mira-border-strong))
     );
   }
 
   .mira-search-panel__input:focus-visible,
   .mira-search-panel__button:focus-visible {
-    border-color: var(--interactive-accent, var(--mira-accent));
+    border-color: transparent;
     box-shadow: 0 0 0 2px
       color-mix(
         in srgb,
-        var(--interactive-accent, var(--mira-accent)) 30%,
+        var(
+            --mira-code-editor-search-focus-ring,
+            var(
+              --mira-code-editor-focus-ring,
+              var(--interactive-accent, var(--mira-accent))
+            )
+          )
+          30%,
         transparent
       );
     outline: none;
@@ -380,10 +434,26 @@
 
   .mira-search-panel__button {
     align-items: center;
-    background: transparent;
-    border: 1px solid var(--background-modifier-border, var(--mira-border));
-    border-radius: var(--radius-s, var(--mira-radius));
-    color: var(--text-muted, var(--mira-muted-foreground));
+    background: var(--mira-code-editor-search-button-background, transparent);
+    border: 1px solid
+      var(
+        --mira-code-editor-search-button-border,
+        var(
+          --mira-code-editor-border,
+          var(--background-modifier-border, var(--mira-border))
+        )
+      );
+    border-radius: var(
+      --mira-code-editor-search-radius,
+      var(--mira-code-editor-radius, var(--radius-s, var(--mira-radius)))
+    );
+    color: var(
+      --mira-code-editor-search-button-foreground,
+      var(
+        --mira-code-editor-search-muted,
+        var(--text-muted, var(--mira-muted-foreground))
+      )
+    );
     cursor: pointer;
     display: inline-flex;
     flex: 0 0 auto;
@@ -395,8 +465,27 @@
 
   .mira-search-panel__button:hover,
   .mira-search-panel__toggle--active {
-    background: var(--background-modifier-hover, var(--mira-accent-soft));
-    color: var(--text-normal, var(--mira-foreground));
+    background: var(
+      --mira-code-editor-search-button-hover-background,
+      var(
+        --mira-code-editor-active-line,
+        var(--background-modifier-hover, var(--mira-accent-soft))
+      )
+    );
+    border-color: var(
+      --mira-code-editor-search-button-hover-border,
+      var(
+        --mira-code-editor-search-focus-ring,
+        var(--mira-code-editor-focus-ring, var(--mira-accent))
+      )
+    );
+    color: var(
+      --mira-code-editor-search-button-hover-foreground,
+      var(
+        --mira-code-editor-foreground,
+        var(--text-normal, var(--mira-foreground))
+      )
+    );
   }
 
   .mira-search-panel__toggle {
@@ -406,7 +495,13 @@
   }
 
   .mira-search-panel__toggle--active {
-    background: var(--background-primary, var(--mira-editor-background));
+    background: var(
+      --mira-code-editor-search-active-background,
+      var(
+        --mira-code-editor-background,
+        var(--background-primary, var(--mira-editor-background))
+      )
+    );
     box-shadow: 0 1px 2px rgb(0 0 0 / 8%);
   }
 

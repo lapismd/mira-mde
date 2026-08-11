@@ -275,6 +275,183 @@ const semanticTokens = [
   ),
 ];
 
+const codeEditorTokens = [
+  token(
+    "--mira-code-editor-background",
+    "Code editor canvas background.",
+    "var(--mira-editor-background)",
+    "MiraCodeEditor code and document variants.",
+  ),
+  token(
+    "--mira-code-editor-foreground",
+    "Code editor foreground.",
+    "var(--mira-foreground)",
+    "MiraCodeEditor text and cursor.",
+  ),
+  token(
+    "--mira-code-editor-border",
+    "Code editor frame and gutter border.",
+    "var(--mira-border)",
+    "Framed MiraCodeEditor and gutter separator.",
+  ),
+  token(
+    "--mira-code-editor-radius",
+    "Code editor frame and tooltip radius.",
+    "var(--mira-radius)",
+    "Framed MiraCodeEditor and completion popovers.",
+  ),
+  token(
+    "--mira-code-editor-focus-ring",
+    "Code editor focus border and ring color.",
+    "var(--mira-focus-ring, var(--mira-accent))",
+    "Focused framed MiraCodeEditor.",
+  ),
+  token(
+    "--mira-code-editor-gutter-background",
+    "Code editor gutter background.",
+    "var(--mira-code-editor-background)",
+    "MiraCodeEditor line-number gutter.",
+  ),
+  token(
+    "--mira-code-editor-active-line",
+    "Code editor active-line fill.",
+    "var(--mira-active-line-background)",
+    "MiraCodeEditor active line and gutter.",
+  ),
+  token(
+    "--mira-code-editor-selection",
+    "Code editor selection fill.",
+    "var(--mira-selection)",
+    "MiraCodeEditor selected text.",
+  ),
+  token(
+    "--mira-code-editor-popover",
+    "Code editor floating surface background.",
+    "var(--mira-popover)",
+    "MiraCodeEditor completion and lint popovers.",
+  ),
+  token(
+    "--mira-code-editor-font-size",
+    "Code editor text size.",
+    "0.82rem",
+    "MiraCodeEditor code variant content.",
+  ),
+  token(
+    "--mira-code-editor-line-height",
+    "Code editor line height.",
+    "1.55",
+    "MiraCodeEditor code variant content.",
+  ),
+  token(
+    "--mira-code-editor-padding",
+    "Code editor content inset.",
+    "0.7rem 0.8rem",
+    "MiraCodeEditor code variant content.",
+  ),
+  token(
+    "--mira-code-editor-min-height",
+    "Resolved minimum editor block size.",
+    "10rem",
+    "Content-height MiraCodeEditor hosts.",
+  ),
+  token(
+    "--mira-code-editor-search-radius",
+    "Search input, button, and option-group radius.",
+    "var(--mira-code-editor-radius)",
+    "MiraCodeEditor Find and Replace controls.",
+  ),
+  token(
+    "--mira-code-editor-search-options-background",
+    "Search option-group background.",
+    "var(--mira-code-editor-background)",
+    "MiraCodeEditor Find and Replace option toggles.",
+  ),
+  token(
+    "--mira-code-editor-search-options-border",
+    "Search option-group border.",
+    "var(--mira-code-editor-border)",
+    "MiraCodeEditor Find and Replace option toggles.",
+  ),
+  token(
+    "--mira-code-editor-search-input-background",
+    "Search input background.",
+    "var(--mira-code-editor-background)",
+    "MiraCodeEditor Find and Replace inputs.",
+  ),
+  token(
+    "--mira-code-editor-search-input-foreground",
+    "Search input foreground.",
+    "var(--mira-code-editor-foreground)",
+    "MiraCodeEditor Find and Replace inputs.",
+  ),
+  token(
+    "--mira-code-editor-search-input-border",
+    "Search input border.",
+    "var(--mira-code-editor-border)",
+    "MiraCodeEditor Find and Replace inputs.",
+  ),
+  token(
+    "--mira-code-editor-search-input-hover-border",
+    "Search input hover border.",
+    "var(--mira-code-editor-focus-ring)",
+    "Hovered MiraCodeEditor Find and Replace inputs.",
+  ),
+  token(
+    "--mira-code-editor-search-muted",
+    "Search placeholder and resting icon foreground.",
+    "var(--mira-muted-foreground)",
+    "MiraCodeEditor Find and Replace controls.",
+  ),
+  token(
+    "--mira-code-editor-search-button-background",
+    "Search button resting background.",
+    "transparent",
+    "MiraCodeEditor Find and Replace buttons.",
+  ),
+  token(
+    "--mira-code-editor-search-button-foreground",
+    "Search button resting foreground.",
+    "var(--mira-code-editor-search-muted)",
+    "MiraCodeEditor Find and Replace buttons.",
+  ),
+  token(
+    "--mira-code-editor-search-button-border",
+    "Search button resting border.",
+    "var(--mira-code-editor-border)",
+    "MiraCodeEditor Find and Replace buttons.",
+  ),
+  token(
+    "--mira-code-editor-search-button-hover-background",
+    "Search button hover background.",
+    "var(--mira-code-editor-active-line)",
+    "Hovered MiraCodeEditor Find and Replace buttons.",
+  ),
+  token(
+    "--mira-code-editor-search-button-hover-foreground",
+    "Search button hover foreground.",
+    "var(--mira-code-editor-foreground)",
+    "Hovered MiraCodeEditor Find and Replace buttons.",
+  ),
+  token(
+    "--mira-code-editor-search-button-hover-border",
+    "Search button hover border.",
+    "var(--mira-code-editor-focus-ring)",
+    "Hovered MiraCodeEditor Find and Replace buttons.",
+  ),
+  token(
+    "--mira-code-editor-search-active-background",
+    "Search option active background.",
+    "var(--mira-code-editor-background)",
+    "Active MiraCodeEditor Find and Replace option toggles.",
+  ),
+  token(
+    "--mira-code-editor-search-focus-ring",
+    "Search input and button focus color.",
+    "var(--mira-code-editor-focus-ring)",
+    "Focused MiraCodeEditor Find and Replace controls.",
+  ),
+];
+
 const syntaxDefaults = {
   heading: "#0f766e",
   link: "#0b6fcb",
@@ -289,6 +466,30 @@ const syntaxDefaults = {
   invalid: "#dc2626",
   "invalid-background": "#fee2e2",
 };
+const codeEditorSyntaxTokens = Object.entries(syntaxDefaults)
+  .filter(([name]) => name !== "invalid-background")
+  .map(([name]) =>
+    token(
+      /** @type {`--mira-${string}`} */ (`--mira-code-editor-syntax-${name}`),
+      `Code editor syntax ${name} color override.`,
+      `var(--mira-syntax-${name})`,
+      "MiraCodeEditor syntax highlighting.",
+    ),
+  );
+codeEditorSyntaxTokens.push(
+  token(
+    "--mira-code-editor-syntax-punctuation",
+    "Code editor punctuation and bracket color.",
+    "var(--mira-code-editor-syntax-operator)",
+    "MiraCodeEditor punctuation and brackets.",
+  ),
+  token(
+    "--mira-code-editor-syntax-keyword-weight",
+    "Code editor keyword font weight.",
+    "inherit",
+    "MiraCodeEditor language keywords.",
+  ),
+);
 const syntaxTokens = Object.entries(syntaxDefaults).map(([name, value]) =>
   token(
     /** @type {`--mira-${string}`} */ (`--mira-syntax-${name}`),
@@ -425,6 +626,8 @@ const checkboxTokens = [
 
 export const cssTokens = [
   ...semanticTokens,
+  ...codeEditorTokens,
+  ...codeEditorSyntaxTokens,
   ...syntaxTokens,
   ...calloutTokens,
   ...headingTokens,
@@ -448,6 +651,8 @@ const commonTokens = [
 ];
 const editorTokens = [
   ...commonTokens,
+  ...codeEditorTokens.map((entry) => entry.name),
+  ...codeEditorSyntaxTokens.map((entry) => entry.name),
   "--mira-active-line-background",
   "--mira-selection",
   "--mira-popover",
@@ -494,7 +699,7 @@ export const catalogEntries = [
     name: "Mira",
     packageName: "@lapismd/mira",
     importPath: "@lapismd/mira",
-    components: ["Mira"],
+    components: ["Mira", "MiraCodeEditor"],
     description:
       "Composable Svelte editor with source, live-preview, reading, and split surfaces.",
     spec: "editor-and-markdown.md#requirements",
