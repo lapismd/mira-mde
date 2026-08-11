@@ -93,6 +93,33 @@ describe("portable preview surfaces", () => {
     await unmount(component);
   });
 
+  it("exits through the public editable-preview contract", async () => {
+    const target = document.createElement("div");
+    const writeMarkdown = vi.fn();
+    const component = mount(EditableMarkdownPreview, {
+      target,
+      props: {
+        file: {
+          kind: "markdown",
+          name: "Portable",
+          path: "notes/portable.md",
+        },
+        fileAdapter: { ...fileAdapter, writeMarkdown },
+      },
+    });
+    await settle();
+
+    target
+      .querySelector<HTMLElement>(
+        '[data-editable-markdown-preview] [role="button"]',
+      )
+      ?.click();
+    await settle();
+    expect(await component.exit()).toBe(true);
+    expect(target.querySelector("[data-editable-markdown-editor]")).toBeNull();
+    await unmount(component);
+  });
+
   it("renders standalone Markdown embeds", async () => {
     const target = document.createElement("div");
     const component = mount(MarkdownEmbed, {
@@ -190,7 +217,9 @@ describe("portable preview surfaces", () => {
 
   it("keeps a writable internal-link card open while its preview is editing", async () => {
     const target = document.createElement("div");
+    const outside = document.createElement("button");
     document.body.append(target);
+    document.body.append(outside);
     const component = mount(NoteLink, {
       target,
       props: {
@@ -223,8 +252,29 @@ describe("portable preview surfaces", () => {
     expect(document.body.querySelector(selector)).toBe(preview);
     expect(preview?.querySelector('[data-editing="true"]')).toBeTruthy();
 
+    outside.focus();
+    await settle();
+    expect(document.body.querySelector(selector)).toBe(preview);
+    expect(preview?.querySelector('[data-editing="true"]')).toBeTruthy();
+
+    outside.dispatchEvent(
+      new PointerEvent("pointerdown", {
+        bubbles: true,
+        composed: true,
+        pointerType: "mouse",
+        button: 0,
+        isPrimary: true,
+        clientX: 100,
+        clientY: 100,
+      }),
+    );
+    await new Promise((resolve) => setTimeout(resolve, 20));
+    await settle();
+    expect(document.body.querySelector(selector)).toBeNull();
+
     await unmount(component);
     target.remove();
+    outside.remove();
   });
 
   it("falls back to portable Markdown when a custom embed renderer declines", async () => {

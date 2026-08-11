@@ -76,6 +76,10 @@
   let value = $state("");
   let loaded = $state(false);
   let loadRevision = $state(0);
+  let surface: {
+    flush: () => Promise<boolean>;
+    exit: () => Promise<boolean>;
+  } | null = $state(null);
 
   const writeMarkdown = $derived(
     fileAdapter.writeMarkdown &&
@@ -121,6 +125,14 @@
       loadRevision += 1;
     });
   });
+
+  export async function flush(): Promise<boolean> {
+    return (await surface?.flush()) ?? true;
+  }
+
+  export async function exit(): Promise<boolean> {
+    return (await surface?.exit()) ?? true;
+  }
 </script>
 
 {#snippet renderedPreview(markdown: string)}
@@ -147,6 +159,7 @@
 
 {#if loaded}
   <EditableMarkdownSurface
+    bind:this={surface}
     {value}
     preview={renderedPreview}
     {writeMarkdown}

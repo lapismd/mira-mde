@@ -32,6 +32,10 @@
     ref?: HTMLElement | null;
   };
 
+  type InteractOutsideEvent = Parameters<
+    NonNullable<HoverCardPrimitive.ContentProps["onInteractOutside"]>
+  >[0];
+
   let {
     href = "",
     id,
@@ -57,6 +61,7 @@
   let previewRequested = $state(false);
   let previewOpen = $state(false);
   let editing = $state(false);
+  let editableSurface: { exit: () => Promise<boolean> } | null = $state(null);
 
   const target = $derived(id || href);
   const displayText = $derived(text || label || target);
@@ -227,8 +232,25 @@
     previewOpen = nextOpen;
   }
 
+  function getPreviewOpen(): boolean {
+    return previewOpen;
+  }
+
   function closeAfterEditing(): void {
     previewOpen = false;
+  }
+
+  function handlePreviewInteractOutside(event: InteractOutsideEvent): void {
+    if (!editing) {
+      return;
+    }
+
+    event.preventDefault();
+    void editableSurface?.exit().then((exited) => {
+      if (exited) {
+        previewOpen = false;
+      }
+    });
   }
 
   function isExternalHref(value: string): boolean {
@@ -237,10 +259,7 @@
 </script>
 
 {#if hasFileAdapter && !isExternal}
-  <HoverCardPrimitive.Root
-    open={previewOpen}
-    onOpenChange={handlePreviewOpenChange}
-  >
+  <HoverCardPrimitive.Root bind:open={getPreviewOpen, handlePreviewOpenChange}>
     <span
       class={`mira-link-preview ${className}`.trim()}
       data-link-preview-state={resolvedFile ? "resolved" : "unresolved"}
@@ -290,12 +309,9 @@
         align="start"
         sideOffset={8}
         collisionPadding={8}
+        onInteractOutside={handlePreviewInteractOutside}
       >
         {#if resolvedFile}
-          <span class="mira-link-preview__title">
-            {resolvedFile.name || displayText}
-          </span>
-          <span class="mira-link-preview__path">{resolvedFile.path}</span>
           {#if previewAssetUrl}
             <img
               class="mira-link-preview__asset"
@@ -311,6 +327,7 @@
               />
             {/snippet}
             <EditableMarkdownSurface
+              bind:this={editableSurface}
               value={previewMarkdown}
               preview={renderedPreview}
               writeMarkdown={writePreviewMarkdown}
@@ -322,6 +339,7 @@
               fileAdapter={markdown.fileAdapter}
               frontmatterOpen={markdown.frontmatterOpen}
               frontmatterConfig={markdown.frontmatterConfig}
+              returnToPreviewOnBlur={false}
               class="mira-link-preview__editable"
               label={`Edit ${resolvedFile.name || resolvedFile.path}`}
               onPersisted={(value) => (previewMarkdown = value)}

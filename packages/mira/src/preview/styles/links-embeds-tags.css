@@ -82,6 +82,7 @@
 .mira-link-preview__card {
   background: var(--popover);
   border: 1px solid var(--border);
+  box-sizing: border-box;
   border-radius: var(--radius-m);
   box-shadow: 0 18px 50px rgb(0 0 0 / 14%);
   color: var(--popover-foreground);
@@ -102,7 +103,8 @@
 .mira-link-preview__card:has(
   .mira-link-preview__editable[data-editing="true"]
 ) {
-  grid-template-rows: auto auto minmax(0, 1fr);
+  border: 2px solid var(--ring);
+  grid-template-rows: minmax(0, 1fr);
   overflow: hidden;
 }
 
@@ -126,7 +128,7 @@
   font-family: var(--font-sans);
   max-height: 18rem;
   overflow: auto;
-  padding: 0;
+  padding: 1rem 2rem;
   white-space: normal;
 }
 
