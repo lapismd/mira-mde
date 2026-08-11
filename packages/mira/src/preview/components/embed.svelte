@@ -211,7 +211,7 @@
       {#if previewAssetUrl}
         <img
           src={previewAssetUrl}
-          alt={displayText}
+          alt=""
           width={imageDetails.width}
           height={imageDetails.height}
         />

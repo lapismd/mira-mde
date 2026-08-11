@@ -170,6 +170,37 @@ describe("portable preview surfaces", () => {
     await unmount(link);
   });
 
+  it("does not repeat an image embed caption as its alternative text", async () => {
+    const target = document.createElement("div");
+    const imageAdapter: MiraFileAdapter = {
+      resolveLink() {
+        return {
+          kind: "image",
+          name: "Service topology",
+          path: "assets/service-topology.svg",
+        };
+      },
+      readAssetUrl() {
+        return "/service-topology.svg";
+      },
+    };
+    const component = mount(FileEmbed, {
+      target,
+      props: {
+        id: "assets/service-topology.svg",
+        label: "Service topology",
+        fileAdapter: imageAdapter,
+      },
+    });
+    await settle();
+
+    expect(target.querySelector("figcaption")?.textContent).toBe(
+      "Service topology",
+    );
+    expect(target.querySelector<HTMLImageElement>("img")?.alt).toBe("");
+    await unmount(component);
+  });
+
   it("loads internal-link preview content only after interaction", async () => {
     const target = document.createElement("div");
     target.dataset.miraTheme = "obsidian company-brand";
@@ -272,9 +303,9 @@ describe("portable preview surfaces", () => {
         clientY: 100,
       }),
     );
-    await new Promise((resolve) => setTimeout(resolve, 20));
-    await settle();
-    expect(document.body.querySelector(selector)).toBeNull();
+    await vi.waitFor(() => {
+      expect(document.body.querySelector(selector)).toBeNull();
+    });
 
     await unmount(component);
     target.remove();

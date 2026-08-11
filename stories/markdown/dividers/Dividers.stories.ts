@@ -124,6 +124,9 @@ export const LivePreview: Story = {
       const firstWidget = canvasElement.querySelector<HTMLElement>(
         ".mira-rich-widget--horizontalrule",
       )!;
+      const initialPicker = within(firstWidget).getByRole("button", {
+        name: "Choose divider style",
+      });
       const initialVariant = firstWidget.querySelector<SVGElement>(
         "svg.mira-doodle-divider",
       )?.dataset.variant;
@@ -143,18 +146,29 @@ export const LivePreview: Story = {
         expect(doodle?.dataset.variant).toBe("waves");
       });
 
+      await waitFor(() => {
+        const currentWidget = canvasElement.querySelector<HTMLElement>(
+          ".mira-rich-widget--horizontalrule",
+        );
+        expect(
+          currentWidget &&
+            within(currentWidget).getByRole("button", {
+              name: "Choose divider style",
+            }),
+        ).not.toBe(initialPicker);
+      });
+
       const refreshedWidget = canvasElement.querySelector<HTMLElement>(
         ".mira-rich-widget--horizontalrule",
       )!;
-      await userEvent.click(
-        within(refreshedWidget).getByRole("button", {
-          name: "Choose divider style",
-        }),
-      );
+      const refreshedPicker = within(refreshedWidget).getByRole("button", {
+        name: "Choose divider style",
+      });
+      await userEvent.click(refreshedPicker);
       const menu = within(refreshedWidget).getByRole("menu", {
         name: "Divider style",
       });
-      expect(menu).toBeVisible();
+      await waitFor(() => expect(menu).toBeVisible());
       expect(within(menu).getAllByRole("menuitemradio")).toHaveLength(8);
       expect(
         within(menu).getByRole("menuitemradio", { name: "Waves" }),
@@ -175,13 +189,29 @@ export const LivePreview: Story = {
         );
       });
 
-      expect(
-        within(
-          canvasElement.querySelector<HTMLElement>(
-            ".mira-rich-widget--horizontalrule",
-          )!,
-        ).getByRole("button", { name: "Edit source" }),
-      ).toBeVisible();
+      await waitFor(() => {
+        const currentWidget = canvasElement.querySelector<HTMLElement>(
+          ".mira-rich-widget--horizontalrule",
+        );
+        expect(
+          currentWidget &&
+            within(currentWidget).getByRole("button", {
+              name: "Choose divider style",
+            }),
+        ).not.toBe(refreshedPicker);
+      });
+
+      await waitFor(() => {
+        const selectedWidget = canvasElement.querySelector<HTMLElement>(
+          ".mira-rich-widget--horizontalrule",
+        )!;
+        const sourceButton = within(selectedWidget).getByRole("button", {
+          name: "Edit source",
+        });
+        sourceButton.focus();
+        expect(sourceButton).toHaveFocus();
+        expect(sourceButton).toBeVisible();
+      });
     });
 
     await step(
