@@ -89,6 +89,7 @@ authorized baseline regeneration migrations are complete.
 | MIRA-MD-027, MIRA-CSS-031, MIRA-ARCH-025                                                                | Minimal padded card paint, two-pixel editing border, focus/hover pinning, and persistence-safe outside-click dismissal | Implemented by editable-preview card alignment  |
 | MIRA-MD-028, MIRA-CSS-032, MIRA-ARCH-026                                                                | Portaled internal-link previews retain inherited trigger theme and color-mode attributes                               | Implemented by effective-appearance propagation |
 | MIRA-MD-029, MIRA-ARCH-027                                                                              | Captioned adapter-backed image embeds avoid duplicate nested image alternatives                                        | Implemented by embed accessibility repair       |
+| MIRA-MD-030, MIRA-ARCH-028                                                                              | Default and base-free composition tests plus public package type and build verification                                | Implemented by portable composition control     |
 
 The selective-release slice defines the exact six-package graph once, configures
 independent Changesets versions and package-owned changelogs, and uses

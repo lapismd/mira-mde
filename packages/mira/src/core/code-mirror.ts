@@ -30,6 +30,7 @@ import { createImageDropPasteExtension } from "./images";
 
 export type MiraCodeMirrorExtensionsOptions = {
   mode: MiraMode;
+  includeBaseExtensions?: boolean;
   readonly?: boolean;
   placeholder?: string;
   lineWrapping?: boolean;
@@ -62,6 +63,7 @@ export function createMiraCodeMirrorExtensions(
 ): Extension[] {
   const {
     mode,
+    includeBaseExtensions = true,
     readonly = false,
     placeholder,
     lineWrapping,
@@ -109,14 +111,16 @@ export function createMiraCodeMirrorExtensions(
     }));
 
   return [
-    createBaseCodeMirrorExtensions({
-      readonly,
-      placeholder,
-      lineWrapping,
-      spellcheck,
-      indentWithTabs,
-      indentWidth,
-    }),
+    includeBaseExtensions
+      ? createBaseCodeMirrorExtensions({
+          readonly,
+          placeholder,
+          lineWrapping,
+          spellcheck,
+          indentWithTabs,
+          indentWidth,
+        })
+      : [],
     createSlashCommandExtensions({ commands: resolved.slashCommands }),
     createMiraCommandKeymap(resolved.commands, runtimeContext),
     createMarkdownCodeMirrorExtensions({
