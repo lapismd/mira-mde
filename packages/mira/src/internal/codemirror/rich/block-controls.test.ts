@@ -153,6 +153,14 @@ describe("block controls", () => {
     expect(
       menu?.parentElement?.classList.contains("mira-block-toolbar-portal"),
     ).toBe(true);
+    const portal = menu?.parentElement as HTMLElement;
+    expect(portal.classList.contains("mira")).toBe(false);
+    expect(portal.style.getPropertyValue("position")).toBe("fixed");
+    expect(portal.style.getPropertyPriority("position")).toBe("important");
+    expect(portal.style.height).toBe("0px");
+    expect(portal.style.minHeight).toBe("0px");
+    expect(portal.style.width).toBe("0px");
+    expect(portal.style.overflow).toBe("visible");
     expect(
       menu
         ?.querySelector('[data-block-toolbar-item="heading1"]')
@@ -167,6 +175,7 @@ describe("block controls", () => {
 
     view.destroy();
     expect(document.body.contains(menu)).toBe(false);
+    expect(document.body.contains(portal)).toBe(false);
     parent.remove();
   });
 

@@ -548,9 +548,22 @@ class BlockControlsPlugin implements PluginValue {
   private mountToolbarPortal(): void {
     const ownerDocument = this.view.dom.ownerDocument;
     this.syncToolbarPortalAppearance();
-    this.toolbarPortal.style.inset = "0";
+    this.toolbarPortal.style.background = "transparent";
+    this.toolbarPortal.style.border = "0";
+    this.toolbarPortal.style.borderRadius = "0";
+    this.toolbarPortal.style.boxShadow = "none";
+    this.toolbarPortal.style.display = "block";
+    this.toolbarPortal.style.height = "0";
+    this.toolbarPortal.style.inset = "0 auto auto 0";
+    this.toolbarPortal.style.minHeight = "0";
+    this.toolbarPortal.style.overflow = "visible";
     this.toolbarPortal.style.pointerEvents = "none";
-    this.toolbarPortal.style.position = "fixed";
+    // CodeMirror's generated root class declares `position: relative
+    // !important`. The portal retains those generated classes so its menu can
+    // use the same EditorView theme, therefore its layout-neutral fixed
+    // geometry must carry the same priority.
+    this.toolbarPortal.style.setProperty("position", "fixed", "important");
+    this.toolbarPortal.style.width = "0";
     this.toolbarPortal.style.zIndex = "1000";
     this.toolbarPortal.append(this.toolbarMenu);
     ownerDocument.body.append(this.toolbarPortal);
@@ -563,7 +576,7 @@ class BlockControlsPlugin implements PluginValue {
     );
     const colorHost = this.view.dom.closest<HTMLElement>(".light, .dark");
     this.toolbarPortal.className = [
-      "mira mira-block-toolbar-portal",
+      "mira-block-toolbar-portal",
       ...this.view.dom.classList,
       ...(colorHost
         ? Array.from(colorHost.classList).filter(
