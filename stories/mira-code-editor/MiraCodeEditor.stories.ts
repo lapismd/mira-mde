@@ -88,6 +88,8 @@ export const FindAndReplace: Story = {
     await expect(getComputedStyle(panel as Element).backgroundColor).toBe(
       "rgba(0, 0, 0, 0)",
     );
+    await expect(getComputedStyle(find).fontSize).toBe("14px");
+    await expect(getComputedStyle(find, "::placeholder").fontSize).toBe("14px");
 
     const wholeWord = canvas.getByRole("button", { name: "Match whole word" });
     await expect(wholeWord).toHaveAttribute("aria-pressed", "false");

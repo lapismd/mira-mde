@@ -361,6 +361,12 @@ const codeEditorTokens = [
     "MiraCodeEditor Find and Replace field shells.",
   ),
   token(
+    "--mira-code-editor-search-font-size",
+    "Find and Replace input and placeholder text size.",
+    "0.875rem",
+    "MiraCodeEditor Find and Replace inputs.",
+  ),
+  token(
     "--mira-code-editor-search-input-background",
     "Search input background.",
     "var(--mira-code-editor-background)",

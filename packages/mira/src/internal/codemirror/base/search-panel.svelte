@@ -374,6 +374,7 @@
       )
     );
     font: inherit;
+    font-size: var(--mira-code-editor-search-font-size, 0.875rem);
     height: 2rem;
     min-width: 10rem;
     padding: 0 0.625rem;
