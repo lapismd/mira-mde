@@ -546,14 +546,14 @@
   margin-inline-start: auto;
 }
 
-[data-slot="dialog-overlay"] {
+[data-mira-overlay][data-slot="dialog-overlay"] {
   background: rgb(0 0 0 / 48%);
   inset: 0;
   position: fixed;
   z-index: 50;
 }
 
-[data-slot="dialog-content"] {
+[data-mira-overlay][data-slot="dialog-content"] {
   background: var(--background, var(--mira-background));
   border: 1px solid var(--border, var(--mira-border));
   border-radius: var(--radius-l, var(--mira-radius));
@@ -576,27 +576,27 @@
   z-index: 50;
 }
 
-[data-slot="dialog-content"].p-0 {
+[data-mira-overlay][data-slot="dialog-content"].p-0 {
   padding: 0;
 }
 
-[data-slot="dialog-content"].overflow-hidden {
+[data-mira-overlay][data-slot="dialog-content"].overflow-hidden {
   overflow: hidden;
 }
 
-[data-slot="dialog-content"].max-h-\[85vh\] {
+[data-mira-overlay][data-slot="dialog-content"].max-h-\[85vh\] {
   max-height: 85vh;
 }
 
-[data-slot="dialog-content"].w-\[95vw\] {
+[data-mira-overlay][data-slot="dialog-content"].w-\[95vw\] {
   width: 95vw;
 }
 
-[data-slot="dialog-content"].max-w-\[95vw\] {
+[data-mira-overlay][data-slot="dialog-content"].max-w-\[95vw\] {
   max-width: 95vw;
 }
 
-[data-slot="dialog-content"] > [data-slot="dialog-close"] {
+[data-mira-overlay][data-slot="dialog-content"] > [data-slot="dialog-close"] {
   align-items: center;
   background: transparent;
   border: 0;
@@ -615,36 +615,37 @@
   width: 1.75rem;
 }
 
-[data-slot="dialog-content"] > [data-slot="dialog-close"]:hover {
+[data-mira-overlay][data-slot="dialog-content"]
+  > [data-slot="dialog-close"]:hover {
   opacity: 1;
 }
 
-[data-slot="dialog-title"] {
+[data-mira-overlay] [data-slot="dialog-title"] {
   font-size: 1.125rem;
   font-weight: 600;
   line-height: 1;
 }
 
-[data-slot="dialog-description"] {
+[data-mira-overlay] [data-slot="dialog-description"] {
   color: var(--muted-foreground, var(--mira-muted-foreground));
   font-size: 0.875rem;
 }
 
-[data-slot="dialog-header"] {
+[data-mira-overlay] [data-slot="dialog-header"] {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   text-align: left;
 }
 
-[data-slot="dialog-footer"] {
+[data-mira-overlay] [data-slot="dialog-footer"] {
   display: flex;
   flex-direction: column-reverse;
   gap: 0.5rem;
 }
 
 @media (min-width: 640px) {
-  [data-slot="dialog-footer"] {
+  [data-mira-overlay] [data-slot="dialog-footer"] {
     flex-direction: row;
     justify-content: flex-end;
   }
