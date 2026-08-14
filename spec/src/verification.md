@@ -94,6 +94,8 @@ authorized baseline regeneration migrations are complete.
 | MIRA-UI-018, MIRA-CSS-033, MIRA-ARCH-030, MIRA-MD-032, MIRA-CAT-014, MIRA-GOV-012                       | Public shell unit tests, internal adoption, catalog contract, package checks/build, and linked Design Core acceptance  | Implemented by generic CodeMirror shell slice   |
 | MIRA-MD-033, MIRA-ARCH-031, MIRA-CSS-034, MIRA-CAT-015                                                  | Search-panel structure and query tests, focused catalog interaction, package build, and linked Lapis acceptance        | Implemented by compact Find and Replace slice   |
 | MIRA-MD-034, MIRA-ARCH-032, MIRA-CSS-035                                                                | Block-toolbar portal geometry and CodeMirror teardown regression coverage                                              | Implemented                                     |
+| MIRA-CSS-036                                                                                            | Obsidian palette contract assertion plus linked Roles Source story axe coverage                                         | Implemented                                     |
+| MIRA-ARCH-033                                                                                           | Public Mira package build plus linked Roles Source story axe coverage                                                    | Implemented                                     |
 
 The selective-release slice defines the exact six-package graph once, configures
 independent Changesets versions and package-owned changelogs, and uses

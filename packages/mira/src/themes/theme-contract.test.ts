@@ -28,6 +28,10 @@ describe("Mira theme CSS contract", () => {
     expect(source).toContain("light-dark(#ffffff, #1e1e1e)");
     expect(source).toContain("light-dark(#222222, #dadada)");
     expect(source).toContain("light-dark(hsl(257 88.88% 70.95%), #7852ee)");
+    expect(source).toContain(
+      "--mira-syntax-string: light-dark(#007a58, #53dfdd)",
+    );
+    expect(source).not.toContain("#008f67");
     expect(source).not.toContain("light-dark(#fbfbfc, #17181c)");
     expect(source).toContain(
       "--mira-callout-default: var(--_mira-callout-default-light)",
