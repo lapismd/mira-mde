@@ -78,6 +78,8 @@ export const miraRichEditorTheme = EditorView.theme({
   "&.cm-live-preview .cm-formatting-hidden": {
     color: "transparent",
     display: "inline-block",
+    height: "0",
+    lineHeight: "0",
     overflow: "hidden",
     width: "0",
   },

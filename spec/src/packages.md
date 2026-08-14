@@ -143,7 +143,10 @@ entry point.
   the public Markdown sans token for ordinary prose while the shipped
   code-specific hooks continue to select the monospaced token. The line-number
   gutter MUST use the same public monospace bridge with tabular numerals and the
-  theme-aware faint foreground without changing other gutter columns. Source-mode
+  theme-aware faint foreground without changing other gutter columns. Hidden
+  live-preview Markdown formatting MUST retain its source mapping while
+  contributing no inline or block geometry, so visible heading text stays on
+  the same line as its gutter. Source-mode
   pipe-table line hooks MUST also select that monospaced token and preserve
   non-wrapping preformatted row geometry so authored delimiters remain aligned.
   Internal task marker ranges MUST account for authored blockquote prefixes

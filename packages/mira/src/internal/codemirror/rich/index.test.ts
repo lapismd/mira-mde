@@ -319,6 +319,35 @@ After`;
     parent.remove();
   });
 
+  it("keeps hidden heading syntax out of the live-preview line box", async () => {
+    const parent = document.createElement("div");
+    document.body.append(parent);
+    const source = "# Visible heading\n\nParagraph";
+    const view = new EditorView({
+      doc: source,
+      selection: { anchor: source.length },
+      extensions: [
+        createMarkdownCodeMirrorExtensions(),
+        createRichEditorExtensions({ livePreview: true }),
+      ],
+      parent,
+    });
+    await nextFrame();
+    await nextFrame();
+
+    const hiddenFormatting = parent.querySelector<HTMLElement>(
+      ".cm-header .cm-formatting-hidden",
+    );
+    expect(hiddenFormatting).not.toBeNull();
+    const style = getComputedStyle(hiddenFormatting!);
+    expect(style.display).toBe("inline-block");
+    expect(Number.parseFloat(style.height)).toBe(0);
+    expect(Number.parseFloat(style.lineHeight)).toBe(0);
+
+    view.destroy();
+    parent.remove();
+  });
+
   it("keeps blockquote markers from collapsing when the line is focused", async () => {
     const parent = document.createElement("div");
     document.body.append(parent);
