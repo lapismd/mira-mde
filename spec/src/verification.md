@@ -96,6 +96,7 @@ authorized baseline regeneration migrations are complete.
 | MIRA-MD-033, MIRA-ARCH-031, MIRA-CSS-034, MIRA-CAT-015                                                  | Search-panel structure and query tests, focused catalog interaction, package build, and linked Lapis acceptance        | Implemented by compact Find and Replace slice   |
 | MIRA-MD-034, MIRA-ARCH-032, MIRA-CSS-035                                                                | Block-toolbar portal geometry and CodeMirror teardown regression coverage                                              | Implemented                                     |
 | MIRA-CSS-036                                                                                            | Obsidian palette contract assertion plus linked Roles Source story axe coverage                                         | Implemented                                     |
+| MIRA-MD-035, MIRA-CSS-037, MIRA-ARCH-034                                                                | Mira UI source contract rejects unscoped generic popover-content paint and stacking selectors                          | Implemented by popover ownership repair         |
 | MIRA-ARCH-033                                                                                           | Public Mira package build plus linked Roles Source story axe coverage                                                    | Implemented                                     |
 
 The selective-release slice defines the exact six-package graph once, configures

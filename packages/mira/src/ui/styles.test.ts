@@ -15,4 +15,15 @@ describe("Mira UI style boundaries", () => {
     );
     expect(overlay).toContain("data-mira-overlay");
   });
+
+  it("scopes popover paint to Mira-owned overlays", () => {
+    const styles = readSource("./styles.css");
+    const popover = readSource("./popover/popover-content.svelte");
+
+    expect(styles).toContain(
+      '[data-mira-overlay][data-slot="popover-content"]',
+    );
+    expect(styles).not.toMatch(/(?:^|\n)\[data-slot="popover-content"\]\s*\{/u);
+    expect(popover).toContain("data-mira-overlay");
+  });
 });

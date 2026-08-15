@@ -370,7 +370,7 @@
   z-index: 1100;
 }
 
-[data-slot="popover-content"] {
+[data-mira-overlay][data-slot="popover-content"] {
   background: var(--popover, var(--mira-widget-background));
   border: 1px solid var(--border, var(--mira-border));
   border-radius: var(--radius-m, var(--mira-radius));
