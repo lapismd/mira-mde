@@ -9,7 +9,7 @@ satisfy a plugin or package contract change.
 | ID           | Requirement                                                                                                                                                                                                                                                                                            |
 | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | MIRA-GOV-001 | `spec/src` Markdown MUST be canonical, indexed once by `SUMMARY.md`, link-valid, and buildable by mdBook.                                                                                                                                                                                              |
-| MIRA-GOV-002 | Requirement IDs MUST be unique and each ID MUST appear in the verification matrix. Repository-owned configuration MUST map Mira paths, verification states, and identifiers onto reusable shared validators.                                                                                           |
+| MIRA-GOV-002 | Requirement IDs MUST be unique and each ID MUST appear in one or more verification evidence rows. Repository-owned configuration MUST map Mira paths, verification row multiplicity, states, and identifiers onto reusable shared validators.                                                         |
 | MIRA-GOV-003 | Protected implementation and configuration changes MUST update every chapter mapped by the repository's configured spec-first policy in the same logical change.                                                                                                                                       |
 | MIRA-GOV-004 | The local gate MUST inspect the current Jujutsu change; pull-request CI MUST compare the exact base and head revisions.                                                                                                                                                                                |
 | MIRA-GOV-005 | Tests, generated output, visual results, and ordinary story assertions MUST NOT satisfy or spuriously trigger the specification-first gate.                                                                                                                                                            |
@@ -21,10 +21,10 @@ satisfy a plugin or package contract change.
 | MIRA-GOV-011 | Release automation MUST be retry-safe, publish in dependency order, reject registry/version/integrity disagreement, create package-version tags and GitHub releases, and verify clean consumer installation and provenance without automatically unpublishing a release.                               |
 | MIRA-GOV-012 | Every new public root component and shipped `--mira-*` token MUST be registered in the catalog contract, mapped to its canonical specification, and checked against package exports and source styles. The spec-first gate MUST reject implementation or catalog changes that omit any mapped chapter. |
 
-The configured shared `spec:validate` command also enforces a one-to-one relationship between chapters
-indexed by `SUMMARY.md`, raw Markdown Storybook mirrors, and the internal-link
-registry. Mirror MDX files contain composition only; they do not copy normative
-prose.
+The configured shared `spec:validate` command also enforces a one-to-one
+relationship between every chapter link indexed by `SUMMARY.md`, raw Markdown
+Storybook mirrors, and the internal-link registry. Mirror MDX files contain
+composition only; they do not copy normative prose.
 
 ## Change map
 

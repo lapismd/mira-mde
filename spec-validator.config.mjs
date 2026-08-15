@@ -43,6 +43,7 @@ export default defineConfig(tableRequirements(), {
         "Visual pending",
       ],
       statusMatch: "prefix",
+      rowMultiplicity: "at-least-one",
     }),
     book: true,
     storybookMirrors: {
