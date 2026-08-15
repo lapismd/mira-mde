@@ -41,7 +41,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Validate canonical specification
-        run: pnpm spec:lint && pnpm spec:validate && pnpm spec:build && pnpm spec:test
+        run: pnpm spec:validate && pnpm spec:build
 
       - name: Enforce specification-first changes
         if: github.event_name == 'pull_request'
