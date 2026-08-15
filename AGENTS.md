@@ -16,6 +16,16 @@ repo unless a more specific `AGENTS.md` is added deeper in the tree.
   as vault/workspace APIs, command registries, metadata workers, sidebars, and
   file-tree services.
 
+## Colocated sibling dependencies
+
+- Consume a colocated LapisMD sibling through an explicit `link:` dependency or
+  a `link:`-valued root `pnpm-workspace.yaml` override; do not add the sibling
+  repository as a workspace member.
+- Keep publishable manifests portable. Do not vendor sibling source, edit its
+  `node_modules`, or replace a local checkout with a registry copy.
+- When a sibling exports built output, rebuild it before validating this
+  repository as a consumer.
+
 ## Styling Model
 
 - Exported package styling must work without requiring consumers to run
