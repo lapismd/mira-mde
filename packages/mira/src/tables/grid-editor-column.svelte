@@ -77,13 +77,16 @@
     };
   };
 
-  function enableEdit(evt: MouseEvent) {
-    editing = onEdit(evt) ?? true;
+  function enableEdit(evt: MouseEvent | FocusEvent) {
+    editing = evt instanceof MouseEvent ? (onEdit(evt) ?? true) : true;
     if (!editing) return;
     tick().then(() => {
       setTimeout(() => {
         view.focus();
-        const pos = view.posAtCoords({ x: evt.clientX, y: evt.clientY }) ?? 0;
+        const pos =
+          evt instanceof MouseEvent
+            ? (view.posAtCoords({ x: evt.clientX, y: evt.clientY }) ?? 0)
+            : view.state.doc.length;
         view.dispatch({ selection: { anchor: pos, head: pos } });
       });
     });
@@ -116,7 +119,7 @@
         type="button"
         aria-label="Edit table cell"
         onclick={(evt) => enableEdit(evt)}
-        onfocus={(evt) => (editing = true)}
+        onfocus={(evt) => enableEdit(evt)}
         style="position: absolute; inset: 0; opacity: 0;"
       ></button>
     </div>

@@ -311,6 +311,7 @@
         align="start"
         sideOffset={8}
         collisionPadding={8}
+        sticky="always"
         onInteractOutside={handlePreviewInteractOutside}
       >
         {#if resolvedFile}

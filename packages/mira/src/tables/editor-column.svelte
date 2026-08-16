@@ -69,16 +69,21 @@
     };
   };
 
-  function enableEdit(evt: MouseEvent) {
+  function enableEdit(evt: MouseEvent | FocusEvent) {
     if (readonly) {
       return;
     }
     editing = true;
-    onEdit(evt);
+    if (evt instanceof MouseEvent) {
+      onEdit(evt);
+    }
     tick().then(() => {
       setTimeout(() => {
         view.focus();
-        const pos = view.posAtCoords({ x: evt.clientX, y: evt.clientY }) ?? 0;
+        const pos =
+          evt instanceof MouseEvent
+            ? (view.posAtCoords({ x: evt.clientX, y: evt.clientY }) ?? 0)
+            : view.state.doc.length;
         view.dispatch({ selection: { anchor: pos, head: pos } });
       });
     });
@@ -123,7 +128,7 @@
         type="button"
         aria-label="Edit table cell"
         onclick={(evt) => enableEdit(evt)}
-        onfocus={(evt) => (editing = true)}
+        onfocus={(evt) => enableEdit(evt)}
         style="position: absolute; inset: 0; opacity: 0;"
       ></button>
     </div>
