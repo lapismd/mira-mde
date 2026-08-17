@@ -26,4 +26,15 @@ describe("Mira UI style boundaries", () => {
     expect(styles).not.toMatch(/(?:^|\n)\[data-slot="popover-content"\]\s*\{/u);
     expect(popover).toContain("data-mira-overlay");
   });
+
+  it("scopes tooltip paint to Mira-owned overlays", () => {
+    const styles = readSource("./styles.css");
+    const tooltip = readSource("./tooltip/tooltip-content.svelte");
+
+    expect(styles).toContain(
+      '[data-mira-overlay][data-slot="tooltip-content"]',
+    );
+    expect(styles).not.toMatch(/(?:^|\n)\[data-slot="tooltip-content"\]/u);
+    expect(tooltip).toContain("data-mira-overlay");
+  });
 });

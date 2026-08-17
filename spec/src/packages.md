@@ -36,6 +36,7 @@ install internal CodeMirror, renderer, UI, or theme workspaces separately.
 | MIRA-ARCH-033 | The shipped `@lapismd/mira` Obsidian theme MUST provide an accessible light-mode string syntax color through the existing public theme export and `--mira-syntax-string` token without changing its dark-mode value or requiring a consumer override.                                                                                                                                                                                                                              |
 | MIRA-ARCH-034 | The shipped `@lapismd/mira` UI stylesheet MUST scope popover paint and stacking declarations to Mira-owned overlays so aggregate-style consumers retain ownership of their generic shadcn popovers.                                                                                                                                                                                                                                                                                |
 | MIRA-ARCH-035 | The public `@lapismd/mira/preview` frontmatter contract MUST expose optional `valueSuggestions` and an optional `FrontmatterEditor` `fileAdapter` without requiring consumers to fork pill-list editing. |
+| MIRA-ARCH-036 | The shipped `@lapismd/mira` UI stylesheet MUST scope tooltip paint and stacking declarations to Mira-owned overlays so aggregate-style consumers retain ownership of their generic shadcn tooltips. |
 
 ## Public graph
 

@@ -651,7 +651,7 @@
   }
 }
 
-[data-slot="tooltip-content"] {
+[data-mira-overlay][data-slot="tooltip-content"] {
   background: var(--popover, var(--mira-widget-background));
   border: 1px solid var(--border, var(--mira-border));
   border-radius: var(--radius-s, 4px);
@@ -665,7 +665,7 @@
   z-index: var(--layer-tooltip, 1200);
 }
 
-[data-slot="tooltip-content"] svg {
+[data-mira-overlay][data-slot="tooltip-content"] svg {
   fill: var(--popover, var(--mira-widget-background));
   color: var(--border, var(--mira-border));
 }
