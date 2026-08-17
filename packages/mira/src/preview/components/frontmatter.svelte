@@ -54,22 +54,20 @@
   const markdown = tryUseMarkdownContext();
   const ownedMarkdown = markdown
     ? null
-    : fileAdapter
-      ? setMarkdownContext({
-          markdown: "",
-          sourcePath: undefined,
-          extensions: [],
-          remarkPlugins: [],
-          rehypePlugins: [],
-          remarkRehypeOptions: { allowDangerousHtml: true },
-          components: {},
-          fileAdapter,
-          listCallouts: [],
-          postProcess: () => {},
-          frontmatterOpen: true,
-          dialog: false,
-        })
-      : null;
+    : setMarkdownContext({
+        markdown: "",
+        sourcePath: undefined,
+        extensions: [],
+        remarkPlugins: [],
+        rehypePlugins: [],
+        remarkRehypeOptions: { allowDangerousHtml: true },
+        components: {},
+        fileAdapter: undefined,
+        listCallouts: [],
+        postProcess: () => {},
+        frontmatterOpen: true,
+        dialog: false,
+      });
   const localController = new FrontmatterController();
   const fallbackManager = createFrontmatterPropertyManager({
     ...(markdown?.frontmatterConfig ?? {}),
