@@ -53,6 +53,53 @@ export type FrontmatterPillWikilink = {
   text: string;
 };
 
+export async function readFrontmatterValueSuggestions(
+  config: FrontmatterConfig | undefined,
+  key: string,
+  query: string,
+): Promise<string[]> {
+  const source = config?.valueSuggestions;
+  if (!source) {
+    return [];
+  }
+  const values = await source(key, query);
+  return filterFrontmatterValueSuggestions(values, query);
+}
+
+export function filterFrontmatterValueSuggestions(
+  suggestions: readonly string[],
+  query: string,
+  excludedValues: readonly string[] = [],
+): string[] {
+  const normalizedQuery = query.trim().toLocaleLowerCase();
+  const excluded = new Set(
+    excludedValues.map((value) => value.trim().toLocaleLowerCase()),
+  );
+  const unique = new Map<string, string>();
+  for (const suggestion of suggestions) {
+    const value = suggestion.trim();
+    const key = value.toLocaleLowerCase();
+    if (!value || excluded.has(key) || unique.has(key)) {
+      continue;
+    }
+    if (normalizedQuery && !key.includes(normalizedQuery)) {
+      continue;
+    }
+    unique.set(key, value);
+  }
+  return [...unique.values()]
+    .sort((left, right) => {
+      const leftName = left.toLocaleLowerCase();
+      const rightName = right.toLocaleLowerCase();
+      const leftStarts =
+        normalizedQuery && leftName.startsWith(normalizedQuery) ? 0 : 1;
+      const rightStarts =
+        normalizedQuery && rightName.startsWith(normalizedQuery) ? 0 : 1;
+      return leftStarts - rightStarts || leftName.localeCompare(rightName);
+    })
+    .slice(0, 20);
+}
+
 export function parseFrontmatterPillWikilink(
   value: string,
 ): FrontmatterPillWikilink | null {

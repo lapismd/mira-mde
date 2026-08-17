@@ -56,6 +56,11 @@ export type FrontmatterPropertySuggestionSource =
       | readonly FrontmatterPropertySuggestionInput[]
       | Promise<readonly FrontmatterPropertySuggestionInput[]>);
 
+export type FrontmatterValueSuggestionSource = (
+  key: string,
+  query: string,
+) => readonly string[] | Promise<readonly string[]>;
+
 export type FrontmatterClipboard = {
   readText: () => string | Promise<string>;
   writeText: (value: string) => void | Promise<void>;
@@ -69,6 +74,7 @@ export type FrontmatterConfig = {
   >;
   widgets?: FrontmatterTypeDefinition[];
   propertySuggestions?: FrontmatterPropertySuggestionSource;
+  valueSuggestions?: FrontmatterValueSuggestionSource;
   clipboard?: FrontmatterClipboard;
   onActionError?: (
     error: unknown,

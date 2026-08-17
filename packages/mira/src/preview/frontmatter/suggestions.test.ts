@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
   filterFrontmatterPropertySuggestions,
+  filterFrontmatterValueSuggestions,
   parseFrontmatterPillWikilink,
   readFrontmatterPropertySuggestions,
+  readFrontmatterValueSuggestions,
 } from "./suggestions";
 
 describe("frontmatter property suggestions", () => {
@@ -29,6 +31,35 @@ describe("frontmatter property suggestions", () => {
         ["state"],
       ).map((suggestion) => suggestion.name),
     ).toEqual(["status", "review-status"]);
+  });
+});
+
+describe("frontmatter value suggestions", () => {
+  it("loads keyed values and ranks prefix matches", async () => {
+    const suggestions = await readFrontmatterValueSuggestions(
+      {
+        valueSuggestions: (key, query) =>
+          key === "tags" && query.startsWith("p")
+            ? ["project/alpha", "inbox", "project/beta"]
+            : [],
+      },
+      "tags",
+      "pro",
+    );
+    expect(suggestions).toEqual(["project/alpha", "project/beta"]);
+  });
+
+  it("excludes current pills and empty values", () => {
+    expect(
+      filterFrontmatterValueSuggestions(
+        ["demo", "ideas", "demo", ""],
+        "dem",
+        ["demo"],
+      ),
+    ).toEqual([]);
+    expect(
+      filterFrontmatterValueSuggestions(["ideas", "demo"], "ide", ["demo"]),
+    ).toEqual(["ideas"]);
   });
 });
 

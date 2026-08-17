@@ -18,7 +18,12 @@
   import Icon from "./icon.svelte";
   import Link from "./link.svelte";
   import FrontmatterPropertyNameInput from "./frontmatter-property-name-input.svelte";
-  import { tryUseMarkdownContext } from "../renderer/context.svelte";
+  import FrontmatterPropertyValueInput from "./frontmatter-property-value-input.svelte";
+  import type { MiraFileAdapter } from "@lapismd/mira/extensions";
+  import {
+    setMarkdownContext,
+    tryUseMarkdownContext,
+  } from "../renderer/context.svelte";
 
   type Props = {
     controller?: FrontmatterController;
@@ -27,6 +32,7 @@
     value?: string;
     open?: boolean;
     showChrome?: boolean;
+    fileAdapter?: MiraFileAdapter;
     ref?: HTMLElement | null;
     "data-offset"?: string | number;
     "data-offset-end"?: string | number;
@@ -39,12 +45,31 @@
     value: valueProp = "",
     open: openProp,
     showChrome = true,
+    fileAdapter,
     ref = $bindable(null),
     "data-offset": dataOffset,
     "data-offset-end": dataOffsetEnd,
   }: Props = $props();
 
   const markdown = tryUseMarkdownContext();
+  const ownedMarkdown = markdown
+    ? null
+    : fileAdapter
+      ? setMarkdownContext({
+          markdown: "",
+          sourcePath: undefined,
+          extensions: [],
+          remarkPlugins: [],
+          rehypePlugins: [],
+          remarkRehypeOptions: { allowDangerousHtml: true },
+          components: {},
+          fileAdapter,
+          listCallouts: [],
+          postProcess: () => {},
+          frontmatterOpen: true,
+          dialog: false,
+        })
+      : null;
   const localController = new FrontmatterController();
   const fallbackManager = createFrontmatterPropertyManager({
     ...(markdown?.frontmatterConfig ?? {}),
@@ -110,6 +135,15 @@
     controller.sourcePath ?? manager.sourcePath ?? markdown?.sourcePath,
   );
   const config = $derived(manager.config);
+
+  $effect.pre(() => {
+    if (!ownedMarkdown) {
+      return;
+    }
+    ownedMarkdown.fileAdapter = fileAdapter;
+    ownedMarkdown.sourcePath = sourcePath;
+    ownedMarkdown.frontmatterConfig = config;
+  });
 
   function updateProperty(
     property: FrontmatterProperty,
@@ -373,9 +407,11 @@
     listDrafts = next;
   }
 
-  function addListValue(property: FrontmatterProperty, event: Event): void {
-    const draft = listDrafts[property.pathString] ?? "";
-    const nextValues = draft
+  function commitListValues(
+    property: FrontmatterProperty,
+    raw = listDrafts[property.pathString] ?? "",
+  ): void {
+    const nextValues = raw
       .split(/[,;]+/)
       .map(normalizeListValue)
       .filter(Boolean);
@@ -392,7 +428,6 @@
     }
     clearListDraft(property.pathString);
     updateProperty(property, next);
-    event.preventDefault();
   }
 
   function removeListValue(property: FrontmatterProperty, index: number): void {
@@ -400,30 +435,6 @@
       property,
       listValues(property).filter((_, itemIndex) => itemIndex !== index),
     );
-  }
-
-  function handleListKeydown(
-    event: KeyboardEvent,
-    property: FrontmatterProperty,
-  ): void {
-    if (
-      event.key === "Enter" ||
-      event.key === "Tab" ||
-      event.key === "," ||
-      event.key === ";"
-    ) {
-      addListValue(property, event);
-      return;
-    }
-
-    if (
-      event.key === "Backspace" &&
-      !listDrafts[property.pathString] &&
-      listValues(property).length
-    ) {
-      event.preventDefault();
-      removeListValue(property, listValues(property).length - 1);
-    }
   }
 
   function toggleOpen(path: string): void {
@@ -741,18 +752,19 @@
             {#each listValues(property) as item, index (`${item}:${index}`)}
               {@render Pill({ property, item, index })}
             {/each}
-            <input
-              class="metadata-input metadata-input-list min-w-[8ch] flex-1 bg-transparent px-1 py-0 text-xs outline-none"
-              aria-label={`${property.pathString} value`}
+            <FrontmatterPropertyValueInput
               value={listDrafts[property.pathString] ?? ""}
-              spellcheck="false"
-              oninput={(event) =>
-                setListDraft(
-                  property.pathString,
-                  (event.currentTarget as HTMLInputElement).value,
-                )}
-              onblur={(event) => addListValue(property, event)}
-              onkeydown={(event) => handleListKeydown(event, property)}
+              propertyKey={property.key}
+              {config}
+              excludedValues={listValues(property)}
+              ariaLabel={`${property.pathString} value`}
+              onInput={(next) => setListDraft(property.pathString, next)}
+              onCommit={(next) => commitListValues(property, next)}
+              onBackspaceEmpty={() => {
+                if (listValues(property).length) {
+                  removeListValue(property, listValues(property).length - 1);
+                }
+              }}
             />
           </div>
         {:else}
