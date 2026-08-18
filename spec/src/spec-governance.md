@@ -117,4 +117,5 @@ toolbars.
 3. Update requirements and verification before or with implementation.
 4. Add focused unit, story interaction, browser, or visual evidence.
 5. Run `pnpm spec:check` plus boundary-appropriate validation.
-6. Commit the verified logical slice with a review-quality message.
+6. Commit the verified logical slice with a review-quality message. This is a
+   standing request; do not wait for the user to ask.
