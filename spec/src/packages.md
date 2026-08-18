@@ -35,8 +35,8 @@ install internal CodeMirror, renderer, UI, or theme workspaces separately.
 | MIRA-ARCH-032 | The shipped `@lapismd/mira` block-toolbar portal MUST preserve editor theme scope without inheriting editor root geometry or requiring consumer cleanup and layout overrides.                                                                                                                                                                                                                                                                                                      |
 | MIRA-ARCH-033 | The shipped `@lapismd/mira` Obsidian theme MUST provide an accessible light-mode string syntax color through the existing public theme export and `--mira-syntax-string` token without changing its dark-mode value or requiring a consumer override.                                                                                                                                                                                                                              |
 | MIRA-ARCH-034 | The shipped `@lapismd/mira` UI stylesheet MUST scope popover paint and stacking declarations to Mira-owned overlays so aggregate-style consumers retain ownership of their generic shadcn popovers.                                                                                                                                                                                                                                                                                |
-| MIRA-ARCH-035 | The public `@lapismd/mira/preview` frontmatter contract MUST expose optional `valueSuggestions` and an optional `FrontmatterEditor` `fileAdapter` without requiring consumers to fork pill-list editing. |
-| MIRA-ARCH-036 | The shipped `@lapismd/mira` UI stylesheet MUST scope tooltip paint and stacking declarations to Mira-owned overlays so aggregate-style consumers retain ownership of their generic shadcn tooltips. |
+| MIRA-ARCH-035 | The public `@lapismd/mira/preview` frontmatter contract MUST expose optional `valueSuggestions` and an optional `FrontmatterEditor` `fileAdapter` without requiring consumers to fork pill-list editing.                                                                                                                                                                                                                                                                           |
+| MIRA-ARCH-036 | The shipped `@lapismd/mira` UI stylesheet MUST scope tooltip paint and stacking declarations to Mira-owned overlays so aggregate-style consumers retain ownership of their generic shadcn tooltips.                                                                                                                                                                                                                                                                                |
 
 ## Public graph
 
@@ -194,7 +194,10 @@ entry point.
   the `cm-table` raw-line decoration consumed by shipped source and
   live-preview fallback styles. Its default CodeMirror extensions MUST attach
   the matching grid-table line decoration and intercept grid-table Tab/Enter
-  navigation before the generic indentation keymap.
+  navigation before the generic indentation keymap. Rendered widget cells MUST
+  wrap through `--table-white-space` without cell or widget overflow. Raw
+  source table rows MUST scroll on the `.cm-line.cm-table` itself without a
+  content-wide horizontal scrollport.
 - `ui` and its documented component subpaths export the shared UI primitives.
 - `themes/mira.css`, `themes/obsidian.css`, `themes.css`, and `styles.css`
   provide explicit CSS entry points.

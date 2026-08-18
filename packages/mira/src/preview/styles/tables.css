@@ -53,7 +53,35 @@
   min-width: 0;
   padding: 0;
   vertical-align: middle;
-  white-space: nowrap;
+  white-space: var(--table-white-space);
+}
+
+.cm-table-widget :is(th, td).whitespace-nowrap,
+.cm-table-widget .table-cell-wrapper .cm-content,
+.cm-table-widget .table-cell-wrapper .cm-line,
+.cm-table-widget .table-cell-wrapper p {
+  white-space: var(--table-white-space);
+}
+
+.cm-table-widget .table-cell-wrapper .cm-editor,
+.cm-table-widget .table-cell-wrapper .cm-scroller,
+.cm-table-widget .table-cell-wrapper .cm-content,
+.cm-table-widget .table-cell-wrapper p {
+  box-sizing: border-box;
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  width: 100%;
+}
+
+.cm-table-widget .table-cell-wrapper .cm-scroller {
+  overflow: hidden;
+}
+
+.markdown-editor-surface .cm-table-widget.overflow-x-auto,
+.markdown-preview-surface .cm-table-widget.overflow-x-auto,
+.markdown-widget-shell .cm-table-widget.overflow-x-auto {
+  overflow-x: visible;
 }
 
 .markdown-rendered :is(th, td)[align="left"],

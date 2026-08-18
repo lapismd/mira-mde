@@ -7,7 +7,7 @@ import {
   markdownEditorDocsSource,
   markdownPreviewDocsSource,
 } from "../_shared/docs-source";
-import { tablesMarkdown } from "../fixtures";
+import { tablesMarkdown, wrappingTablesMarkdown } from "../fixtures";
 
 const meta = {
   title: "Markdown/Tables",
@@ -101,6 +101,61 @@ async function expectRawTableTypography(
   }
 }
 
+async function expectWrappedTableWidget(
+  canvasElement: HTMLElement,
+  longCellText = "100",
+): Promise<void> {
+  const shell = canvasElement.querySelector<HTMLElement>(
+    ".mira-table-widget-shell",
+  );
+  await expect(shell).not.toBeNull();
+  await expect(["visible", "hidden"]).toContain(
+    getComputedStyle(shell!).overflowX,
+  );
+
+  const cell = Array.from(
+    canvasElement.querySelectorAll<HTMLElement>(".table-cell-wrapper"),
+  ).find((element) => element.textContent?.includes(longCellText));
+  await expect(cell).toBeDefined();
+
+  const tableCell = cell!.closest("td, th");
+  await expect(tableCell).not.toBeNull();
+  await expect(getComputedStyle(tableCell!).whiteSpace).toBe("break-spaces");
+
+  const scroller = cell!.querySelector<HTMLElement>(".cm-scroller");
+  await expect(scroller).not.toBeNull();
+  await expect(["hidden", "clip"]).toContain(
+    getComputedStyle(scroller!).overflowX,
+  );
+  await expect(scroller!.scrollWidth).toBeLessThanOrEqual(
+    scroller!.clientWidth + 1,
+  );
+}
+
+async function expectScrollableSourceTableLines(
+  canvasElement: HTMLElement,
+): Promise<void> {
+  const content = canvasElement.querySelector<HTMLElement>(
+    ".cm-editor.markdown-source-view > .cm-scroller > .cm-content, .cm-editor.markdown-live-preview-mode > .cm-scroller > .cm-content",
+  );
+  const tableLine =
+    canvasElement.querySelector<HTMLElement>(".cm-line.cm-table");
+  await expect(content).not.toBeNull();
+  await expect(tableLine).not.toBeNull();
+  await expect(["visible", "hidden"]).toContain(
+    getComputedStyle(content!).overflowX,
+  );
+  await expect(getComputedStyle(tableLine!).overflowX).toBe("auto");
+  await expect(getComputedStyle(tableLine!).scrollbarWidth).toBe("none");
+  await expect(getComputedStyle(tableLine!).whiteSpace).toBe("pre");
+  await expect(tableLine!.scrollWidth).toBeGreaterThan(tableLine!.clientWidth);
+
+  const contentScrollLeft = content!.scrollLeft;
+  tableLine!.scrollLeft = 40;
+  await expect(tableLine!.scrollLeft).toBeGreaterThan(0);
+  await expect(content!.scrollLeft).toBe(contentScrollLeft);
+}
+
 export const Preview: Story = {
   tags: [
     "visual-approved",
@@ -123,8 +178,8 @@ export const Preview: Story = {
 
 export const LivePreview: Story = {
   tags: [
-    "visual-approved",
-    "!visual-pending",
+    "visual-pending",
+    "!visual-approved",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -156,6 +211,7 @@ export const LivePreview: Story = {
   },
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
+    await expectWrappedTableWidget(canvasElement);
     const sourceToggle = await canvas.findByRole("button", {
       name: "Edit table source",
     });
@@ -206,5 +262,94 @@ export const SourceMode: Story = {
   },
   play: async ({ canvasElement }) => {
     await expectRawTableTypography(canvasElement);
+  },
+};
+
+export const SourceModeOverflow: Story = {
+  tags: [
+    "visual-pending",
+    "!visual-approved",
+    "!visual-ready",
+    "!visual-failed",
+  ],
+  name: "Source Mode Overflow",
+  args: {
+    value: wrappingTablesMarkdown,
+  },
+  render: (args) => ({
+    Component: EditorModeStory,
+    props: {
+      ...args,
+      mode: "source",
+      width: "22rem",
+    },
+  }),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Long source-mode table rows scroll horizontally without visible scrollbar chrome.",
+      },
+      source: {
+        language: "html",
+        type: "code",
+        code: markdownEditorDocsSource("wrappingTablesMarkdown", "source"),
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    await expectScrollableSourceTableLines(canvasElement);
+  },
+};
+
+export const LivePreviewWrapping: Story = {
+  tags: [
+    "visual-pending",
+    "!visual-approved",
+    "!visual-ready",
+    "!visual-failed",
+  ],
+  name: "Live Preview Wrapping",
+  args: {
+    value: wrappingTablesMarkdown,
+  },
+  render: (args) => ({
+    Component: EditorModeStory,
+    props: {
+      ...args,
+      mode: "live-preview",
+      width: "22rem",
+    },
+  }),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Rendered live-preview table cells wrap their text instead of scrolling.",
+      },
+      source: {
+        language: "html",
+        type: "code",
+        code: markdownEditorDocsSource(
+          "wrappingTablesMarkdown",
+          "live-preview",
+        ),
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    await expectWrappedTableWidget(
+      canvasElement,
+      "Browser automation: navigate, click, snapshot",
+    );
+    const longCell = Array.from(
+      canvasElement.querySelectorAll<HTMLElement>(".table-cell-wrapper"),
+    ).find((element) =>
+      element.textContent?.includes(
+        "Browser automation: navigate, click, snapshot",
+      ),
+    );
+    await expect(longCell).toBeDefined();
+    await expect(longCell!.getBoundingClientRect().height).toBeGreaterThan(28);
   },
 };

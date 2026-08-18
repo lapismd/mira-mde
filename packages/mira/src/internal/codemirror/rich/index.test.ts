@@ -319,6 +319,68 @@ After`;
     parent.remove();
   });
 
+  it("keeps ordinary parentheses visible while hiding real link closers", async () => {
+    const parent = document.createElement("div");
+    document.body.append(parent);
+    const source = [
+      "You might mean tools (what I can run in Cursor) next.",
+      "",
+      "## Agent tools (what I can use in this chat)",
+      "",
+      "See [docs](https://example.com) after.",
+    ].join("\n");
+    const view = new EditorView({
+      doc: source,
+      selection: { anchor: source.length },
+      extensions: [
+        createMarkdownCodeMirrorExtensions(),
+        createRichEditorExtensions({ livePreview: true }),
+      ],
+      parent,
+    });
+    await nextFrame();
+    await nextFrame();
+
+    const proseLine = [...parent.querySelectorAll(".cm-line")].find((line) =>
+      line.textContent?.includes("what I can run in Cursor"),
+    );
+    const headingLine = [...parent.querySelectorAll(".cm-line")].find((line) =>
+      line.textContent?.includes("what I can use in this chat"),
+    );
+    const linkLine = [...parent.querySelectorAll(".cm-line")].find((line) =>
+      line.textContent?.includes("https://example.com"),
+    );
+
+    expect(proseLine).toBeDefined();
+    expect(headingLine).toBeDefined();
+    expect(linkLine).toBeDefined();
+
+    const hiddenProseParens = [
+      ...(proseLine?.querySelectorAll(".cm-formatting-hidden") ?? []),
+    ].filter((node) => (node.textContent || "").includes(")"));
+    const hiddenHeadingParens = [
+      ...(headingLine?.querySelectorAll(".cm-formatting-hidden") ?? []),
+    ].filter((node) => (node.textContent || "").includes(")"));
+    const hiddenLinkClosers = [
+      ...(linkLine?.querySelectorAll(".cm-formatting-hidden") ?? []),
+    ].filter((node) => {
+      const text = node.textContent || "";
+      return text.includes(")") || text.includes("](");
+    });
+
+    expect(hiddenProseParens).toHaveLength(0);
+    expect(hiddenHeadingParens).toHaveLength(0);
+    expect(proseLine?.textContent).toContain("Cursor)");
+    expect(headingLine?.textContent).toContain("chat)");
+    expect(hiddenLinkClosers.length).toBeGreaterThan(0);
+    expect(
+      hiddenLinkClosers.some((node) => (node.textContent || "").includes(")")),
+    ).toBe(true);
+
+    view.destroy();
+    parent.remove();
+  });
+
   it("keeps hidden heading syntax out of the live-preview line box", async () => {
     const parent = document.createElement("div");
     document.body.append(parent);

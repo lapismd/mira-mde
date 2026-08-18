@@ -143,6 +143,13 @@ export const tablesMarkdown = String.raw`# Pipe tables
 Pipe tables support alignment markers and shared preview/live-preview styling.
 `;
 
+export const wrappingTablesMarkdown = String.raw`# Wrapping tables
+
+| Category | What it does |
+| -------- | ------------ |
+| Chrome DevTools MCP | Browser automation: navigate, click, snapshot, network/console, Lighthouse, performance traces, and form fill |
+`;
+
 export const gridTablesMarkdown = String.raw`# Grid tables
 
 Grid tables use explicit row and column boundaries for spans, sections, and alignment.

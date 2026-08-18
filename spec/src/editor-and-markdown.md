@@ -47,6 +47,7 @@ resolvers, extension contributions, source fallback, and shipped plain CSS.
 | MIRA-MD-036 | Focusing an editable pipe- or grid-table cell trigger with the keyboard MUST enter its inline CodeMirror editor and transfer focus into the editable content. Pointer activation MUST retain coordinate-based cursor placement, while keyboard activation MUST place the cursor at a deterministic valid offset without unmounting the trigger before focus transfer completes. |
 | MIRA-MD-037 | `FrontmatterConfig` MAY supply `valueSuggestions(key, query)`. Tags, aliases, and multitext pill inputs MUST offer those values as autocomplete. When Markdown context is absent, `FrontmatterEditor` MAY accept a `fileAdapter` and MUST install a minimal context so wikilink pills resolve through the portable Link. |
 | MIRA-MD-038 | Loading Mira's portable Markdown and UI styles MUST NOT change the paint of consumer-owned portaled tooltips. Mira tooltip declarations MUST require a Mira-owned overlay marker in addition to the shared `data-slot="tooltip-content"` hook. |
+| MIRA-MD-039 | Live-preview hidden formatting MUST hide Markdown delimiter tokens only. Ordinary parentheses in prose and headings MUST remain visible. A bare `)` MUST NOT receive `cm-formatting-hidden`. Real link, image, and wikilink closers MUST remain hidden until the caret intersects that construct. |
 
 ## Lapis reference boundary
 
@@ -92,7 +93,9 @@ The table extension decorates every raw pipe-table row with `cm-table` and
 `cm-formatting-table`. Shipped CSS scopes the monospaced, preformatted row
 treatment to source mode and the raw Markdown fallback revealed from a
 live-preview table; live-preview table widgets and reading tables do not
-inherit that raw-source treatment.
+inherit that raw-source treatment. Rendered widget cells wrap their text
+without overflow. Each raw source table line scrolls horizontally without
+scrollbar chrome.
 
 List continuation layout follows Lapis's syntax-tree ownership and measured
 prefix contract: inactive replacement widgets and editable raw prefixes share
