@@ -67,11 +67,11 @@
   --mira-radius: 6px;
 }
 
-:where(.dark, .theme-dark) {
+:is(.dark, .theme-dark) {
   color-scheme: dark;
 }
 
-:where(.light, .theme-light) {
+:is(.light, .theme-light) {
   color-scheme: light;
 }
 

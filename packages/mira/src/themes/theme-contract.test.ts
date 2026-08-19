@@ -56,6 +56,15 @@ describe("Mira theme CSS contract", () => {
     expect(obsidian).toBeGreaterThan(mira);
   });
 
+  it("lets inherited light and dark classes override the root system mode", () => {
+    const source = read("./_contract.css");
+
+    expect(source).toContain(":is(.dark, .theme-dark)");
+    expect(source).toContain(":is(.light, .theme-light)");
+    expect(source).not.toContain(":where(.dark, .theme-dark)");
+    expect(source).not.toContain(":where(.light, .theme-light)");
+  });
+
   it("exports aggregate and individual theme entrypoints", () => {
     const manifest = JSON.parse(read("../../package.json")) as {
       exports: Record<string, unknown>;
