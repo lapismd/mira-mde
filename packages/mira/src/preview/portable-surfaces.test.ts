@@ -32,6 +32,31 @@ async function settle(): Promise<void> {
 }
 
 describe("portable preview surfaces", () => {
+  it("reports rendered task-checkbox source ranges", async () => {
+    const target = document.createElement("div");
+    const onChange = vi.fn();
+    const component = mount(MarkdownEmbed, {
+      target,
+      props: {
+        value: "# Checklist\n\n- [ ] Confirm release notes.\n",
+        onChange,
+      },
+    });
+    await settle();
+
+    const checkbox = target.querySelector<HTMLInputElement>(
+      'input[aria-label="Toggle task"]',
+    );
+    expect(checkbox?.disabled).toBe(false);
+    checkbox!.checked = true;
+    checkbox!.dispatchEvent(new Event("change", { bubbles: true }));
+    await settle();
+    expect(onChange).toHaveBeenCalledOnce();
+    expect(onChange).toHaveBeenCalledWith("x", 16, 17);
+
+    await unmount(component);
+  });
+
   it("keeps adapters without writeMarkdown read-only", async () => {
     const target = document.createElement("div");
     const component = mount(EditableMarkdownPreview, {
@@ -90,6 +115,56 @@ describe("portable preview surfaces", () => {
     expect(target.querySelector(".cm-activeLine")?.textContent).toContain(
       "Embedded note",
     );
+    await unmount(component);
+  });
+
+  it("persists rendered task-checkbox changes through a writable adapter", async () => {
+    const target = document.createElement("div");
+    const writeMarkdown = vi.fn();
+    const component = mount(EditableMarkdownPreview, {
+      target,
+      props: {
+        file: {
+          kind: "markdown",
+          name: "Checklist",
+          path: "notes/checklist.md",
+        },
+        fileAdapter: {
+          ...fileAdapter,
+          readMarkdown: () => "# Checklist\n\n- [ ] Confirm release notes.\n",
+          writeMarkdown,
+        },
+        activateOnPreviewInteraction: false,
+      },
+    });
+    await settle();
+
+    const checkbox = target.querySelector<HTMLInputElement>(
+      'input[aria-label="Toggle task"]',
+    );
+    expect(checkbox).not.toBeNull();
+    expect(checkbox?.disabled).toBe(false);
+
+    checkbox!.checked = true;
+    checkbox!.dispatchEvent(new Event("change", { bubbles: true }));
+    await settle();
+    expect(checkbox?.checked).toBe(true);
+    expect(
+      target
+        .querySelector("[data-editable-markdown-preview]")
+        ?.getAttribute("data-save-state"),
+    ).toBe("dirty");
+    await expect(component.flush()).resolves.toBe(true);
+    expect(writeMarkdown).toHaveBeenCalledOnce();
+    expect(writeMarkdown).toHaveBeenCalledWith(
+      {
+        kind: "markdown",
+        name: "Checklist",
+        path: "notes/checklist.md",
+      },
+      "# Checklist\n\n- [x] Confirm release notes.\n",
+    );
+
     await unmount(component);
   });
 

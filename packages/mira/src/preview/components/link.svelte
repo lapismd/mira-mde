@@ -62,6 +62,9 @@
   let previewOpen = $state(false);
   let editing = $state(false);
   let editableSurface: { exit: () => Promise<boolean> } | null = $state(null);
+  let previewOnChange:
+    | ((replacement: string, from: number, to: number) => void)
+    | undefined = $state(undefined);
 
   const target = $derived(id || href);
   const displayText = $derived(text || label || target);
@@ -327,12 +330,14 @@
                 class="mira-link-preview__markdown"
                 {value}
                 sourcePath={resolvedFile?.path ?? activeSourcePath}
+                onChange={previewOnChange}
               />
             {/snippet}
             <EditableMarkdownSurface
               bind:this={editableSurface}
               value={previewMarkdown}
               preview={renderedPreview}
+              bind:previewOnChange
               writeMarkdown={writePreviewMarkdown}
               bind:editing
               extensions={markdown.extensions}

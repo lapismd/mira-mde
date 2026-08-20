@@ -19,9 +19,16 @@
     type SerializedMarkdownWriterState,
   } from "./serialized-writer";
 
+  type MarkdownRangeChange = (
+    replacement: string,
+    from: number,
+    to: number,
+  ) => void;
+
   type Props = {
     value: string;
     preview: Snippet<[string]>;
+    previewOnChange?: MarkdownRangeChange;
     writeMarkdown?: (value: string) => void | Promise<void>;
     editing?: boolean;
     extensions?: MiraExtension[];
@@ -47,6 +54,7 @@
   let {
     value,
     preview,
+    previewOnChange = $bindable(undefined),
     writeMarkdown,
     editing = $bindable(false),
     extensions = [],
@@ -87,6 +95,13 @@
   let editorScrollRatio = 0;
 
   const writable = $derived(Boolean(writeMarkdown));
+
+  $effect(() => {
+    previewOnChange = writable ? updatePreviewRange : undefined;
+    return () => {
+      previewOnChange = undefined;
+    };
+  });
 
   $effect(() => {
     const write = writeMarkdown;
@@ -238,6 +253,25 @@
   function updateBuffer(nextValue: string): void {
     buffer = nextValue;
     writer?.update(nextValue);
+  }
+
+  function updatePreviewRange(
+    replacement: string,
+    from: number,
+    to: number,
+  ): void {
+    if (
+      !writable ||
+      !Number.isInteger(from) ||
+      !Number.isInteger(to) ||
+      from < 0 ||
+      to < from ||
+      to > buffer.length
+    ) {
+      return;
+    }
+
+    updateBuffer(`${buffer.slice(0, from)}${replacement}${buffer.slice(to)}`);
   }
 
   async function leaveEditing(reason: "blur" | "escape"): Promise<void> {

@@ -80,6 +80,9 @@
     flush: () => Promise<boolean>;
     exit: () => Promise<boolean>;
   } | null = $state(null);
+  let previewOnChange:
+    | ((replacement: string, from: number, to: number) => void)
+    | undefined = $state(undefined);
 
   const writeMarkdown = $derived(
     fileAdapter.writeMarkdown &&
@@ -154,6 +157,7 @@
     {dialog}
     {listCallouts}
     {postProcess}
+    onChange={previewOnChange}
   />
 {/snippet}
 
@@ -162,6 +166,7 @@
     bind:this={surface}
     {value}
     preview={renderedPreview}
+    bind:previewOnChange
     {writeMarkdown}
     bind:editing
     {extensions}

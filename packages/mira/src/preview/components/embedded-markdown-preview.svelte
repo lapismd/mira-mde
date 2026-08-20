@@ -8,6 +8,7 @@
     class?: string;
     frontmatterOpen?: boolean;
     ref?: HTMLElement | null;
+    onChange?: (replacement: string, from: number, to: number) => void;
   };
 
   let {
@@ -16,6 +17,7 @@
     class: className = "",
     frontmatterOpen = false,
     ref = $bindable(null),
+    onChange,
   }: Props = $props();
   const markdown = useMarkdownContext();
   const activeSourcePath = $derived(sourcePath || markdown.sourcePath);
@@ -44,6 +46,7 @@
         {frontmatterOpen}
         frontmatterConfig={markdown.frontmatterConfig}
         dialog={markdown.dialog}
+        {onChange}
       />
     </div>
   </div>

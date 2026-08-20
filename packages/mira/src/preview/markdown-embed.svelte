@@ -30,6 +30,7 @@
     dialog?: boolean;
     listCallouts?: MiraListCallout[];
     postProcess?: MiraMarkdownPostProcessor;
+    onChange?: (replacement: string, from: number, to: number) => void;
   };
 
   let {
@@ -51,6 +52,7 @@
     dialog = false,
     listCallouts = [],
     postProcess,
+    onChange,
   }: Props = $props();
 </script>
 
@@ -73,5 +75,6 @@
   {dialog}
   {listCallouts}
   {postProcess}
+  {onChange}
   embed
 />
