@@ -112,6 +112,21 @@ function measureLeadingRawPrefixBox(
     : null;
 }
 
+function measureTextNodeWidth(node: Text): number | null {
+  if (node.length <= 0) {
+    return null;
+  }
+
+  const range = document.createRange();
+  range.setStart(node, 0);
+  range.setEnd(node, node.length);
+  const rect =
+    Array.from(range.getClientRects()).find(
+      (candidate) => candidate.width > 0 || candidate.height > 0,
+    ) ?? range.getBoundingClientRect();
+  return Number.isFinite(rect.width) && rect.width > 0 ? rect.width : null;
+}
+
 function measureMarkerWidth(line: HTMLElement): number {
   const marker = line.querySelector<HTMLElement>(
     ".cm-formatting-list-ul, .cm-formatting-list-ol",
@@ -149,8 +164,7 @@ function measureStableWidgetWidth(line: HTMLElement): number | null {
   const segmentWidth = Array.from(
     widget.querySelectorAll<HTMLElement>(".cm-indent"),
   ).reduce((total, segment) => {
-    const width = segment.getBoundingClientRect().width;
-    return total + (Number.isFinite(width) && width > 0 ? width : 0);
+    return total + (measureIndentSegmentWidth(segment) ?? 0);
   }, 0);
   if (segmentWidth > 0) {
     return segmentWidth;
@@ -158,6 +172,31 @@ function measureStableWidgetWidth(line: HTMLElement): number | null {
 
   const widgetWidth = widget.getBoundingClientRect().width;
   return Number.isFinite(widgetWidth) && widgetWidth > 0 ? widgetWidth : null;
+}
+
+export function measureIndentSegmentWidth(segment: HTMLElement): number | null {
+  if (segment.classList.contains("cm-indent-spacer")) {
+    let textWidth = 0;
+    let measuredText = false;
+    const walker = document.createTreeWalker(segment, NodeFilter.SHOW_TEXT);
+    while (walker.nextNode()) {
+      const node = walker.currentNode;
+      if (!(node instanceof Text)) {
+        continue;
+      }
+      const width = measureTextNodeWidth(node);
+      if (width !== null) {
+        textWidth += width;
+        measuredText = true;
+      }
+    }
+    if (measuredText && textWidth > 0) {
+      return textWidth;
+    }
+  }
+
+  const width = segment.getBoundingClientRect().width;
+  return Number.isFinite(width) && width > 0 ? width : null;
 }
 
 function measureRawPrefixWidth(
