@@ -135,7 +135,7 @@
   white-space: pre;
 }
 
-.markdown-editor-surface .cm-editor .cm-indent {
+.markdown-editor-surface .cm-editor .cm-indent-guide {
   min-width: var(--list-indent);
 }
 
