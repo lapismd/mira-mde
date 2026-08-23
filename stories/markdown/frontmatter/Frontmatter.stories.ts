@@ -180,7 +180,7 @@ export const PropertyActions: Story = {
       });
       await expect(typeMenu).toBeVisible();
       await expect(textType).toBeVisible();
-      const statusRow = statusValue.closest<HTMLElement>(".metadata-property");
+      const statusRow = typeMenu.closest<HTMLElement>(".metadata-property");
       expect(statusRow).not.toBeNull();
       expect(typeMenu.getBoundingClientRect().bottom).toBeGreaterThan(
         statusRow!.getBoundingClientRect().bottom,
@@ -190,7 +190,10 @@ export const PropertyActions: Story = {
         textTypeBounds.left + textTypeBounds.width / 2,
         textTypeBounds.top + textTypeBounds.height / 2,
       );
-      expect(hit === textType || textType.contains(hit)).toBe(true);
+      expect(
+        hit === textType || textType.contains(hit),
+        `Expected the Text item to own its center point; hit ${hit?.tagName ?? "nothing"}.${hit instanceof HTMLElement ? hit.className : ""} in ${hit instanceof HTMLElement ? hit.closest<HTMLElement>(".metadata-property")?.dataset.property : "no row"}; menu z=${getComputedStyle(typeMenu).zIndex}, row z=${getComputedStyle(statusRow!).zIndex}, row overflow=${getComputedStyle(statusRow!).overflow}`,
+      ).toBe(true);
       await userEvent.click(canvas.getByRole("menuitem", { name: "Remove" }));
       await expect(
         canvas.queryByRole("textbox", { name: "status value" }),

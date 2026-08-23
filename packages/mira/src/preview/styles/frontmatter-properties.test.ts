@@ -7,11 +7,18 @@ const css = readFileSync(
   resolve(cwd(), "src/preview/styles/frontmatter-properties.css"),
   "utf8",
 );
+const component = readFileSync(
+  resolve(cwd(), "src/preview/components/frontmatter.svelte"),
+  "utf8",
+);
 
 describe("frontmatter property styles", () => {
   it("lets an open type menu escape its otherwise clipped property row", () => {
     expect(css).toMatch(
       /\.metadata-property:has\(\.metadata-property-type-menu\)\s*\{[^}]*overflow:\s*visible;[^}]*z-index:\s*5;/su,
+    );
+    expect(component).not.toMatch(
+      /class="metadata-property[^"\n]*\boverflow-hidden\b/u,
     );
   });
 });

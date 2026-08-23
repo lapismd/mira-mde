@@ -591,7 +591,7 @@
 {#snippet Tree({ property }: { property: FrontmatterProperty })}
   {#if property.children.length}
     <div
-      class="metadata-property metadata-property--parent focus-within:ring-border relative flex overflow-hidden border-b focus-within:rounded-sm focus-within:border focus-within:ring-2"
+      class="metadata-property metadata-property--parent focus-within:ring-border relative flex border-b focus-within:rounded-sm focus-within:border focus-within:ring-2"
       data-property={property.pathString}
       data-state={isOpen(property.pathString) ? "open" : "closed"}
       style={`--mira-property-depth: ${property.depth}`}
@@ -648,7 +648,7 @@
     {/if}
   {:else}
     <div
-      class="metadata-property focus-within:ring-border relative flex overflow-hidden border-b focus-within:rounded-sm focus-within:border focus-within:ring-2"
+      class="metadata-property focus-within:ring-border relative flex border-b focus-within:rounded-sm focus-within:border focus-within:ring-2"
       data-property={property.pathString}
       data-property-type={property.type}
       data-valid={property.valid}
