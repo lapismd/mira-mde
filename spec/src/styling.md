@@ -49,6 +49,7 @@ customization and Obsidian-compatible aliases retained as a compatibility layer.
 | MIRA-CSS-038 | Frontmatter pill-value autocomplete MUST reuse the property-name suggestion popover treatment: positioned below the input, overflowing the property row, and using the same popover surface tokens. |
 | MIRA-CSS-039 | Mira's exported UI stylesheet MUST scope tooltip paint and stacking declarations to a Mira-owned overlay marker. Loading Mira styles MUST NOT restyle unrelated consumer tooltips that share the generic shadcn `data-slot="tooltip-content"` hook. |
 | MIRA-CSS-040 | Rendered live-preview and reading table cells MUST wrap using `--table-white-space` and MUST NOT introduce a widget-shell or per-cell scrollbar or overflow. Nested cell editors MUST constrain their content to the cell width. Raw source and revealed pipe-table rows MUST keep their non-wrapping `white-space: pre` contract and scroll horizontally on the `.cm-line.cm-table` itself, hiding scrollbar chrome without scrolling the editor content. |
+| MIRA-CSS-041 | An open frontmatter property type menu MUST escape its property row's clipping boundary and remain visually exposed and hit-testable above adjacent property rows. Closed rows MUST retain their normal overflow containment. |
 
 Stylesheet order remains theme, UI, preview, Svelte/Mira Editor, and framework
 wrapper composition as documented by the package entrypoints.

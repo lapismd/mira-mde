@@ -172,6 +172,25 @@ export const PropertyActions: Story = {
       await userEvent.click(
         canvas.getByRole("button", { name: "Change status type" }),
       );
+      const typeMenu = canvas.getByRole("menu", {
+        name: "Property type for status",
+      });
+      const textType = within(typeMenu).getByRole("menuitemradio", {
+        name: "Text",
+      });
+      await expect(typeMenu).toBeVisible();
+      await expect(textType).toBeVisible();
+      const statusRow = statusValue.closest<HTMLElement>(".metadata-property");
+      expect(statusRow).not.toBeNull();
+      expect(typeMenu.getBoundingClientRect().bottom).toBeGreaterThan(
+        statusRow!.getBoundingClientRect().bottom,
+      );
+      const textTypeBounds = textType.getBoundingClientRect();
+      const hit = canvasElement.ownerDocument.elementFromPoint(
+        textTypeBounds.left + textTypeBounds.width / 2,
+        textTypeBounds.top + textTypeBounds.height / 2,
+      );
+      expect(hit === textType || textType.contains(hit)).toBe(true);
       await userEvent.click(canvas.getByRole("menuitem", { name: "Remove" }));
       await expect(
         canvas.queryByRole("textbox", { name: "status value" }),

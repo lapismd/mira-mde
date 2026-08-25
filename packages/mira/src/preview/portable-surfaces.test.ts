@@ -10,6 +10,8 @@ import EditableMarkdownPreview from "./editable-markdown-preview.svelte";
 import MarkdownEmbed from "./markdown-embed.svelte";
 import MarkdownPreview from "./markdown-preview.svelte";
 import NoteLink from "./note-link.svelte";
+import FrontmatterEditor from "./components/frontmatter.svelte";
+import { FrontmatterController } from "./frontmatter";
 
 const fileAdapter: MiraFileAdapter = {
   resolveLink(target) {
@@ -487,6 +489,50 @@ describe("portable preview surfaces", () => {
     expect(collapse?.getAttribute("aria-label")).toBe("Collapse properties");
     expect(collapse?.getAttribute("aria-expanded")).toBe("true");
     expect(target.querySelector(".md-frontmatter__content")).not.toBeNull();
+
+    await unmount(component);
+  });
+
+  it("opens the frontmatter property type menu and applies a selected type", async () => {
+    const target = document.createElement("div");
+    const controller = new FrontmatterController({
+      record: { title: "Portable" },
+    });
+    const component = mount(FrontmatterEditor, {
+      target,
+      props: {
+        controller,
+      },
+    });
+    await settle();
+
+    const trigger = target.querySelector<HTMLButtonElement>(
+      'button[aria-label="Change title type"]',
+    );
+    expect(trigger).not.toBeNull();
+    expect(trigger?.getAttribute("aria-expanded")).toBe("false");
+
+    trigger?.click();
+    await settle();
+
+    const menu = target.querySelector<HTMLElement>(
+      '[role="menu"][aria-label="Property type for title"]',
+    );
+    const numberType = Array.from(
+      menu?.querySelectorAll<HTMLButtonElement>('[role="menuitemradio"]') ?? [],
+    ).find((item) => item.textContent?.trim() === "Number");
+    expect(trigger?.getAttribute("aria-expanded")).toBe("true");
+    expect(menu).not.toBeNull();
+    expect(numberType).toBeDefined();
+
+    numberType?.click();
+    await settle();
+
+    expect(trigger?.getAttribute("aria-expanded")).toBe("false");
+    expect(target.querySelector('[role="menu"]')).toBeNull();
+    expect(
+      controller.propertyManager.properties(controller.getRecord())[0]?.kind,
+    ).toBe("number");
 
     await unmount(component);
   });
