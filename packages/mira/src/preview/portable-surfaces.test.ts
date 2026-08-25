@@ -507,7 +507,7 @@ describe("portable preview surfaces", () => {
     await settle();
 
     const trigger = target.querySelector<HTMLButtonElement>(
-      'button[aria-label="Change title type"]',
+      'button[aria-label="Property options for title"]',
     );
     expect(trigger).not.toBeNull();
     expect(trigger?.getAttribute("aria-expanded")).toBe("false");
@@ -515,16 +515,58 @@ describe("portable preview surfaces", () => {
     trigger?.click();
     await settle();
 
-    const menu = document.body.querySelector<HTMLElement>(
+    const optionsMenu = document.body.querySelector<HTMLElement>(
+      '[role="menu"][aria-label="Property options for title"]',
+    );
+    const propertyType = Array.from(
+      optionsMenu?.querySelectorAll<HTMLElement>('[role="menuitem"]') ?? [],
+    ).find((item) => item.textContent?.trim() === "Property type");
+    const actionLabels = Array.from(
+      optionsMenu?.querySelectorAll<HTMLElement>('[role="menuitem"]') ?? [],
+    ).map((item) => item.textContent?.trim());
+    expect(trigger?.getAttribute("aria-expanded")).toBe("true");
+    expect(optionsMenu).not.toBeNull();
+    expect(target.contains(optionsMenu)).toBe(false);
+    expect(propertyType).toBeDefined();
+    expect(actionLabels).toEqual([
+      "Property type",
+      "Cut",
+      "Copy",
+      "Paste",
+      "Remove",
+    ]);
+    expect(optionsMenu?.textContent).not.toContain("Number");
+
+    propertyType?.focus();
+    propertyType?.dispatchEvent(
+      new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }),
+    );
+    await settle();
+
+    const typeMenu = document.body.querySelector<HTMLElement>(
       '[role="menu"][aria-label="Property type for title"]',
     );
     const numberType = Array.from(
-      menu?.querySelectorAll<HTMLButtonElement>('[role="menuitemradio"]') ?? [],
+      typeMenu?.querySelectorAll<HTMLElement>('[role="menuitemcheckbox"]') ??
+        [],
     ).find((item) => item.textContent?.trim() === "Number");
-    expect(trigger?.getAttribute("aria-expanded")).toBe("true");
-    expect(menu).not.toBeNull();
-    expect(target.contains(menu)).toBe(false);
+    const textType = Array.from(
+      typeMenu?.querySelectorAll<HTMLElement>('[role="menuitemcheckbox"]') ??
+        [],
+    ).find((item) => item.textContent?.trim() === "Text");
+    expect(typeMenu).not.toBeNull();
+    expect(target.contains(typeMenu)).toBe(false);
     expect(numberType).toBeDefined();
+    expect(numberType?.getAttribute("aria-checked")).toBe("false");
+    expect(numberType?.firstElementChild?.querySelector("svg")).toBeNull();
+    expect(
+      numberType?.querySelector(".metadata-property-type-menu__type-icon"),
+    ).not.toBeNull();
+    expect(textType?.getAttribute("aria-checked")).toBe("true");
+    expect(textType?.firstElementChild?.querySelector("svg")).not.toBeNull();
+    expect(
+      textType?.querySelector(".metadata-property-type-menu__type-icon"),
+    ).not.toBeNull();
 
     numberType?.click();
     await settle();
@@ -532,7 +574,7 @@ describe("portable preview surfaces", () => {
     expect(trigger?.getAttribute("aria-expanded")).toBe("false");
     expect(
       document.body.querySelector(
-        '[role="menu"][aria-label="Property type for title"]',
+        '[role="menu"][aria-label="Property options for title"]',
       ),
     ).toBeNull();
     expect(

@@ -19,7 +19,7 @@
   import Link from "./link.svelte";
   import FrontmatterPropertyNameInput from "./frontmatter-property-name-input.svelte";
   import FrontmatterPropertyValueInput from "./frontmatter-property-value-input.svelte";
-  import * as Popover from "../../ui/popover/index.js";
+  import * as DropdownMenu from "../../ui/dropdown-menu/index.js";
   import type { MiraFileAdapter } from "@lapismd/mira/extensions";
   import {
     setMarkdownContext,
@@ -756,7 +756,7 @@
   property: FrontmatterProperty;
   icon: string;
 })}
-  <Popover.Root
+  <DropdownMenu.Root
     open={typeMenuPath === property.pathString}
     onOpenChange={(open: boolean) => {
       if (open) {
@@ -766,90 +766,89 @@
       }
     }}
   >
-    <Popover.Trigger
+    <DropdownMenu.Trigger
       type="button"
       class="metadata-property-type-button"
-      aria-label={`Change ${property.key} type`}
+      aria-label={`Property options for ${property.key}`}
       onclick={(event) => event.stopPropagation()}
     >
       <Icon name={icon} class="size-3.5" />
-    </Popover.Trigger>
-    <Popover.Content
-      class="metadata-property-type-menu w-44 p-1"
+    </DropdownMenu.Trigger>
+    <DropdownMenu.Content
+      class="metadata-property-menu"
       align="start"
       side="bottom"
       sideOffset={4}
-      role="menu"
-      aria-label={`Property type for ${property.key}`}
+      aria-label={`Property options for ${property.key}`}
     >
-      {#each typeOptions as option}
-        <button
-          type="button"
-          class="metadata-property-type-menu__item"
-          data-selected={property.kind === option.type}
-          role="menuitemradio"
-          aria-checked={property.kind === option.type}
-          onclick={() => changePropertyKind(property, option.type)}
-        >
-          <Icon
-            name={option.icon ?? frontmatterPropertyIcon(option.type, config)}
-            class="size-3.5"
-          />
-          <span
-            >{option.label ??
-              frontmatterPropertyLabel(option.type, config)}</span
+      <DropdownMenu.Group>
+        <DropdownMenu.Sub>
+          <DropdownMenu.SubTrigger>
+            <span
+              class="metadata-property-menu__icon-placeholder"
+              aria-hidden="true"
+            ></span>
+            <span>Property type</span>
+          </DropdownMenu.SubTrigger>
+          <DropdownMenu.SubContent
+            class="metadata-property-type-menu"
+            aria-label={`Property type for ${property.key}`}
           >
-          {#if property.kind === option.type}
-            <Icon name="check" class="metadata-property-type-menu__check" />
-          {/if}
-        </button>
-      {/each}
-      <div
-        class="metadata-property-type-menu__separator"
-        role="separator"
-      ></div>
-      <button
-        type="button"
-        class="metadata-property-type-menu__item"
-        role="menuitem"
-        onclick={() => void copyProperty(property, true)}
-      >
-        <Icon name="scissors" class="size-3.5" />
-        <span>Cut</span>
-      </button>
-      <button
-        type="button"
-        class="metadata-property-type-menu__item"
-        role="menuitem"
-        onclick={() => void copyProperty(property)}
-      >
-        <Icon name="copy" class="size-3.5" />
-        <span>Copy</span>
-      </button>
-      <button
-        type="button"
-        class="metadata-property-type-menu__item"
-        role="menuitem"
-        onclick={() => void pasteProperties(property)}
-      >
-        <Icon name="clipboard-paste" class="size-3.5" />
-        <span>Paste</span>
-      </button>
-      <div
-        class="metadata-property-type-menu__separator"
-        role="separator"
-      ></div>
-      <button
-        type="button"
-        class="metadata-property-type-menu__item metadata-property-type-menu__item--destructive"
-        role="menuitem"
-        onclick={() => removeProperty(property)}
-      >
-        <Icon name="trash-2" class="size-3.5" />
-        <span>Remove</span>
-      </button>
-    </Popover.Content>
-  </Popover.Root>
+            {#each typeOptions as option}
+              <DropdownMenu.CheckboxItem
+                checked={property.kind === option.type}
+                onclick={() => changePropertyKind(property, option.type)}
+              >
+                <Icon
+                  name={option.icon ??
+                    frontmatterPropertyIcon(option.type, config)}
+                  class="metadata-property-type-menu__type-icon size-4"
+                />
+                <span
+                  >{option.label ??
+                    frontmatterPropertyLabel(option.type, config)}</span
+                >
+              </DropdownMenu.CheckboxItem>
+            {/each}
+          </DropdownMenu.SubContent>
+        </DropdownMenu.Sub>
+      </DropdownMenu.Group>
+      <DropdownMenu.Separator />
+      <DropdownMenu.Group>
+        <DropdownMenu.Item onclick={() => void copyProperty(property, true)}>
+          <span
+            class="metadata-property-menu__icon-placeholder"
+            aria-hidden="true"
+          ></span>
+          <span>Cut</span>
+        </DropdownMenu.Item>
+        <DropdownMenu.Item onclick={() => void copyProperty(property)}>
+          <span
+            class="metadata-property-menu__icon-placeholder"
+            aria-hidden="true"
+          ></span>
+          <span>Copy</span>
+        </DropdownMenu.Item>
+        <DropdownMenu.Item onclick={() => void pasteProperties(property)}>
+          <span
+            class="metadata-property-menu__icon-placeholder"
+            aria-hidden="true"
+          ></span>
+          <span>Paste</span>
+        </DropdownMenu.Item>
+      </DropdownMenu.Group>
+      <DropdownMenu.Separator />
+      <DropdownMenu.Group>
+        <DropdownMenu.Item onclick={() => removeProperty(property)}>
+          <span
+            class="metadata-property-menu__icon-placeholder"
+            aria-hidden="true"
+          ></span>
+          <span>Remove</span>
+        </DropdownMenu.Item>
+      </DropdownMenu.Group>
+    </DropdownMenu.Content>
+  </DropdownMenu.Root>
 {/snippet}
 
 {#snippet Pill({

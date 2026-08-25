@@ -13,21 +13,28 @@ const component = readFileSync(
 );
 
 describe("frontmatter property styles", () => {
-  it("portals the type menu beyond property and workspace clipping", () => {
+  it("uses the legacy dropdown and nested type-menu structure", () => {
     expect(component).toContain(
-      'import * as Popover from "../../ui/popover/index.js";',
+      'import * as DropdownMenu from "../../ui/dropdown-menu/index.js";',
     );
     expect(component).toContain(
-      '<Popover.Content\n      class="metadata-property-type-menu w-44 p-1"',
+      '<DropdownMenu.Content\n      class="metadata-property-menu"',
     );
+    expect(component).toContain("<DropdownMenu.SubTrigger>");
+    expect(component).toContain("<span>Property type</span>");
+    expect(component).toContain(
+      '<DropdownMenu.SubContent\n            class="metadata-property-type-menu"',
+    );
+    expect(component).toContain("<DropdownMenu.CheckboxItem");
+    expect(component).toContain(
+      'class="metadata-property-type-menu__type-icon size-4"',
+    );
+    expect(component).not.toContain("metadata-property-type-menu__item");
     expect(component).not.toMatch(
       /class="metadata-property[^"\n]*\boverflow-hidden\b/u,
     );
-    expect(css).not.toMatch(
-      /\.metadata-property-type-menu\s*\{[^}]*position:\s*absolute;/su,
-    );
     expect(css).toMatch(
-      /\.metadata-property-type-menu\s*\{[^}]*max-height:\s*var\(--bits-popover-content-available-height\);[^}]*overflow-y:\s*auto;/su,
+      /\.metadata-property-menu,\s*\.metadata-property-type-menu\s*\{[^}]*--bits-dropdown-menu-content-available-height/su,
     );
   });
 });

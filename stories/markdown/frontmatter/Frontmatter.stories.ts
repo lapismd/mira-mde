@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/svelte-vite";
-import { expect, userEvent, within } from "storybook/test";
+import { expect, userEvent, waitFor, within } from "storybook/test";
 import EditorModeStory from "../_shared/EditorModeStory.svelte";
 import MarkdownPreviewStory from "../_shared/MarkdownPreviewStory.svelte";
 import {
@@ -55,8 +55,8 @@ export const Preview: Story = {
 
 export const LivePreview: Story = {
   tags: [
-    "visual-approved",
-    "!visual-pending",
+    "visual-pending",
+    "!visual-approved",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -169,39 +169,105 @@ export const PropertyActions: Story = {
       await userEvent.tab();
       await expect(statusValue).toHaveTextContent("approved");
 
-      await userEvent.click(
-        canvas.getByRole("button", { name: "Change status type" }),
-      );
       const page = within(canvasElement.ownerDocument.body);
-      const statusRow = canvas
-        .getByRole("button", { name: "Change status type" })
-        .closest<HTMLElement>(".metadata-property");
+      const statusTrigger = canvas.getByRole("button", {
+        name: "Property options for status",
+      });
+      await userEvent.click(statusTrigger);
+      const statusRow =
+        statusTrigger.closest<HTMLElement>(".metadata-property");
+      const optionsMenu = page.getByRole("menu", {
+        name: "Property options for status",
+      });
+      const propertyType = within(optionsMenu).getByRole("menuitem", {
+        name: "Property type",
+      });
+      await expect(optionsMenu).toBeVisible();
+      await expect(
+        within(optionsMenu)
+          .getAllByRole("menuitem")
+          .map((item) => item.textContent?.trim()),
+      ).toEqual(["Property type", "Cut", "Copy", "Paste", "Remove"]);
+      await expect(
+        within(optionsMenu).queryByRole("menuitemcheckbox", {
+          name: "Number",
+        }),
+      ).not.toBeInTheDocument();
+
+      propertyType.focus();
+      await userEvent.keyboard("{ArrowRight}");
       const typeMenu = page.getByRole("menu", {
         name: "Property type for status",
       });
-      const textType = within(typeMenu).getByRole("menuitemradio", {
+      const numberType = within(typeMenu).getByRole("menuitemcheckbox", {
+        name: "Number",
+      });
+      const textType = within(typeMenu).getByRole("menuitemcheckbox", {
         name: "Text",
       });
       await expect(typeMenu).toBeVisible();
-      await expect(textType).toBeVisible();
+      await expect(numberType).toBeVisible();
+      await expect(numberType).toHaveAttribute("aria-checked", "false");
+      expect(numberType.firstElementChild?.querySelector("svg")).toBeNull();
+      expect(
+        numberType.querySelector(".metadata-property-type-menu__type-icon"),
+      ).not.toBeNull();
+      await expect(textType).toHaveAttribute("aria-checked", "true");
+      expect(textType.firstElementChild?.querySelector("svg")).not.toBeNull();
+      expect(
+        textType.querySelector(".metadata-property-type-menu__type-icon"),
+      ).not.toBeNull();
       expect(statusRow).not.toBeNull();
       expect(statusRow!.contains(typeMenu)).toBe(false);
       expect(typeMenu.getBoundingClientRect().bottom).toBeGreaterThan(
         statusRow!.getBoundingClientRect().bottom,
       );
-      const textTypeBounds = textType.getBoundingClientRect();
+      const numberTypeBounds = numberType.getBoundingClientRect();
       const hit = canvasElement.ownerDocument.elementFromPoint(
-        textTypeBounds.left + textTypeBounds.width / 2,
-        textTypeBounds.top + textTypeBounds.height / 2,
+        numberTypeBounds.left + numberTypeBounds.width / 2,
+        numberTypeBounds.top + numberTypeBounds.height / 2,
       );
       expect(
-        hit === textType || textType.contains(hit),
-        `Expected the Text item to own its center point; hit ${hit?.tagName ?? "nothing"}.${hit instanceof HTMLElement ? hit.className : ""} in ${hit instanceof HTMLElement ? hit.closest<HTMLElement>(".metadata-property")?.dataset.property : "no row"}; menu z=${getComputedStyle(typeMenu).zIndex}, row z=${getComputedStyle(statusRow!).zIndex}, row overflow=${getComputedStyle(statusRow!).overflow}`,
+        hit === numberType || numberType.contains(hit),
+        `Expected the Number item to own its center point; hit ${hit?.tagName ?? "nothing"}.${hit instanceof HTMLElement ? hit.className : ""} in ${hit instanceof HTMLElement ? hit.closest<HTMLElement>(".metadata-property")?.dataset.property : "no row"}; menu z=${getComputedStyle(typeMenu).zIndex}, row z=${getComputedStyle(statusRow!).zIndex}, row overflow=${getComputedStyle(statusRow!).overflow}`,
       ).toBe(true);
+      await userEvent.click(numberType);
+      await waitFor(() => {
+        expect(
+          canvas.getByRole("button", {
+            name: "Property options for status",
+          }),
+        ).toHaveAttribute("aria-expanded", "false");
+        expect(
+          getComputedStyle(canvasElement.ownerDocument.body).pointerEvents,
+        ).not.toBe("none");
+      });
+      await userEvent.click(
+        canvas.getByRole("button", { name: "Property options for status" }),
+      );
       await userEvent.click(page.getByRole("menuitem", { name: "Remove" }));
       await expect(
-        canvas.queryByRole("textbox", { name: "status value" }),
+        canvas.queryByRole("button", { name: "Property options for status" }),
       ).not.toBeInTheDocument();
+      await waitFor(() => {
+        expect(
+          getComputedStyle(canvasElement.ownerDocument.body).pointerEvents,
+        ).not.toBe("none");
+      });
+    });
+
+    await step("leave the standard property type submenu visible", async () => {
+      await userEvent.click(
+        canvas.getByRole("button", { name: "Property options for title" }),
+      );
+      const page = within(canvasElement.ownerDocument.body);
+      const propertyType = within(
+        page.getByRole("menu", { name: "Property options for title" }),
+      ).getByRole("menuitem", { name: "Property type" });
+      await userEvent.hover(propertyType);
+      await expect(
+        page.getByRole("menu", { name: "Property type for title" }),
+      ).toBeVisible();
     });
   },
 };
