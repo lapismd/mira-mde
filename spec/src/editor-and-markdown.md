@@ -48,7 +48,7 @@ resolvers, extension contributions, source fallback, and shipped plain CSS.
 | MIRA-MD-037 | `FrontmatterConfig` MAY supply `valueSuggestions(key, query)`. Tags, aliases, and multitext pill inputs MUST offer those values as autocomplete. When Markdown context is absent, `FrontmatterEditor` MAY accept a `fileAdapter` and MUST install a minimal context so wikilink pills resolve through the portable Link. |
 | MIRA-MD-038 | Loading Mira's portable Markdown and UI styles MUST NOT change the paint of consumer-owned portaled tooltips. Mira tooltip declarations MUST require a Mira-owned overlay marker in addition to the shared `data-slot="tooltip-content"` hook. |
 | MIRA-MD-039 | Live-preview hidden formatting MUST hide Markdown delimiter tokens only. Ordinary parentheses in prose and headings MUST remain visible. A bare `)` MUST NOT receive `cm-formatting-hidden`. Real link, image, and wikilink closers MUST remain hidden until the caret intersects that construct. |
-| MIRA-MD-040 | Activating a rendered frontmatter property type control MUST expose its complete type-and-action menu. Choosing a type MUST update the property through the existing controller and close the menu. |
+| MIRA-MD-040 | Activating a rendered frontmatter property type control MUST expose its complete type-and-action menu in a portalled overlay. Choosing a type MUST update the property through the existing controller and close the menu. |
 
 ## Lapis reference boundary
 

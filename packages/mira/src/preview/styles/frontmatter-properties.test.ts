@@ -13,12 +13,21 @@ const component = readFileSync(
 );
 
 describe("frontmatter property styles", () => {
-  it("lets an open type menu escape its otherwise clipped property row", () => {
-    expect(css).toMatch(
-      /\.metadata-property:has\(\.metadata-property-type-menu\)\s*\{[^}]*overflow:\s*visible;[^}]*z-index:\s*5;/su,
+  it("portals the type menu beyond property and workspace clipping", () => {
+    expect(component).toContain(
+      'import * as Popover from "../../ui/popover/index.js";',
+    );
+    expect(component).toContain(
+      '<Popover.Content\n      class="metadata-property-type-menu w-44 p-1"',
     );
     expect(component).not.toMatch(
       /class="metadata-property[^"\n]*\boverflow-hidden\b/u,
+    );
+    expect(css).not.toMatch(
+      /\.metadata-property-type-menu\s*\{[^}]*position:\s*absolute;/su,
+    );
+    expect(css).toMatch(
+      /\.metadata-property-type-menu\s*\{[^}]*max-height:\s*var\(--bits-popover-content-available-height\);[^}]*overflow-y:\s*auto;/su,
     );
   });
 });

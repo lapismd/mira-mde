@@ -19,6 +19,7 @@
   import Link from "./link.svelte";
   import FrontmatterPropertyNameInput from "./frontmatter-property-name-input.svelte";
   import FrontmatterPropertyValueInput from "./frontmatter-property-value-input.svelte";
+  import * as Popover from "../../ui/popover/index.js";
   import type { MiraFileAdapter } from "@lapismd/mira/extensions";
   import {
     setMarkdownContext,
@@ -213,15 +214,6 @@
 
   function canRename(property: FrontmatterProperty): boolean {
     return typeof property.path.at(-1) === "string";
-  }
-
-  function toggleTypeMenu(
-    event: MouseEvent,
-    property: FrontmatterProperty,
-  ): void {
-    event.stopPropagation();
-    typeMenuPath =
-      typeMenuPath === property.pathString ? null : property.pathString;
   }
 
   function siblingPropertyNames(property: FrontmatterProperty): string[] {
@@ -612,18 +604,7 @@
               aria-hidden="true"
             />
           </button>
-          <button
-            type="button"
-            class="metadata-property-type-button"
-            aria-label={`Change ${property.key} type`}
-            aria-expanded={typeMenuPath === property.pathString}
-            onclick={(event) => toggleTypeMenu(event, property)}
-          >
-            <Icon name="list-tree" class="size-3.5" />
-          </button>
-          {#if typeMenuPath === property.pathString}
-            {@render TypeMenu({ property })}
-          {/if}
+          {@render TypeMenu({ property, icon: "list-tree" })}
         </span>
         <FrontmatterPropertyNameInput
           value={property.key}
@@ -658,18 +639,7 @@
         class="metadata-property-key focus-within:bg-secondary text-muted-foreground flex shrink-0 self-stretch"
       >
         <span class="metadata-property-icon flex items-center py-1 pl-1">
-          <button
-            type="button"
-            class="metadata-property-type-button"
-            aria-label={`Change ${property.key} type`}
-            aria-expanded={typeMenuPath === property.pathString}
-            onclick={(event) => toggleTypeMenu(event, property)}
-          >
-            <Icon name={property.icon} class="size-3.5" />
-          </button>
-          {#if typeMenuPath === property.pathString}
-            {@render TypeMenu({ property })}
-          {/if}
+          {@render TypeMenu({ property, icon: property.icon })}
         </span>
         <FrontmatterPropertyNameInput
           value={property.key}
@@ -779,72 +749,107 @@
   {/if}
 {/snippet}
 
-{#snippet TypeMenu({ property }: { property: FrontmatterProperty })}
-  <div
-    class="metadata-property-type-menu"
-    role="menu"
-    aria-label={`Property type for ${property.key}`}
+{#snippet TypeMenu({
+  property,
+  icon,
+}: {
+  property: FrontmatterProperty;
+  icon: string;
+})}
+  <Popover.Root
+    open={typeMenuPath === property.pathString}
+    onOpenChange={(open: boolean) => {
+      if (open) {
+        typeMenuPath = property.pathString;
+      } else if (typeMenuPath === property.pathString) {
+        typeMenuPath = null;
+      }
+    }}
   >
-    {#each typeOptions as option}
+    <Popover.Trigger
+      type="button"
+      class="metadata-property-type-button"
+      aria-label={`Change ${property.key} type`}
+      onclick={(event) => event.stopPropagation()}
+    >
+      <Icon name={icon} class="size-3.5" />
+    </Popover.Trigger>
+    <Popover.Content
+      class="metadata-property-type-menu w-44 p-1"
+      align="start"
+      side="bottom"
+      sideOffset={4}
+      role="menu"
+      aria-label={`Property type for ${property.key}`}
+    >
+      {#each typeOptions as option}
+        <button
+          type="button"
+          class="metadata-property-type-menu__item"
+          data-selected={property.kind === option.type}
+          role="menuitemradio"
+          aria-checked={property.kind === option.type}
+          onclick={() => changePropertyKind(property, option.type)}
+        >
+          <Icon
+            name={option.icon ?? frontmatterPropertyIcon(option.type, config)}
+            class="size-3.5"
+          />
+          <span
+            >{option.label ??
+              frontmatterPropertyLabel(option.type, config)}</span
+          >
+          {#if property.kind === option.type}
+            <Icon name="check" class="metadata-property-type-menu__check" />
+          {/if}
+        </button>
+      {/each}
+      <div
+        class="metadata-property-type-menu__separator"
+        role="separator"
+      ></div>
       <button
         type="button"
         class="metadata-property-type-menu__item"
-        data-selected={property.kind === option.type}
-        role="menuitemradio"
-        aria-checked={property.kind === option.type}
-        onclick={() => changePropertyKind(property, option.type)}
+        role="menuitem"
+        onclick={() => void copyProperty(property, true)}
       >
-        <Icon
-          name={option.icon ?? frontmatterPropertyIcon(option.type, config)}
-          class="size-3.5"
-        />
-        <span
-          >{option.label ?? frontmatterPropertyLabel(option.type, config)}</span
-        >
-        {#if property.kind === option.type}
-          <Icon name="check" class="metadata-property-type-menu__check" />
-        {/if}
+        <Icon name="scissors" class="size-3.5" />
+        <span>Cut</span>
       </button>
-    {/each}
-    <div class="metadata-property-type-menu__separator" role="separator"></div>
-    <button
-      type="button"
-      class="metadata-property-type-menu__item"
-      role="menuitem"
-      onclick={() => void copyProperty(property, true)}
-    >
-      <Icon name="scissors" class="size-3.5" />
-      <span>Cut</span>
-    </button>
-    <button
-      type="button"
-      class="metadata-property-type-menu__item"
-      role="menuitem"
-      onclick={() => void copyProperty(property)}
-    >
-      <Icon name="copy" class="size-3.5" />
-      <span>Copy</span>
-    </button>
-    <button
-      type="button"
-      class="metadata-property-type-menu__item"
-      role="menuitem"
-      onclick={() => void pasteProperties(property)}
-    >
-      <Icon name="clipboard-paste" class="size-3.5" />
-      <span>Paste</span>
-    </button>
-    <div class="metadata-property-type-menu__separator" role="separator"></div>
-    <button
-      type="button"
-      class="metadata-property-type-menu__item metadata-property-type-menu__item--destructive"
-      role="menuitem"
-      onclick={() => removeProperty(property)}
-    >
-      <Icon name="trash-2" class="size-3.5" />
-      <span>Remove</span>
-    </button>
-  </div>
+      <button
+        type="button"
+        class="metadata-property-type-menu__item"
+        role="menuitem"
+        onclick={() => void copyProperty(property)}
+      >
+        <Icon name="copy" class="size-3.5" />
+        <span>Copy</span>
+      </button>
+      <button
+        type="button"
+        class="metadata-property-type-menu__item"
+        role="menuitem"
+        onclick={() => void pasteProperties(property)}
+      >
+        <Icon name="clipboard-paste" class="size-3.5" />
+        <span>Paste</span>
+      </button>
+      <div
+        class="metadata-property-type-menu__separator"
+        role="separator"
+      ></div>
+      <button
+        type="button"
+        class="metadata-property-type-menu__item metadata-property-type-menu__item--destructive"
+        role="menuitem"
+        onclick={() => removeProperty(property)}
+      >
+        <Icon name="trash-2" class="size-3.5" />
+        <span>Remove</span>
+      </button>
+    </Popover.Content>
+  </Popover.Root>
 {/snippet}
 
 {#snippet Pill({

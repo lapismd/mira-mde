@@ -172,7 +172,11 @@ export const PropertyActions: Story = {
       await userEvent.click(
         canvas.getByRole("button", { name: "Change status type" }),
       );
-      const typeMenu = canvas.getByRole("menu", {
+      const page = within(canvasElement.ownerDocument.body);
+      const statusRow = canvas
+        .getByRole("button", { name: "Change status type" })
+        .closest<HTMLElement>(".metadata-property");
+      const typeMenu = page.getByRole("menu", {
         name: "Property type for status",
       });
       const textType = within(typeMenu).getByRole("menuitemradio", {
@@ -180,8 +184,8 @@ export const PropertyActions: Story = {
       });
       await expect(typeMenu).toBeVisible();
       await expect(textType).toBeVisible();
-      const statusRow = typeMenu.closest<HTMLElement>(".metadata-property");
       expect(statusRow).not.toBeNull();
+      expect(statusRow!.contains(typeMenu)).toBe(false);
       expect(typeMenu.getBoundingClientRect().bottom).toBeGreaterThan(
         statusRow!.getBoundingClientRect().bottom,
       );
@@ -194,7 +198,7 @@ export const PropertyActions: Story = {
         hit === textType || textType.contains(hit),
         `Expected the Text item to own its center point; hit ${hit?.tagName ?? "nothing"}.${hit instanceof HTMLElement ? hit.className : ""} in ${hit instanceof HTMLElement ? hit.closest<HTMLElement>(".metadata-property")?.dataset.property : "no row"}; menu z=${getComputedStyle(typeMenu).zIndex}, row z=${getComputedStyle(statusRow!).zIndex}, row overflow=${getComputedStyle(statusRow!).overflow}`,
       ).toBe(true);
-      await userEvent.click(canvas.getByRole("menuitem", { name: "Remove" }));
+      await userEvent.click(page.getByRole("menuitem", { name: "Remove" }));
       await expect(
         canvas.queryByRole("textbox", { name: "status value" }),
       ).not.toBeInTheDocument();

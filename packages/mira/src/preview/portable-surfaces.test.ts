@@ -515,7 +515,7 @@ describe("portable preview surfaces", () => {
     trigger?.click();
     await settle();
 
-    const menu = target.querySelector<HTMLElement>(
+    const menu = document.body.querySelector<HTMLElement>(
       '[role="menu"][aria-label="Property type for title"]',
     );
     const numberType = Array.from(
@@ -523,13 +523,18 @@ describe("portable preview surfaces", () => {
     ).find((item) => item.textContent?.trim() === "Number");
     expect(trigger?.getAttribute("aria-expanded")).toBe("true");
     expect(menu).not.toBeNull();
+    expect(target.contains(menu)).toBe(false);
     expect(numberType).toBeDefined();
 
     numberType?.click();
     await settle();
 
     expect(trigger?.getAttribute("aria-expanded")).toBe("false");
-    expect(target.querySelector('[role="menu"]')).toBeNull();
+    expect(
+      document.body.querySelector(
+        '[role="menu"][aria-label="Property type for title"]',
+      ),
+    ).toBeNull();
     expect(
       controller.propertyManager.properties(controller.getRecord())[0]?.kind,
     ).toBe("number");
