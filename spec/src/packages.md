@@ -170,6 +170,9 @@ entry point.
   remove the authored marker and its separator without changing geometry
   between highlight types.
 - `preview` exports Markdown preview, outline, embed, and renderer surfaces. Its
+  floating outline MUST resolve the nearest ancestor with an actual scroll
+  range so a consumer-owned viewport drives the active rail stroke and panel
+  item when the preview delegates scrolling. Its
   shipped reading styles MUST keep a list guide continued through a child
   blockquote on the parent's painted guide column after accounting for the
   blockquote border box. Reading list controls MUST use the first rendered item

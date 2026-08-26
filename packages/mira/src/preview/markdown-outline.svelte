@@ -1,5 +1,7 @@
 <script lang="ts">
   import {
+    activeMarkdownOutlineId,
+    findMarkdownOutlineScrollRoot,
     slugHeadingText,
     type MarkdownOutlineItem,
     type MarkdownOutlineVariant,
@@ -85,50 +87,6 @@
     return candidate;
   }
 
-  function findScrollRoot(target: HTMLElement | null): HTMLElement | null {
-    const preview = root?.matches(".mira-markdown-preview")
-      ? root
-      : root?.querySelector<HTMLElement>(".mira-markdown-preview");
-    if (preview && (!target || preview.contains(target))) return preview;
-
-    let current = target?.parentElement ?? null;
-    while (current) {
-      const style = getComputedStyle(current);
-      if (
-        /(auto|scroll)/.test(`${style.overflowY} ${style.overflow}`) &&
-        current.scrollHeight > current.clientHeight
-      ) {
-        return current;
-      }
-      current = current.parentElement;
-    }
-    return null;
-  }
-
-  function updateActiveHeading(): void {
-    if (items.length === 0) {
-      activeId = "";
-      return;
-    }
-
-    const firstTarget = headingElement(items[0]!);
-    const scrollRoot = findScrollRoot(firstTarget);
-    const rootTop = scrollRoot?.getBoundingClientRect().top ?? 0;
-    let current = items[0]!;
-
-    for (const item of items) {
-      const target = headingElement(item);
-      if (!target) continue;
-      if (target.getBoundingClientRect().top - rootTop <= 96) {
-        current = item;
-      } else {
-        break;
-      }
-    }
-
-    activeId = current.id;
-  }
-
   function navigateToHeading(item: MarkdownOutlineItem): void {
     const target = headingElement(item);
     if (!target) return;
@@ -180,11 +138,13 @@
     if (variant !== "floating" || items.length === 0) return;
 
     const firstTarget = headingElement(items[0]!);
-    const scrollRoot = findScrollRoot(firstTarget);
+    const scrollRoot = findMarkdownOutlineScrollRoot(firstTarget, root);
     let frame = 0;
     const scheduleUpdate = () => {
       cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(updateActiveHeading);
+      frame = requestAnimationFrame(() => {
+        activeId = activeMarkdownOutlineId(items, headingElement, scrollRoot);
+      });
     };
 
     scheduleUpdate();

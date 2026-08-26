@@ -176,12 +176,20 @@ export const OutlineNavigation: Story = {
       await expect(target).toHaveAttribute("id", "heading-4");
       await userEvent.click(marker);
 
-      const outline = canvas.getByRole("navigation", {
+      const outline = await canvas.findByRole("navigation", {
         name: "Table of contents",
+      });
+      const activePanelItem = within(outline).getByRole("button", {
+        name: "Heading 4",
       });
       await expect(outline).toBeVisible();
       await expect(within(outline).getByText("On this page")).toBeVisible();
       await expect(marker).toHaveAttribute("aria-current", "true");
+      await expect(
+        marker.querySelector(".mira-markdown-outline__rail-line"),
+      ).toHaveClass("is-active");
+      await expect(activePanelItem).toHaveAttribute("aria-current", "true");
+      await expect(activePanelItem).toHaveClass("is-active");
       await waitFor(
         () => {
           expect(preview.scrollTop).toBeGreaterThan(0);
