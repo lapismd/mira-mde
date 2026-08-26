@@ -27,7 +27,7 @@
   let editorEl: HTMLDivElement | null = $state(null);
   let query = $state("");
   let open = $state(false);
-  let activeIndex = $state(0);
+  let activeIndex = $state(-1);
   let suggestionVersion = 0;
   let suggestions = $state<string[]>([]);
   let committedSuggestion: string | null = null;
@@ -41,7 +41,7 @@
 
   $effect(() => {
     if (activeIndex >= filteredSuggestions.length) {
-      activeIndex = Math.max(0, filteredSuggestions.length - 1);
+      activeIndex = -1;
     }
   });
 
@@ -110,21 +110,25 @@
     if (event.key === "ArrowDown" && filteredSuggestions.length) {
       event.preventDefault();
       open = true;
-      activeIndex = (activeIndex + 1) % filteredSuggestions.length;
+      activeIndex =
+        activeIndex < 0 ? 0 : (activeIndex + 1) % filteredSuggestions.length;
       return;
     }
     if (event.key === "ArrowUp" && filteredSuggestions.length) {
       event.preventDefault();
       open = true;
       activeIndex =
-        (activeIndex - 1 + filteredSuggestions.length) %
-        filteredSuggestions.length;
+        activeIndex < 0
+          ? filteredSuggestions.length - 1
+          : (activeIndex - 1 + filteredSuggestions.length) %
+            filteredSuggestions.length;
       return;
     }
     if (
       (event.key === "Enter" || event.key === "Tab") &&
       open &&
-      filteredSuggestions.length
+      activeIndex >= 0 &&
+      activeIndex < filteredSuggestions.length
     ) {
       event.preventDefault();
       selectSuggestion(activeIndex);
@@ -140,13 +144,18 @@
       open = false;
     }
   }
+
+  function textControlProps<T extends { type?: unknown }>(props: T) {
+    const { type: _triggerType, ...controlProps } = props;
+    return controlProps;
+  }
 </script>
 
 <Popover.Root bind:open>
   <Popover.Trigger>
     {#snippet child({ props })}
       <div
-        {...props}
+        {...textControlProps(props)}
         bind:this={editorEl}
         class={className}
         role="combobox"
@@ -162,18 +171,20 @@
         onclick={() => {
           query = currentValue();
           open = true;
+          activeIndex = -1;
           void loadSuggestions(query);
         }}
         onfocus={() => {
           query = currentValue();
           open = true;
+          activeIndex = -1;
           void loadSuggestions(query);
         }}
         oninput={() => {
           committedSuggestion = null;
           query = currentValue();
           open = true;
-          activeIndex = 0;
+          activeIndex = -1;
           void loadSuggestions(query);
         }}
         onblur={handleBlur}
@@ -201,7 +212,7 @@
         <button
           type="button"
           class="mira-property-value-suggestion"
-          data-active={index === activeIndex}
+          data-active={index === activeIndex ? "true" : undefined}
           data-property-value-suggestion="true"
           role="option"
           aria-selected={index === activeIndex}

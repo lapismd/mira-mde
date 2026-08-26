@@ -64,6 +64,16 @@ describe("frontmatter property styles", () => {
     expect(css).toMatch(
       /\.metadata-property-pill-remove \.mira-icon,[^{]+\{[^}]*height: 0\.625rem[^}]*width: 0\.625rem/su,
     );
+    expect(component).toContain('class="metadata-property-pill-label"');
+    expect(css).toMatch(
+      /\.metadata-property-value-list\s*\{[^}]*flex-wrap:\s*wrap[^}]*min-width:\s*0/su,
+    );
+    expect(css).toMatch(
+      /\.metadata-property-pill-chip\s*\{[^}]*overflow-wrap:\s*anywhere[^}]*white-space:\s*normal/su,
+    );
+    expect(css).toMatch(
+      /\.metadata-property-pill-label,[^{]+\{[^}]*text-overflow:\s*clip[^}]*white-space:\s*normal/su,
+    );
   });
 
   it("portals list and text value suggestions through Mira Popover", () => {
@@ -86,5 +96,13 @@ describe("frontmatter property styles", () => {
     expect(css).not.toContain(
       '.metadata-property:has(.mira-property-value-input[data-open="true"])',
     );
+    expect(listValueComponent).toContain('let draft = $state("");');
+    expect(listValueComponent).not.toContain("onInput:");
+    expect(listValueComponent).toContain('type="text"');
+    expect(listValueComponent).toContain("...textControlProps(props)");
+    for (const source of [listValueComponent, textValueComponent]) {
+      expect(source).toContain("let activeIndex = $state(-1);");
+      expect(source).toContain("activeIndex >= 0");
+    }
   });
 });

@@ -7,36 +7,32 @@
   import * as Popover from "../../ui/popover/index.js";
 
   type Props = {
-    value: string;
     propertyKey: string;
     config?: FrontmatterConfig;
     excludedValues?: string[];
     ariaLabel: string;
-    onInput: (value: string) => void;
     onCommit: (value: string) => void;
     onBackspaceEmpty: () => void;
   };
 
   let {
-    value,
     propertyKey,
     config,
     excludedValues = [],
     ariaLabel,
-    onInput,
     onCommit,
     onBackspaceEmpty,
   }: Props = $props();
 
   let inputEl: HTMLInputElement | null = $state(null);
+  let draft = $state("");
   let open = $state(false);
-  let activeIndex = $state(0);
+  let activeIndex = $state(-1);
   let suggestionVersion = 0;
   let suggestions = $state<string[]>([]);
-  let suppressNextBlurCommit = false;
 
   const filteredSuggestions = $derived(
-    filterFrontmatterValueSuggestions(suggestions, value, excludedValues),
+    filterFrontmatterValueSuggestions(suggestions, draft, excludedValues),
   );
   const suggestionListId = $derived(
     `mira-property-value-suggestions-${propertyKey.replace(/[^a-z0-9_-]+/giu, "-")}`,
@@ -44,17 +40,17 @@
 
   $effect(() => {
     if (activeIndex >= filteredSuggestions.length) {
-      activeIndex = Math.max(0, filteredSuggestions.length - 1);
+      activeIndex = -1;
     }
   });
 
-  async function loadSuggestions(): Promise<void> {
+  async function loadSuggestions(nextQuery = draft): Promise<void> {
     const version = ++suggestionVersion;
     try {
       const next = await readFrontmatterValueSuggestions(
         config,
         propertyKey,
-        value,
+        nextQuery,
       );
       if (version === suggestionVersion) {
         suggestions = next;
@@ -69,10 +65,19 @@
   function selectSuggestion(index: number): void {
     const suggestion = filteredSuggestions[index];
     if (suggestion) {
-      suppressNextBlurCommit = true;
-      open = false;
-      onCommit(suggestion);
+      commitDraft(suggestion);
     }
+  }
+
+  function commitDraft(nextValue = draft): void {
+    const committedValue = nextValue.trim();
+    if (!committedValue) {
+      return;
+    }
+    draft = "";
+    open = false;
+    activeIndex = -1;
+    onCommit(committedValue);
   }
 
   function handleBlur(event: FocusEvent): void {
@@ -83,12 +88,8 @@
     queueMicrotask(() => {
       if (inputEl?.ownerDocument.activeElement !== inputEl) {
         open = false;
-        if (suppressNextBlurCommit) {
-          suppressNextBlurCommit = false;
-          return;
-        }
-        if (value.trim()) {
-          onCommit(value);
+        if (draft.trim()) {
+          commitDraft();
         }
       }
     });
@@ -98,21 +99,25 @@
     if (event.key === "ArrowDown" && filteredSuggestions.length) {
       event.preventDefault();
       open = true;
-      activeIndex = (activeIndex + 1) % filteredSuggestions.length;
+      activeIndex =
+        activeIndex < 0 ? 0 : (activeIndex + 1) % filteredSuggestions.length;
       return;
     }
     if (event.key === "ArrowUp" && filteredSuggestions.length) {
       event.preventDefault();
       open = true;
       activeIndex =
-        (activeIndex - 1 + filteredSuggestions.length) %
-        filteredSuggestions.length;
+        activeIndex < 0
+          ? filteredSuggestions.length - 1
+          : (activeIndex - 1 + filteredSuggestions.length) %
+            filteredSuggestions.length;
       return;
     }
     if (
       (event.key === "Enter" || event.key === "Tab") &&
       open &&
-      filteredSuggestions.length
+      activeIndex >= 0 &&
+      activeIndex < filteredSuggestions.length
     ) {
       event.preventDefault();
       selectSuggestion(activeIndex);
@@ -124,24 +129,29 @@
       event.key === "," ||
       event.key === ";"
     ) {
-      if (value.trim()) {
+      if (draft.trim()) {
         event.preventDefault();
-        open = false;
-        onCommit(value);
+        commitDraft();
       }
       return;
     }
     if (event.key === "Escape") {
       event.preventDefault();
-      suppressNextBlurCommit = true;
       open = false;
+      activeIndex = -1;
+      draft = "";
       inputEl?.blur();
       return;
     }
-    if (event.key === "Backspace" && !value) {
+    if (event.key === "Backspace" && !draft) {
       event.preventDefault();
       onBackspaceEmpty();
     }
+  }
+
+  function textControlProps<T extends { type?: unknown }>(props: T) {
+    const { type: _triggerType, ...inputProps } = props;
+    return inputProps;
   }
 </script>
 
@@ -153,11 +163,12 @@
     <Popover.Trigger>
       {#snippet child({ props })}
         <input
-          {...props}
+          {...textControlProps(props)}
           bind:this={inputEl}
+          type="text"
           class="metadata-input metadata-input-list min-w-[8ch] flex-1 bg-transparent px-1 py-0 text-xs outline-none"
           aria-label={ariaLabel}
-          {value}
+          value={draft}
           spellcheck="false"
           role="combobox"
           aria-autocomplete="list"
@@ -166,18 +177,20 @@
           aria-expanded={open && filteredSuggestions.length > 0}
           onclick={() => {
             open = true;
+            activeIndex = -1;
             void loadSuggestions();
           }}
           onfocus={() => {
             open = true;
+            activeIndex = -1;
             void loadSuggestions();
           }}
           oninput={(event) => {
-            suppressNextBlurCommit = false;
+            const nextValue = (event.currentTarget as HTMLInputElement).value;
+            draft = nextValue;
             open = true;
-            activeIndex = 0;
-            onInput((event.currentTarget as HTMLInputElement).value);
-            void loadSuggestions();
+            activeIndex = -1;
+            void loadSuggestions(nextValue);
           }}
           onblur={handleBlur}
           onkeydown={handleKeydown}
@@ -202,7 +215,7 @@
           <button
             type="button"
             class="mira-property-value-suggestion"
-            data-active={index === activeIndex}
+            data-active={index === activeIndex ? "true" : undefined}
             data-property-value-suggestion="true"
             role="option"
             aria-selected={index === activeIndex}

@@ -403,6 +403,12 @@
 }
 
 .metadata-property-value-list {
+  align-items: center;
+  display: flex;
+  flex: 1 1 0;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  min-width: 0;
   padding-block: 0.25rem;
 }
 
@@ -414,10 +420,13 @@
 .metadata-property-pill-chip {
   align-items: center;
   display: inline-flex;
-  flex-shrink: 0;
+  flex: 0 1 auto;
   gap: 0.25rem;
   max-width: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
   padding-inline: 0.35rem 0.2rem;
+  white-space: normal;
 }
 
 .metadata-property-pill-chip:not(.tag) {
@@ -434,25 +443,31 @@
   );
 }
 
+.metadata-property-pill-label,
 .metadata-property-pill-link {
   color: inherit;
   display: inline-block;
   font-weight: 400;
-  max-width: 12rem;
+  max-width: 100%;
   min-width: 0;
-  overflow: hidden;
+  overflow: visible;
+  overflow-wrap: anywhere;
   text-decoration: none;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  width: max-content;
+  text-overflow: clip;
+  white-space: normal;
 }
 
 .metadata-property-pill-link .mira-link-preview__trigger {
   display: block;
-  max-width: 12rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  max-width: 100%;
+  overflow: visible;
+  overflow-wrap: anywhere;
+  text-overflow: clip;
+  white-space: normal;
+}
+
+.metadata-property-pill-chip.tag {
+  line-height: 1.2;
 }
 
 .metadata-property-pill-chip button,

@@ -86,7 +86,6 @@
   let rawDraft = $state("");
   let frontmatterOpen = $state(markdown?.frontmatterOpen ?? true);
   let opened = $state<Record<string, boolean>>({});
-  let listDrafts = $state<Record<string, string>>({});
   let typeMenuPath = $state<string | null>(null);
   let newPropertyPath = $state<string | null>(null);
 
@@ -373,23 +372,7 @@
     return value;
   }
 
-  function setListDraft(path: string, value: string): void {
-    listDrafts = {
-      ...listDrafts,
-      [path]: value,
-    };
-  }
-
-  function clearListDraft(path: string): void {
-    const next = { ...listDrafts };
-    delete next[path];
-    listDrafts = next;
-  }
-
-  function commitListValues(
-    property: FrontmatterProperty,
-    raw = listDrafts[property.pathString] ?? "",
-  ): void {
+  function commitListValues(property: FrontmatterProperty, raw: string): void {
     const nextValues = raw
       .split(/[,;]+/)
       .map(normalizeListValue)
@@ -405,7 +388,6 @@
         next.push(value);
       }
     }
-    clearListDraft(property.pathString);
     updateProperty(property, next);
   }
 
@@ -705,12 +687,10 @@
               {@render Pill({ property, item, index })}
             {/each}
             <FrontmatterPropertyValueInput
-              value={listDrafts[property.pathString] ?? ""}
               propertyKey={property.key}
               {config}
               excludedValues={listValues(property)}
               ariaLabel={`${property.pathString} value`}
-              onInput={(next) => setListDraft(property.pathString, next)}
               onCommit={(next) => commitListValues(property, next)}
               onBackspaceEmpty={() => {
                 if (listValues(property).length) {
@@ -857,7 +837,9 @@
         class="metadata-property-pill-link"
       />
     {:else}
-      {displayListValue(property, item)}
+      <span class="metadata-property-pill-label">
+        {displayListValue(property, item)}
+      </span>
     {/if}
     <button
       type="button"

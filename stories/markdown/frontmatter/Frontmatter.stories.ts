@@ -181,9 +181,44 @@ export const PropertyActions: Story = {
       }
     });
 
+    await step(
+      "commit custom list values while suggestions remain advisory",
+      async () => {
+        const page = within(canvasElement.ownerDocument.body);
+        let tagsValue = canvas.getByRole("combobox", { name: "tags value" });
+        await userEvent.click(tagsValue);
+        await userEvent.type(tagsValue, "rel");
+        await expect(tagsValue).toHaveValue("rel");
+        const releaseOption = await page.findByRole("option", {
+          name: "release",
+        });
+        await expect(releaseOption).toHaveAttribute("aria-selected", "false");
+        await userEvent.keyboard("{Enter}");
+        await expect(canvas.getByText("rel", { exact: true })).toBeVisible();
+        await expect(
+          canvas.queryByText("release", { exact: true }),
+        ).not.toBeInTheDocument();
+
+        const longTag =
+          "topic/financial-planning-and-long-term-investing-with-custom-scenarios-and-review-notes";
+        tagsValue = canvas.getByRole("combobox", { name: "tags value" });
+        await userEvent.type(tagsValue, longTag);
+        await expect(tagsValue).toHaveValue(longTag);
+        await userEvent.keyboard("{Enter}");
+        const longTagLabel = canvas.getByText(longTag, { exact: true });
+        const longTagPill = longTagLabel.closest<HTMLElement>(
+          ".metadata-property-pill-chip",
+        );
+        expect(longTagPill).not.toBeNull();
+        expect(getComputedStyle(longTagLabel).whiteSpace).toBe("normal");
+        expect(getComputedStyle(longTagLabel).overflowWrap).toBe("anywhere");
+        expect(getComputedStyle(longTagLabel).textOverflow).toBe("clip");
+      },
+    );
+
     await step("edit and remove a property", async () => {
       const page = within(canvasElement.ownerDocument.body);
-      const statusValue = canvas.getByRole("combobox", {
+      let statusValue = canvas.getByRole("combobox", {
         name: "status value",
       });
       await userEvent.clear(statusValue);
@@ -192,6 +227,7 @@ export const PropertyActions: Story = {
       const approvedOption = await page.findByRole("option", {
         name: "approved",
       });
+      await expect(approvedOption).toHaveAttribute("aria-selected", "false");
       const suggestionList = approvedOption.closest<HTMLElement>(
         ".mira-property-value-suggestions",
       );
@@ -206,7 +242,16 @@ export const PropertyActions: Story = {
       expect(
         optionHit === approvedOption || approvedOption.contains(optionHit),
       ).toBe(true);
-      await userEvent.click(approvedOption);
+      await userEvent.keyboard("{Enter}");
+      statusValue = canvas.getByRole("combobox", { name: "status value" });
+      await expect(statusValue).toHaveTextContent("app");
+
+      await userEvent.clear(statusValue);
+      await userEvent.type(statusValue, "app");
+      await userEvent.click(
+        await page.findByRole("option", { name: "approved" }),
+      );
+      statusValue = canvas.getByRole("combobox", { name: "status value" });
       await expect(statusValue).toHaveTextContent("approved");
 
       const statusTrigger = canvas.getByRole("button", {
