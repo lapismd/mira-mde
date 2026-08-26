@@ -8,7 +8,11 @@ async function gotoStory(page: Page, id: string) {
 }
 
 function editorScroller(page: Page) {
-  return page.locator(".mira__editor-host > .cm-editor > .cm-scroller").first();
+  return page
+    .locator(
+      ".mira__editor-host > .mira-code-editor__host > .cm-editor > .cm-scroller",
+    )
+    .first();
 }
 
 async function scrollEditorUntilVisible(

@@ -138,7 +138,9 @@ entry point.
   `measuredIndentExtension` and `syncMeasuredIndentStyles`; internal layout
   repairs MUST preserve those exports. Indentation-guide, continuation, and
   syntax-tree-derived indented-code line geometry remains internal to those
-  factories and MUST NOT require a new consumer API. Internal rendered block
+  factories and MUST NOT require a new consumer API. Their measured indentation
+  state MUST survive transient focus and selection decoration rebuilds without
+  shifting an already resolved continuation column. Internal rendered block
   widget styles MUST also normalize CodeMirror's source whitespace behavior so
   embedded Markdown retains the same block spacing as the public preview
   renderer without exposing another styling API. Internal Markdown parser

@@ -7,7 +7,9 @@ async function gotoStory(page: Page, id: string) {
 
 async function scrollEditorUntilVisible(page: Page, locator: Locator) {
   const scroller = page
-    .locator(".mira__editor-host > .cm-editor > .cm-scroller")
+    .locator(
+      ".mira__editor-host > .mira-code-editor__host > .cm-editor > .cm-scroller",
+    )
     .first();
   const scrollHeight = await scroller.evaluate(
     (element) => element.scrollHeight,

@@ -294,7 +294,7 @@ export const Playground: Story = {
       await userEvent.click(
         within(dialog).getByRole("button", { name: "Close" }),
       );
-      await expect(dialog).not.toBeVisible();
+      await waitFor(() => expect(dialog).not.toBeVisible());
     });
   },
 };

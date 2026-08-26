@@ -51,11 +51,9 @@ describe("frontmatter value suggestions", () => {
 
   it("excludes current pills and empty values", () => {
     expect(
-      filterFrontmatterValueSuggestions(
-        ["demo", "ideas", "demo", ""],
-        "dem",
-        ["demo"],
-      ),
+      filterFrontmatterValueSuggestions(["demo", "ideas", "demo", ""], "dem", [
+        "demo",
+      ]),
     ).toEqual([]);
     expect(
       filterFrontmatterValueSuggestions(["ideas", "demo"], "ide", ["demo"]),

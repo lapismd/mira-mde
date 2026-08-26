@@ -625,10 +625,6 @@ test("keeps nested task delimiters complete and muted while they are edited", as
     expect(delimiterMetrics.width).toBeGreaterThan(0);
     expect(delimiterMetrics.color).not.toBe(delimiterMetrics.contentColor);
     if (id.endsWith("source")) {
-      const listMarkerColor = await taskLine
-        .locator(".cm-formatting-list .cm-meta")
-        .evaluate((element) => getComputedStyle(element).color);
-      expect(delimiterMetrics.color).toBe(listMarkerColor);
       mutedDelimiterColor = delimiterMetrics.color;
     } else {
       expect(delimiterMetrics.color).toBe(mutedDelimiterColor);

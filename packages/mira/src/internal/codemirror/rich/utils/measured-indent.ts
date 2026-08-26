@@ -56,23 +56,29 @@ export function syncMeasuredIndentStyles(
       ? measurements.get(from)
       : undefined;
     if (!measurement) {
-      removeStylePropertyIfPresent(line, measuredPaddingProperty);
-      removeStylePropertyIfPresent(line, measuredPrefixProperty);
+      // The read and write phases can straddle a CodeMirror decoration
+      // update. Preserve a still-participating line that was absent from this
+      // read; only a line that definitively lost its indent contract clears
+      // the last valid measurement.
+      if (!line.hasAttribute("data-indent-prefix")) {
+        removeStylePropertyIfPresent(line, measuredPaddingProperty);
+        removeStylePropertyIfPresent(line, measuredPrefixProperty);
+      }
       continue;
     }
 
-    if (measurement.paddingPx === null) {
-      removeStylePropertyIfPresent(line, measuredPaddingProperty);
-    } else {
+    // A null component means that this measurement pass could not resolve it,
+    // not that the line stopped participating. Preserve the last valid value
+    // through focus and decoration transitions; a line absent from the map is
+    // the explicit signal to clear both properties.
+    if (measurement.paddingPx !== null) {
       setStylePropertyIfChanged(
         line,
         measuredPaddingProperty,
         `${measurement.paddingPx}px`,
       );
     }
-    if (measurement.prefixPx === null) {
-      removeStylePropertyIfPresent(line, measuredPrefixProperty);
-    } else {
+    if (measurement.prefixPx !== null) {
       setStylePropertyIfChanged(
         line,
         measuredPrefixProperty,
@@ -303,7 +309,10 @@ function measureFirstContentOffset(line: HTMLElement): number | null {
 
 class MeasuredIndentPlugin implements PluginValue {
   private readonly cache = new Map<string, number>();
+  private readonly measuredPaddingByFrom = new Map<number, number>();
+  private reschedule = false;
   private scheduled = false;
+  private transitionRetryFrames = 0;
   private retryFrames = 0;
   private destroyed = false;
 
@@ -313,10 +322,19 @@ class MeasuredIndentPlugin implements PluginValue {
   }
 
   update(update: ViewUpdate): void {
+    if (update.docChanged) {
+      this.measuredPaddingByFrom.clear();
+    }
     let needsMeasure = update.geometryChanged;
     const selectionChanged = !update.startState.selection.eq(
       update.state.selection,
     );
+    if (update.focusChanged || selectionChanged) {
+      // CodeMirror can rebuild line decorations across several frames after a
+      // focus or selection transition. Keep measuring until that transition
+      // has exposed its stable DOM, including under a busy browser worker.
+      this.transitionRetryFrames = 30;
+    }
     // A geometry update can be the second half of CodeMirror revealing a raw
     // prefix. Keep the last widget-backed width until a laid-out widget can
     // replace it; clearing the cache here creates a one-frame 2ch/4ch jump.
@@ -330,6 +348,10 @@ class MeasuredIndentPlugin implements PluginValue {
 
   private schedule(view: EditorView): boolean {
     if (this.scheduled) {
+      // Focus, selection, and geometry updates can arrive before the pending
+      // measure writes. Remember the later invalidation so a transitional DOM
+      // read cannot become the final indentation state.
+      this.reschedule = true;
       return true;
     }
     if (!view.inView) {
@@ -442,10 +464,11 @@ class MeasuredIndentPlugin implements PluginValue {
             if (anchorOffset !== null && anchorOffset > 0) {
               paddingPx = anchorOffset;
             } else {
-              // Keep the structural parent-prefix fallback until its content
-              // span is measurable. Using this continuation's own full widget
-              // width here would move the default render for one paint frame.
-              paddingPx = null;
+              // Focus and decoration transitions can briefly replace the
+              // anchor's measurable content span. Retain this document's last
+              // resolved parent column instead of dropping to the narrower
+              // structural fallback for a paint frame.
+              paddingPx = this.measuredPaddingByFrom.get(from) ?? null;
             }
           }
 
@@ -467,10 +490,28 @@ class MeasuredIndentPlugin implements PluginValue {
       },
       write: ({ inactive, measurements, selectionFrom, selectionTo }) => {
         this.scheduled = false;
+        const reschedule = this.reschedule;
+        this.reschedule = false;
+        const scheduleFollowUp = () => {
+          if (reschedule) {
+            this.schedule(view);
+            return;
+          }
+          if (this.transitionRetryFrames <= 0) {
+            return;
+          }
+          this.transitionRetryFrames -= 1;
+          requestAnimationFrame(() => {
+            if (!this.destroyed) {
+              this.schedule(view);
+            }
+          });
+        };
         // CodeMirror can move an otherwise visible editor out of its measured
         // viewport between scheduling and reading. That is not evidence that
         // its valid line measurements became stale.
         if (inactive) {
+          scheduleFollowUp();
           return;
         }
         const selection = view.state.selection.main;
@@ -482,6 +523,9 @@ class MeasuredIndentPlugin implements PluginValue {
         for (const measurement of measurements) {
           const { cacheKey, from, paddingPx, prefixPx, stableIndentPx } =
             measurement;
+          if (paddingPx !== null) {
+            this.measuredPaddingByFrom.set(from, paddingPx);
+          }
           if (paddingPx !== null || prefixPx !== null) {
             byFrom.set(from, { paddingPx, prefixPx });
           }
@@ -495,6 +539,7 @@ class MeasuredIndentPlugin implements PluginValue {
           }
         }
         syncMeasuredIndentStyles(view.contentDOM, byFrom);
+        scheduleFollowUp();
       },
     });
     return true;

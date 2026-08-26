@@ -106,7 +106,24 @@ describe("measured indent styles", () => {
     );
   });
 
-  it("keeps a measured widget width when the parent padding falls back", () => {
+  it("preserves a participating line omitted by a transitional read", () => {
+    const root = document.createElement("div");
+    const line = appendLine(root, 10);
+    line.dataset["indentPrefix"] = "  ";
+    line.style.setProperty("--hmd-indent-padding-measured", "24px");
+    line.style.setProperty("--hmd-indent-prefix-measured", "8px");
+
+    syncMeasuredIndentStyles(root, new Map());
+
+    expect(line.style.getPropertyValue("--hmd-indent-padding-measured")).toBe(
+      "24px",
+    );
+    expect(line.style.getPropertyValue("--hmd-indent-prefix-measured")).toBe(
+      "8px",
+    );
+  });
+
+  it("keeps the last measured padding when the parent temporarily falls back", () => {
     const root = document.createElement("div");
     const line = appendLine(root, 10);
     line.style.setProperty("--hmd-indent-padding-measured", "24px");
@@ -117,7 +134,7 @@ describe("measured indent styles", () => {
     );
 
     expect(line.style.getPropertyValue("--hmd-indent-padding-measured")).toBe(
-      "",
+      "24px",
     );
     expect(line.style.getPropertyValue("--hmd-indent-prefix-measured")).toBe(
       "32px",

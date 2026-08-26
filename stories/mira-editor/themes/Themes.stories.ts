@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/svelte-vite";
-import { expect, userEvent, within } from "storybook/test";
+import { expect, userEvent, waitFor, within } from "storybook/test";
 import MiraEditorStory from "../_shared/MiraEditorStory.svelte";
 import {
   defaultEditorArgs,
@@ -106,7 +106,7 @@ async function expectAboutLogoHalf(
   await expect(themedEdgeDelta).toBeLessThan(1);
 
   await userEvent.click(within(dialog).getByRole("button", { name: "Close" }));
-  await expect(dialog).not.toBeVisible();
+  await waitFor(() => expect(dialog).not.toBeVisible());
 }
 
 export const MiraLight: Story = {

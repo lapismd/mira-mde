@@ -106,10 +106,12 @@ from live-preview marker slots and distinguishes authored raw-prefix width from
 the full indent-unit minimum used by a replacement widget. Parent padding and
 prefix width are refined independently so a temporarily unavailable parent
 measurement cannot collapse an otherwise stable widget column. Indentation
-guides are painted on the complete wrapped line box rather than on an inline
-prefix segment. Live preview applies Lapis's styled unordered-marker hook away
-from the caret, so dash, asterisk, and plus source markers share the reading
-surface's bullet presentation without losing raw-prefix editing.
+measurements retain their last valid content column while CodeMirror rebuilds
+line decorations after focus or selection transitions. Guides are painted on
+the complete wrapped line box rather than on an inline prefix segment. Live
+preview applies Lapis's styled unordered-marker hook away from the caret, so
+dash, asterisk, and plus source markers share the reading surface's bullet
+presentation without losing raw-prefix editing.
 
 Callout and task-state rendering consumes public RGB-channel tokens inside
 `rgb()` and `rgba()` declarations. Those tokens therefore remain raw channel
