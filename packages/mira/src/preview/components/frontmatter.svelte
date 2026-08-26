@@ -18,6 +18,7 @@
   import Icon from "./icon.svelte";
   import Link from "./link.svelte";
   import FrontmatterPropertyNameInput from "./frontmatter-property-name-input.svelte";
+  import FrontmatterPropertyTextInput from "./frontmatter-property-text-input.svelte";
   import FrontmatterPropertyValueInput from "./frontmatter-property-value-input.svelte";
   import * as DropdownMenu from "../../ui/dropdown-menu/index.js";
   import type { MiraFileAdapter } from "@lapismd/mira/extensions";
@@ -70,13 +71,16 @@
         dialog: false,
       });
   const localController = new FrontmatterController();
-  const fallbackManager = createFrontmatterPropertyManager({
-    ...(markdown?.frontmatterConfig ?? {}),
-    sourcePath: markdown?.sourcePath,
-  });
+  const fallbackManager = $derived(
+    createFrontmatterPropertyManager({
+      ...(markdown?.frontmatterConfig ?? {}),
+      sourcePath: markdown?.sourcePath,
+    }),
+  );
   const controller = $derived(controllerProp ?? localController);
   const manager = $derived(
-    managerProp ?? controller.propertyManager ?? fallbackManager,
+    managerProp ??
+      (controllerProp ? controllerProp.propertyManager : fallbackManager),
   );
 
   let rawDraft = $state("");
@@ -332,21 +336,6 @@
       property,
       parseFrontmatterValue(target.value, property.kind),
     );
-  }
-
-  function updateEditableTextProperty(
-    event: Event,
-    property: FrontmatterProperty,
-  ): void {
-    const target = event.currentTarget as HTMLElement;
-    updateProperty(property, target.textContent ?? "");
-  }
-
-  function handleEditableTextKeydown(event: KeyboardEvent): void {
-    if (event.key === "Enter" && !event.shiftKey) {
-      event.preventDefault();
-      (event.currentTarget as HTMLElement).blur();
-    }
   }
 
   function updateBooleanProperty(
@@ -669,19 +658,14 @@
             onchange={(event) => updateBooleanProperty(event, property)}
           />
         {:else if toBuiltinFrontmatterKind(property.kind) === "text"}
-          <div
+          <FrontmatterPropertyTextInput
+            value={formatFrontmatterValue(property.value)}
+            propertyKey={property.key}
+            {config}
+            ariaLabel={`${property.pathString} value`}
             class={`metadata-input metadata-input-longtext metadata-property-value-item min-w-0 grow bg-transparent px-2 py-1 outline-none ${valueClass(property.kind)}`}
-            role="textbox"
-            aria-label={`${property.pathString} value`}
-            contenteditable="true"
-            spellcheck="true"
-            tabindex="0"
-            data-placeholder="Empty"
-            onblur={(event) => updateEditableTextProperty(event, property)}
-            onkeydown={handleEditableTextKeydown}
-          >
-            {formatFrontmatterValue(property.value)}
-          </div>
+            onCommit={(next) => updateProperty(property, next)}
+          />
         {:else if toBuiltinFrontmatterKind(property.kind) === "number"}
           <input
             class={`metadata-input metadata-input-number metadata-property-value-item min-w-0 grow bg-transparent px-2 py-1 outline-none ${valueClass(property.kind)}`}
@@ -862,7 +846,8 @@
 })}
   {@const wikilink = parseFrontmatterPillWikilink(item)}
   <span
-    class={`metadata-property-pill-chip inline-flex min-w-0 items-center gap-0.5 rounded-sm ${property.kind === "tags" ? "tag" : "bg-secondary text-secondary-foreground transition-colors hover:bg-[var(--background-modifier-hover)]"}`.trim()}
+    class={`metadata-property-pill-chip ${property.kind === "tags" ? "tag" : ""}`.trim()}
+    data-property-pill-kind={toBuiltinFrontmatterKind(property.kind)}
   >
     {#if wikilink}
       <Link
@@ -876,7 +861,7 @@
     {/if}
     <button
       type="button"
-      class={`metadata-property-pill-remove text-muted-foreground hover:text-foreground inline-flex size-3.5 shrink-0 items-center justify-center rounded-full border-0 bg-transparent p-px [&_svg]:size-2.5 ${property.kind === "tags" ? "hover:bg-[color-mix(in_srgb,currentColor_12%,transparent)]" : "hover:bg-[var(--background-modifier-hover)] hover:text-foreground"}`}
+      class="metadata-property-pill-remove"
       aria-label={`Remove ${item}`}
       onclick={(event) => {
         event.preventDefault();

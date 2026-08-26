@@ -15,6 +15,12 @@
       { name: "review-status", icon: "lucide-circle-check" },
       { name: "summary", kind: "text" },
     ],
+    valueSuggestions: (key) =>
+      ({
+        status: ["draft", "approved", "in review"],
+        tags: ["markdown", "properties", "release"],
+        aliases: ["Markdown metadata", "Release metadata"],
+      })[key] ?? [],
     clipboard: {
       readText: () => clipboardValue,
       writeText(nextValue) {

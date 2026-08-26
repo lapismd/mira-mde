@@ -203,18 +203,13 @@
   width: 0.875rem;
 }
 
-.metadata-property:has(.mira-property-value-input[data-open="true"]) {
-  overflow: visible;
-}
-
 .mira-property-value-input {
   display: flex;
   flex: 1 1 8ch;
   min-width: 8ch;
-  position: relative;
 }
 
-.mira-property-value-suggestions {
+[data-slot="popover-content"].mira-property-value-suggestions {
   background: var(--popover, var(--background-primary));
   border: 1px solid var(--border);
   border-radius: var(--radius-m);
@@ -224,12 +219,12 @@
   color: var(--text-normal);
   display: grid;
   gap: 0.125rem;
-  inset-inline: 0;
-  min-width: 12rem;
+  max-height: min(18rem, var(--bits-popover-content-available-height, 18rem));
+  max-width: min(20rem, var(--bits-popover-content-available-width, 20rem));
+  min-width: min(12rem, var(--bits-popover-content-available-width, 12rem));
+  overflow-y: auto;
   padding: 0.25rem;
-  position: absolute;
-  top: calc(100% + 0.25rem);
-  z-index: 30;
+  width: var(--bits-popover-anchor-width, 12rem);
 }
 
 .mira-property-value-suggestion {
@@ -425,6 +420,20 @@
   padding-inline: 0.35rem 0.2rem;
 }
 
+.metadata-property-pill-chip:not(.tag) {
+  background: var(--markdown-alias-background, var(--secondary));
+  border-radius: var(--radius-s);
+  color: var(--secondary-foreground, var(--text-normal));
+  transition: background-color 120ms ease;
+}
+
+.metadata-property-pill-chip:not(.tag):hover {
+  background: var(
+    --markdown-alias-background-hover,
+    var(--background-modifier-hover)
+  );
+}
+
 .metadata-property-pill-link {
   color: inherit;
   display: inline-block;
@@ -457,13 +466,30 @@
   display: inline-flex;
   height: 1rem;
   justify-content: center;
+  opacity: 0.72;
   padding: 0;
   width: 1rem;
+}
+
+.metadata-property-pill-remove .mira-icon,
+.metadata-property-pill-chip__remove .mira-icon {
+  display: block;
+  flex: 0 0 0.625rem;
+  height: 0.625rem;
+  stroke: currentColor;
+  width: 0.625rem;
 }
 
 .metadata-property-pill-chip button:hover,
 .metadata-property-pill-chip__remove:hover {
   background: color-mix(in oklab, currentColor 14%, transparent);
+  opacity: 1;
+}
+
+.metadata-property-pill-chip button:focus-visible,
+.metadata-property-pill-chip__remove:focus-visible {
+  box-shadow: 0 0 0 2px var(--ring, var(--text-accent));
+  outline: none;
 }
 
 .mira-frontmatter__raw {

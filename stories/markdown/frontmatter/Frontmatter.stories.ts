@@ -35,8 +35,8 @@ type Story = StoryObj<typeof meta>;
 
 export const Preview: Story = {
   tags: [
-    "visual-approved",
-    "!visual-pending",
+    "visual-pending",
+    "!visual-approved",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -140,8 +140,8 @@ export const PropertyActions: Story = {
     Component: FrontmatterActionsStory,
   }),
   tags: [
-    "visual-approved",
-    "!visual-pending",
+    "visual-pending",
+    "!visual-approved",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -160,22 +160,59 @@ export const PropertyActions: Story = {
       );
     });
 
+    await step("paint list pills and their remove controls", async () => {
+      for (const label of ["markdown", "Markdown metadata"]) {
+        const pill = canvas
+          .getByText(label, { exact: true })
+          .closest<HTMLElement>(".metadata-property-pill-chip");
+        const remove = canvas.getByRole("button", {
+          name: `Remove ${label}`,
+        });
+        const icon = remove.querySelector<SVGElement>("svg");
+        expect(pill).not.toBeNull();
+        expect(getComputedStyle(pill as HTMLElement).backgroundColor).not.toBe(
+          "rgba(0, 0, 0, 0)",
+        );
+        expect(icon?.querySelector('path[d="M18 6 6 18"]')).not.toBeNull();
+        expect(icon?.querySelector('path[d="m6 6 12 12"]')).not.toBeNull();
+        expect(icon?.getBoundingClientRect().width ?? 0).toBeGreaterThanOrEqual(
+          9,
+        );
+      }
+    });
+
     await step("edit and remove a property", async () => {
-      const statusValue = canvas.getByRole("textbox", {
+      const page = within(canvasElement.ownerDocument.body);
+      const statusValue = canvas.getByRole("combobox", {
         name: "status value",
       });
       await userEvent.clear(statusValue);
-      await userEvent.type(statusValue, "approved");
-      await userEvent.tab();
+      await userEvent.type(statusValue, "app");
+      const statusRow = statusValue.closest<HTMLElement>(".metadata-property");
+      const approvedOption = await page.findByRole("option", {
+        name: "approved",
+      });
+      const suggestionList = approvedOption.closest<HTMLElement>(
+        ".mira-property-value-suggestions",
+      );
+      expect(statusRow).not.toBeNull();
+      expect(suggestionList).not.toBeNull();
+      expect(statusRow?.contains(suggestionList)).toBe(false);
+      const optionBounds = approvedOption.getBoundingClientRect();
+      const optionHit = canvasElement.ownerDocument.elementFromPoint(
+        optionBounds.left + optionBounds.width / 2,
+        optionBounds.top + optionBounds.height / 2,
+      );
+      expect(
+        optionHit === approvedOption || approvedOption.contains(optionHit),
+      ).toBe(true);
+      await userEvent.click(approvedOption);
       await expect(statusValue).toHaveTextContent("approved");
 
-      const page = within(canvasElement.ownerDocument.body);
       const statusTrigger = canvas.getByRole("button", {
         name: "Property options for status",
       });
       await userEvent.click(statusTrigger);
-      const statusRow =
-        statusTrigger.closest<HTMLElement>(".metadata-property");
       const optionsMenu = page.getByRole("menu", {
         name: "Property options for status",
       });

@@ -11,6 +11,20 @@ const component = readFileSync(
   resolve(cwd(), "src/preview/components/frontmatter.svelte"),
   "utf8",
 );
+const listValueComponent = readFileSync(
+  resolve(
+    cwd(),
+    "src/preview/components/frontmatter-property-value-input.svelte",
+  ),
+  "utf8",
+);
+const textValueComponent = readFileSync(
+  resolve(
+    cwd(),
+    "src/preview/components/frontmatter-property-text-input.svelte",
+  ),
+  "utf8",
+);
 
 describe("frontmatter property styles", () => {
   it("uses the legacy dropdown and nested type-menu structure", () => {
@@ -35,6 +49,42 @@ describe("frontmatter property styles", () => {
     );
     expect(css).toMatch(
       /\.metadata-property-menu,\s*\.metadata-property-type-menu\s*\{[^}]*--bits-dropdown-menu-content-available-height/su,
+    );
+  });
+
+  it("ships pill paint and remove-icon geometry without consumer utilities", () => {
+    expect(component).toContain(
+      "data-property-pill-kind={toBuiltinFrontmatterKind(property.kind)}",
+    );
+    expect(component).toContain('<Icon name="x" />');
+    expect(component).not.toContain("[&_svg]:size-2.5");
+    expect(css).toMatch(
+      /\.metadata-property-pill-chip:not\(\.tag\)\s*\{[^}]*--markdown-alias-background[^}]*--secondary/su,
+    );
+    expect(css).toMatch(
+      /\.metadata-property-pill-remove \.mira-icon,[^{]+\{[^}]*height: 0\.625rem[^}]*width: 0\.625rem/su,
+    );
+  });
+
+  it("portals list and text value suggestions through Mira Popover", () => {
+    for (const source of [listValueComponent, textValueComponent]) {
+      expect(source).toContain(
+        'import * as Popover from "../../ui/popover/index.js";',
+      );
+      expect(source).toContain("<Popover.Root bind:open>");
+      expect(source).toContain('class="mira-property-value-suggestions"');
+      expect(source).toContain('role="listbox"');
+    }
+    expect(component).toContain("<FrontmatterPropertyTextInput");
+    expect(component).toContain("const fallbackManager = $derived(");
+    expect(component).toContain(
+      "(controllerProp ? controllerProp.propertyManager : fallbackManager)",
+    );
+    expect(css).toContain(
+      '[data-slot="popover-content"].mira-property-value-suggestions',
+    );
+    expect(css).not.toContain(
+      '.metadata-property:has(.mira-property-value-input[data-open="true"])',
     );
   });
 });
