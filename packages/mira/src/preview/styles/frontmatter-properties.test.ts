@@ -72,7 +72,16 @@ describe("frontmatter property styles", () => {
       /\.metadata-property-pill-chip\s*\{[^}]*overflow-wrap:\s*anywhere[^}]*white-space:\s*normal/su,
     );
     expect(css).toMatch(
-      /\.metadata-property-pill-label,[^{]+\{[^}]*text-overflow:\s*clip[^}]*white-space:\s*normal/su,
+      /\.metadata-property-pill-chip\s*\{[^}]*flex:\s*0 0 auto/su,
+    );
+    expect(css).toMatch(
+      /\.metadata-property-pill-label,[^{]+\{[^}]*text-overflow:\s*clip[^}]*white-space:\s*normal[^}]*width:\s*max-content/su,
+    );
+    expect(css).toMatch(
+      /\.metadata-property-pill-link \.mira-link-preview__trigger\s*\{[^}]*display:\s*inline-block[^}]*white-space:\s*normal[^}]*width:\s*max-content/su,
+    );
+    expect(css).toMatch(
+      /\.metadata-property-value-list \.metadata-property-pill-chip\.tag\s*\{[^}]*border-radius:\s*var\(--radius-s\)/su,
     );
   });
 

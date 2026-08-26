@@ -254,12 +254,16 @@
   background-color: var(--markdown-tag-background);
   border: var(--markdown-tag-border-width) solid
     var(--markdown-tag-border-color);
-  border-radius: var(--markdown-tag-radius);
   color: var(--markdown-tag-color);
   font-size: var(--markdown-tag-size);
   font-weight: var(--markdown-tag-weight);
   line-height: 1;
   padding: var(--markdown-tag-padding-y) var(--markdown-tag-padding-x);
+}
+
+.markdown-rendered span.tag:not(.metadata-property-pill-chip),
+.markdown-preview-surface .markdown span.tag:not(.metadata-property-pill-chip) {
+  border-radius: var(--markdown-tag-radius);
 }
 
 .markdown-rendered span.tag:hover,

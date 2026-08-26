@@ -202,6 +202,7 @@ export const PropertyActions: Story = {
         const longTag =
           "topic/financial-planning-and-long-term-investing-with-custom-scenarios-and-review-notes";
         tagsValue = canvas.getByRole("combobox", { name: "tags value" });
+        await userEvent.clear(tagsValue);
         await userEvent.type(tagsValue, longTag);
         await expect(tagsValue).toHaveValue(longTag);
         await userEvent.keyboard("{Enter}");
@@ -209,10 +210,26 @@ export const PropertyActions: Story = {
         const longTagPill = longTagLabel.closest<HTMLElement>(
           ".metadata-property-pill-chip",
         );
+        const aliasPill = canvas
+          .getByText("Markdown metadata", { exact: true })
+          .closest<HTMLElement>(".metadata-property-pill-chip");
         expect(longTagPill).not.toBeNull();
+        expect(aliasPill).not.toBeNull();
         expect(getComputedStyle(longTagLabel).whiteSpace).toBe("normal");
         expect(getComputedStyle(longTagLabel).overflowWrap).toBe("anywhere");
         expect(getComputedStyle(longTagLabel).textOverflow).toBe("clip");
+        expect(getComputedStyle(longTagPill as HTMLElement).borderRadius).toBe(
+          getComputedStyle(aliasPill as HTMLElement).borderRadius,
+        );
+        expect(
+          getComputedStyle(longTagPill as HTMLElement).backgroundColor,
+        ).not.toBe("rgba(0, 0, 0, 0)");
+        const tagBounds = (longTagPill as HTMLElement).getBoundingClientRect();
+        const tagLabelBounds = longTagLabel.getBoundingClientRect();
+        expect(tagLabelBounds.left).toBeGreaterThan(tagBounds.left);
+        expect(tagLabelBounds.top).toBeGreaterThan(tagBounds.top);
+        expect(tagLabelBounds.right).toBeLessThan(tagBounds.right);
+        expect(tagLabelBounds.bottom).toBeLessThan(tagBounds.bottom);
       },
     );
 
