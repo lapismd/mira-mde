@@ -117,10 +117,11 @@ repository; Mira does not duplicate those fixes in a downstream patch. The
 dependency MUST remain repository-only and MUST NOT enter any public package's
 manifest or packed dependency graph.
 
-The root also links `@lapismd/spec-validator` as development tooling while
-retaining Mira's package graph, requirement IDs, paths, and enforcement policy
-in this repository. The shared validator MUST NOT enter any public package's
-manifest or packed dependency graph.
+The root consumes `@lapismd/spec-validator` from npm as development tooling
+while retaining Mira's package graph, requirement IDs, paths, and enforcement
+policy in this repository. The shared validator MUST NOT enter any public
+package's manifest or packed dependency graph, and normal repository checks MUST
+not require the sibling validator checkout.
 
 The private root toolchain aligns the six core Storybook packages at `10.5.6`.
 That alignment is repository infrastructure only: it MUST NOT add Storybook to

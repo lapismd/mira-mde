@@ -14,7 +14,7 @@ batteries-included editor, and thin framework adapters.
 | MIRA-ARCH-003 | Extensions MUST integrate through Mira callbacks, resolvers, adapters, commands, renderer hooks, and CodeMirror extensions rather than application singletons.                                                                                                                                                                                                                                                                                            |
 | MIRA-ARCH-004 | Every workspace package MUST expose deterministic check, test where applicable, and build behavior compatible with root orchestration.                                                                                                                                                                                                                                                                                                                    |
 | MIRA-ARCH-005 | Storybook MUST be the only repository application used for browsable documentation, demos, component examples, and interaction scenarios.                                                                                                                                                                                                                                                                                                                 |
-| MIRA-ARCH-020 | Root Storybook and specification tooling MUST resolve the Visual Delta and spec-validator sibling packages through local links; both dependencies MUST remain outside the six-package public graph.                                                                                                                                                                                                                                                       |
+| MIRA-ARCH-020 | Root Storybook tooling MUST resolve the Visual Delta sibling package through a local link, while specification tooling MUST resolve published `@lapismd/spec-validator` from npm once available; both dependencies MUST remain outside the six-package public graph.                                                                                                                                                                                     |
 | MIRA-ARCH-030 | The `@lapismd/mira` root MUST export `MiraCodeEditor`, `MiraCodeEditorProps`, and `MiraCodeEditorHandle`. Mira's primary Markdown surface and editable preview editor MUST consume that shell, while downstream packages MAY supply language and domain extensions through the public CodeMirror extension prop and bridge their theme from an ancestor through the shell's inheritable public background, focus-ring, search-control, and syntax tokens. |
 
 ## Package boundary
@@ -53,6 +53,11 @@ package MUST own the clean-stage worker
 fallback, generated-cache exclusions, canonical build identity, and runner
 behavior required by those gates; Mira does not maintain a downstream pnpm
 patch for behavior available in the reviewed upstream release.
+
+Specification validation follows the same root-only boundary but resolves from
+the published `@lapismd/spec-validator` npm package once available. Mira owns
+its validator configuration, requirement IDs, paths, and evidence locally; it
+does not require the validator sibling checkout for normal repository checks.
 
 The root keeps the `storybook`, accessibility, docs, themes, Vitest, and Svelte
 Vite packages on one reviewed patch line; the current set is `10.5.6`.

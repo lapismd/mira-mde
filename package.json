@@ -64,7 +64,7 @@
     "@codemirror/lang-yaml": "^6.1.2",
     "@eslint/js": "^9.39.2",
     "@lapismd/storybook-addon-visual-delta": "link:../storybook-addon-visual-delta",
-    "@lapismd/spec-validator": "link:../spec-validator",
+    "@lapismd/spec-validator": "0.1.0",
     "@lucide/svelte": "^0.525.0",
     "@playwright/test": "^1.61.1",
     "@storybook/addon-a11y": "^10.5.6",
