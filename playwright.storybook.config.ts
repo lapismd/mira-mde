@@ -3,11 +3,11 @@ import { defineConfig, devices } from "@playwright/test";
 export default defineConfig({
   testDir: "tests/storybook",
   timeout: 30_000,
-  // Keep Storybook's on-demand compilation within the concurrency that the
-  // catalog exercised before the focused indentation suite was added.
-  workers: 3,
+  // Keep Storybook's single dev server deterministic for docs/story cold
+  // compilation and CodeMirror geometry assertions.
+  workers: 1,
   expect: {
-    timeout: 10_000,
+    timeout: 30_000,
   },
   use: {
     baseURL: "http://127.0.0.1:7007",

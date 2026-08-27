@@ -80,22 +80,12 @@ function approvedEnvironment(manifest) {
       "Publishing requires an approved CI environment (MIRA_RELEASE_APPROVED=1)",
     );
   }
-  const bootstrap = process.env.MIRA_RELEASE_BOOTSTRAP === "1";
-  if (bootstrap !== (manifest.bootstrapRequired === true)) {
+  if (manifest.bootstrapRequired === true) {
     throw new Error(
-      manifest.bootstrapRequired
-        ? "First publication requires the npm-bootstrap environment"
-        : "Bootstrap credentials cannot publish an established package",
+      "First publication is manual; publish the verified tarballs outside CI before enabling trusted publishing",
     );
   }
-  if (bootstrap) {
-    if (!process.env.NODE_AUTH_TOKEN) {
-      throw new Error("Bootstrap publication requires NODE_AUTH_TOKEN");
-    }
-    if (manifest.packages.some(({ version }) => version !== "0.0.1")) {
-      throw new Error("Bootstrap publication is restricted to version 0.0.1");
-    }
-  } else if (
+  if (
     !process.env.ACTIONS_ID_TOKEN_REQUEST_URL ||
     !process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN
   ) {
@@ -103,7 +93,6 @@ function approvedEnvironment(manifest) {
       "Trusted publication requires GitHub OIDC token permission",
     );
   }
-  return bootstrap;
 }
 
 async function waitForPublishedIntegrity(record, registry) {

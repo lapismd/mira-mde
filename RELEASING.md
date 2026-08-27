@@ -14,37 +14,43 @@ unpublished versions in the public dependency graph.
 4. Merge the reviewed pull request. The release workflow creates or updates the
    `Version Packages` pull request.
 5. Review and merge that pull request. The workflow rebuilds and packs the exact
-   unpublished versions, then waits for approval on `npm-production` before
-   publishing.
+   unpublished versions. Established packages then wait for approval on
+   `npm-production` before publishing with trusted publishing.
 
 Published package tags use `<package-name>@<version>`, such as
 `mira-editor@0.2.0`. GitHub release notes are the exact package changelog entry.
 The workflow performs a clean npm installation plus signature and SLSA
 provenance verification before creating either.
 
-## One-time `0.0.1` bootstrap
+## One-time manual `0.0.1` publication
 
-npm trusted publishing can only be configured after a package exists. Perform
-this sequence once:
+npm trusted publishing can only be configured after a package exists. The first
+publication is therefore manual, from the same reviewed tarballs used by the
+release workflow. Perform this sequence once:
 
-1. Make `github.com/lapismd/mira` public and enable GitHub Actions to create pull
-   requests.
-2. Create protected GitHub environments named `npm-bootstrap` and
-   `npm-production`, each with required reviewers.
-3. Create a short-lived granular npm access token that can publish the six
-   `@lapismd` packages. Store it only as `NPM_BOOTSTRAP_TOKEN` on the
-   `npm-bootstrap` environment.
-4. From `main`, manually run **Release public packages** with `bootstrap` set to
-   `true`, approve `npm-bootstrap`, and wait for all six `0.0.1` packages plus
-   provenance verification to complete.
-5. On npm, configure a GitHub Actions trusted publisher for every package with
-   organization `lapismd`, repository `mira`, workflow `release.yml`, and
-   environment `npm-production`.
-6. Delete the `NPM_BOOTSTRAP_TOKEN` secret and revoke the temporary npm token.
-   All later releases use GitHub OIDC and `npm-production` only.
+1. Make `github.com/lapismd/mira-mde` public and enable GitHub Actions to create
+   pull requests.
+2. Create protected GitHub environments named `npm-production` and
+   `github-pages`, each with the intended required reviewers.
+3. From `main`, manually run **Release public packages**. When all six packages
+   are absent from npm, the workflow validates the repository, prepares the
+   exact tarballs, uploads the release artifact, and stops with a manual
+   first-publication notice.
+4. Download the release artifact and inspect `.release/release-manifest.json`
+   plus every `.release/tarballs/*.tgz`. Publish one tarball at a time, in
+   manifest order, with public access and the v1 staging tag:
+   `npm publish .release/tarballs/<name>.tgz --access public --tag next
+--registry https://registry.npmjs.org`.
+5. After every package resolves from npm with the manifest integrity, configure a
+   GitHub Actions trusted publisher for every package with organization
+   `lapismd`, repository `mira-mde`, workflow `release.yml`, environment
+   `npm-production`, and allowed action `npm publish`.
+6. Rerun **Release public packages** from `main` after trusted publishers are
+   configured. The established-package path uses GitHub OIDC, verifies clean
+   installs and provenance, and creates package tags plus GitHub releases.
 
 The normal workflow detects an empty registry and reports that bootstrap is
-required; it cannot silently fall back to the token path.
+required; it cannot silently fall back to a token path.
 
 ## Recovery and safety
 

@@ -3,7 +3,7 @@
   "changelog": [
     "@changesets/changelog-github",
     {
-      "repo": "lapismd/mira"
+      "repo": "lapismd/mira-mde"
     }
   ],
   "commit": false,

@@ -22,7 +22,7 @@ function auditFor(record, overrides = {}) {
       buildDefinition: {
         externalParameters: {
           workflow: {
-            repository: "https://github.com/lapismd/mira",
+            repository: "https://github.com/lapismd/mira-mde",
             path: ".github/workflows/release.yml",
             ref: "refs/heads/main",
             ...overrides,
@@ -86,7 +86,7 @@ test("rejects the wrong workflow source or tarball digest", () => {
           buildDefinition: {
             externalParameters: {
               workflow: {
-                repository: "https://github.com/lapismd/mira",
+                repository: "https://github.com/lapismd/mira-mde",
                 path: ".github/workflows/other.yml",
                 ref: "refs/heads/main",
               },

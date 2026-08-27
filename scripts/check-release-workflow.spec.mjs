@@ -22,7 +22,15 @@ test("rejects token credentials in production and direct publication", () => {
     ".github/workflows/mira-spec-first.yml",
     "utf8",
   );
-  const result = validateReleaseWorkflows({ releaseSource, ciSource });
+  const pagesSource = readFileSync(
+    ".github/workflows/publish-storybook-pages.yml",
+    "utf8",
+  );
+  const result = validateReleaseWorkflows({
+    releaseSource,
+    ciSource,
+    pagesSource,
+  });
   assert.equal(result.ok, false);
   assert.match(result.errors.join("\n"), /token credentials/);
   assert.match(result.errors.join("\n"), /release:publish/);
@@ -34,7 +42,34 @@ test("rejects CI without explicit release intent", () => {
     ".github/workflows/mira-spec-first.yml",
     "utf8",
   ).replace("pnpm release:intent", "pnpm omitted:intent");
-  const result = validateReleaseWorkflows({ releaseSource, ciSource });
+  const pagesSource = readFileSync(
+    ".github/workflows/publish-storybook-pages.yml",
+    "utf8",
+  );
+  const result = validateReleaseWorkflows({
+    releaseSource,
+    ciSource,
+    pagesSource,
+  });
   assert.equal(result.ok, false);
   assert.match(result.errors.join("\n"), /release:intent/);
+});
+
+test("rejects Pages workflow without deployment permission", () => {
+  const releaseSource = readFileSync(".github/workflows/release.yml", "utf8");
+  const ciSource = readFileSync(
+    ".github/workflows/mira-spec-first.yml",
+    "utf8",
+  );
+  const pagesSource = readFileSync(
+    ".github/workflows/publish-storybook-pages.yml",
+    "utf8",
+  ).replace("pages: write", "pages: read");
+  const result = validateReleaseWorkflows({
+    releaseSource,
+    ciSource,
+    pagesSource,
+  });
+  assert.equal(result.ok, false);
+  assert.match(result.errors.join("\n"), /pages: write/);
 });

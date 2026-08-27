@@ -90,9 +90,9 @@ function main() {
   const manifestPath = path.resolve(process.argv[2] ?? DEFAULT_MANIFEST_PATH);
   const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
   const repository = process.env.GITHUB_REPOSITORY;
-  if (!process.env.GITHUB_TOKEN || repository !== "lapismd/mira") {
+  if (!process.env.GITHUB_TOKEN || repository !== "lapismd/mira-mde") {
     throw new Error(
-      "GitHub release creation requires lapismd/mira CI credentials",
+      "GitHub release creation requires lapismd/mira-mde CI credentials",
     );
   }
   if (!process.env.GITHUB_SHA || process.env.GITHUB_SHA !== manifest.commit) {

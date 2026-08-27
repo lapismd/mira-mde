@@ -66,10 +66,10 @@ environment. It receives only the verified artifact, authenticates with npm's
 GitHub Actions trusted publisher through OIDC, publishes in public-graph order,
 and verifies exact-version installation and provenance before creating release
 metadata. The first `0.0.1` publication is a one-time exception because npm
-cannot configure a trusted publisher for a package that does not yet exist: a
-manually dispatched job under the distinct `npm-bootstrap` environment may use
-the temporary `NPM_BOOTSTRAP_TOKEN`, after which maintainers configure trusted
-publishers and remove that credential. Neither path automatically unpublishes.
+cannot configure a trusted publisher for a package that does not yet exist: the
+workflow prepares and uploads the exact verified tarballs, then maintainers
+publish them manually with the v1 staging tag before configuring trusted
+publishers. Neither path automatically unpublishes.
 
 The initial pipeline change carries an explicit empty Changeset so it can add
 governance and packaging machinery without moving any first-release package
@@ -89,9 +89,10 @@ repository/package validation, packed-consumer checks, a static Storybook build,
 and focused browser acceptance. On `main`, the Changesets action uses the
 GitHub API to maintain one Version Packages pull request without receiving npm
 credentials. Only a commit with no pending Changesets advances to artifact
-planning. Production and bootstrap publishing are separate jobs and protected
-environments; both download the already verified artifact and neither checks
-out or rebuilds package source after approval.
+planning. Production publishing is the only workflow path that receives an npm
+credential, and that credential is short-lived OIDC scoped by the
+`npm-production` environment. It downloads the already verified artifact and
+does not check out or rebuild package source after approval.
 
 Rename-aware working-copy validation evaluates both the removed and added path
 of a Jujutsu or Git rename. Consolidating a protected workspace therefore

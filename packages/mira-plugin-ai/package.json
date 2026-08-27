@@ -6,7 +6,7 @@
   "license": "AGPL-3.0-or-later",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/lapismd/mira.git",
+    "url": "git+https://github.com/lapismd/mira-mde.git",
     "directory": "packages/mira-plugin-ai"
   },
   "type": "module",

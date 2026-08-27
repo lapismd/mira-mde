@@ -1134,16 +1134,10 @@ test("keeps active continuation and blockquote prefix geometry stable", async ({
   await content.focus();
   await settleLayout(page);
   const afterRefocus = await lineMetrics(continuationLine);
-  expect(afterBlur.paddingInlineStart).toBeCloseTo(
-    before.paddingInlineStart,
-    1,
-  );
-  expect(afterRefocus.paddingInlineStart).toBeCloseTo(
-    before.paddingInlineStart,
-    1,
-  );
-  expect(afterBlur.textIndent).toBeCloseTo(before.textIndent, 1);
-  expect(afterRefocus.textIndent).toBeCloseTo(before.textIndent, 1);
+  expectSameContentColumn(afterBlur, before, "active-prefix after blur");
+  expectSameContentColumn(afterRefocus, before, "active-prefix after refocus");
+  expectStableRowLefts(afterBlur);
+  expectStableRowLefts(afterRefocus);
   expect(await page.evaluate(() => document.getSelection()?.toString())).toBe(
     selectionBefore,
   );

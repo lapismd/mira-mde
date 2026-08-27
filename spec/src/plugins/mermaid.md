@@ -24,5 +24,7 @@ The package is shipped only as `@lapismd/mira-plugin-mermaid`, begins at
 `0.0.1`, and then versions independently with a package-owned changelog. Its
 source, manifest, packed output, Storybook examples, and tests must not retain
 the pre-release package identity. Its public Mira dependency uses `workspace:~`
-so the packed pre-1.0 range remains compatible without accepting unrelated
-minor releases.
+so the packed pre-1.0 range remains compatible without accepting unrelated minor
+releases. Its package manifest points at the canonical public repository
+`lapismd/mira-mde` with package-specific `repository.directory` metadata so npm
+and provenance links resolve to the owning monorepo path.

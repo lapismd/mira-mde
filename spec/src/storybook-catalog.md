@@ -77,6 +77,11 @@ policy are owned by the installed Visual Delta Playwright suite. The default
 `playwright.config.ts` is therefore reserved for Visual Delta; focused
 Storybook acceptance uses `playwright.storybook.config.ts`. Authoritative
 capture uses the addon's pinned profile and `nested-import` baseline layout.
+The Storybook acceptance project MUST run against one Storybook dev server
+worker at a time with a cold-render expect timeout that covers on-demand docs,
+story, font, and CodeMirror geometry startup. This keeps interaction and
+layout assertions deterministic instead of allowing parallel iframe loads to
+race the single dev server.
 The root dependency range records the reviewed add-on release; upgrading it is
 a catalog-infrastructure change and does not authorize baseline mutation.
 Repository-local dependency patches MUST be narrow, documented in verification,

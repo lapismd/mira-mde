@@ -1,5 +1,9 @@
 # Mira
 
+[![Mira CI](https://github.com/lapismd/mira-mde/actions/workflows/mira-spec-first.yml/badge.svg)](https://github.com/lapismd/mira-mde/actions/workflows/mira-spec-first.yml)
+[![Release public packages](https://github.com/lapismd/mira-mde/actions/workflows/release.yml/badge.svg)](https://github.com/lapismd/mira-mde/actions/workflows/release.yml)
+[![Storybook](https://img.shields.io/badge/Storybook-live-ff4785?logo=storybook&logoColor=white)](https://lapismd.github.io/mira-mde/)
+
 ![Mira MDE](assets/logo-light.png#gh-light-mode-only)
 ![Mira MDE](assets/logo-dark.png#gh-dark-mode-only)
 
@@ -18,6 +22,15 @@ preview, language, and UI behavior.
 | `@lapismd/mira-plugin-mermaid` | Mermaid language, rendering, and diagram controls.                     |
 | `@lapismd/mira-react`          | React components for `Mira`, `MiraEditor`, and `MiraEditorToolbar`.    |
 | `@lapismd/mira-vanilla`        | Plain JavaScript `createMira` and `createMiraEditor` mounting helpers. |
+
+| npm                            | Version                                                                                                                             |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `@lapismd/mira`                | [![npm](https://img.shields.io/npm/v/@lapismd/mira.svg)](https://www.npmjs.com/package/@lapismd/mira)                               |
+| `@lapismd/mira-plugin-ai`      | [![npm](https://img.shields.io/npm/v/@lapismd/mira-plugin-ai.svg)](https://www.npmjs.com/package/@lapismd/mira-plugin-ai)           |
+| `@lapismd/mira-plugin-mermaid` | [![npm](https://img.shields.io/npm/v/@lapismd/mira-plugin-mermaid.svg)](https://www.npmjs.com/package/@lapismd/mira-plugin-mermaid) |
+| `@lapismd/mira-editor`         | [![npm](https://img.shields.io/npm/v/@lapismd/mira-editor.svg)](https://www.npmjs.com/package/@lapismd/mira-editor)                 |
+| `@lapismd/mira-react`          | [![npm](https://img.shields.io/npm/v/@lapismd/mira-react.svg)](https://www.npmjs.com/package/@lapismd/mira-react)                   |
+| `@lapismd/mira-vanilla`        | [![npm](https://img.shields.io/npm/v/@lapismd/mira-vanilla.svg)](https://www.npmjs.com/package/@lapismd/mira-vanilla)               |
 
 All public packages begin at `0.0.1` and then version independently. Normal
 validation never publishes; the protected release workflow publishes only
@@ -57,6 +70,8 @@ Storybook is Mira's only browsable documentation and demo application. The
 canonical behavioral contract is the mdBook source under [`spec/src`](spec/src),
 which Storybook renders directly. Component descriptions, examples, fixture
 data, interactions, and CSS-token metadata live in the Storybook catalog.
+The published static Storybook is deployed to
+<https://lapismd.github.io/mira-mde/>.
 
 The catalog runs at the repo root on port **7007**. Visual Delta host wiring
 edits trigger a full restart via the run wrapper (the manager is a one-shot

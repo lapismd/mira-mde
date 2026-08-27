@@ -96,7 +96,8 @@ treatment to source mode and the raw Markdown fallback revealed from a
 live-preview table; live-preview table widgets and reading tables do not
 inherit that raw-source treatment. Rendered widget cells wrap their text
 without overflow. Each raw source table line scrolls horizontally without
-scrollbar chrome.
+scrollbar chrome, and consecutive rows of the same table keep one shared
+offset.
 
 List continuation layout follows Lapis's syntax-tree ownership and measured
 prefix contract: inactive replacement widgets and editable raw prefixes share

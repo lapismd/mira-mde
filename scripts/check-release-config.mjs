@@ -11,10 +11,16 @@ import {
 } from "./public-packages.mjs";
 import { syncEditorVersion } from "./sync-release-versions.mjs";
 
+export const CANONICAL_REPOSITORY_URL =
+  "git+https://github.com/lapismd/mira-mde.git";
+
 export function validateReleaseConfiguration(repoRoot = DEFAULT_REPO_ROOT) {
   const errors = [];
   const configPath = path.join(repoRoot, ".changeset/config.json");
   const config = JSON.parse(readFileSync(configPath, "utf8"));
+  if (config.changelog?.[1]?.repo !== "lapismd/mira-mde") {
+    errors.push("Changesets changelog repository must be lapismd/mira-mde");
+  }
   if (config.access !== "public")
     errors.push("Changesets access must be public");
   if (config.baseBranch !== "main")
@@ -48,6 +54,20 @@ export function validateReleaseConfiguration(repoRoot = DEFAULT_REPO_ROOT) {
   }
 
   for (const record of readPublicPackages(repoRoot)) {
+    if (record.manifest.repository?.url !== CANONICAL_REPOSITORY_URL) {
+      errors.push(
+        `${record.name}: repository URL must be ${CANONICAL_REPOSITORY_URL}`,
+      );
+    }
+    const expectedDirectory = path
+      .relative(repoRoot, record.directory)
+      .replaceAll("\\", "/");
+    if (record.manifest.repository?.directory !== expectedDirectory) {
+      errors.push(
+        `${record.name}: repository.directory must be ${expectedDirectory}`,
+      );
+    }
+
     const changelog = path.join(record.directory, "CHANGELOG.md");
     if (!existsSync(changelog)) {
       errors.push(`${record.name}: missing CHANGELOG.md`);

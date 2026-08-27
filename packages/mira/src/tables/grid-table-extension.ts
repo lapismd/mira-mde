@@ -160,6 +160,7 @@ function gridTableLineBreakAction(view: EditorView): boolean {
 
 const gridTableLineDecoration = Decoration.line({
   class: "cm-table cm-formatting-table cm-formatting-grid-table",
+  attributes: { tabindex: "0" },
 });
 
 class GridTableDecoration implements PluginValue {

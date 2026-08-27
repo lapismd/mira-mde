@@ -14,7 +14,7 @@ batteries-included editor, and thin framework adapters.
 | MIRA-ARCH-003 | Extensions MUST integrate through Mira callbacks, resolvers, adapters, commands, renderer hooks, and CodeMirror extensions rather than application singletons.                                                                                                                                                                                                                                                                                            |
 | MIRA-ARCH-004 | Every workspace package MUST expose deterministic check, test where applicable, and build behavior compatible with root orchestration.                                                                                                                                                                                                                                                                                                                    |
 | MIRA-ARCH-005 | Storybook MUST be the only repository application used for browsable documentation, demos, component examples, and interaction scenarios.                                                                                                                                                                                                                                                                                                                 |
-| MIRA-ARCH-020 | Root Storybook tooling MUST resolve the published `@lapismd/storybook-addon-visual-delta` package from npm once available, while specification tooling MUST resolve published `@lapismd/spec-validator` from npm once available; both dependencies MUST remain outside the six-package public graph.                                                                                                                                              |
+| MIRA-ARCH-020 | Root Storybook tooling MUST resolve the published `@lapismd/storybook-addon-visual-delta` package from npm once available, while specification tooling MUST resolve published `@lapismd/spec-validator` from npm once available; both dependencies MUST remain outside the six-package public graph.                                                                                                                                                      |
 | MIRA-ARCH-030 | The `@lapismd/mira` root MUST export `MiraCodeEditor`, `MiraCodeEditorProps`, and `MiraCodeEditorHandle`. Mira's primary Markdown surface and editable preview editor MUST consume that shell, while downstream packages MAY supply language and domain extensions through the public CodeMirror extension prop and bridge their theme from an ancestor through the shell's inheritable public background, focus-ring, search-control, and syntax tokens. |
 
 ## Package boundary
@@ -102,10 +102,13 @@ changelog entry in one transferable manifest.
 
 GitHub Actions keeps three trust levels distinct: pull-request validation has
 read-only repository access, the Changesets job can update the Version Packages
-pull request but receives no npm credential, and publish jobs receive OIDC or
-the one-time bootstrap token only after their named environment approval. The
-post-publish job consumes the artifact again for clean-install and provenance
-checks before a final repository-write job creates tags and release notes.
+pull request but receives no npm credential, and the production publish job
+receives npm's GitHub Actions trusted-publisher OIDC only after its named
+environment approval. Initial `0.0.1` artifacts are prepared by the workflow but
+published manually because npm trusted publishers can only be configured after a
+package exists. The post-publish job consumes the artifact again for
+clean-install and provenance checks before a final repository-write job creates
+tags and release notes.
 
 The root owns the Vitest 4 Storybook project and its Chromium browser provider;
 package-local Vitest configurations continue to own pure unit tests. The

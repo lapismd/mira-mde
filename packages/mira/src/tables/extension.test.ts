@@ -9,6 +9,7 @@ import {
   tableEnterAction,
   tableExtension,
 } from "./extension";
+import { bindTableLineScrollSync } from "./table-line-scroll-sync";
 
 const markdownTable = [
   "| Feature | Behavior |",
@@ -96,7 +97,54 @@ describe("table extension", () => {
     );
 
     expect(tableLines).toHaveLength(5);
+    expect(
+      Array.from(tableLines).map((line) => line.getAttribute("tabindex")),
+    ).toEqual(["0", "0", "0", "0", "0"]);
 
     view.destroy();
+  });
+
+  it("keeps consecutive source table lines scrolled together", () => {
+    const content = document.createElement("div");
+    const lines = Array.from({ length: 5 }, (_, index) => {
+      const line = document.createElement("div");
+      line.className = index === 3 ? "cm-line" : "cm-line cm-table";
+      content.append(line);
+      return line;
+    });
+    [80, 100, 120, 60, 70].forEach((width, index) => {
+      Object.defineProperty(lines[index], "scrollWidth", { value: width });
+    });
+    const unbind = bindTableLineScrollSync(content);
+
+    expect(
+      lines.slice(0, 3).map((line) => line.style.paddingInlineEnd),
+    ).toEqual(["40px", "20px", "0px"]);
+    expect(lines.slice(0, 3).map((line) => line.tabIndex)).toEqual([0, 0, 0]);
+    expect(
+      lines
+        .slice(0, 3)
+        .map((line) => line.getAttribute("data-mira-table-scroll-sync")),
+    ).toEqual(["true", "true", "true"]);
+
+    lines[0]!.scrollLeft = 24;
+    lines[0]!.dispatchEvent(new Event("scroll"));
+    expect(lines.slice(0, 3).map((line) => line.scrollLeft)).toEqual([
+      24, 24, 24,
+    ]);
+    expect(lines[4]!.scrollLeft).toBe(0);
+
+    unbind();
+    expect(
+      lines.slice(0, 3).map((line) => line.style.paddingInlineEnd),
+    ).toEqual(["", "", ""]);
+    expect(
+      lines.slice(0, 3).map((line) => line.getAttribute("tabindex")),
+    ).toEqual([null, null, null]);
+    expect(
+      lines
+        .slice(0, 3)
+        .map((line) => line.getAttribute("data-mira-table-scroll-sync")),
+    ).toEqual([null, null, null]);
   });
 });

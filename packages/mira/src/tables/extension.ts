@@ -20,6 +20,7 @@ export {
   gridTableTabAction,
 } from "./grid-table-extension";
 import { gridTableExtension } from "./grid-table-extension";
+import { tableLineScrollSync } from "./table-line-scroll-sync";
 
 export function getTableNode(
   view: EditorView,
@@ -90,6 +91,7 @@ export function tabAction(delta: number) {
 
 const decorationTable = Decoration.line({
   class: "cm-table cm-formatting-table",
+  attributes: { tabindex: "0" },
 });
 
 class TableDecoration implements PluginValue {
@@ -228,5 +230,5 @@ export function tableEnterAction(view: EditorView): boolean {
 }
 
 export function createTableExtensions(): Extension[] {
-  return [tableExtension(), gridTableExtension()];
+  return [tableExtension(), gridTableExtension(), tableLineScrollSync()];
 }

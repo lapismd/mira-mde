@@ -68,3 +68,6 @@ Mira Editor, React, and Vanilla each version independently and ship their own
 changelog. The editor's release version command synchronizes
 `MIRA_EDITOR_VERSION` from `packages/mira-editor/package.json`; source and UI
 tests consume the exported constant instead of duplicating a release literal.
+Their package manifests point at the canonical public repository
+`lapismd/mira-mde` with package-specific `repository.directory` metadata so npm
+and provenance links resolve to the owning monorepo path.

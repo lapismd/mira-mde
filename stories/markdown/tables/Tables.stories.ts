@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/svelte-vite";
-import { expect, userEvent, within } from "storybook/test";
+import { expect, userEvent, waitFor, within } from "storybook/test";
 import { catalogParameters } from "../../catalog/catalog.mjs";
 import EditorModeStory from "../_shared/EditorModeStory.svelte";
 import MarkdownPreviewStory from "../_shared/MarkdownPreviewStory.svelte";
@@ -138,22 +138,40 @@ async function expectScrollableSourceTableLines(
   const content = canvasElement.querySelector<HTMLElement>(
     ".cm-editor.markdown-source-view > .cm-scroller > .cm-content, .cm-editor.markdown-live-preview-mode > .cm-scroller > .cm-content",
   );
-  const tableLine =
-    canvasElement.querySelector<HTMLElement>(".cm-line.cm-table");
+  const tableLine = await waitFor(() => {
+    const tableLines = Array.from(
+      canvasElement.querySelectorAll<HTMLElement>(".cm-line.cm-table"),
+    );
+    expect(tableLines).not.toHaveLength(0);
+    expect(
+      tableLines.every((line) => line.dataset.miraTableScrollSync === "true"),
+    ).toBe(true);
+    const overflowingLine = tableLines.find(
+      (line) => line.scrollWidth > line.clientWidth,
+    );
+    expect(overflowingLine).toBeDefined();
+    return overflowingLine!;
+  });
   await expect(content).not.toBeNull();
-  await expect(tableLine).not.toBeNull();
   await expect(["visible", "hidden"]).toContain(
     getComputedStyle(content!).overflowX,
   );
   await expect(getComputedStyle(tableLine!).overflowX).toBe("auto");
   await expect(getComputedStyle(tableLine!).scrollbarWidth).toBe("none");
   await expect(getComputedStyle(tableLine!).whiteSpace).toBe("pre");
+  await expect(tableLine!.tabIndex).toBe(0);
   await expect(tableLine!.scrollWidth).toBeGreaterThan(tableLine!.clientWidth);
 
   const contentScrollLeft = content!.scrollLeft;
   tableLine!.scrollLeft = 40;
+  tableLine!.dispatchEvent(new Event("scroll"));
   await expect(tableLine!.scrollLeft).toBeGreaterThan(0);
   await expect(content!.scrollLeft).toBe(contentScrollLeft);
+  for (const line of canvasElement.querySelectorAll<HTMLElement>(
+    ".cm-line.cm-table",
+  )) {
+    await expect(line.scrollLeft).toBe(tableLine!.scrollLeft);
+  }
 }
 
 export const Preview: Story = {

@@ -8,12 +8,17 @@ import { DEFAULT_REPO_ROOT } from "./public-packages.mjs";
 
 const RELEASE_WORKFLOW = ".github/workflows/release.yml";
 const CI_WORKFLOW = ".github/workflows/mira-spec-first.yml";
+const PAGES_WORKFLOW = ".github/workflows/publish-storybook-pages.yml";
 
 function requireText(source, pattern, label, errors) {
   if (!pattern.test(source)) errors.push(`missing ${label}`);
 }
 
-export function validateReleaseWorkflows({ releaseSource, ciSource }) {
+export function validateReleaseWorkflows({
+  releaseSource,
+  ciSource,
+  pagesSource,
+}) {
   const errors = [];
   requireText(
     releaseSource,
@@ -33,15 +38,9 @@ export function validateReleaseWorkflows({ releaseSource, ciSource }) {
     "npm-production environment",
     errors,
   );
-  requireText(
-    releaseSource,
-    /environment:\s*\n\s+name: npm-bootstrap/,
-    "npm-bootstrap environment",
-    errors,
-  );
   requireText(releaseSource, /id-token: write/, "OIDC permission", errors);
-  if ((releaseSource.match(/id-token: write/g) ?? []).length !== 2) {
-    errors.push("only the two publish jobs may request OIDC permission");
+  if ((releaseSource.match(/id-token: write/g) ?? []).length !== 1) {
+    errors.push("only the production publish job may request OIDC permission");
   }
   for (const command of [
     "pnpm release:plan",
@@ -62,12 +61,27 @@ export function validateReleaseWorkflows({ releaseSource, ciSource }) {
     errors.push("workflow must publish only through release:publish");
   }
   const production = releaseSource.match(
-    /publish-production:[\s\S]*?(?=\n {2}publish-bootstrap:)/,
+    /publish-production:[\s\S]*?(?=\n {2}verify:)/,
   )?.[0];
   if (!production) errors.push("missing publish-production job");
   else if (/NPM_BOOTSTRAP_TOKEN|NODE_AUTH_TOKEN/.test(production)) {
     errors.push("production job must not receive npm token credentials");
   }
+  if (
+    /NPM_BOOTSTRAP_TOKEN|npm-bootstrap|MIRA_RELEASE_BOOTSTRAP/.test(
+      releaseSource,
+    )
+  ) {
+    errors.push(
+      "workflow must not include temporary npm bootstrap credentials",
+    );
+  }
+  requireText(
+    releaseSource,
+    /Initial packages require manual npm publication/,
+    "manual first-publication notice",
+    errors,
+  );
 
   for (const command of [
     "pnpm release:intent",
@@ -79,6 +93,21 @@ export function validateReleaseWorkflows({ releaseSource, ciSource }) {
   ]) {
     requireText(ciSource, new RegExp(command), `CI ${command}`, errors);
   }
+
+  for (const pattern of [
+    /uses: actions\/configure-pages@v6/,
+    /uses: actions\/upload-pages-artifact@v5/,
+    /uses: actions\/deploy-pages@v5/,
+    /pnpm build-storybook/,
+    /test -f storybook-static\/index\.html/,
+    /test -f storybook-static\/iframe\.html/,
+    /test -f storybook-static\/index\.json/,
+    /pages: write/,
+    /id-token: write/,
+    /environment:\s*\n\s+name: github-pages/,
+  ]) {
+    requireText(pagesSource, pattern, `Pages workflow ${pattern}`, errors);
+  }
   return { ok: errors.length === 0, errors };
 }
 
@@ -86,6 +115,7 @@ export function checkReleaseWorkflows(repoRoot = DEFAULT_REPO_ROOT) {
   return validateReleaseWorkflows({
     releaseSource: readFileSync(path.join(repoRoot, RELEASE_WORKFLOW), "utf8"),
     ciSource: readFileSync(path.join(repoRoot, CI_WORKFLOW), "utf8"),
+    pagesSource: readFileSync(path.join(repoRoot, PAGES_WORKFLOW), "utf8"),
   });
 }
 

@@ -5,7 +5,7 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 
 export const PROVENANCE_PREDICATE = "https://slsa.dev/provenance/v1";
-export const PUBLISH_REPOSITORY = "https://github.com/lapismd/mira";
+export const PUBLISH_REPOSITORY = "https://github.com/lapismd/mira-mde";
 export const PUBLISH_WORKFLOW = ".github/workflows/release.yml";
 
 export function npmPackagePurl(packageName, version) {
