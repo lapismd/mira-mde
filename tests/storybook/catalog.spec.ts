@@ -130,7 +130,7 @@ test("Live Preview doodle dividers reroll and select a family beside the source 
   page,
 }) => {
   await page.goto(
-    "/iframe.html?id=markdown-dividers--live-preview&viewMode=story",
+    "/iframe.html?id=markdown-dividers--live-preview-browser-acceptance&viewMode=story",
   );
   const editor = page.locator(".mira-story-surface--editor");
   await expect(editor).toBeVisible();

@@ -243,6 +243,23 @@ export const LivePreview: Story = {
   },
 };
 
+export const LivePreviewBrowserAcceptance: Story = {
+  name: "Live Preview browser acceptance",
+  render: (args) => ({
+    Component: EditorModeStory,
+    props: {
+      ...args,
+      mode: "live-preview",
+      exposeValue: true,
+    },
+  }),
+  parameters: {
+    docs: {
+      disable: true,
+    },
+  },
+};
+
 export const Source: Story = {
   render: (args) => ({
     Component: EditorModeStory,
