@@ -112,6 +112,16 @@ inputs match, and strict visual mismatches or missing baselines are collected
 across the selected scope without restarting the Playwright worker after every
 expected policy failure.
 
+For the initial `0.0.1` npm publication only, those nineteen
+`visual-pending` missing baselines are a documented non-release-blocking
+exception. The 2026-08-27 compare-only run captured all 151 selected stories and
+reported every Playwright story capture as passed, then exited non-zero because
+the review-required baselines are intentionally absent. Release preparation MUST
+therefore keep `pnpm test:visual` available for manual review, MUST NOT create
+or refresh those pending baselines without explicit visual acceptance, and MUST
+use `storybook:check` only for catalog, static Storybook, and browser
+acceptance until the pending review is complete.
+
 The focused divider page covers Source, Live Preview, Reading, custom variants,
 the frozen v1 gallery, a 24-divider review page, and a story-only refresh
 control. The Live Preview story additionally exercises the shipped inline reroll

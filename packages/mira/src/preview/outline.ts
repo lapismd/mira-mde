@@ -42,8 +42,16 @@ export function activeMarkdownOutlineId(
   headingElement: (item: MarkdownOutlineItem) => HTMLElement | null,
   scrollRoot: HTMLElement | null,
   activationOffset = 96,
+  activeElement: Element | null = null,
 ): string {
   if (items.length === 0) return "";
+
+  if (activeElement instanceof HTMLElement) {
+    const focused = items.find(
+      (item) => headingElement(item) === activeElement,
+    );
+    if (focused) return focused.id;
+  }
 
   const rootTop = scrollRoot?.getBoundingClientRect().top ?? 0;
   let current = items[0]!;

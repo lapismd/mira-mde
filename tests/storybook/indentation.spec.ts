@@ -49,7 +49,7 @@ async function settleLayout(page: Page): Promise<void> {
 
 function lineContaining(page: Page, snippet: string): Locator {
   return page
-    .locator(".cm-editor .cm-line")
+    .locator(".cm-editor:visible .cm-line")
     .filter({ hasText: snippet })
     .first();
 }
@@ -231,6 +231,23 @@ async function placeCaretAtLineOffset(
     await page.keyboard.press("ArrowRight");
   }
   await settleLayout(page);
+}
+
+async function settledContentColumnState(
+  page: Page,
+  line: Locator,
+  expected: LineMetrics,
+  context: string,
+): Promise<string> {
+  await settleLayout(page);
+  const actual = await lineMetrics(line);
+  try {
+    expectSameContentColumn(actual, expected, context);
+    expectStableRowLefts(actual);
+    return "ok";
+  } catch (error) {
+    return error instanceof Error ? error.message : String(error);
+  }
 }
 
 function expectSameContentColumn(
@@ -824,6 +841,39 @@ test("renders the indented live-preview blockquote in its focused story", async 
 test("aligns inactive continuation paragraphs with their parent content", async ({
   page,
 }) => {
+  async function settledContinuationState(
+    parentSnippet: string,
+    continuationSnippet: string,
+  ): Promise<string> {
+    await settleLayout(page);
+    const parent = await lineMetrics(lineContaining(page, parentSnippet));
+    const continuation = await lineMetrics(
+      lineContaining(page, continuationSnippet),
+    );
+    if (parent.firstGlyphLeft === null) return "missing parent glyph";
+    if (continuation.anchorFrom === null) return "missing continuation anchor";
+    if (!continuation.hasIndentWidget) return "missing indent widget";
+    if (continuation.indentSegmentWidths.length === 0)
+      return "missing indent segment";
+    if (continuation.indentSegmentWidths.some((width) => width <= 0))
+      return "empty indent segment";
+    if (continuation.firstGlyphLeft === null)
+      return "missing continuation glyph";
+
+    const alignmentDelta = Math.abs(
+      continuation.firstGlyphLeft - parent.firstGlyphLeft,
+    );
+    if (alignmentDelta >= 1.5)
+      return `alignment delta ${alignmentDelta.toFixed(3)}`;
+
+    if (continuation.rowLefts.length <= 1) return "missing wrapped rows";
+    const rowDelta =
+      Math.max(...continuation.rowLefts) - Math.min(...continuation.rowLefts);
+    if (rowDelta >= 1.5) return `row delta ${rowDelta.toFixed(3)}`;
+
+    return "ok";
+  }
+
   for (const id of [
     "markdown-indentation--continuation-paragraphs-source",
     "markdown-indentation--continuation-paragraphs-live-preview",
@@ -831,36 +881,38 @@ test("aligns inactive continuation paragraphs with their parent content", async 
     await gotoStory(page, id);
     for (const group of [
       {
-        parent: "Bullet item",
+        reference: "Bullet item",
         children: [
-          "This single-space continuation",
-          "This two-space continuation",
+          {
+            reference: "Bullet item",
+            snippet: "This single-space continuation",
+          },
+          {
+            reference: "Bullet item",
+            snippet: "This two-space continuation",
+          },
         ],
       },
       {
-        parent: "Multiple paragraphs in a list item",
+        reference: "Multiple paragraphs in a list item",
         children: [
-          "Four-space continuation text",
-          "This blank-separated continuation",
+          {
+            reference: "Multiple paragraphs in a list item",
+            snippet: "Four-space continuation text",
+          },
+          {
+            reference: "Four-space continuation text",
+            snippet: "This blank-separated continuation",
+          },
         ],
       },
     ]) {
-      const parent = await lineMetrics(lineContaining(page, group.parent));
-      expect(parent.firstGlyphLeft).not.toBeNull();
-      for (const snippet of group.children) {
-        const continuation = await lineMetrics(lineContaining(page, snippet));
-        expect(continuation.anchorFrom).not.toBeNull();
-        expect(continuation.hasIndentWidget).toBe(true);
-        expect(continuation.indentSegmentWidths.length).toBeGreaterThan(0);
-        for (const width of continuation.indentSegmentWidths) {
-          expect(width).toBeGreaterThan(0);
-        }
-        expect(continuation.firstGlyphLeft).not.toBeNull();
-        expect(
-          Math.abs(continuation.firstGlyphLeft! - parent.firstGlyphLeft!),
-          `${id}: ${snippet} should align with ${group.parent}`,
-        ).toBeLessThan(1.5);
-        expectStableRowLefts(continuation);
+      for (const { reference, snippet } of group.children) {
+        await expect
+          .poll(() => settledContinuationState(reference, snippet), {
+            message: `${id}: ${snippet} should align with ${reference}`,
+          })
+          .toBe("ok");
       }
     }
   }
@@ -1130,14 +1182,32 @@ test("keeps active continuation and blockquote prefix geometry stable", async ({
   );
   await page.locator("[data-indentation-story]").focus();
   await settleLayout(page);
-  const afterBlur = await lineMetrics(continuationLine);
+  await expect
+    .poll(
+      () =>
+        settledContentColumnState(
+          page,
+          continuationLine,
+          before,
+          "active-prefix after blur",
+        ),
+      { message: "active-prefix after blur should keep content geometry" },
+    )
+    .toBe("ok");
   await content.focus();
   await settleLayout(page);
-  const afterRefocus = await lineMetrics(continuationLine);
-  expectSameContentColumn(afterBlur, before, "active-prefix after blur");
-  expectSameContentColumn(afterRefocus, before, "active-prefix after refocus");
-  expectStableRowLefts(afterBlur);
-  expectStableRowLefts(afterRefocus);
+  await expect
+    .poll(
+      () =>
+        settledContentColumnState(
+          page,
+          continuationLine,
+          before,
+          "active-prefix after refocus",
+        ),
+      { message: "active-prefix after refocus should keep content geometry" },
+    )
+    .toBe("ok");
   expect(await page.evaluate(() => document.getSelection()?.toString())).toBe(
     selectionBefore,
   );

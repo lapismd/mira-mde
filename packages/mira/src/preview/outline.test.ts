@@ -87,4 +87,39 @@ describe("Markdown outline scroll tracking", () => {
       "details",
     );
   });
+
+  it("keeps an explicitly focused outline target active while scrolling settles", () => {
+    const items: MarkdownOutlineItem[] = [
+      { id: "intro", text: "Intro", level: 1 },
+      { id: "details", text: "Details", level: 2 },
+    ];
+    const intro = document.createElement("h1");
+    const details = document.createElement("h2");
+    const scrollRoot = document.createElement("div");
+    const headings = new Map([
+      ["intro", intro],
+      ["details", details],
+    ]);
+    setVerticalLayout(scrollRoot, {
+      clientHeight: 300,
+      scrollHeight: 900,
+      top: 0,
+    });
+    setVerticalLayout(intro, { clientHeight: 32, scrollHeight: 32, top: 8 });
+    setVerticalLayout(details, {
+      clientHeight: 32,
+      scrollHeight: 32,
+      top: 390,
+    });
+
+    expect(
+      activeMarkdownOutlineId(
+        items,
+        (item) => headings.get(item.id) ?? null,
+        scrollRoot,
+        96,
+        details,
+      ),
+    ).toBe("details");
+  });
 });

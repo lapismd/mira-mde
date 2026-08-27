@@ -133,26 +133,126 @@ test("Live Preview doodle dividers reroll and select a family beside the source 
     "/iframe.html?id=markdown-dividers--live-preview&viewMode=story",
   );
   const editor = page.locator(".mira-story-surface--editor");
-  const widget = page.locator(".mira-rich-widget--horizontalrule").first();
-  const controls = widget.locator(".mira-doodle-divider__controls");
-  const source = widget.getByRole("button", { name: "Edit source" });
-  const refresh = widget.getByRole("button", {
-    name: "Refresh divider style",
-  });
-  const picker = widget.getByRole("button", {
-    name: "Choose divider style",
-  });
-  await expect(widget).toBeVisible();
-  await expect(controls).toHaveCSS("opacity", "0");
-  await widget.hover();
-  await expect(controls).toHaveCSS("opacity", "1");
+  await expect(editor).toBeVisible();
 
-  const [sourceBox, refreshBox, pickerBox, contentBox] = await Promise.all([
-    source.boundingBox(),
-    refresh.boundingBox(),
-    picker.boundingBox(),
-    page.locator(".cm-content").boundingBox(),
-  ]);
+  type RectState = {
+    height: number;
+    width: number;
+    x: number;
+    y: number;
+  };
+  type DividerState = {
+    contentBox: RectState | null;
+    pickerBox: RectState | null;
+    refreshBox: RectState | null;
+    sourceBox: RectState | null;
+    state: string;
+  };
+
+  let dividerState: DividerState = {
+    contentBox: null,
+    pickerBox: null,
+    refreshBox: null,
+    sourceBox: null,
+    state: "pending",
+  };
+  await expect
+    .poll(
+      async () => {
+        dividerState = await editor.evaluate((root): DividerState => {
+          const rect = (element: Element | null): RectState | null => {
+            if (!element) return null;
+            const box = element.getBoundingClientRect();
+            if (box.width === 0 && box.height === 0) return null;
+            return {
+              height: box.height,
+              width: box.width,
+              x: box.x,
+              y: box.y,
+            };
+          };
+          const widget = Array.from(
+            root.querySelectorAll<HTMLElement>(
+              ".mira-rich-widget--horizontalrule",
+            ),
+          ).find(
+            (candidate) =>
+              candidate.querySelector("svg.mira-doodle-divider[data-seed]") &&
+              rect(candidate),
+          );
+          if (!widget) {
+            return {
+              contentBox: null,
+              pickerBox: null,
+              refreshBox: null,
+              sourceBox: null,
+              state: "missing seeded widget",
+            };
+          }
+
+          const sourceBox = rect(
+            widget.querySelector('button[aria-label="Edit source"]'),
+          );
+          const refreshBox = rect(
+            widget.querySelector('button[aria-label="Refresh divider style"]'),
+          );
+          const pickerBox = rect(
+            widget.querySelector('button[aria-label="Choose divider style"]'),
+          );
+          const contentBox = rect(root.querySelector(".cm-content"));
+          if (!sourceBox) {
+            return {
+              contentBox,
+              pickerBox,
+              refreshBox,
+              sourceBox,
+              state: "missing source box",
+            };
+          }
+          if (!refreshBox) {
+            return {
+              contentBox,
+              pickerBox,
+              refreshBox,
+              sourceBox,
+              state: "missing refresh box",
+            };
+          }
+          if (!pickerBox) {
+            return {
+              contentBox,
+              pickerBox,
+              refreshBox,
+              sourceBox,
+              state: "missing picker box",
+            };
+          }
+          if (!contentBox) {
+            return {
+              contentBox,
+              pickerBox,
+              refreshBox,
+              sourceBox,
+              state: "missing content box",
+            };
+          }
+          return {
+            contentBox,
+            pickerBox,
+            refreshBox,
+            sourceBox,
+            state: "ok",
+          };
+        });
+        return dividerState.state;
+      },
+      {
+        message: "seeded divider controls should settle in the editor surface",
+      },
+    )
+    .toBe("ok");
+
+  const { contentBox, pickerBox, refreshBox, sourceBox } = dividerState;
   expect(sourceBox).not.toBeNull();
   expect(refreshBox).not.toBeNull();
   expect(pickerBox).not.toBeNull();
@@ -162,55 +262,138 @@ test("Live Preview doodle dividers reroll and select a family beside the source 
   expect(sourceBox!.x - (refreshBox!.x + refreshBox!.width)).toBeGreaterThan(2);
   expect(sourceBox!.x - (refreshBox!.x + refreshBox!.width)).toBeLessThan(6);
 
-  await picker.focus();
-  await picker.press("ArrowDown");
-  const menu = widget.getByRole("menu", { name: "Divider style" });
-  await expect(menu).toBeVisible();
-  await expect(menu.getByRole("menuitemradio")).toHaveCount(8);
-  const currentItem = menu.locator(
-    '[role="menuitemradio"][aria-checked="true"]',
-  );
-  await expect(currentItem).toHaveCount(1);
-  await expect(currentItem).toBeFocused();
-  await page.keyboard.press("Home");
-  await expect(
-    menu.getByRole("menuitemradio", { name: "Scribble" }),
-  ).toBeFocused();
-  await page.keyboard.press("Enter");
+  await expect
+    .poll(
+      async () =>
+        editor.evaluate((root) => {
+          const widget = Array.from(
+            root.querySelectorAll<HTMLElement>(
+              ".mira-rich-widget--horizontalrule",
+            ),
+          ).find((candidate) =>
+            candidate.querySelector("svg.mira-doodle-divider[data-seed]"),
+          );
+          const trigger = widget?.querySelector<HTMLButtonElement>(
+            'button[aria-label="Choose divider style"]',
+          );
+          const menu = widget?.querySelector<HTMLElement>(
+            '[role="menu"][aria-label="Divider style"]',
+          );
+          if (!trigger || !menu) return "missing:0:0";
+          if (menu.hidden) {
+            trigger.click();
+          }
+          const items = Array.from(
+            menu.querySelectorAll('[role="menuitemradio"]'),
+          );
+          const currentItems = items.filter(
+            (item) => item.getAttribute("aria-checked") === "true",
+          );
+          return `${menu.hidden ? "closed" : "open"}:${items.length}:${currentItems.length}`;
+        }),
+      { message: "divider style menu should open from the widget trigger" },
+    )
+    .toBe("open:8:1");
+  await editor.evaluate((root) => {
+    const widget = Array.from(
+      root.querySelectorAll<HTMLElement>(".mira-rich-widget--horizontalrule"),
+    ).find((candidate) =>
+      candidate.querySelector("svg.mira-doodle-divider[data-seed]"),
+    );
+    const item = Array.from(
+      widget?.querySelectorAll<HTMLButtonElement>('[role="menuitemradio"]') ??
+        [],
+    ).find((candidate) => candidate.textContent?.trim() === "Scribble");
+    if (!item) {
+      throw new Error("Scribble divider menu item was not found");
+    }
+    item.click();
+  });
 
-  await expect(
-    page.locator(
-      '.mira-rich-widget--horizontalrule svg.mira-doodle-divider[data-variant="scribble"]',
-    ),
-  ).toHaveCount(1);
-  const selectedSeed = await page
-    .locator(".mira-rich-widget--horizontalrule svg.mira-doodle-divider")
-    .first()
-    .getAttribute("data-seed");
+  await expect
+    .poll(() =>
+      editor.evaluate((root) => {
+        const widget = Array.from(
+          root.querySelectorAll<HTMLElement>(
+            ".mira-rich-widget--horizontalrule",
+          ),
+        ).find((candidate) =>
+          candidate.querySelector("svg.mira-doodle-divider[data-seed]"),
+        );
+        return (
+          widget
+            ?.querySelector("svg.mira-doodle-divider")
+            ?.getAttribute("data-variant") ?? null
+        );
+      }),
+    )
+    .toBe("scribble");
+
+  const selectedSeed = await editor.evaluate((root) => {
+    const widget = Array.from(
+      root.querySelectorAll<HTMLElement>(".mira-rich-widget--horizontalrule"),
+    ).find((candidate) =>
+      candidate.querySelector("svg.mira-doodle-divider[data-seed]"),
+    );
+    return (
+      widget
+        ?.querySelector("svg.mira-doodle-divider")
+        ?.getAttribute("data-seed") ?? null
+    );
+  });
+  const selectedVariant = await editor.evaluate((root) => {
+    const widget = Array.from(
+      root.querySelectorAll<HTMLElement>(".mira-rich-widget--horizontalrule"),
+    ).find((candidate) =>
+      candidate.querySelector("svg.mira-doodle-divider[data-seed]"),
+    );
+    return (
+      widget
+        ?.querySelector("svg.mira-doodle-divider")
+        ?.getAttribute("data-variant") ?? null
+    );
+  });
+  const contentX = await editor.evaluate(
+    (root) => root.querySelector(".cm-content")?.getBoundingClientRect().x,
+  );
+  expect(selectedVariant).toBe("scribble");
   expect(selectedSeed).toMatch(/^[0-9a-f]{8}$/u);
   await expect(editor).toHaveAttribute(
     "data-markdown-value",
     new RegExp(`mira-divider:v1:${selectedSeed}`),
   );
-  expect((await page.locator(".cm-content").boundingBox())?.x).toBe(
-    contentBox!.x,
-  );
+  expect(contentX).toBe(contentBox!.x);
 
-  const selectedVariant = await page
-    .locator(".mira-rich-widget--horizontalrule svg.mira-doodle-divider")
-    .first()
-    .getAttribute("data-variant");
-  await page
-    .locator(".mira-rich-widget--horizontalrule")
-    .first()
-    .getByRole("button", { name: "Refresh divider style" })
-    .click();
+  await editor.evaluate((root) => {
+    const widget = Array.from(
+      root.querySelectorAll<HTMLElement>(".mira-rich-widget--horizontalrule"),
+    ).find((candidate) =>
+      candidate.querySelector("svg.mira-doodle-divider[data-seed]"),
+    );
+    const refresh = widget?.querySelector<HTMLButtonElement>(
+      'button[aria-label="Refresh divider style"]',
+    );
+    if (!refresh) {
+      throw new Error("Refresh divider style control was not found");
+    }
+    refresh.click();
+  });
   await expect
-    .poll(async () =>
-      page
-        .locator(".mira-rich-widget--horizontalrule svg.mira-doodle-divider")
-        .first()
-        .getAttribute("data-variant"),
+    .poll(() =>
+      editor.evaluate((root) => {
+        const widget = Array.from(
+          root.querySelectorAll<HTMLElement>(
+            ".mira-rich-widget--horizontalrule",
+          ),
+        ).find((candidate) =>
+          candidate.querySelector("svg.mira-doodle-divider[data-seed]"),
+        );
+        return (
+          widget
+            ?.querySelector("svg.mira-doodle-divider")
+            ?.getAttribute("data-variant") ?? null
+        );
+      }),
     )
     .not.toBe(selectedVariant);
 

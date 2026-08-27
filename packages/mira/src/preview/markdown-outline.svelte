@@ -81,10 +81,11 @@
   }
 
   function headingElement(item: MarkdownOutlineItem): HTMLElement | null {
-    const candidate = document.getElementById(item.id);
-    if (!candidate) return null;
-    if (root && !root.contains(candidate)) return null;
-    return candidate;
+    if (root) {
+      return root.querySelector<HTMLElement>(`[id="${CSS.escape(item.id)}"]`);
+    }
+
+    return document.getElementById(item.id);
   }
 
   function navigateToHeading(item: MarkdownOutlineItem): void {
@@ -143,7 +144,13 @@
     const scheduleUpdate = () => {
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
-        activeId = activeMarkdownOutlineId(items, headingElement, scrollRoot);
+        activeId = activeMarkdownOutlineId(
+          items,
+          headingElement,
+          scrollRoot,
+          96,
+          document.activeElement,
+        );
       });
     };
 

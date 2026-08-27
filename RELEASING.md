@@ -36,6 +36,11 @@ release workflow. Perform this sequence once:
    are absent from npm, the workflow validates the repository, prepares the
    exact tarballs, uploads the release artifact, and stops with a manual
    first-publication notice.
+   The initial `0.0.1` release intentionally does not use `pnpm test:visual` as
+   a publishing gate: the current Visual Delta inventory has nineteen
+   review-required `visual-pending` stories without approved baselines. Keep
+   `pnpm test:visual` as recorded manual evidence and do not create or refresh
+   those baselines without separate visual acceptance.
 4. Download the release artifact and inspect `.release/release-manifest.json`
    plus every `.release/tarballs/*.tgz`. Publish one tarball at a time, in
    manifest order, with public access and the v1 staging tag:

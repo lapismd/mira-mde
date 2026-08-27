@@ -82,9 +82,9 @@ pnpm storybook              # http://localhost:7007; restarts on manager / visua
 pnpm storybook:restart      # kill listeners on 7007 (+ legacy 9009) and start fresh
 pnpm build-storybook        # static build → storybook-static/
 pnpm test:e2e               # Playwright acceptance against Storybook stories
-pnpm test:visual            # Playwright baselines against storybook-static
+pnpm test:visual            # explicit Visual Delta review; non-blocking for initial 0.0.1 release
 pnpm test:visual:update     # gated baseline create/update (VISUAL_UPDATE_APPROVED=1)
-pnpm storybook:check        # build-storybook + test:visual
+pnpm storybook:check        # catalog + static Storybook + Storybook browser acceptance
 ```
 
 Override the port with `STORYBOOK_PORT` when needed.

@@ -81,11 +81,15 @@ and Solid placeholders remain private under `internal/adapters`.
 
 Root quality gates compose the specification, catalog, package, Storybook, and
 browser checks. In particular, `storybook:check` validates catalog metadata and
-CSS-token coverage before building the static host and running compare-only
-visual validation. `build-storybook` first builds every workspace package so
-the static host and canonical container capture do not depend on stale local
-`dist` output. Its explicit 4 GB Node heap ceiling fits within the pinned
-capture profile while accommodating the complete catalog bundle.
+CSS-token coverage before building the static host and running focused
+Storybook browser acceptance. `build-storybook` first builds every workspace
+package so the static host and canonical container capture do not depend on
+stale local `dist` output. Its explicit 4 GB Node heap ceiling fits within the
+pinned capture profile while accommodating the complete catalog bundle. The
+initial `0.0.1` npm bootstrap release has a documented visual-gate exception:
+`pnpm test:visual` remains an explicit Visual Delta review command, but it is
+not release-blocking until the current `visual-pending` stories receive
+separate human-approved baselines.
 
 The private root also owns Changesets and release orchestration. One shared
 public-package graph supplies package-boundary validation, tarball validation,

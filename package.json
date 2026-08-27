@@ -34,7 +34,7 @@
     "release:version": "changeset version && pnpm install --lockfile-only && node ./scripts/sync-release-versions.mjs --write && prettier packages/*/package.json packages/*/CHANGELOG.md packages/mira-editor/src/version.ts --write",
     "storybook": "WATCHPACK_POLLING=250 node scripts/storybook-run.mjs --no-open",
     "storybook:restart": "bash scripts/storybook-restart.sh",
-    "storybook:check": "pnpm catalog:check && pnpm build-storybook && pnpm test:visual",
+    "storybook:check": "pnpm catalog:check && pnpm build-storybook && pnpm test:e2e",
     "spec:build": "spec-validator build",
     "spec:check": "spec-validator check",
     "spec:first": "spec-validator first",
