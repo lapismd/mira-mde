@@ -21,7 +21,7 @@ install internal CodeMirror, renderer, UI, or theme workspaces separately.
 | MIRA-ARCH-016 | Public internal dependencies MUST use pre-1.0-compatible `workspace:~` ranges, release planning MUST follow the public dependency graph, and only packages whose exact local version is absent from npm MAY be selected for publication.                                                                                                                                                                                                                                           |
 | MIRA-ARCH-017 | `@lapismd/mira` MUST expose additive block-control toolbar configuration, semantic block metadata, and explicit `toolbar`, `block-menu`, and `context-menu` action placements; Mira Editor, React, and Vanilla MUST normalize those contracts without creating framework-specific editing semantics. The core package MUST own the shared page-wide gutter allowance, clipped-surface escape, and themed overlay behavior used by every adapter.                                   |
 | MIRA-ARCH-018 | `@lapismd/mira/extensions` MUST expose the opt-in doodle-divider factory, immutable default variant gallery and palette, synchronous seed and drawing contracts, and explicit pure Markdown seed-migration helper without adding a separately released package or runtime drawing dependency.                                                                                                                                                                                      |
-| MIRA-ARCH-019 | The private workspace root MUST resolve `@lapismd/storybook-addon-visual-delta` from the sibling checkout through `link:../storybook-addon-visual-delta`. Visual Delta MUST remain repository-only and MUST NOT enter a public package manifest or packed dependency graph.                                                                                                                                                                                                        |
+| MIRA-ARCH-019 | The private workspace root MUST resolve `@lapismd/storybook-addon-visual-delta` from its published npm semver package. Visual Delta MUST remain repository-only and MUST NOT enter a public package manifest or packed dependency graph.                                                                                                                                                                                                                                   |
 | MIRA-ARCH-021 | The shipped `@lapismd/mira/preview` implementation MUST retain portable semantic icons requested by consumer frontmatter type definitions, including the built-in Tags definition's canonical Lucide hash geometry, and its frontmatter editor's non-scrolling narrow single-column container behavior with label-aligned values without requiring consumer Tailwind processing, component-local Tailwind container utilities, or an app-specific icon registry.                   |
 | MIRA-ARCH-022 | The shipped `@lapismd/mira/preview` frontmatter component MUST preserve local collapse and expand interaction while still synchronizing an initial or subsequently changed public `open` input. Context synchronization MUST NOT immediately overwrite an unchanged input's local disclosure state.                                                                                                                                                                                |
 | MIRA-ARCH-023 | The shipped `@lapismd/mira/preview` internal-link surface MUST use the package's existing owner-document overlay infrastructure and Bits UI `LinkPreview` rather than consumer-specific portals or an inline absolutely positioned card. Its built output MUST retain lazy `MiraFileAdapter` preview loading, local navigation callbacks, stable link-preview hooks, full sticky owner-document collision placement, interactive pointer handoff, and Mira appearance propagation. |
@@ -109,11 +109,11 @@ releases are accepted on a rerun only when their commit and notes agree.
 Repository-only tools such as `@lapismd/storybook-addon-visual-delta` belong in
 the private root manifest. They are not part of the six-package public release
 set and MUST NOT appear in packed consumer dependency graphs. The root resolves
-the sibling checkout through `link:../storybook-addon-visual-delta` so local
-Storybook and compare-only capture exercise the reviewed workspace source. The
-linked package owns the compact, path-independent affected state, canonical
-Storybook build reuse, isolated staging, and runner behavior used by this
-repository; Mira does not duplicate those fixes in a downstream patch. The
+the published npm package so local Storybook and compare-only capture exercise
+the reviewed upstream release. The package owns the compact, path-independent
+affected state, canonical Storybook build reuse, isolated staging, and runner
+behavior used by this repository; Mira does not duplicate those fixes in a
+downstream patch. The
 dependency MUST remain repository-only and MUST NOT enter any public package's
 manifest or packed dependency graph.
 

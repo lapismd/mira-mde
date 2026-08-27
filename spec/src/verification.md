@@ -15,8 +15,8 @@ authorized baseline regeneration migrations are complete.
 | MIRA-ARCH-016                                                                                           | Shared public graph, registry planner, tarball manifest, and release tests                                             | Implemented                                                                                        |
 | MIRA-ARCH-017                                                                                           | Public block-control and action-placement contract tests                                                               | Implemented by core and adapter slices                                                             |
 | MIRA-ARCH-018                                                                                           | Extension export, type, package-build, and migration contract tests                                                    | Implemented by doodle-divider core slice                                                           |
-| MIRA-ARCH-019                                                                                           | Root manifest link, lockfile importer, package-boundary and pack checks                                                | Implemented by sibling Visual Delta wiring                                                         |
-| MIRA-ARCH-020                                                                                           | Root-only Storybook tool boundary, Visual Delta sibling resolution, and npm-resolved spec-validator checks              | Implemented                                                                                        |
+| MIRA-ARCH-019                                                                                           | Root manifest npm dependency, lockfile importer, package-boundary and pack checks                                       | Implemented by published Visual Delta wiring                                                       |
+| MIRA-ARCH-020                                                                                           | Root-only Storybook tool boundary plus npm-resolved Visual Delta and spec-validator checks                              | Implemented                                                                                        |
 | MIRA-MD-001, MIRA-MD-002, MIRA-MD-003, MIRA-MD-004, MIRA-MD-005, MIRA-MD-006                            | Package unit tests, Layout Showcase, Storybook browser acceptance                                                      | Implemented; hidden heading-formatting geometry regression covered in a real linked consumer story |
 | MIRA-MD-007                                                                                             | Comprehensive fixture plus focused Storybook fixtures                                                                  | Implemented; catalog checker enforced                                                              |
 | MIRA-MD-008, MIRA-MD-009                                                                                | Enforced Storybook accessibility and icon-bearing editor controls                                                      | Implemented                                                                                        |
@@ -498,11 +498,11 @@ Stories retain `visual-pending` until human acceptance is recorded separately;
 this review state does not mean their committed baseline or deterministic
 comparison is missing.
 
-The Visual Delta suite is resolved from the sibling checkout through the
-private root's `link:../storybook-addon-visual-delta` development dependency.
-It retains the canonical capture runner used by both Storybook's Diff Browser
-action and the CLI, so a host-local browser cannot be mislabeled as the
-Linux/ARM64 baseline target. The package retains the `0.0.4` guards that build a source worker only when
+The Visual Delta suite is resolved from the private root's published
+`@lapismd/storybook-addon-visual-delta` development dependency. It retains the
+canonical capture runner used by both Storybook's Diff Browser action and the
+CLI, so a host-local browser cannot be mislabeled as the Linux/ARM64 baseline
+target. The package retains the guards that build a source worker only when
 `tsconfig.node-build.json` exists, use its executable shipped `dist` worker
 otherwise, and exclude `.turbo` from both clean-workspace staging and post-run
 artifact inventory. The package carries focused regression tests for both
@@ -566,17 +566,15 @@ directory; the immediate repeat passed without a downstream patch. The
 dependency update also passes `pnpm spec:check`, `pnpm catalog:check`, and
 `pnpm check:all`; no visual baseline is created or refreshed by the upgrade.
 
-An earlier published-release restoration resolved
-`@lapismd/storybook-addon-visual-delta@0.0.6` from pnpm's registry store rather
+The published-release restoration resolves
+`@lapismd/storybook-addon-visual-delta@0.0.7` from pnpm's registry store rather
 than the sibling checkout, and the lockfile records the published tarball's
 integrity. The upstream strict doctor rebuild passes 16 checks with no warnings
 or errors and inventories all 132 visual files. Its compare-only affected
 dry-run selects all 132 stories because the root manifest changed, without
 running captures, changing review status, or mutating a baseline. The migration
-passes `pnpm spec:check`, `pnpm catalog:check`, and `pnpm check:all` against the
-published package. The current workspace intentionally restores the sibling
-link so local Storybook and compare-only tooling exercise local add-on source
-without adding Visual Delta to any public Mira package.
+passes repository specification checks against the published package without
+adding Visual Delta to any public Mira package.
 
 The Storybook patch refresh aligns `storybook`, addon-a11y, addon-docs,
 addon-themes, addon-vitest, and svelte-vite at `10.5.6`, while retaining the
