@@ -739,3 +739,19 @@ The portable parity audit recorded 59 present features, six consumer-adapter
 boundaries, six Lapis-only behaviors, and no remaining portable P0-P2 gaps at
 the time it was retired. This is historical evidence, not a waiver from current
 tests or the requirements above.
+
+The initial npm-release workflow stabilization keeps Visual Delta comparison
+outside the release-blocking gate while nineteen `visual-pending` stories await
+separate human baseline review. The 2026-08-27 local release pass includes
+`pnpm spec:first`, `pnpm spec:check`, `pnpm release:check`, `pnpm catalog:check`,
+`pnpm storybook:check`, `pnpm install --frozen-lockfile`, `pnpm check:all`,
+`pnpm packages:check`, `pnpm packages:pack`, `pnpm release:plan --registry
+https://registry.npmjs.org`, `pnpm release:prepare`, and explicit tarball
+manifest inspection for all six `0.0.1` packages. A compare-only
+`pnpm test:visual` run captured all 151 selected stories and reported every
+Playwright capture as passed, then exited non-zero solely because pending
+baselines were intentionally absent. No pending visual baseline was created or
+refreshed. The Storybook continuation-paragraph acceptance now avoids a
+duplicated parent-glyph comparison that proved CI-renderer-sensitive while
+retaining anchored-continuation, wrapped-row stability, and the separate
+caret-state content-column regression.

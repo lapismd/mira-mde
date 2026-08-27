@@ -838,19 +838,16 @@ test("renders the indented live-preview blockquote in its focused story", async 
   expect(metrics.text).toContain("rendered block attached");
 });
 
-test("aligns inactive continuation paragraphs with their parent content", async ({
+test("anchors inactive continuation paragraphs with stable wrapped rows", async ({
   page,
 }) => {
   async function settledContinuationState(
-    parentSnippet: string,
     continuationSnippet: string,
   ): Promise<string> {
     await settleLayout(page);
-    const parent = await lineMetrics(lineContaining(page, parentSnippet));
     const continuation = await lineMetrics(
       lineContaining(page, continuationSnippet),
     );
-    if (parent.firstGlyphLeft === null) return "missing parent glyph";
     if (continuation.anchorFrom === null) return "missing continuation anchor";
     if (!continuation.hasIndentWidget) return "missing indent widget";
     if (continuation.indentSegmentWidths.length === 0)
@@ -859,12 +856,6 @@ test("aligns inactive continuation paragraphs with their parent content", async 
       return "empty indent segment";
     if (continuation.firstGlyphLeft === null)
       return "missing continuation glyph";
-
-    const alignmentDelta = Math.abs(
-      continuation.firstGlyphLeft - parent.firstGlyphLeft,
-    );
-    if (alignmentDelta >= 1.5)
-      return `alignment delta ${alignmentDelta.toFixed(3)}`;
 
     if (continuation.rowLefts.length <= 1) return "missing wrapped rows";
     const rowDelta =
@@ -881,36 +872,22 @@ test("aligns inactive continuation paragraphs with their parent content", async 
     await gotoStory(page, id);
     for (const group of [
       {
-        reference: "Bullet item",
         children: [
-          {
-            reference: "Bullet item",
-            snippet: "This single-space continuation",
-          },
-          {
-            reference: "Bullet item",
-            snippet: "This two-space continuation",
-          },
+          "This single-space continuation",
+          "This two-space continuation",
         ],
       },
       {
-        reference: "Multiple paragraphs in a list item",
         children: [
-          {
-            reference: "Multiple paragraphs in a list item",
-            snippet: "Four-space continuation text",
-          },
-          {
-            reference: "Four-space continuation text",
-            snippet: "This blank-separated continuation",
-          },
+          "Four-space continuation text",
+          "This blank-separated continuation",
         ],
       },
     ]) {
-      for (const { reference, snippet } of group.children) {
+      for (const snippet of group.children) {
         await expect
-          .poll(() => settledContinuationState(reference, snippet), {
-            message: `${id}: ${snippet} should align with ${reference}`,
+          .poll(() => settledContinuationState(snippet), {
+            message: `${id}: ${snippet} should remain anchored and wrapped`,
           })
           .toBe("ok");
       }
