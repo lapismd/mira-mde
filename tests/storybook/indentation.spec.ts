@@ -937,14 +937,26 @@ test("keeps continuation geometry stable while its prefix becomes editable", asy
       { offset: 3, hasWidget: true },
     ]) {
       await placeCaretAtLineOffset(page, continuationLine, state.offset);
-      const metrics = await lineMetrics(continuationLine);
-      expect(metrics.hasIndentWidget).toBe(state.hasWidget);
-      expectSameContentColumn(
-        metrics,
-        inactive,
-        `${id} at offset ${state.offset}: ${JSON.stringify({ inactive, metrics })}`,
-      );
-      expectStableRowLefts(metrics);
+      await expect
+        .poll(
+          async () => {
+            const metrics = await lineMetrics(continuationLine);
+            if (metrics.hasIndentWidget !== state.hasWidget) {
+              return `${id} at offset ${state.offset}: expected hasIndentWidget=${state.hasWidget}, received ${metrics.hasIndentWidget}`;
+            }
+            try {
+              expectSameContentColumn(metrics, inactive);
+              expectStableRowLefts(metrics);
+              return "ok";
+            } catch (error) {
+              return error instanceof Error ? error.message : String(error);
+            }
+          },
+          {
+            message: `${id} at offset ${state.offset}: continuation column should settle`,
+          },
+        )
+        .toBe("ok");
     }
 
     await page.locator("[data-indentation-story]").focus();
