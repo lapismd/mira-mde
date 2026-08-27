@@ -7,52 +7,55 @@
 ![Mira MDE](assets/logo-light.png#gh-light-mode-only)
 ![Mira MDE](assets/logo-dark.png#gh-dark-mode-only)
 
-Standalone, package-oriented Markdown editor extracted from the Lapis Notes markdown
-plugin. Mira is built around CodeMirror 6, Svelte 5, unified/remark/rehype,
-and an extension contract that lets feature packages contribute editor,
-preview, language, and UI behavior.
+Mira is a package-oriented Markdown editor toolkit for applications that need a
+portable editing surface, Markdown preview rendering, and optional feature
+packages without taking on application state, routing, storage, or AI-provider
+policy. It is built around CodeMirror 6, Svelte 5, unified/remark/rehype, and
+an extension contract that lets packages contribute editor, preview, language,
+and UI behavior.
 
-## Packages
+## Choose a package
 
-| Install                        | Use                                                                    |
-| ------------------------------ | ---------------------------------------------------------------------- |
-| `@lapismd/mira`                | Composable Svelte editor and supported advanced runtime subpaths.      |
-| `@lapismd/mira-editor`         | Batteries-included Svelte editor, toolbar, features, and default CSS.  |
-| `@lapismd/mira-plugin-ai`      | Optional consumer-configured AI actions.                               |
-| `@lapismd/mira-plugin-mermaid` | Mermaid language, rendering, and diagram controls.                     |
-| `@lapismd/mira-react`          | React components for `Mira`, `MiraEditor`, and `MiraEditorToolbar`.    |
-| `@lapismd/mira-vanilla`        | Plain JavaScript `createMira` and `createMiraEditor` mounting helpers. |
-
-| npm                            | Version                                                                                                                             |
-| ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `@lapismd/mira`                | [![npm](https://img.shields.io/npm/v/@lapismd/mira.svg)](https://www.npmjs.com/package/@lapismd/mira)                               |
-| `@lapismd/mira-plugin-ai`      | [![npm](https://img.shields.io/npm/v/@lapismd/mira-plugin-ai.svg)](https://www.npmjs.com/package/@lapismd/mira-plugin-ai)           |
-| `@lapismd/mira-plugin-mermaid` | [![npm](https://img.shields.io/npm/v/@lapismd/mira-plugin-mermaid.svg)](https://www.npmjs.com/package/@lapismd/mira-plugin-mermaid) |
-| `@lapismd/mira-editor`         | [![npm](https://img.shields.io/npm/v/@lapismd/mira-editor.svg)](https://www.npmjs.com/package/@lapismd/mira-editor)                 |
-| `@lapismd/mira-react`          | [![npm](https://img.shields.io/npm/v/@lapismd/mira-react.svg)](https://www.npmjs.com/package/@lapismd/mira-react)                   |
-| `@lapismd/mira-vanilla`        | [![npm](https://img.shields.io/npm/v/@lapismd/mira-vanilla.svg)](https://www.npmjs.com/package/@lapismd/mira-vanilla)               |
+| Package                        | Use                                                                    | Version                                                                                                                             |
+| ------------------------------ | ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `@lapismd/mira`                | Composable Svelte editor and supported advanced runtime subpaths.      | [![npm](https://img.shields.io/npm/v/@lapismd/mira.svg)](https://www.npmjs.com/package/@lapismd/mira)                               |
+| `@lapismd/mira-editor`         | Batteries-included Svelte editor, toolbar, features, and default CSS.  | [![npm](https://img.shields.io/npm/v/@lapismd/mira-editor.svg)](https://www.npmjs.com/package/@lapismd/mira-editor)                 |
+| `@lapismd/mira-plugin-ai`      | Optional consumer-configured AI actions.                               | [![npm](https://img.shields.io/npm/v/@lapismd/mira-plugin-ai.svg)](https://www.npmjs.com/package/@lapismd/mira-plugin-ai)           |
+| `@lapismd/mira-plugin-mermaid` | Mermaid language, rendering, and diagram controls.                     | [![npm](https://img.shields.io/npm/v/@lapismd/mira-plugin-mermaid.svg)](https://www.npmjs.com/package/@lapismd/mira-plugin-mermaid) |
+| `@lapismd/mira-react`          | React components for `Mira`, `MiraEditor`, and `MiraEditorToolbar`.    | [![npm](https://img.shields.io/npm/v/@lapismd/mira-react.svg)](https://www.npmjs.com/package/@lapismd/mira-react)                   |
+| `@lapismd/mira-vanilla`        | Plain JavaScript `createMira` and `createMiraEditor` mounting helpers. | [![npm](https://img.shields.io/npm/v/@lapismd/mira-vanilla.svg)](https://www.npmjs.com/package/@lapismd/mira-vanilla)               |
 
 All public packages begin at `0.0.1` and then version independently. Normal
 validation never publishes; the protected release workflow publishes only
 verified exact-version tarballs. See [Releasing Mira packages](RELEASING.md).
 Vue and Solid remain private placeholders under `internal/adapters`.
 
-### Pre-release migration
+## Quick start
 
-| Removed                                     | Replacement                            |
-| ------------------------------------------- | -------------------------------------- |
-| `@mira-mde/svelte` and runtime workspaces   | `@lapismd/mira` and supported subpaths |
-| `@mira-mde/default-ui`                      | `@lapismd/mira-editor`                 |
-| `@mira-mde/plugin-ai`                       | `@lapismd/mira-plugin-ai`              |
-| `@mira-mde/plugin-mermaid`                  | `@lapismd/mira-plugin-mermaid`         |
-| `@mira-mde/react`                           | `@lapismd/mira-react`                  |
-| `@mira-mde/vanilla`                         | `@lapismd/mira-vanilla`                |
-| `MiraMde` / `MiraDefaultMde`                | `Mira` / `MiraEditor`                  |
-| `MiraDefaultToolbar`                        | `MiraEditorToolbar`                    |
-| `createMiraMde` / `createMiraDefaultEditor` | `createMira` / `createMiraEditor`      |
+For a Svelte application, install the batteries-included editor:
 
-This is a hard pre-release migration. The removed names are not exported as
-deprecated aliases.
+```sh
+pnpm add @lapismd/mira-editor
+```
+
+```svelte
+<script lang="ts">
+  import { MiraEditor } from "@lapismd/mira-editor";
+  import "@lapismd/mira-editor/styles.css";
+
+  let value = "# Hello Mira";
+</script>
+
+<MiraEditor bind:value defaultEditMode="live-preview" />
+```
+
+Use `@lapismd/mira` directly when you want the composable editor and your own
+feature set. Use `@lapismd/mira-react` or `@lapismd/mira-vanilla` when a Svelte
+component is not the right integration boundary.
+
+Mira packages own editor and Markdown behavior only. Consumers remain
+responsible for persistence, file/vault models, routing, application commands,
+credentials, and provider-specific AI execution.
 
 ## Development
 

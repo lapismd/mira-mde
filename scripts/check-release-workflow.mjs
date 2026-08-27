@@ -67,6 +67,35 @@ export function validateReleaseWorkflows({
   else if (/NPM_BOOTSTRAP_TOKEN|NODE_AUTH_TOKEN/.test(production)) {
     errors.push("production job must not receive npm token credentials");
   }
+  const notes = releaseSource.match(/notes:[\s\S]*$/)?.[0];
+  if (!notes) {
+    errors.push("missing package release notes job");
+  } else {
+    requireText(
+      notes,
+      /name: Create package tags and GitHub releases/,
+      "package GitHub releases job",
+      errors,
+    );
+    requireText(
+      notes,
+      /contents: write/,
+      "release notes contents permission",
+      errors,
+    );
+    requireText(
+      notes,
+      /needs:[\s\S]*verify/,
+      "release notes verify dependency",
+      errors,
+    );
+    requireText(
+      notes,
+      /run: pnpm release:notes \.release\/release-manifest\.json/,
+      "release notes command uses the verified manifest",
+      errors,
+    );
+  }
   if (
     /NPM_BOOTSTRAP_TOKEN|npm-bootstrap|MIRA_RELEASE_BOOTSTRAP/.test(
       releaseSource,

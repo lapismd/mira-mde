@@ -79,10 +79,12 @@ prereleases, and require every declared public graph edge to use
 
 Focused release tests cover registry selection, local-behind rejection,
 artifact path and integrity validation, graph-ordered publication, safe reruns,
-integrity disagreement, scoped npm provenance PURLs, and release-intent
-classification. Post-publish verification performs a clean exact-version
-install and validates npm signatures plus SLSA provenance before the release
-notes command may create commit-bound package tags and GitHub releases.
+integrity disagreement, scoped npm provenance PURLs, release-intent
+classification, and package-version tag generation for every public Mira
+package. Post-publish verification performs a clean exact-version install and
+validates npm signatures plus SLSA provenance before the release notes command
+may create commit-bound package tags and GitHub releases with npm, source,
+changelog, verified-integrity, and commit metadata.
 
 Pull-request CI runs the canonical specification and release-intent gates,
 repository/package validation, packed-consumer checks, a static Storybook build,

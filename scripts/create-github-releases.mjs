@@ -12,6 +12,22 @@ export function packageReleaseTag(record) {
   return `${packageName}@${record.version}`;
 }
 
+export function packageReleaseBody(record) {
+  const npmPath = `${record.name}/v/${record.version}`;
+  const lines = [
+    record.changelog.trim(),
+    "",
+    "### Release metadata",
+    "",
+    `- npm package: https://www.npmjs.com/package/${npmPath}`,
+    `- Source path: \`${record.directory}\``,
+    `- Changelog: \`${record.changelogPath}\``,
+    `- Verified npm integrity: \`${record.integrity}\``,
+  ];
+  if (record.commit) lines.push(`- Source commit: \`${record.commit}\``);
+  return lines.join("\n");
+}
+
 function runGh(args, { allowFailure = false } = {}) {
   const result = spawnSync("gh", args, {
     encoding: "utf8",
@@ -57,10 +73,11 @@ function ensureTag(repository, tag, commit) {
 
 function ensureRelease(repository, record, tag) {
   const releasePath = `repos/${repository}/releases/tags/${encodedTag(tag)}`;
+  const body = packageReleaseBody(record);
   const existing = runGh(["api", releasePath], { allowFailure: true });
   if (existing.status === 0) {
     const release = JSON.parse(existing.stdout);
-    if (release.body?.trim() !== record.changelog.trim()) {
+    if (release.body?.trim() !== body.trim()) {
       throw new Error(`${tag}: existing GitHub release notes differ`);
     }
     return;
@@ -82,7 +99,7 @@ function ensureRelease(repository, record, tag) {
     "-f",
     `name=${record.name} ${record.version}`,
     "-f",
-    `body=${record.changelog}`,
+    `body=${body}`,
   ]);
 }
 

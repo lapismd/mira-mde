@@ -116,7 +116,7 @@ export default defineConfig(tableRequirements(), {
         },
         {
           pattern:
-            "^(?:scripts/(?:check-spec-.+|check-catalog(?:\\.spec)?|check-package-boundaries(?:\\.spec)?)\\.mjs|\\.markdownlint-cli2\\.jsonc|spec/book\\.toml|\\.github/workflows/.+\\.ya?ml$|AGENTS\\.md$|spec-validator\\.config\\.mjs$)",
+            "^(?:scripts/(?:check-spec-.+|check-catalog(?:\\.spec)?|check-package-boundaries(?:\\.spec)?|check-release-.+|create-github-releases(?:\\.spec)?|prepare-release|publish-release(?:\\.spec)?|release-manifest(?:\\.spec)?|release-plan(?:\\.spec)?|sync-release-versions(?:\\.spec)?|verify-(?:npm-provenance|release)(?:\\.spec)?)\\.mjs|\\.markdownlint-cli2\\.jsonc|spec/book\\.toml|\\.github/workflows/.+\\.ya?ml$|AGENTS\\.md$|spec-validator\\.config\\.mjs$)",
           chapters: ["spec/src/spec-governance.md"],
         },
         {
@@ -126,7 +126,7 @@ export default defineConfig(tableRequirements(), {
         },
       ],
       protected: [
-        "^(?:packages/[^/]+/src/|\\.storybook/|stories/catalog/|scripts/(?:check-spec-.+|check-catalog(?:\\.spec)?|check-package-boundaries(?:\\.spec)?)\\.mjs|\\.markdownlint-cli2\\.jsonc|spec/book\\.toml|\\.github/workflows/.+\\.ya?ml$|AGENTS\\.md$|spec-validator\\.config\\.mjs$|package\\.json$|pnpm-lock\\.yaml$|pnpm-workspace\\.yaml$|turbo\\.json$|tsconfig(?:\\.[^.]+)*\\.json$|playwright(?:\\.[^.]+)*\\.config\\.ts$)",
+        "^(?:packages/[^/]+/src/|\\.storybook/|stories/catalog/|scripts/(?:check-spec-.+|check-catalog(?:\\.spec)?|check-package-boundaries(?:\\.spec)?|check-release-.+|create-github-releases(?:\\.spec)?|prepare-release|publish-release(?:\\.spec)?|release-manifest(?:\\.spec)?|release-plan(?:\\.spec)?|sync-release-versions(?:\\.spec)?|verify-(?:npm-provenance|release)(?:\\.spec)?)\\.mjs|\\.markdownlint-cli2\\.jsonc|spec/book\\.toml|\\.github/workflows/.+\\.ya?ml$|AGENTS\\.md$|spec-validator\\.config\\.mjs$|package\\.json$|pnpm-lock\\.yaml$|pnpm-workspace\\.yaml$|turbo\\.json$|tsconfig(?:\\.[^.]+)*\\.json$|playwright(?:\\.[^.]+)*\\.config\\.ts$)",
       ],
     },
   },
