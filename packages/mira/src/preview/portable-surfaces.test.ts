@@ -584,6 +584,44 @@ describe("portable preview surfaces", () => {
     await unmount(component);
   });
 
+  it("refreshes an edited text property after focus leaves the control", async () => {
+    const target = document.createElement("div");
+    document.body.append(target);
+    const controller = new FrontmatterController({
+      record: { status: "ready" },
+    });
+    const component = mount(FrontmatterEditor, {
+      target,
+      props: {
+        controller,
+      },
+    });
+    await settle();
+
+    const status = target.querySelector<HTMLElement>(
+      '[role="combobox"][aria-label="status value"]',
+    );
+    expect(status?.textContent).toBe("ready");
+
+    status?.focus();
+    expect(document.activeElement).toBe(status);
+    if (status) status.textContent = "local";
+    status?.dispatchEvent(new InputEvent("input", { bubbles: true }));
+    controller.syncRecord({ status: "planned" }, { commit: false });
+    await settle();
+    expect(status?.textContent).toBe("local");
+
+    status?.blur();
+    await settle();
+
+    controller.syncRecord({ status: "review" }, { commit: false });
+    await settle();
+
+    expect(status?.textContent).toBe("review");
+    await unmount(component);
+    target.remove();
+  });
+
   it("keeps read-only list callouts passive and makes editable markers selectable", async () => {
     const readOnlyTarget = document.createElement("div");
     const editableTarget = document.createElement("div");

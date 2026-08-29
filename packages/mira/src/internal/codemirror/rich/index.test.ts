@@ -17,6 +17,90 @@ describe("createRichEditorExtensions", () => {
     expect(createRichEditorExtensions({ enabled: false })).toEqual([]);
   });
 
+  it("preserves a local frontmatter disclosure across preview widget remounts", async () => {
+    const parent = document.createElement("div");
+    document.body.append(parent);
+    const source = "---\ntitle: Portable\n---\n\n# Note";
+    const view = new EditorView({
+      doc: source,
+      selection: { anchor: source.length },
+      extensions: [
+        createMarkdownCodeMirrorExtensions(),
+        createRichEditorExtensions({
+          livePreview: true,
+          frontmatterOpen: false,
+        }),
+      ],
+      parent,
+    });
+    await nextFrame();
+    await nextFrame();
+
+    const expand = parent.querySelector<HTMLButtonElement>(
+      '.mira-rich-widget--frontmatter button[aria-label="Expand properties"]',
+    );
+    expect(expand).not.toBeNull();
+    expand?.click();
+    await nextFrame();
+    expect(parent.querySelector(".md-frontmatter__content")).not.toBeNull();
+
+    view.dispatch({ selection: { anchor: 2 } });
+    await nextFrame();
+    expect(parent.querySelector(".mira-rich-widget--frontmatter")).toBeNull();
+
+    view.dispatch({ selection: { anchor: source.length } });
+    await nextFrame();
+    await nextFrame();
+    expect(
+      parent.querySelector(
+        '.mira-rich-widget--frontmatter button[aria-label="Collapse properties"]',
+      ),
+    ).not.toBeNull();
+    expect(parent.querySelector(".md-frontmatter__content")).not.toBeNull();
+
+    view.destroy();
+    parent.remove();
+  });
+
+  it("keeps an interactive frontmatter menu mounted while its trigger receives focus", async () => {
+    const parent = document.createElement("div");
+    document.body.append(parent);
+    const source = "---\ntitle: Portable\n---\n\n# Note";
+    const view = new EditorView({
+      doc: source,
+      selection: { anchor: source.length },
+      extensions: [
+        createMarkdownCodeMirrorExtensions(),
+        createRichEditorExtensions({
+          livePreview: true,
+          frontmatterOpen: true,
+        }),
+      ],
+      parent,
+    });
+    await nextFrame();
+    await nextFrame();
+
+    const trigger = parent.querySelector<HTMLButtonElement>(
+      'button[aria-label="Property options for title"]',
+    );
+    expect(trigger).not.toBeNull();
+    trigger?.focus();
+    trigger?.click();
+    await nextFrame();
+
+    expect(trigger?.isConnected).toBe(true);
+    expect(trigger?.getAttribute("aria-expanded")).toBe("true");
+    expect(
+      document.body.querySelector(
+        '[role="menu"][aria-label="Property options for title"]',
+      ),
+    ).not.toBeNull();
+
+    view.destroy();
+    parent.remove();
+  });
+
   it("renders and reveals a seeded divider comment and rule as one widget", async () => {
     const parent = document.createElement("div");
     document.body.append(parent);

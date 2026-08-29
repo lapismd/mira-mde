@@ -22,6 +22,11 @@ import { estimateMarkdownBlockHeight } from "../utils/height-estimates";
 import { createSourceToggleButton, selectWidgetSource } from "./source-toggle";
 
 const previewWidgetMounts = new WeakMap<HTMLElement, Record<string, unknown>>();
+const previewWidgetObservers = new WeakMap<HTMLElement, MutationObserver>();
+const frontmatterDisclosureByView = new WeakMap<
+  EditorView,
+  { configuredOpen: boolean; open: boolean }
+>();
 
 export class BlockPreviewWidget extends WidgetType {
   constructor(
@@ -104,6 +109,23 @@ export class BlockPreviewWidget extends WidgetType {
     );
 
     let pendingFrontmatterValue = "";
+    const configuredFrontmatterOpen =
+      this.config.options.frontmatterOpen ?? true;
+    const retainedFrontmatterDisclosure =
+      this.config.nodeName === "Frontmatter"
+        ? frontmatterDisclosureByView.get(view)
+        : undefined;
+    const frontmatterOpen =
+      retainedFrontmatterDisclosure?.configuredOpen ===
+      configuredFrontmatterOpen
+        ? retainedFrontmatterDisclosure.open
+        : configuredFrontmatterOpen;
+    if (this.config.nodeName === "Frontmatter") {
+      frontmatterDisclosureByView.set(view, {
+        configuredOpen: configuredFrontmatterOpen,
+        open: frontmatterOpen,
+      });
+    }
     const component = mount(MarkdownPreview, {
       target: container,
       props: {
@@ -114,7 +136,7 @@ export class BlockPreviewWidget extends WidgetType {
         linkResolver: this.config.options.linkResolver,
         assetResolver: this.config.options.assetResolver,
         fileAdapter: this.config.options.fileAdapter,
-        frontmatterOpen: this.config.options.frontmatterOpen ?? true,
+        frontmatterOpen,
         frontmatterConfig: this.config.options.frontmatterConfig as any,
         onChange: (replacement: string, from: number, to: number) => {
           const absoluteFrom = this.absoluteMarkdownOffset(from);
@@ -141,6 +163,28 @@ export class BlockPreviewWidget extends WidgetType {
       },
     });
     previewWidgetMounts.set(container, component as Record<string, unknown>);
+
+    if (this.config.nodeName === "Frontmatter") {
+      const retainDisclosure = () => {
+        const expanded = container
+          .querySelector<HTMLElement>(".md-frontmatter__trigger")
+          ?.getAttribute("aria-expanded");
+        if (expanded !== "true" && expanded !== "false") return;
+        frontmatterDisclosureByView.set(view, {
+          configuredOpen: configuredFrontmatterOpen,
+          open: expanded === "true",
+        });
+      };
+      retainDisclosure();
+      const observer = new MutationObserver(retainDisclosure);
+      observer.observe(container, {
+        attributes: true,
+        attributeFilter: ["aria-expanded"],
+        childList: true,
+        subtree: true,
+      });
+      previewWidgetObservers.set(container, observer);
+    }
 
     if (this.config.nodeName === "HorizontalRule") {
       container.addEventListener(MIRA_DOODLE_DIVIDER_CONTROL_EVENT, (event) => {
@@ -268,6 +312,8 @@ export class BlockPreviewWidget extends WidgetType {
   }
 
   override destroy(dom: HTMLElement): void {
+    previewWidgetObservers.get(dom)?.disconnect();
+    previewWidgetObservers.delete(dom);
     const component = previewWidgetMounts.get(dom);
     if (component) {
       void unmount(component);

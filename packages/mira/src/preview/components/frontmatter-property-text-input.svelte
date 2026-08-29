@@ -46,8 +46,12 @@
   });
 
   $effect(() => {
+    const nextValue = value;
     if (editorEl?.ownerDocument.activeElement !== editorEl) {
-      query = value;
+      query = nextValue;
+      if (editorEl && editorEl.textContent !== nextValue) {
+        editorEl.textContent = nextValue;
+      }
     }
   });
 
