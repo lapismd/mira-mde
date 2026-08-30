@@ -144,7 +144,14 @@ async function lineMetrics(line: Locator): Promise<LineMetrics> {
     const probe = document.createElement("span");
     probe.style.cssText =
       "height: 0; position: absolute; visibility: hidden; width: var(--list-indent);";
-    element.append(probe);
+    const editor = element.closest<HTMLElement>(".cm-editor");
+    if (!editor) {
+      throw new Error("Expected the measured line to belong to an editor");
+    }
+    // Keep geometry probes outside CodeMirror's managed content DOM. Adding a
+    // temporary child to `.cm-line` wakes CodeMirror's mutation observer and
+    // can rebuild the exact decorations this assertion is waiting to settle.
+    editor.append(probe);
     const listIndentWidth = probe.getBoundingClientRect().width;
     probe.remove();
     const contentRects = firstTextRects(content);
@@ -922,14 +929,40 @@ test("keeps continuation geometry stable while its prefix becomes editable", asy
     "markdown-indentation--continuation-paragraphs-live-preview",
   ]) {
     await gotoStory(page, id);
-    const parent = await lineMetrics(lineContaining(page, "Bullet item"));
+    const parentLine = lineContaining(page, "Bullet item");
     const continuationLine = lineContaining(
       page,
       "This two-space continuation",
     );
-    const inactive = await lineMetrics(continuationLine);
+    await expect(continuationLine).toBeVisible();
+    await expect
+      .poll(
+        async () => {
+          const measurements = await Promise.all(
+            [parentLine, continuationLine].map((line) =>
+              line.evaluate((element) => [
+                element.style
+                  .getPropertyValue("--hmd-indent-padding-measured")
+                  .trim(),
+                element.style
+                  .getPropertyValue("--hmd-indent-prefix-measured")
+                  .trim(),
+              ]),
+            ),
+          );
+          return measurements.every(([padding, prefix]) => padding && prefix);
+        },
+        { message: `${id}: indentation measurements should settle` },
+      )
+      .toBe(true);
+    await settleLayout(page);
+    const [parent, inactive] = await Promise.all([
+      lineMetrics(parentLine),
+      lineMetrics(continuationLine),
+    ]);
     expect(inactive.hasIndentWidget).toBe(true);
     expectSameContentColumn(inactive, parent);
+    expectStableRowLefts(inactive);
 
     for (const state of [
       { offset: 0, hasWidget: false },
