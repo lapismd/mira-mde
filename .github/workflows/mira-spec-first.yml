@@ -44,9 +44,11 @@ jobs:
         run: pnpm spec:validate && pnpm spec:build
 
       - name: Enforce specification-first changes
-        if: github.event_name == 'pull_request'
+        if: >-
+          github.event_name == 'pull_request' &&
+          github.head_ref != 'changeset-release/main'
         run: >-
-          pnpm spec:first --
+          pnpm spec:first
           --base "${{ github.event.pull_request.base.sha }}"
           --head "${{ github.event.pull_request.head.sha }}"
 
