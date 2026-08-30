@@ -1,6 +1,6 @@
 {
   "name": "@lapismd/mira",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Composable Markdown editor, extension SDK, preview renderer, and UI for Mira.",
   "author": "Steve Juma <help@lapis.md>",
   "license": "AGPL-3.0-or-later",
