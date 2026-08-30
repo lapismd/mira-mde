@@ -100,7 +100,10 @@ The publish command accepts only a manifest whose commit, package versions,
 graph order, paths, changelog entries, and tarball digests still match the
 workspace and artifact. It runs only with the explicit approved-CI guard. A
 rerun skips an exact npm version only when the registry integrity equals the
-verified tarball; any disagreement fails without publishing later dependants.
+verified tarball. The verifier normalizes npm's scalar and single-result JSON
+response shapes before comparison, while empty, multi-result, or non-string
+integrity responses fail closed. Any disagreement fails without publishing
+later dependants.
 
 Package release tags use the unscoped package name plus exact version, for
 example `mira-editor@0.2.0`. Tags target the commit recorded in the artifact and

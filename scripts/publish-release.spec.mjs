@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { publishVerifiedPackages } from "./publish-release.mjs";
+import {
+  parsePublishedIntegrity,
+  publishVerifiedPackages,
+} from "./publish-release.mjs";
 
 const packageRecord = {
   name: "@lapismd/mira",
@@ -48,5 +51,26 @@ test("rejects an existing version with different bytes", async () => {
       },
     ),
     /different integrity/,
+  );
+});
+
+test("normalizes npm integrity scalar output", () => {
+  assert.equal(
+    parsePublishedIntegrity('"sha512-verified"\n'),
+    "sha512-verified",
+  );
+});
+
+test("normalizes npm 12 single-result integrity output", () => {
+  assert.equal(
+    parsePublishedIntegrity('["sha512-verified"]\n'),
+    "sha512-verified",
+  );
+});
+
+test("rejects ambiguous npm integrity output", () => {
+  assert.throws(
+    () => parsePublishedIntegrity('["sha512-verified", "sha512-unexpected"]'),
+    /unexpected response/,
   );
 });

@@ -42,7 +42,23 @@ export function publishedIntegrity(
       `npm integrity lookup failed for ${packageName}@${version}: ${details.trim()}`,
     );
   }
-  return result.stdout.trim() ? JSON.parse(result.stdout) : null;
+  return parsePublishedIntegrity(result.stdout);
+}
+
+export function parsePublishedIntegrity(output) {
+  if (!output.trim()) return null;
+
+  const parsed = JSON.parse(output);
+  if (typeof parsed === "string") return parsed;
+  if (
+    Array.isArray(parsed) &&
+    parsed.length === 1 &&
+    typeof parsed[0] === "string"
+  ) {
+    return parsed[0];
+  }
+
+  throw new Error("npm integrity lookup returned an unexpected response");
 }
 
 export async function publishVerifiedPackages(
