@@ -55,6 +55,31 @@ test("rejects CI without explicit release intent", () => {
   assert.match(result.errors.join("\n"), /release:intent/);
 });
 
+test("rejects deprecated action runtimes and an invalid spec-first separator", () => {
+  const releaseSource = readFileSync(".github/workflows/release.yml", "utf8")
+    .replaceAll("actions/checkout@v7", "actions/checkout@v5")
+    .replaceAll("pnpm/action-setup@v6", "pnpm/action-setup@v4")
+    .replaceAll("actions/setup-node@v7", "actions/setup-node@v5");
+  const ciSource = readFileSync(
+    ".github/workflows/mira-spec-first.yml",
+    "utf8",
+  ).replace("pnpm spec:first\n", "pnpm spec:first --\n");
+  const pagesSource = readFileSync(
+    ".github/workflows/publish-storybook-pages.yml",
+    "utf8",
+  );
+  const result = validateReleaseWorkflows({
+    releaseSource,
+    ciSource,
+    pagesSource,
+  });
+  assert.equal(result.ok, false);
+  assert.match(result.errors.join("\n"), /actions\/checkout@v7/);
+  assert.match(result.errors.join("\n"), /pnpm\/action-setup@v6/);
+  assert.match(result.errors.join("\n"), /actions\/setup-node@v7/);
+  assert.match(result.errors.join("\n"), /spec-first gate/);
+});
+
 test("rejects Pages workflow without deployment permission", () => {
   const releaseSource = readFileSync(".github/workflows/release.yml", "utf8");
   const ciSource = readFileSync(

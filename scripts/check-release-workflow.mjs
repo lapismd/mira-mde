@@ -20,6 +20,20 @@ export function validateReleaseWorkflows({
   pagesSource,
 }) {
   const errors = [];
+  for (const [name, source] of [
+    ["release", releaseSource],
+    ["CI", ciSource],
+    ["Pages", pagesSource],
+  ]) {
+    for (const [pattern, label] of [
+      [/uses: actions\/checkout@v7/, "actions/checkout@v7"],
+      [/uses: pnpm\/action-setup@v6/, "pnpm/action-setup@v6"],
+      [/uses: actions\/setup-node@v7/, "actions/setup-node@v7"],
+      [/node-version: 24/, "Node.js 24"],
+    ]) {
+      requireText(source, pattern, `${name} ${label}`, errors);
+    }
+  }
   requireText(
     releaseSource,
     /uses: changesets\/action@v1\.8\.0/,
@@ -122,6 +136,12 @@ export function validateReleaseWorkflows({
   ]) {
     requireText(ciSource, new RegExp(command), `CI ${command}`, errors);
   }
+  requireText(
+    ciSource,
+    /github\.head_ref != 'changeset-release\/main'[\s\S]*?pnpm spec:first\s+--base/,
+    "CI source-only spec-first gate without a forwarded separator",
+    errors,
+  );
 
   for (const pattern of [
     /uses: actions\/configure-pages@v6/,
