@@ -2,7 +2,7 @@
 
 `@lapismd/mira-plugin-mermaid` owns Mermaid language support, deterministic render
 identity, reading/live-preview rendering, source fallback, and expanded diagram
-controls.
+controls. The package is licensed Apache-2.0.
 
 ## Requirements
 

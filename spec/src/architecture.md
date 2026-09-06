@@ -1,9 +1,11 @@
 # Architecture and Boundaries
 
-Mira is a pnpm monorepo of independently buildable public products. Supported
-entry points are defined in [Public packages and entry points](packages.md), and
-dependency direction flows from the composable editor toward plugins, the
-batteries-included editor, and thin framework adapters.
+Mira is a pnpm monorepo of independently buildable public products. The
+workspace root, six public packages, and private adapters are licensed
+Apache-2.0. Supported entry points are defined in
+[Public packages and entry points](packages.md), and dependency direction flows
+from the composable editor toward plugins, the batteries-included editor, and
+thin framework adapters.
 
 ## Requirements
 

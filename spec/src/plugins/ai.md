@@ -1,7 +1,8 @@
 # AI Plugin
 
 `@lapismd/mira-plugin-ai` contributes portable editor actions while leaving model
-selection, credentials, networking, persistence, and policy to the consumer.
+selection, credentials, networking, persistence, and policy to the consumer. The
+package is licensed Apache-2.0.
 
 ## Requirements
 

@@ -1,8 +1,10 @@
 # Mira Editor and Framework Surfaces
 
 Mira Editor composes the portable editor with compact toolbar and view
-controls. Lower-level and framework-specific packages remain adapters over the
-same controller and rendering contracts.
+controls. `@lapismd/mira-editor`, `@lapismd/mira-react`, `@lapismd/mira-vanilla`,
+and the private Vue and Solid placeholders are licensed Apache-2.0. Lower-level
+and framework-specific packages remain adapters over the same controller and
+rendering contracts.
 
 ## Requirements
 

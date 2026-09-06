@@ -28,7 +28,7 @@ function createFixture(mutate) {
           name: packageName,
           version: "0.0.1",
           description: `${packageName} fixture`,
-          license: "AGPL-3.0-or-later",
+          license: "Apache-2.0",
           repository: { type: "git", url: "git+https://example.test/mira.git" },
           files: ["CHANGELOG.md", "dist"],
           exports: { ".": "./dist/index.js" },

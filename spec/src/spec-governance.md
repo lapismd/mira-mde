@@ -47,10 +47,11 @@ catalog/token checker. Changes to either cannot weaken or bypass the contract
 without updating this chapter in the same logical change.
 
 `pnpm packages:check` verifies the exact six publishable manifests, dependency
-direction, stable Semantic Version metadata, private adapter identities, curated export
-maps, and public source/build output. It rejects legacy package imports,
-internal adapter or runtime imports, removed public symbols, and removed CSS
-hooks.
+direction, stable Semantic Version metadata, Apache-2.0 license fields, private
+adapter identities, curated export maps, and public source/build output. It
+rejects legacy package imports, internal adapter or runtime imports, removed
+public symbols, and removed CSS hooks. Boundary fixtures MUST declare the same
+Apache-2.0 license metadata.
 
 `pnpm packages:pack` is the corresponding built-artifact gate. It installs the
 six tarballs as consumers see them, compiles adapter-specific fixtures, resolves

@@ -3,7 +3,7 @@
   "version": "0.0.2",
   "description": "Composable Markdown editor, extension SDK, preview renderer, and UI for Mira.",
   "author": "Steve Juma <help@lapis.md>",
-  "license": "AGPL-3.0-or-later",
+  "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/lapismd/mira-mde.git",

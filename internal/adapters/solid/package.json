@@ -2,7 +2,7 @@
   "name": "@mira-internal/solid",
   "version": "0.0.0",
   "private": true,
-  "license": "AGPL-3.0-or-later",
+  "license": "Apache-2.0",
   "type": "module",
   "scripts": {
     "build": "echo \"@mira-internal/solid is planned after the public API stabilizes\"",
