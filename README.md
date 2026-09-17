@@ -64,6 +64,7 @@ pnpm install
 pnpm dev                    # Storybook at http://localhost:7007
 pnpm spec:check             # normative contract and governance
 pnpm packages:check         # six-package boundary and leak checks
+pnpm audit                  # fail closed on known-vulnerable dependencies
 pnpm check:all
 ```
 

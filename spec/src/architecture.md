@@ -18,6 +18,7 @@ thin framework adapters.
 | MIRA-ARCH-005 | Storybook MUST be the only repository application used for browsable documentation, demos, component examples, and interaction scenarios.                                                                                                                                                                                                                                                                                                                 |
 | MIRA-ARCH-020 | Root Storybook tooling MUST resolve the published `@lapismd/storybook-addon-visual-delta` package from npm once available, while specification tooling MUST resolve published `@lapismd/spec-validator` from npm once available; both dependencies MUST remain outside the six-package public graph.                                                                                                                                                      |
 | MIRA-ARCH-030 | The `@lapismd/mira` root MUST export `MiraCodeEditor`, `MiraCodeEditorProps`, and `MiraCodeEditorHandle`. Mira's primary Markdown surface and editable preview editor MUST consume that shell, while downstream packages MAY supply language and domain extensions through the public CodeMirror extension prop and bridge their theme from an ancestor through the shell's inheritable public background, focus-ring, search-control, and syntax tokens. |
+| MIRA-ARCH-039 | The root `check` and `check:all` commands MUST run `pnpm audit` against the committed lockfile before package validation. Fixable findings MUST be resolved with declared ranges or workspace overrides in the same change; `pnpm.auditConfig.ignoreCves` MAY list only unpatched advisories.                                                                                                                                                             |
 
 ## Package boundary
 
@@ -80,6 +81,12 @@ The former `apps/demo` and `apps/docs` workspaces are retired. The root package
 owns Storybook development, static builds, and browser acceptance. The
 `packages` directory contains exactly six public products; unimplemented Vue
 and Solid placeholders remain private under `internal/adapters`.
+
+Root `check` and `check:all` run `pnpm audit` first so a lockfile or override
+change cannot land with a known-vulnerable graph. Workspace overrides pin
+transitive patches; public package ranges that ship those dependencies, such as
+Mermaid, MUST declare a patched floor so packed consumers do not reintroduce
+the advisory.
 
 Root quality gates compose the specification, catalog, package, Storybook, and
 browser checks. In particular, `storybook:check` validates catalog metadata and

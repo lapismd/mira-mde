@@ -53,7 +53,11 @@ install internal CodeMirror, renderer, UI, or theme workspaces separately.
 
 `@lapismd/mira-editor` depends on Mira and the Mermaid plugin because Mermaid
 is part of its default feature set. The AI plugin remains opt-in. React and
-Vanilla depend only on the public products they adapt.
+Vanilla depend only on the public products they adapt. The Mermaid plugin's
+published range MUST stay on the patched 11.16 line so consumers do not resolve
+known-vulnerable Mermaid or DOMPurify releases. Workspace `pnpm audit` is part
+of root `check` and `check:all`; a public-range or lockfile change that
+reintroduces an advisory fails that gate.
 
 The Markdown action identifier is exported additively from Mira and re-exported
 by the editor, React, and Vanilla entry points. Their handles delegate to Mira's

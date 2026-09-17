@@ -178,6 +178,10 @@ pnpm build
 pnpm test:e2e
 ```
 
+`pnpm check` and `pnpm check:all` both run `pnpm audit` first. Do not skip that
+gate or weaken it with an unrecorded ignore. Fix findings with declared ranges
+or workspace overrides, then refresh the lockfile.
+
 `pnpm check:all` runs the standard full-repo non-e2e validation:
 
 ```sh

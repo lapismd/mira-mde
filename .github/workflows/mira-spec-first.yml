@@ -83,6 +83,9 @@ jobs:
       - name: Validate catalog and package contracts
         run: pnpm catalog:check && pnpm packages:check
 
+      - name: Audit dependencies
+        run: pnpm audit
+
       - name: Run full non-browser validation
         run: pnpm check:all
 

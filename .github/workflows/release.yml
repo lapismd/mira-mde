@@ -97,6 +97,7 @@ jobs:
           pnpm spec:check
           pnpm catalog:check
           pnpm packages:check
+          pnpm audit
           pnpm check:all
           pnpm packages:pack
 
