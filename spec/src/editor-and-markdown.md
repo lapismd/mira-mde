@@ -1,8 +1,9 @@
 # Portable Markdown and Editor
 
 Mira provides the portable part of the Lapis Markdown editing contract without
-its application runtime. The renderer and editor surfaces share syntax,
-resolvers, extension contributions, source fallback, and shipped plain CSS.
+its application runtime. The `@lapismd/mira` package that ships that contract is
+licensed Apache-2.0. The renderer and editor surfaces share syntax, resolvers,
+extension contributions, source fallback, and shipped plain CSS.
 
 ## Requirements
 

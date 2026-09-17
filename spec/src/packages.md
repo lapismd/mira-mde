@@ -9,7 +9,7 @@ install internal CodeMirror, renderer, UI, or theme workspaces separately.
 | ID            | Requirement                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | MIRA-ARCH-006 | The public release set MUST contain exactly `@lapismd/mira`, `@lapismd/mira-editor`, `@lapismd/mira-plugin-ai`, `@lapismd/mira-plugin-mermaid`, `@lapismd/mira-react`, and `@lapismd/mira-vanilla`.                                                                                                                                                                                                                                                                                |
-| MIRA-ARCH-007 | Public packages MUST use independent stable Semantic Versions, public npm access metadata, explicit export maps, shipped-file lists, side-effect declarations, and package descriptions; the first public version of each package MUST remain `0.0.1`.                                                                                                                                                                                                                             |
+| MIRA-ARCH-007 | Public packages MUST use independent stable Semantic Versions, public npm access metadata, the Apache-2.0 license field, explicit export maps, shipped-file lists, side-effect declarations, and package descriptions; the first public version of each package MUST remain `0.0.1`.                                                                                                                                                                                               |
 | MIRA-ARCH-008 | `@lapismd/mira` MUST provide the Svelte-first root plus supported `core`, `extensions`, `codemirror`, `preview`, `tables`, `ui`, theme CSS, and aggregate stylesheet subpaths.                                                                                                                                                                                                                                                                                                     |
 | MIRA-ARCH-009 | Public package output MUST NOT reference `@mira-mde/*`, `@mira-internal/*`, or another unshipped implementation package.                                                                                                                                                                                                                                                                                                                                                           |
 | MIRA-ARCH-010 | Public dependencies MUST flow from `mira` to plugins and `mira-editor`, then to React and Vanilla adapters; plugins MUST integrate through supported Mira entry points.                                                                                                                                                                                                                                                                                                            |
@@ -53,7 +53,11 @@ install internal CodeMirror, renderer, UI, or theme workspaces separately.
 
 `@lapismd/mira-editor` depends on Mira and the Mermaid plugin because Mermaid
 is part of its default feature set. The AI plugin remains opt-in. React and
-Vanilla depend only on the public products they adapt.
+Vanilla depend only on the public products they adapt. The Mermaid plugin's
+published range MUST stay on the patched 11.16 line so consumers do not resolve
+known-vulnerable Mermaid or DOMPurify releases. Workspace `pnpm audit` is part
+of root `check` and `check:all`; a public-range or lockfile change that
+reintroduces an advisory fails that gate.
 
 The Markdown action identifier is exported additively from Mira and re-exported
 by the editor, React, and Vanilla entry points. Their handles delegate to Mira's
@@ -75,6 +79,9 @@ actions. Its controls consume the core package's cataloged focus and elevation
 tokens without expanding the public token registry.
 
 ## Release model
+
+Every public package manifest MUST declare `license: "Apache-2.0"`. The workspace
+root, private adapters, and `LICENSE.md` use the same SPDX identifier.
 
 The six public packages version independently. Changesets record release intent
 and generate one changelog per affected package; a change to one product does

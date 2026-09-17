@@ -2,7 +2,7 @@
 
 `@lapismd/mira-plugin-mermaid` owns Mermaid language support, deterministic render
 identity, reading/live-preview rendering, source fallback, and expanded diagram
-controls.
+controls. The package is licensed Apache-2.0.
 
 ## Requirements
 
@@ -13,6 +13,7 @@ controls.
 | MIRA-MERMAID-003 | Expanded diagrams MUST expose accessible zoom, pan, reset, copy, close, and source controls with deterministic teardown.    |
 | MIRA-MERMAID-004 | Render failures MUST preserve the source path and expose a usable error state rather than removing the Markdown content.    |
 | MIRA-MERMAID-005 | Storybook MUST cover inline, dialog, source fallback, disabled, and representative layout modes with interactions.          |
+| MIRA-MERMAID-006 | The published `@lapismd/mira-plugin-mermaid` manifest MUST depend on `mermaid` at `^11.16.1` or a later patched 11.x range. |
 
 Mermaid configuration is portable. Application-wide registration and persisted
 settings remain consumer responsibilities.

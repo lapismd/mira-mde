@@ -130,6 +130,7 @@ export function validateReleaseWorkflows({
     "pnpm release:intent",
     "pnpm packages:check",
     "pnpm packages:pack",
+    "pnpm audit",
     "pnpm check:all",
     "pnpm build-storybook",
     "pnpm test:e2e",

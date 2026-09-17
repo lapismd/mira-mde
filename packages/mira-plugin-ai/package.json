@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Optional consumer-configured AI extension for Mira.",
   "author": "Steve Juma <help@lapis.md>",
-  "license": "AGPL-3.0-or-later",
+  "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/lapismd/mira-mde.git",

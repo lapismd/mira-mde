@@ -22,6 +22,7 @@ satisfy a plugin or package contract change.
 | MIRA-GOV-012 | Every new public root component and shipped `--mira-*` token MUST be registered in the catalog contract, mapped to its canonical specification, and checked against package exports and source styles. The spec-first gate MUST reject implementation or catalog changes that omit any mapped chapter.                                                                                                  |
 | MIRA-GOV-013 | Repository agent guidance MUST resolve published LapisMD dependencies through npm semver ranges, keep external repositories outside this pnpm workspace, preserve portable published manifests, and route dependency defects to the owning repository before consuming a released version.                                                                                                              |
 | MIRA-GOV-014 | GitHub workflows MUST use Node.js 24 and action majors whose JavaScript entrypoints run on Node.js 24. Ordinary pull requests MUST run spec-first against their exact base and head without forwarding a literal separator; the generated Changesets release pull request MAY skip source-change and release-intent gates already satisfied by its constituent source commits.                          |
+| MIRA-GOV-015 | Pull-request CI, release revalidation, and the release-workflow checker MUST require `pnpm audit` so every change fails closed on known-vulnerable dependencies.                                                                                                                                                                                                                                        |
 
 The configured shared `spec:validate` command also enforces a one-to-one
 relationship between every chapter link indexed by `SUMMARY.md`, raw Markdown
@@ -47,10 +48,11 @@ catalog/token checker. Changes to either cannot weaken or bypass the contract
 without updating this chapter in the same logical change.
 
 `pnpm packages:check` verifies the exact six publishable manifests, dependency
-direction, stable Semantic Version metadata, private adapter identities, curated export
-maps, and public source/build output. It rejects legacy package imports,
-internal adapter or runtime imports, removed public symbols, and removed CSS
-hooks.
+direction, stable Semantic Version metadata, Apache-2.0 license fields, private
+adapter identities, curated export maps, and public source/build output. It
+rejects legacy package imports, internal adapter or runtime imports, removed
+public symbols, and removed CSS hooks. Boundary fixtures MUST declare the same
+Apache-2.0 license metadata.
 
 `pnpm packages:pack` is the corresponding built-artifact gate. It installs the
 six tarballs as consumers see them, compiles adapter-specific fixtures, resolves
@@ -88,8 +90,9 @@ may create commit-bound package tags and GitHub releases with npm, source,
 changelog, verified-integrity, and commit metadata.
 
 Pull-request CI runs the canonical specification and release-intent gates,
-repository/package validation, packed-consumer checks, a static Storybook build,
-and focused browser acceptance. On `main`, the Changesets action uses the
+repository/package validation, `pnpm audit`, packed-consumer checks, a static
+Storybook build, and focused browser acceptance. The release-workflow checker
+requires the explicit `pnpm audit` step in addition to `pnpm check:all`. On `main`, the Changesets action uses the
 GitHub API to maintain one Version Packages pull request without receiving npm
 credentials. Only a commit with no pending Changesets advances to artifact
 planning. Production publishing is the only workflow path that receives an npm

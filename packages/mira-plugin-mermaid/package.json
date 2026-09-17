@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Mermaid language, preview, and diagram controls for Mira.",
   "author": "Steve Juma <help@lapis.md>",
-  "license": "AGPL-3.0-or-later",
+  "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/lapismd/mira-mde.git",
@@ -38,7 +38,7 @@
     "@mermaid-js/layout-elk": "^0.1.9",
     "@lapismd/mira": "workspace:~",
     "codemirror-lang-mermaid": "^0.5.0",
-    "mermaid": "^11.12.1",
+    "mermaid": "^11.16.1",
     "svg-pan-zoom": "^3.6.2",
     "svg2roughjs": "^3.2.1",
     "type-fest": "^4.41.0",
