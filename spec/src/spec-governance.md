@@ -16,7 +16,7 @@ satisfy a plugin or package contract change.
 | MIRA-GOV-006 | Shared governance tooling MUST have regression tests and MUST fail closed when it cannot determine a trustworthy change set.                                                                                                                                                                                                                                                                            |
 | MIRA-GOV-007 | Generated mdBook output MUST remain untracked.                                                                                                                                                                                                                                                                                                                                                          |
 | MIRA-GOV-008 | Package-boundary validation MUST reject unapproved public products, invalid dependency direction, legacy package imports, and leaked internal runtime references.                                                                                                                                                                                                                                       |
-| MIRA-GOV-009 | A protected public-package change MUST include a Changeset or an explicit empty Changeset, and the Version Packages workflow MUST preserve independent package versions and per-package changelogs.                                                                                                                                                                                                     |
+| MIRA-GOV-009 | A protected public-package change MUST include a Changeset or an explicit empty Changeset, and the Version Packages workflow MUST preserve independent package versions and per-package changelogs. Release tests MUST prove Changesets can still read workspace YAML after workspace audit pins.                                                                                                       |
 | MIRA-GOV-010 | Stable npm publication MUST require the protected `npm-production` environment, GitHub OIDC provenance, and a verified immutable artifact containing only exact unpublished package versions.                                                                                                                                                                                                           |
 | MIRA-GOV-011 | Release automation MUST be retry-safe, normalize npm's scalar and single-result JSON integrity responses before exact comparison, fail closed on ambiguous responses, publish in dependency order, reject registry/version/integrity disagreement, create package-version tags and GitHub releases, and verify clean consumer installation and provenance without automatically unpublishing a release. |
 | MIRA-GOV-012 | Every new public root component and shipped `--mira-*` token MUST be registered in the catalog contract, mapped to its canonical specification, and checked against package exports and source styles. The spec-first gate MUST reject implementation or catalog changes that omit any mapped chapter.                                                                                                  |
@@ -92,9 +92,12 @@ changelog, verified-integrity, and commit metadata.
 Pull-request CI runs the canonical specification and release-intent gates,
 repository/package validation, `pnpm audit`, packed-consumer checks, a static
 Storybook build, and focused browser acceptance. The release-workflow checker
-requires the explicit `pnpm audit` step in addition to `pnpm check:all`. On `main`, the Changesets action uses the
-GitHub API to maintain one Version Packages pull request without receiving npm
-credentials. Only a commit with no pending Changesets advances to artifact
+requires the explicit `pnpm audit` step in addition to `pnpm check:all`. On
+`main`, the Changesets action uses the GitHub API to maintain one Version
+Packages pull request without receiving npm credentials. Release tests prove
+Changesets can still read `pnpm-workspace.yaml` after `js-yaml` audit pins,
+which MUST stay on the requested major line so `read-yaml-file` keeps
+`safeLoad`. Only a commit with no pending Changesets advances to artifact
 planning. Production publishing is the only workflow path that receives an npm
 credential, and that credential is short-lived OIDC scoped by the
 `npm-production` environment. It downloads the already verified artifact and

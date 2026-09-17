@@ -57,7 +57,9 @@ Vanilla depend only on the public products they adapt. The Mermaid plugin's
 published range MUST stay on the patched 11.16 line so consumers do not resolve
 known-vulnerable Mermaid or DOMPurify releases. Workspace `pnpm audit` is part
 of root `check` and `check:all`; a public-range or lockfile change that
-reintroduces an advisory fails that gate.
+reintroduces an advisory fails that gate. Audit overrides that pin `js-yaml`
+MUST keep 3.x consumers on patched 3.x and 4.x consumers on patched 4.x so
+Changesets can still version public packages.
 
 The Markdown action identifier is exported additively from Mira and re-exported
 by the editor, React, and Vanilla entry points. Their handles delegate to Mira's
