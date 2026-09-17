@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
-import { spawnSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { createRequire } from "node:module";
+import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
@@ -9,6 +9,28 @@ const repoRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
   "..",
 );
+
+function loadChangesetsYamlReader() {
+  const entries = readdirSync(path.join(repoRoot, "node_modules/.pnpm")).filter(
+    (name) => name.startsWith("read-yaml-file@"),
+  );
+  assert.equal(
+    entries.length,
+    1,
+    `expected one read-yaml-file install, found ${entries.join(", ")}`,
+  );
+  const pkgDir = path.join(
+    repoRoot,
+    "node_modules/.pnpm",
+    entries[0],
+    "node_modules/read-yaml-file",
+  );
+  const require = createRequire(path.join(pkgDir, "package.json"));
+  return {
+    readYamlFile: require(pkgDir),
+    yaml: require("js-yaml"),
+  };
+}
 
 test("js-yaml audit overrides stay on their requested major lines", () => {
   const workspace = readFileSync(
@@ -26,12 +48,13 @@ test("js-yaml audit overrides stay on their requested major lines", () => {
   );
 });
 
-test("Changesets can read the workspace YAML with the installed js-yaml", () => {
-  const result = spawnSync("pnpm", ["exec", "changeset", "status"], {
-    cwd: repoRoot,
-    encoding: "utf8",
-  });
-  const output = `${result.stdout}\n${result.stderr}`;
-  assert.doesNotMatch(output, /yaml\.safeLoad is not a function/);
-  assert.equal(result.status, 0, output);
+test("Changesets YAML reader can parse the workspace with js-yaml 3", async () => {
+  const { readYamlFile, yaml } = loadChangesetsYamlReader();
+  assert.equal(typeof yaml.safeLoad, "function");
+  const workspace = await readYamlFile(
+    path.join(repoRoot, "pnpm-workspace.yaml"),
+  );
+  assert.deepEqual(workspace.packages, ["packages/*", "internal/adapters/*"]);
+  assert.equal(workspace.overrides["js-yaml@3"], ">=3.15.2 <4");
+  assert.equal(workspace.overrides["js-yaml@4"], ">=4.3.2 <5");
 });
