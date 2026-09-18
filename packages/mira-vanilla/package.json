@@ -1,6 +1,6 @@
 {
   "name": "@lapismd/mira-vanilla",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Plain JavaScript factories for the composable Mira and batteries-included Mira Editor surfaces.",
   "author": "Steve Juma <help@lapis.md>",
   "license": "Apache-2.0",
