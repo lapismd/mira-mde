@@ -1,6 +1,6 @@
 {
   "name": "@lapismd/mira-plugin-ai",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Optional consumer-configured AI extension for Mira.",
   "author": "Steve Juma <help@lapis.md>",
   "license": "Apache-2.0",
