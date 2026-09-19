@@ -73,3 +73,7 @@ tests consume the exported constant instead of duplicating a release literal.
 Their package manifests point at the canonical public repository
 `lapismd/mira-mde` with package-specific `repository.directory` metadata so npm
 and provenance links resolve to the owning monorepo path.
+Mira Editor, React, and Vanilla may align package-local Svelte development
+ranges with the private root for patched compiler/audit validation, while their
+public peer and adapter contracts stay on the documented Svelte 5 compatibility
+surface.

@@ -67,6 +67,11 @@ The action engine owns Markdown interpretation and transaction construction.
 Framework toolbars provide action identifiers only; they do not recreate
 delimiter, selection, block-prefix, or list-normalization rules.
 
+The `@lapismd/mira` package may align its Svelte development dependency with
+the private root's patched compiler range for repository audit checks, but its
+public Svelte peer range and Markdown runtime contracts remain unchanged by
+that validation-only refresh.
+
 Seeded doodle dividers use the authored pair
 `<!-- mira-divider:v1:xxxxxxxx -->` followed immediately by a thematic break.
 The versioned 32-bit hexadecimal seed is authoritative for the selected
