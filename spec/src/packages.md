@@ -45,6 +45,10 @@ geometry when an editor is embedded beneath rendered Markdown. This shipped
 boundary excludes internal buffer images from authored-image styling; consumers
 do not need to repair checkbox layout through local CSS. See MIRA-CSS-042.
 
+List selectors in the exported source stylesheet support Markdown surface and mode classes
+on the CodeMirror root, as used by directly composed API editors. List bullets
+and indentation retain the wrapped editor's styling without consumer overrides.
+
 ## Public graph
 
 | Package                        | Responsibility                                                                                    |

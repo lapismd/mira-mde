@@ -142,6 +142,11 @@ marker pseudo-borders become transparent; every editable child row's line-owned
 outer border MUST align with the rendered parent block border without a
 duplicate, displaced guide beside a first-depth prefix.
 
+The shipped list selectors MUST accept both a Markdown wrapper around
+CodeMirror and Markdown classes on the CodeMirror root. List marker slots,
+hanging indentation, guides, and bullet paint use the same tokens in both
+mount shapes; consumers MUST NOT need a wrapper solely to activate those rules.
+
 The default toolbar About dialog inherits the editor's portaled appearance
 tokens. Its combined light/dark logo keeps explicit intrinsic dimensions to
 avoid layout shift, scales down to the available inline size, and is capped by

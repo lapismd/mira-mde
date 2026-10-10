@@ -125,6 +125,11 @@ preview applies Lapis's styled unordered-marker hook away from the caret, so
 dash, asterisk, and plus source markers share the reading surface's bullet
 presentation without losing raw-prefix editing.
 
+For MIRA-MD-007, that list presentation MUST also work when a consumer mounts
+the public CodeMirror stack directly and places the Markdown surface and mode
+classes on the editor itself. Inactive dash, asterisk, and plus markers paint
+bullets; placing the caret inside a marker reveals its authored source.
+
 Callout and task-state rendering consumes public RGB-channel tokens inside
 `rgb()` and `rgba()` declarations. Those tokens therefore remain raw channel
 triplets in every color mode; mode selection changes the channel value without

@@ -298,6 +298,17 @@ deltas (13 in the repaired indentation and list surfaces, plus 6 shared
 editor-surface snapshots); no visual baselines were created or refreshed for
 this repair.
 
+`BareCodeMirrorLivePreview` extends MIRA-MD-007 acceptance to the public
+CodeMirror stack with Markdown classes on the editor root. It checks painted,
+non-zero dash/asterisk/plus bullets. `bare-codemirror.spec.ts` verifies raw-marker
+visibility at the caret with native browser keyboard input.
+Tasks `InlineEditorAlignment` checks both Focus bullets in Today and Applications
+against the packed stylesheet. The initial exact targets each failed once
+because the bullet pseudo-element was absent.
+Both original targets now pass. Final source acceptance passes 418 unit tests,
+156 Storybook interaction/axe stories, and 49 browser cases against freshly
+built Storybook output, including native raw-marker reveal and restoration.
+
 The nested-quote whitespace follow-up reproduced a live-preview block widget
 inheriting CodeMirror's `white-space: break-spaces`: its outer quote measured
 `341.17px` high against `194.17px` in reading mode, the paragraph-to-list gap

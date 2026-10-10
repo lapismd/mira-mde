@@ -5,6 +5,7 @@ import {
   markdownPreviewDocsSource,
 } from "../_shared/docs-source";
 import IndentationStory from "./IndentationStory.svelte";
+import BareCodeMirrorStory from "./BareCodeMirrorStory.svelte";
 import {
   activePrefixesMarkdown,
   configurableIndentWidthMarkdown,
@@ -38,6 +39,41 @@ const meta = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
+
+export const BareCodeMirrorLivePreview: Story = {
+  tags: ["visual-pending", "!autodocs"],
+  render: () => ({ Component: BareCodeMirrorStory }),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The public CodeMirror stack paints inactive list bullets when the Markdown surface classes are on the editor itself, without a framework wrapper.",
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const editor = within(canvasElement).getByRole("textbox", {
+      name: "Markdown editor",
+    });
+    await waitFor(() => {
+      const markers = editor.querySelectorAll<HTMLElement>(
+        ".cm-formatting-list-bullet > .cm-meta",
+      );
+      expect(markers).toHaveLength(3);
+      for (const marker of markers) {
+        const bullet = getComputedStyle(marker, "::after");
+        expect(bullet.content).toBe('""');
+        expect(parseFloat(bullet.width)).toBeGreaterThan(0);
+        expect(parseFloat(bullet.height)).toBeGreaterThan(0);
+        expect(bullet.backgroundColor).not.toBe("rgba(0, 0, 0, 0)");
+        expect(getComputedStyle(marker).color).toBe("rgba(0, 0, 0, 0)");
+        expect(getComputedStyle(marker.parentElement!).display).toBe(
+          "inline-block",
+        );
+      }
+    });
+  },
+};
 
 function findVisibleTarget(
   root: HTMLElement,
