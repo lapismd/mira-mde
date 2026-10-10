@@ -95,10 +95,12 @@ Storybook build, and focused browser acceptance. The release-workflow checker
 requires the explicit `pnpm audit` step in addition to `pnpm check:all`. On
 `main`, the Changesets action uses the GitHub API to maintain one Version
 Packages pull request without receiving npm credentials. Release tests invoke
-Changesets' `read-yaml-file` reader directly so pull-request checkouts without
+Changesets 3's Manypkg reader directly so pull-request checkouts without
 a local `main` still prove `pnpm-workspace.yaml` parses after `js-yaml` audit
-pins, which MUST stay on the requested major line so `safeLoad` remains
-available. Only a commit with no pending Changesets advances to artifact
+pins, which MUST stay on the requested major line. Both specification check
+and validation enforce the same Markdown rules with `markdownlint-cli`; the
+validator's supported structured check lane selects that runner without a
+package patch or replacement validator. Only a commit with no pending Changesets advances to artifact
 planning. Production publishing is the only workflow path that receives an npm
 credential, and that credential is short-lived OIDC scoped by the
 `npm-production` environment. It downloads the already verified artifact and

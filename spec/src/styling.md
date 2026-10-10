@@ -51,6 +51,8 @@ customization and Obsidian-compatible aliases retained as a compatibility layer.
 | MIRA-CSS-040 | Rendered live-preview and reading table cells MUST wrap using `--table-white-space` and MUST NOT introduce a widget-shell or per-cell scrollbar or overflow. Nested cell editors MUST constrain their content to the cell width. Raw source and revealed pipe-table rows MUST keep their non-wrapping `white-space: pre` contract and scroll horizontally on the `.cm-line.cm-table` itself, hiding scrollbar chrome, keeping consecutive rows of the same table aligned, and without scrolling the editor content. |
 | MIRA-CSS-041 | An open frontmatter property type menu MUST escape property-row and consumer-viewport clipping through the overlay portal and remain visually exposed and hit-testable. Closed rows MUST retain their normal overflow containment. |
 
+| MIRA-CSS-042 | Generic Markdown image styling MUST exclude CodeMirror's internal `cm-widgetBuffer` images, including editors nested beneath rendered Markdown. Cursor buffers MUST retain CodeMirror's zero-width inline geometry without Markdown image borders, while authored Markdown images retain their existing block sizing and borders. |
+
 Stylesheet order remains theme, UI, preview, Svelte/Mira Editor, and framework
 wrapper composition as documented by the package entrypoints.
 

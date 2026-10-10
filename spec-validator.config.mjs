@@ -19,6 +19,9 @@ export default defineConfig(tableRequirements(), {
     specFirst: "MIRA-GOV-003",
     internal: "MIRA-GOV-006",
   },
+  check: {
+    lanes: [{ name: "markdownlint", command: "pnpm", args: ["spec:lint"] }],
+  },
   validators: {
     summary: true,
     governance: {
@@ -58,7 +61,7 @@ export default defineConfig(tableRequirements(), {
       chapterTemplate: "plugins/<name>.md",
       identityTemplate: "@lapismd/mira-plugin-<name>",
     },
-    markdownlint: { config: ".markdownlint-cli2.jsonc" },
+    markdownlint: false,
     specFirst: {
       mode: "mapped",
       canonicalPattern: "^spec/src/(?!SUMMARY\\.md$).+\\.md$",
@@ -74,6 +77,10 @@ export default defineConfig(tableRequirements(), {
         "\\.(?:actual|diff)\\.png$",
       ],
       rules: [
+        {
+          pattern: "^\\.markdownlint\\.json$",
+          chapters: ["spec/src/spec-governance.md"],
+        },
         {
           pattern:
             "^packages/(?:plugin-ai|mira-plugin-ai)/(?:src/|package\\.json$)",
@@ -116,7 +123,7 @@ export default defineConfig(tableRequirements(), {
         },
         {
           pattern:
-            "^(?:scripts/(?:check-spec-.+|check-catalog(?:\\.spec)?|check-package-boundaries(?:\\.spec)?|check-release-.+|create-github-releases(?:\\.spec)?|prepare-release|publish-release(?:\\.spec)?|release-manifest(?:\\.spec)?|release-plan(?:\\.spec)?|sync-release-versions(?:\\.spec)?|verify-(?:npm-provenance|release)(?:\\.spec)?)\\.mjs|\\.markdownlint-cli2\\.jsonc|spec/book\\.toml|\\.github/workflows/.+\\.ya?ml$|AGENTS\\.md$|spec-validator\\.config\\.mjs$)",
+            "^(?:scripts/(?:check-spec-.+|check-catalog(?:\\.spec)?|check-package-boundaries(?:\\.spec)?|check-release-.+|create-github-releases(?:\\.spec)?|prepare-release|publish-release(?:\\.spec)?|release-manifest(?:\\.spec)?|release-plan(?:\\.spec)?|sync-release-versions(?:\\.spec)?|verify-(?:npm-provenance|release)(?:\\.spec)?)\\.mjs|\\.markdownlint(?:-cli2)?\\.jsonc|spec/book\\.toml|\\.github/workflows/.+\\.ya?ml$|AGENTS\\.md$|spec-validator\\.config\\.mjs$)",
           chapters: ["spec/src/spec-governance.md"],
         },
         {
@@ -126,7 +133,8 @@ export default defineConfig(tableRequirements(), {
         },
       ],
       protected: [
-        "^(?:packages/[^/]+/src/|\\.storybook/|stories/catalog/|scripts/(?:check-spec-.+|check-catalog(?:\\.spec)?|check-package-boundaries(?:\\.spec)?|check-release-.+|create-github-releases(?:\\.spec)?|prepare-release|publish-release(?:\\.spec)?|release-manifest(?:\\.spec)?|release-plan(?:\\.spec)?|sync-release-versions(?:\\.spec)?|verify-(?:npm-provenance|release)(?:\\.spec)?)\\.mjs|\\.markdownlint-cli2\\.jsonc|spec/book\\.toml|\\.github/workflows/.+\\.ya?ml$|AGENTS\\.md$|spec-validator\\.config\\.mjs$|package\\.json$|pnpm-lock\\.yaml$|pnpm-workspace\\.yaml$|turbo\\.json$|tsconfig(?:\\.[^.]+)*\\.json$|playwright(?:\\.[^.]+)*\\.config\\.ts$)",
+        "^\\.markdownlint\\.json$",
+        "^(?:packages/[^/]+/src/|\\.storybook/|stories/catalog/|scripts/(?:check-spec-.+|check-catalog(?:\\.spec)?|check-package-boundaries(?:\\.spec)?|check-release-.+|create-github-releases(?:\\.spec)?|prepare-release|publish-release(?:\\.spec)?|release-manifest(?:\\.spec)?|release-plan(?:\\.spec)?|sync-release-versions(?:\\.spec)?|verify-(?:npm-provenance|release)(?:\\.spec)?)\\.mjs|\\.markdownlint(?:-cli2)?\\.jsonc|spec/book\\.toml|\\.github/workflows/.+\\.ya?ml$|AGENTS\\.md$|spec-validator\\.config\\.mjs$|package\\.json$|pnpm-lock\\.yaml$|pnpm-workspace\\.yaml$|turbo\\.json$|tsconfig(?:\\.[^.]+)*\\.json$|playwright(?:\\.[^.]+)*\\.config\\.ts$)",
       ],
     },
   },

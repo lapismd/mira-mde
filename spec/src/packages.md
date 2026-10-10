@@ -40,6 +40,11 @@ install internal CodeMirror, renderer, UI, or theme workspaces separately.
 | MIRA-ARCH-037 | The shipped `@lapismd/mira/preview` frontmatter component and stylesheet MUST expose the complete property type-and-action menu through Mira's portalled overlay boundary so property rows and consumer workspace viewports cannot clip it, without requiring a consumer override or alternate menu implementation.                                                                                                                                                                |
 | MIRA-ARCH-038 | The shipped `@lapismd/mira/preview` frontmatter text control MUST reconcile an externally synchronized controller value into an unfocused contenteditable element even after prior user editing, while preserving focused in-progress input.                                                                                                                                                                                                                                       |
 
+The exported preview and aggregate styles preserve CodeMirror cursor-buffer
+geometry when an editor is embedded beneath rendered Markdown. This shipped
+boundary excludes internal buffer images from authored-image styling; consumers
+do not need to repair checkbox layout through local CSS. See MIRA-CSS-042.
+
 ## Public graph
 
 | Package                        | Responsibility                                                                                    |
@@ -59,7 +64,16 @@ known-vulnerable Mermaid or DOMPurify releases. Workspace `pnpm audit` is part
 of root `check` and `check:all`; a public-range or lockfile change that
 reintroduces an advisory fails that gate. Audit overrides that pin `js-yaml`
 MUST keep 3.x consumers on patched 3.x and 4.x consumers on patched 4.x so
-Changesets can still version public packages.
+legacy consumers retain their APIs. The maintained Changesets 3 reader MUST
+discover all six public packages and parse the workspace through YAML 2.
+Mira's KaTeX development range and workspace renderer override MUST select
+`>=0.18.2 <0.19`, including the renderer nested under `rehype-katex`. Since
+0.18.11 was deprecated for accidental breaking changes, the reviewed workspace
+currently pins 0.18.10. Since `rehype-katex@7` still declares KaTeX 0.16,
+this override is repository-local;
+packed-consumer security acceptance MUST report that upstream range limitation
+separately from the workspace audit.
+
 Svelte remains a public peer range of `^5.0.0`; repository-owned Svelte
 `devDependencies` may move to a patched compiler range for audit validation
 without changing that public peer contract.
