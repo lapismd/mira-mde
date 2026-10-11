@@ -89,6 +89,11 @@ Mermaid, MUST declare a patched floor so packed consumers do not reintroduce
 the advisory. Override replacements MUST stay on the requested major line. An
 unbounded `js-yaml` 3.x replacement can resolve to 5.x and break Changesets'
 `read-yaml-file`, which still calls `safeLoad`.
+Audit-only refreshes of Svelte development ranges may update the private root
+and public package `devDependencies` together so repository checks resolve a
+single patched compiler graph. Those refreshes MUST leave public runtime peer
+ranges and workspace dependency direction unchanged unless the consumer contract
+itself changes.
 
 Root quality gates compose the specification, catalog, package, Storybook, and
 browser checks. In particular, `storybook:check` validates catalog metadata and

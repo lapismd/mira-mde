@@ -60,6 +60,9 @@ of root `check` and `check:all`; a public-range or lockfile change that
 reintroduces an advisory fails that gate. Audit overrides that pin `js-yaml`
 MUST keep 3.x consumers on patched 3.x and 4.x consumers on patched 4.x so
 Changesets can still version public packages.
+Svelte remains a public peer range of `^5.0.0`; repository-owned Svelte
+`devDependencies` may move to a patched compiler range for audit validation
+without changing that public peer contract.
 
 The Markdown action identifier is exported additively from Mira and re-exported
 by the editor, React, and Vanilla entry points. Their handles delegate to Mira's
