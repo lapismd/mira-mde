@@ -59,7 +59,6 @@ function main() {
 
   try {
     const tarballs = new Map();
-    const versions = {};
     for (const { directory } of PUBLIC_PACKAGE_GRAPH) {
       const packageDirectory = path.join(REPO_ROOT, "packages", directory);
       const before = new Set(readdirSync(tarballDirectory));
@@ -76,7 +75,6 @@ function main() {
         readFileSync(path.join(packageDirectory, "package.json"), "utf8"),
       );
       tarballs.set(manifest.name, path.join(tarballDirectory, filename));
-      versions[manifest.name] = manifest.version;
 
       const unpacked = path.join(temporaryRoot, "unpacked", directory);
       mkdirSync(unpacked, { recursive: true });
@@ -218,7 +216,7 @@ console.log("All public stylesheet imports resolve without hoisted dependencies.
       path.join(evidenceDirectory, "production-consumer-audit.json"),
       audit.stdout ?? "",
     );
-    console.log(checkPackedAudit(audit, versions));
+    console.log(checkPackedAudit(audit));
 
     console.log(
       "Mira tarballs validated: six packages installed together; Svelte, React, Vanilla, CSS, and leak checks passed.",

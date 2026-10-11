@@ -65,8 +65,9 @@ six tarballs as consumers see them, compiles adapter-specific fixtures, resolves
 CSS exports, and rejects legacy or internal imports in packed output.
 Its production audit retains complete JSON evidence and reports the explicit
 2026-10-11 KaTeX acceptance governed by MIRA-ARCH-039 and `packages.md`.
-Release-policy tests MUST reject unrelated findings, escalated severity,
-expired package versions, and failed or malformed audits.
+Release-policy tests MUST prove acceptance persists across package releases
+while rejecting unrelated findings, escalated severity, changed vulnerable
+ranges, muted findings, and failed or malformed audits.
 CI and release workflows MUST retain packed audit reports as downloadable
 artifacts, including when a reported finding fails the gate.
 
