@@ -79,6 +79,17 @@ packed-consumer security acceptance MUST report that upstream range limitation
 separately from the workspace audit.
 The packed fixture MUST run its own production dependency audit without renderer
 overrides; a workspace-only audit pass does not qualify registry publication.
+The user-approved 2026-10-11 exception MAY accept only low-severity
+[GHSA-238p-pmpm-9mq7](https://github.com/advisories/GHSA-238p-pmpm-9mq7)
+for KaTeX `>=0.11.0 <0.18.2` in Mira 0.0.3 and the five companion 0.0.2
+releases, including their 0.0.2/0.0.1 preparation manifests.
+Every packed package MUST remain within that version scope when the exception
+is used; different advisories, severity increases, audit command failures,
+malformed responses, or inconsistent counts MUST fail the gate.
+The full report MUST remain at `.release/production-consumer-audit.json`, and
+the gate MUST print any accepted exception; clean audits require no exception.
+Remove the policy when upstream math dependencies admit patched KaTeX; later
+versions MUST NOT inherit this acceptance.
 Public stylesheet imports MUST resolve from the packed manifests without relying
 on hoisted transitive dependencies or repository development dependencies.
 KaTeX CSS therefore belongs to Mira's declared runtime graph; the packed

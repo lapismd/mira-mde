@@ -84,3 +84,39 @@ cold browser suite passes all 49 tests. Package/release checks pass all 30 tests
 The first final spec-first attempt reported one missing mapped Markdown chapter;
 MIRA-MD-040 now records portal settlement alongside the catalog requirement.
 No timeout, assertion, audit severity, or visual baseline is weakened.
+
+## Accepted KaTeX release exception — 2026-10-11
+
+The user explicitly requested an exception for GHSA-238p-pmpm-9mq7 and an
+update to the release PRs. This accepts the low-severity risk that existing
+prototype pollution can bypass KaTeX trust restrictions; it does not repair
+KaTeX or assert that consumers are immune. Upstream rehype-katex and
+micromark-extension-math still admit KaTeX 0.16.x, and workspace overrides
+cannot travel to npm consumers.
+
+The exception covers only Mira 0.0.3 and the other five public packages 0.0.2,
+plus the corresponding preparation manifests (0.0.2 and 0.0.1).
+The packed gate preserves complete JSON evidence, prints the accepted GHSA,
+and rejects any different advisory, severity escalation, changed vulnerable
+range, invalid response, command failure, or version outside this scope.
+Normal workspace audit policy remains unchanged. Remove the exception once
+upstream ranges resolve patched KaTeX; subsequent releases require clean
+audits or fresh explicit acceptance.
+
+Before this policy, the exact `pnpm packages:pack` target failed on one unique
+low advisory after all functional package checks passed. The earlier blockers
+above remain historical evidence; this section records their explicit risk
+acceptance for the planned release.
+
+After acceptance, `pnpm packages:pack` passes with the GHSA printed and all
+public framework, CSS, and private-import checks retained. The first policy run
+rejected pnpm 10's valid report because it omits the optional `muted` field;
+the corrected parser accepts that shape and still rejects suppressed findings.
+All six focused policy tests and all 36 release tests pass. `pnpm check:all`
+passes with zero workspace findings and 418 unit tests; the cold browser rerun
+passes all 49 tests. Canonical checks and release-workflow validation pass.
+Audit evidence is retained as a CI/release artifact. Logs:
+`/tmp/mira-katex-exception-pack-final.log`,
+`/tmp/mira-katex-exception-check-all.log`,
+`/tmp/mira-katex-exception-browser.log`, and
+`/tmp/mira-katex-exception-release-tests-final.log`.

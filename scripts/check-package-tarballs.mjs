@@ -14,6 +14,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { PUBLIC_PACKAGE_GRAPH } from "./public-packages.mjs";
+import { checkPackedAudit } from "./packed-audit-policy.mjs";
 
 const REPO_ROOT = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -58,6 +59,7 @@ function main() {
 
   try {
     const tarballs = new Map();
+    const versions = {};
     for (const { directory } of PUBLIC_PACKAGE_GRAPH) {
       const packageDirectory = path.join(REPO_ROOT, "packages", directory);
       const before = new Set(readdirSync(tarballDirectory));
@@ -74,6 +76,7 @@ function main() {
         readFileSync(path.join(packageDirectory, "package.json"), "utf8"),
       );
       tarballs.set(manifest.name, path.join(tarballDirectory, filename));
+      versions[manifest.name] = manifest.version;
 
       const unpacked = path.join(temporaryRoot, "unpacked", directory);
       mkdirSync(unpacked, { recursive: true });
@@ -204,7 +207,18 @@ console.log("All public stylesheet imports resolve without hoisted dependencies.
     );
 
     console.log(run("node", ["styles.mjs"], fixtureRoot).trim());
-    run("pnpm", ["audit", "--prod"], fixtureRoot);
+    const audit = spawnSync("pnpm", ["audit", "--prod", "--json"], {
+      cwd: fixtureRoot,
+      encoding: "utf8",
+      timeout: 120_000,
+    });
+    const evidenceDirectory = path.join(REPO_ROOT, ".release");
+    mkdirSync(evidenceDirectory, { recursive: true });
+    writeFileSync(
+      path.join(evidenceDirectory, "production-consumer-audit.json"),
+      audit.stdout ?? "",
+    );
+    console.log(checkPackedAudit(audit, versions));
 
     console.log(
       "Mira tarballs validated: six packages installed together; Svelte, React, Vanilla, CSS, and leak checks passed.",

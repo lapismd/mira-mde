@@ -22,6 +22,11 @@ thin framework adapters.
 
 ## Package boundary
 
+Packed-consumer audit policy remains separate from the committed workspace
+audit under MIRA-ARCH-039. Only the recorded, version-scoped KaTeX exception in
+[Public packages](packages.md) MAY qualify an otherwise failing packed audit;
+normal workspace audits and dependency overrides remain unchanged.
+
 The six-package public graph separates installation products from implementation
 modules. `@lapismd/mira` owns the portable runtime and supported advanced
 subpaths; plugins, the default editor, and adapters depend only on those public

@@ -63,6 +63,12 @@ Apache-2.0 license metadata.
 `pnpm packages:pack` is the corresponding built-artifact gate. It installs the
 six tarballs as consumers see them, compiles adapter-specific fixtures, resolves
 CSS exports, and rejects legacy or internal imports in packed output.
+Its production audit retains complete JSON evidence and reports the explicit
+2026-10-11 KaTeX acceptance governed by MIRA-ARCH-039 and `packages.md`.
+Release-policy tests MUST reject unrelated findings, escalated severity,
+expired package versions, and failed or malformed audits.
+CI and release workflows MUST retain packed audit reports as downloadable
+artifacts, including when a reported finding fails the gate.
 
 Changesets owns release intent and version/changelog mutation. Pull requests
 that change a public product must carry either a version-bearing Changeset or an
