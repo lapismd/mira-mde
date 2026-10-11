@@ -40,6 +40,15 @@ install internal CodeMirror, renderer, UI, or theme workspaces separately.
 | MIRA-ARCH-037 | The shipped `@lapismd/mira/preview` frontmatter component and stylesheet MUST expose the complete property type-and-action menu through Mira's portalled overlay boundary so property rows and consumer workspace viewports cannot clip it, without requiring a consumer override or alternate menu implementation.                                                                                                                                                                |
 | MIRA-ARCH-038 | The shipped `@lapismd/mira/preview` frontmatter text control MUST reconcile an externally synchronized controller value into an unfocused contenteditable element even after prior user editing, while preserving focused in-progress input.                                                                                                                                                                                                                                       |
 
+The exported preview and aggregate styles preserve CodeMirror cursor-buffer
+geometry when an editor is embedded beneath rendered Markdown. This shipped
+boundary excludes internal buffer images from authored-image styling; consumers
+do not need to repair checkbox layout through local CSS. See MIRA-CSS-042.
+
+List selectors in the exported source stylesheet support Markdown surface and mode classes
+on the CodeMirror root, as used by directly composed API editors. List bullets
+and indentation retain the wrapped editor's styling without consumer overrides.
+
 ## Public graph
 
 | Package                        | Responsibility                                                                                    |
@@ -59,7 +68,37 @@ known-vulnerable Mermaid or DOMPurify releases. Workspace `pnpm audit` is part
 of root `check` and `check:all`; a public-range or lockfile change that
 reintroduces an advisory fails that gate. Audit overrides that pin `js-yaml`
 MUST keep 3.x consumers on patched 3.x and 4.x consumers on patched 4.x so
-Changesets can still version public packages.
+legacy consumers retain their APIs. The maintained Changesets 3 reader MUST
+discover all six public packages and parse the workspace through YAML 2.
+Mira's direct KaTeX runtime dependency and workspace renderer override MUST select
+`>=0.18.2 <0.19`, including the renderer nested under `rehype-katex`. Since
+0.18.11 was deprecated for accidental breaking changes, the reviewed workspace
+currently pins 0.18.10. Since `rehype-katex@7` still declares KaTeX 0.16,
+this override is repository-local;
+packed-consumer security acceptance MUST report that upstream range limitation
+separately from the workspace audit.
+The packed fixture MUST run its own production dependency audit without renderer
+overrides; a workspace-only audit pass does not qualify registry publication.
+The user-approved 2026-10-11 exception MAY accept only low-severity
+[GHSA-238p-pmpm-9mq7](https://github.com/advisories/GHSA-238p-pmpm-9mq7)
+for KaTeX `>=0.11.0 <0.18.2` in Mira 0.0.3 and the five companion 0.0.2
+releases, including their 0.0.2/0.0.1 preparation manifests.
+Every packed package MUST remain within that version scope when the exception
+is used; different advisories, severity increases, audit command failures,
+malformed responses, or inconsistent counts MUST fail the gate.
+The full report MUST remain at `.release/production-consumer-audit.json`, and
+the gate MUST print any accepted exception; clean audits require no exception.
+Remove the policy when upstream math dependencies admit patched KaTeX; later
+versions MUST NOT inherit this acceptance.
+Public stylesheet imports MUST resolve from the packed manifests without relying
+on hoisted transitive dependencies or repository development dependencies.
+KaTeX CSS therefore belongs to Mira's declared runtime graph; the packed
+fixture explicitly selects the isolated pnpm linker and disables hoisting
+regardless of the invoking workspace's package-manager configuration.
+
+Svelte remains a public peer range of `^5.0.0`; repository-owned Svelte
+`devDependencies` may move to a patched compiler range for audit validation
+without changing that public peer contract.
 
 The Markdown action identifier is exported additively from Mira and re-exported
 by the editor, React, and Vanilla entry points. Their handles delegate to Mira's

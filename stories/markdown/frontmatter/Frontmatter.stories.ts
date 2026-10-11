@@ -275,7 +275,7 @@ export const PropertyActions: Story = {
         name: "Property options for status",
       });
       await userEvent.click(statusTrigger);
-      const optionsMenu = page.getByRole("menu", {
+      const optionsMenu = await page.findByRole("menu", {
         name: "Property options for status",
       });
       const propertyType = within(optionsMenu).getByRole("menuitem", {
@@ -295,7 +295,7 @@ export const PropertyActions: Story = {
 
       propertyType.focus();
       await userEvent.keyboard("{ArrowRight}");
-      const typeMenu = page.getByRole("menu", {
+      const typeMenu = await page.findByRole("menu", {
         name: "Property type for status",
       });
       const numberType = within(typeMenu).getByRole("menuitemcheckbox", {

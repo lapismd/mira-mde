@@ -1,5 +1,11 @@
 # Specification Governance
 
+Release CLI fixtures resolve the repository's Git store explicitly, including
+Jujutsu workspaces, and use a commit ID as the base reference. They copy only
+package metadata and use a controlled Changeset in a disposable fixture, so the
+same reader test passes before and after versioning. They perform read-only Git
+queries; release planning must not depend on a local named base checkout.
+
 Specification changes precede or accompany protected implementation changes.
 The gate is intentionally package-aware: updating an unrelated chapter does not
 satisfy a plugin or package contract change.
@@ -57,6 +63,12 @@ Apache-2.0 license metadata.
 `pnpm packages:pack` is the corresponding built-artifact gate. It installs the
 six tarballs as consumers see them, compiles adapter-specific fixtures, resolves
 CSS exports, and rejects legacy or internal imports in packed output.
+Its production audit retains complete JSON evidence and reports the explicit
+2026-10-11 KaTeX acceptance governed by MIRA-ARCH-039 and `packages.md`.
+Release-policy tests MUST reject unrelated findings, escalated severity,
+expired package versions, and failed or malformed audits.
+CI and release workflows MUST retain packed audit reports as downloadable
+artifacts, including when a reported finding fails the gate.
 
 Changesets owns release intent and version/changelog mutation. Pull requests
 that change a public product must carry either a version-bearing Changeset or an
@@ -95,10 +107,12 @@ Storybook build, and focused browser acceptance. The release-workflow checker
 requires the explicit `pnpm audit` step in addition to `pnpm check:all`. On
 `main`, the Changesets action uses the GitHub API to maintain one Version
 Packages pull request without receiving npm credentials. Release tests invoke
-Changesets' `read-yaml-file` reader directly so pull-request checkouts without
+Changesets 3's Manypkg reader directly so pull-request checkouts without
 a local `main` still prove `pnpm-workspace.yaml` parses after `js-yaml` audit
-pins, which MUST stay on the requested major line so `safeLoad` remains
-available. Only a commit with no pending Changesets advances to artifact
+pins, which MUST stay on the requested major line. Both specification check
+and validation enforce the same Markdown rules with `markdownlint-cli`; the
+validator's supported structured check lane selects that runner without a
+package patch or replacement validator. Only a commit with no pending Changesets advances to artifact
 planning. Production publishing is the only workflow path that receives an npm
 credential, and that credential is short-lived OIDC scoped by the
 `npm-production` environment. It downloads the already verified artifact and

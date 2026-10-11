@@ -51,6 +51,8 @@ customization and Obsidian-compatible aliases retained as a compatibility layer.
 | MIRA-CSS-040 | Rendered live-preview and reading table cells MUST wrap using `--table-white-space` and MUST NOT introduce a widget-shell or per-cell scrollbar or overflow. Nested cell editors MUST constrain their content to the cell width. Raw source and revealed pipe-table rows MUST keep their non-wrapping `white-space: pre` contract and scroll horizontally on the `.cm-line.cm-table` itself, hiding scrollbar chrome, keeping consecutive rows of the same table aligned, and without scrolling the editor content. |
 | MIRA-CSS-041 | An open frontmatter property type menu MUST escape property-row and consumer-viewport clipping through the overlay portal and remain visually exposed and hit-testable. Closed rows MUST retain their normal overflow containment. |
 
+| MIRA-CSS-042 | Generic Markdown image styling MUST exclude CodeMirror's internal `cm-widgetBuffer` images, including editors nested beneath rendered Markdown. Cursor buffers MUST retain CodeMirror's zero-width inline geometry without Markdown image borders, while authored Markdown images retain their existing block sizing and borders. |
+
 Stylesheet order remains theme, UI, preview, Svelte/Mira Editor, and framework
 wrapper composition as documented by the package entrypoints.
 
@@ -139,6 +141,11 @@ active in live preview, its authored quote markers become visible and nested
 marker pseudo-borders become transparent; every editable child row's line-owned
 outer border MUST align with the rendered parent block border without a
 duplicate, displaced guide beside a first-depth prefix.
+
+The shipped list selectors MUST accept both a Markdown wrapper around
+CodeMirror and Markdown classes on the CodeMirror root. List marker slots,
+hanging indentation, guides, and bullet paint use the same tokens in both
+mount shapes; consumers MUST NOT need a wrapper solely to activate those rules.
 
 The default toolbar About dialog inherits the editor's portaled appearance
 tokens. Its combined light/dark logo keeps explicit intrinsic dimensions to

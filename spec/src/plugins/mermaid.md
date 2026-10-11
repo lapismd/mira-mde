@@ -29,3 +29,6 @@ so the packed pre-1.0 range remains compatible without accepting unrelated minor
 releases. Its package manifest points at the canonical public repository
 `lapismd/mira-mde` with package-specific `repository.directory` metadata so npm
 and provenance links resolve to the owning monorepo path.
+Its Svelte development dependency may track the workspace's patched compiler
+range for audit validation only; the plugin's public Mermaid, Mira, and Svelte
+consumer contracts remain governed by the published dependency and peer ranges.

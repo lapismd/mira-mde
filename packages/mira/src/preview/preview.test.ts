@@ -4,6 +4,8 @@ import rehypeRaw from "rehype-raw";
 import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import remarkEmoji from "remark-emoji";
 import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
 import {
   TYPE_TABLE,
   mdast2hastGridTablesHandler,
@@ -16,6 +18,37 @@ import { findElement } from "./test-utils";
 describe("preview exports", () => {
   it("exports built-in remark plugins", () => {
     expect(typeof remarkWikiLinks).toBe("function");
+  });
+});
+
+describe("patched math renderer", () => {
+  it("renders inline and display math through the preview pipeline", () => {
+    const parser = createParser([remarkMath], [rehypeKatex]);
+    const ast = parser("Inline $x^2$.\n\n$$\nx^2 + y^2 = z^2\n$$") as Root;
+    const rendered = JSON.stringify(ast);
+    expect(rendered).toContain("katex-mathml");
+    expect(rendered).toContain("katex-display");
+    expect(findElement(ast, "math")).toBeDefined();
+  });
+
+  it("does not inherit polluted trust options when rendering authored math", () => {
+    const descriptor = Object.getOwnPropertyDescriptor(
+      Object.prototype,
+      "trust",
+    );
+    try {
+      Object.defineProperty(Object.prototype, "trust", {
+        value: true,
+        configurable: true,
+      });
+      const parser = createParser([remarkMath], [rehypeKatex]);
+      const ast = parser("$\\href{https://example.com}{untrusted}$") as Root;
+      expect(findElement(ast, "a")).toBeUndefined();
+    } finally {
+      if (descriptor)
+        Object.defineProperty(Object.prototype, "trust", descriptor);
+      else Reflect.deleteProperty(Object.prototype, "trust");
+    }
   });
 });
 

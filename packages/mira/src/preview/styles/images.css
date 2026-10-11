@@ -2,13 +2,15 @@
    reading column, while preserving aspect ratio. Applies to both the
    dedicated image component and any raw <img> rendered through markdown
    (e.g. via rehype-raw HTML). Link-preview card thumbnails opt out since
-   they already have their own, smaller sizing tuned for hover tooltips. */
+   they already have their own, smaller sizing tuned for hover tooltips.
+   CodeMirror cursor-buffer images must retain their zero-width inline layout
+   when an editor is nested inside rendered Markdown. */
 :is(
     .markdown-rendered,
     .markdown-preview-surface .markdown,
     .markdown-widget-shell
   )
-  img:not(.mira-link-preview__asset),
+  img:not(.mira-link-preview__asset, .cm-widgetBuffer),
 .mira-markdown-image {
   border: 1px solid var(--mira-border);
   border-radius: var(--radius-s, 4px);

@@ -14,6 +14,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { PUBLIC_PACKAGE_GRAPH } from "./public-packages.mjs";
+import { checkPackedAudit } from "./packed-audit-policy.mjs";
 
 const REPO_ROOT = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -58,6 +59,7 @@ function main() {
 
   try {
     const tarballs = new Map();
+    const versions = {};
     for (const { directory } of PUBLIC_PACKAGE_GRAPH) {
       const packageDirectory = path.join(REPO_ROOT, "packages", directory);
       const before = new Set(readdirSync(tarballDirectory));
@@ -74,6 +76,7 @@ function main() {
         readFileSync(path.join(packageDirectory, "package.json"), "utf8"),
       );
       tarballs.set(manifest.name, path.join(tarballDirectory, filename));
+      versions[manifest.name] = manifest.version;
 
       const unpacked = path.join(temporaryRoot, "unpacked", directory);
       mkdirSync(unpacked, { recursive: true });
@@ -93,6 +96,16 @@ function main() {
 
     const fixtureRoot = path.join(temporaryRoot, "fixture");
     mkdirSync(fixtureRoot, { recursive: true });
+    writeFileSync(
+      path.join(fixtureRoot, ".npmrc"),
+      "node-linker=isolated\nhoist=false\n",
+    );
+    // Keep all public-package references on these archives, including peers.
+    writeJson(path.join(fixtureRoot, "pnpm-workspace.yaml"), {
+      overrides: Object.fromEntries(
+        [...tarballs].map(([name, tarball]) => [name, `file:${tarball}`]),
+      ),
+    });
     writeJson(path.join(fixtureRoot, "package.json"), {
       name: "mira-package-smoke",
       private: true,
@@ -107,11 +120,6 @@ function main() {
         "react-dom": "^19.0.0",
         svelte: "^5.46.1",
         typescript: "^5.9.3",
-      },
-      pnpm: {
-        overrides: Object.fromEntries(
-          [...tarballs].map(([name, tarball]) => [name, `file:${tarball}`]),
-        ),
       },
     });
 
@@ -135,6 +143,26 @@ void [createMira, createMiraEditor];
     for (const [filename, source] of Object.entries(fixtures)) {
       writeFileSync(path.join(fixtureRoot, filename), source);
     }
+    writeFileSync(
+      path.join(fixtureRoot, "styles.mjs"),
+      String.raw`import { readFileSync } from "node:fs";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const visited = new Set();
+function check(file) {
+  if (visited.has(file)) return;
+  visited.add(file);
+  const resolve = createRequire(file).resolve;
+  for (const match of readFileSync(file, "utf8").matchAll(/@import\s+["']([^"']+)["']/g)) {
+    check(resolve(match[1]));
+  }
+}
+for (const name of ["@lapismd/mira", "@lapismd/mira-editor", "@lapismd/mira-react"]) {
+  check(require.resolve(name + "/styles.css"));
+}
+console.log("All public stylesheet imports resolve without hoisted dependencies.");
+`,
+    );
     writeJson(path.join(fixtureRoot, "tsconfig.json"), {
       compilerOptions: {
         jsx: "react-jsx",
@@ -155,6 +183,8 @@ void [createMira, createMiraEditor];
         "--prefer-offline",
         "--ignore-scripts",
         "--no-frozen-lockfile",
+        "--config.node-linker=isolated",
+        "--config.hoist=false",
       ],
       fixtureRoot,
     );
@@ -175,6 +205,20 @@ void [createMira, createMiraEditor];
       ],
       fixtureRoot,
     );
+
+    console.log(run("node", ["styles.mjs"], fixtureRoot).trim());
+    const audit = spawnSync("pnpm", ["audit", "--prod", "--json"], {
+      cwd: fixtureRoot,
+      encoding: "utf8",
+      timeout: 120_000,
+    });
+    const evidenceDirectory = path.join(REPO_ROOT, ".release");
+    mkdirSync(evidenceDirectory, { recursive: true });
+    writeFileSync(
+      path.join(evidenceDirectory, "production-consumer-audit.json"),
+      audit.stdout ?? "",
+    );
+    console.log(checkPackedAudit(audit, versions));
 
     console.log(
       "Mira tarballs validated: six packages installed together; Svelte, React, Vanilla, CSS, and leak checks passed.",

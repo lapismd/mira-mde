@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/svelte-vite";
-import { expect, userEvent, within } from "storybook/test";
+import { expect, userEvent, waitFor, within } from "storybook/test";
 import EditorModeStory from "../_shared/EditorModeStory.svelte";
+import EmbeddedTaskEditorStory from "./EmbeddedTaskEditorStory.svelte";
 import MarkdownPreviewStory from "../_shared/MarkdownPreviewStory.svelte";
 import {
   markdownEditorDocsSource,
@@ -143,5 +144,47 @@ export const SourceMode: Story = {
         code: markdownEditorDocsSource("taskStatesMarkdown", "source"),
       },
     },
+  },
+};
+
+export const EmbeddedLivePreview: Story = {
+  tags: ["visual-pending"],
+  render: () => ({ Component: EmbeddedTaskEditorStory }),
+  play: async ({ canvasElement }) => {
+    await waitFor(() => {
+      const lines =
+        canvasElement.querySelectorAll<HTMLElement>(".cm-task-line");
+      expect(lines).toHaveLength(2);
+      for (const line of lines) {
+        const checkbox = line.querySelector<HTMLInputElement>(
+          "input[type=checkbox]",
+        )!;
+        const label = line.querySelector<HTMLElement>(".cm-list-1")!;
+        const checkboxRect = checkbox.getBoundingClientRect();
+        const labelRect = label.getClientRects()[0];
+        expect(labelRect.top).toBeLessThan(checkboxRect.bottom);
+        expect(labelRect.bottom).toBeGreaterThan(checkboxRect.top);
+        expect(labelRect.left).toBeGreaterThanOrEqual(checkboxRect.right);
+        const buffers = line.querySelectorAll<HTMLImageElement>(
+          "img.cm-widgetBuffer",
+        );
+        expect(buffers.length).toBeGreaterThan(0);
+        for (const buffer of buffers) {
+          expect(getComputedStyle(buffer).display).toBe("inline");
+          expect(buffer.getBoundingClientRect().width).toBe(0);
+          expect(getComputedStyle(buffer).borderTopWidth).toBe("0px");
+        }
+      }
+    });
+    const image = within(canvasElement).getByRole("img", {
+      name: "Gray square",
+    });
+    expect(getComputedStyle(image).display).toBe("block");
+    expect(getComputedStyle(image).borderTopWidth).toBe("1px");
+    const checkbox = within(canvasElement).getAllByRole("checkbox", {
+      name: "Toggle task",
+    })[0];
+    await userEvent.click(checkbox);
+    await expect(checkbox).toBeChecked();
   },
 };

@@ -5,6 +5,10 @@ its application runtime. The `@lapismd/mira` package that ships that contract is
 licensed Apache-2.0. The renderer and editor surfaces share syntax, resolvers,
 extension contributions, source fallback, and shipped plain CSS.
 
+For MIRA-MD-005, a live-preview editor nested inside rendered Markdown MUST
+retain inline checkbox/label geometry. CodeMirror's invisible cursor buffers
+MUST remain inline and zero-width rather than adopting authored image styling.
+
 ## Requirements
 
 | ID          | Requirement                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
@@ -49,7 +53,7 @@ extension contributions, source fallback, and shipped plain CSS.
 | MIRA-MD-037 | `FrontmatterConfig` MAY supply `valueSuggestions(key, query)`. Tags, aliases, and multitext pill inputs MUST offer those values as autocomplete. When Markdown context is absent, `FrontmatterEditor` MAY accept a `fileAdapter` and MUST install a minimal context so wikilink pills resolve through the portable Link. |
 | MIRA-MD-038 | Loading Mira's portable Markdown and UI styles MUST NOT change the paint of consumer-owned portaled tooltips. Mira tooltip declarations MUST require a Mira-owned overlay marker in addition to the shared `data-slot="tooltip-content"` hook. |
 | MIRA-MD-039 | Live-preview hidden formatting MUST hide Markdown delimiter tokens only. Ordinary parentheses in prose and headings MUST remain visible. A bare `)` MUST NOT receive `cm-formatting-hidden`. Real link, image, and wikilink closers MUST remain hidden until the caret intersects that construct. |
-| MIRA-MD-040 | Activating a rendered frontmatter property type control MUST expose its complete type-and-action menu in a portalled overlay. Choosing a type MUST update the property through the existing controller and close the menu. |
+| MIRA-MD-040 | Activating a rendered frontmatter property type control MUST expose its complete type-and-action menu in a portalled overlay. Choosing a type MUST update the property through the existing controller and close the menu. Interaction acceptance MUST observe accessible portal settlement after activation before checking menu state and geometry. |
 | MIRA-MD-041 | An unfocused frontmatter text property MUST reconcile its contenteditable DOM text when the controller receives a later record revision, including after the user previously edited that control. A focused control MUST retain its in-progress text until focus leaves so an external revision does not overwrite active input. |
 
 ## Lapis reference boundary
@@ -66,6 +70,11 @@ adapters.
 The action engine owns Markdown interpretation and transaction construction.
 Framework toolbars provide action identifiers only; they do not recreate
 delimiter, selection, block-prefix, or list-normalization rules.
+
+The `@lapismd/mira` package may align its Svelte development dependency with
+the private root's patched compiler range for repository audit checks, but its
+public Svelte peer range and Markdown runtime contracts remain unchanged by
+that validation-only refresh.
 
 Seeded doodle dividers use the authored pair
 `<!-- mira-divider:v1:xxxxxxxx -->` followed immediately by a thematic break.
@@ -115,6 +124,11 @@ the complete wrapped line box rather than on an inline prefix segment. Live
 preview applies Lapis's styled unordered-marker hook away from the caret, so
 dash, asterisk, and plus source markers share the reading surface's bullet
 presentation without losing raw-prefix editing.
+
+For MIRA-MD-007, that list presentation MUST also work when a consumer mounts
+the public CodeMirror stack directly and places the Markdown surface and mode
+classes on the editor itself. Inactive dash, asterisk, and plus markers paint
+bullets; placing the caret inside a marker reveals its authored source.
 
 Callout and task-state rendering consumes public RGB-channel tokens inside
 `rgb()` and `rgba()` declarations. Those tokens therefore remain raw channel

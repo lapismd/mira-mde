@@ -56,7 +56,9 @@ user-visible interactions; browser-sensitive geometry and native browser APIs
 remain in focused Playwright acceptance against Storybook iframes. That
 acceptance covers scroll ownership and synchronization, pointer drag/drop,
 table mutation and source reveal, native clipboard behavior, and Mermaid SVG
-and portal settlement. Story-only icon dependencies and the preview palette
+and portal settlement. Frontmatter menu acceptance MUST await the accessible
+portalled menu after click or keyboard activation before checking its items,
+geometry, focus, and property mutation. Story-only icon dependencies and the preview palette
 addon are prebundled so a clean browser run cannot invalidate story modules
 with a mid-suite Vite reload.
 

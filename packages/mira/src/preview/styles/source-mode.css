@@ -1,4 +1,4 @@
-.markdown-editor-surface .cm-editor {
+:is(.markdown-editor-surface .cm-editor, .cm-editor.markdown-editor-surface) {
   cursor: text;
   font-family: var(--font-sans);
   font-size: var(--font-text-size);
@@ -37,25 +37,34 @@
   width: 0;
 }
 
-.markdown-editor-surface .cm-editor .cm-formatting-list-ul,
-.markdown-editor-surface .cm-editor .cm-formatting-list-ol {
+:is(.markdown-editor-surface .cm-editor, .cm-editor.markdown-editor-surface)
+  .cm-formatting-list-ul,
+:is(.markdown-editor-surface .cm-editor, .cm-editor.markdown-editor-surface)
+  .cm-formatting-list-ol {
   font-variant-numeric: tabular-nums;
   padding-inline-start: 0;
 }
 
-.markdown-editor-surface .cm-editor .cm-formatting-task {
+:is(.markdown-editor-surface .cm-editor, .cm-editor.markdown-editor-surface)
+  .cm-formatting-task {
   color: var(--markdown-code-comment);
 }
 
-.markdown-live-preview-mode .cm-editor .cm-formatting-list-ul:not(.cm-line) {
+:is(
+    .markdown-live-preview-mode .cm-editor,
+    .cm-editor.markdown-live-preview-mode
+  )
+  .cm-formatting-list-ul:not(.cm-line) {
   box-sizing: border-box;
   display: inline-block;
   inline-size: var(--hmd-unordered-list-marker-slot-width);
   padding-inline-start: var(--hmd-unordered-list-marker-padding-inline-start);
 }
 
-.markdown-live-preview-mode
-  .cm-editor
+:is(
+    .markdown-live-preview-mode .cm-editor,
+    .cm-editor.markdown-live-preview-mode
+  )
   .cm-formatting-list-bullet
   > span.cm-meta {
   color: transparent;
@@ -63,8 +72,10 @@
   position: relative;
 }
 
-.markdown-live-preview-mode
-  .cm-editor
+:is(
+    .markdown-live-preview-mode .cm-editor,
+    .cm-editor.markdown-live-preview-mode
+  )
   .cm-formatting-list-bullet
   > span.cm-meta::after {
   background-color: var(--list-marker-color);
@@ -82,13 +93,17 @@
   width: var(--list-bullet-size);
 }
 
-.markdown-live-preview-mode
-  .cm-editor
+:is(
+    .markdown-live-preview-mode .cm-editor,
+    .cm-editor.markdown-live-preview-mode
+  )
   .cm-line:hover
   .cm-formatting-list-bullet
   > span.cm-meta::after,
-.markdown-live-preview-mode
-  .cm-editor
+:is(
+    .markdown-live-preview-mode .cm-editor,
+    .cm-editor.markdown-live-preview-mode
+  )
   .cm-activeLine
   .cm-formatting-list-bullet
   > span.cm-meta::after {
@@ -96,11 +111,13 @@
   box-shadow: 0 0 0 4px var(--background-modifier-hover);
 }
 
-.markdown-editor-surface .cm-editor .HyperMD-list-line {
+:is(.markdown-editor-surface .cm-editor, .cm-editor.markdown-editor-surface)
+  .HyperMD-list-line {
   white-space: pre-wrap;
 }
 
-.markdown-editor-surface .cm-editor .indented-wrapped-line {
+:is(.markdown-editor-surface .cm-editor, .cm-editor.markdown-editor-surface)
+  .indented-wrapped-line {
   padding-inline-start: var(
     --hmd-indent-padding-measured,
     var(--hmd-indent-padding-fallback, 0px)
@@ -111,8 +128,7 @@
   );
 }
 
-.markdown-editor-surface
-  .cm-editor
+:is(.markdown-editor-surface .cm-editor, .cm-editor.markdown-editor-surface)
   .indented-wrapped-line:has(.cm-hmd-list-indent) {
   text-indent: calc(
     0px -
@@ -126,40 +142,54 @@
   );
 }
 
-.markdown-editor-surface .cm-editor .cm-line > * {
+:is(.markdown-editor-surface .cm-editor, .cm-editor.markdown-editor-surface)
+  .cm-line
+  > * {
   text-indent: 0;
 }
 
-.markdown-editor-surface .cm-editor .cm-hmd-list-indent {
+:is(.markdown-editor-surface .cm-editor, .cm-editor.markdown-editor-surface)
+  .cm-hmd-list-indent {
   display: inline-block;
   white-space: pre;
 }
 
-.markdown-editor-surface .cm-editor .cm-indent-guide {
+:is(.markdown-editor-surface .cm-editor, .cm-editor.markdown-editor-surface)
+  .cm-indent-guide {
   min-width: var(--list-indent);
 }
 
-.markdown-editor-surface .cm-editor .cm-plain-indent-line,
-.markdown-editor-surface .cm-editor .cm-plain-indent-widget {
+:is(.markdown-editor-surface .cm-editor, .cm-editor.markdown-editor-surface)
+  .cm-plain-indent-line,
+:is(.markdown-editor-surface .cm-editor, .cm-editor.markdown-editor-surface)
+  .cm-plain-indent-widget {
   position: relative;
 }
 
-.markdown-editor-surface .cm-editor .cm-hmd-list-indent .cm-indent,
-.markdown-editor-surface .cm-editor .cm-plain-indent-widget .cm-indent {
+:is(.markdown-editor-surface .cm-editor, .cm-editor.markdown-editor-surface)
+  .cm-hmd-list-indent
+  .cm-indent,
+:is(.markdown-editor-surface .cm-editor, .cm-editor.markdown-editor-surface)
+  .cm-plain-indent-widget
+  .cm-indent {
   color: transparent;
   display: inline-block;
   position: relative;
   white-space: pre;
 }
 
-.markdown-editor-surface
-  .cm-editor.cm-show-indentation-guides
+:is(
+    .markdown-editor-surface .cm-editor.cm-show-indentation-guides,
+    .cm-editor.markdown-editor-surface.cm-show-indentation-guides
+  )
   .indented-wrapped-line {
   position: relative;
 }
 
-.markdown-editor-surface
-  .cm-editor.cm-show-indentation-guides
+:is(
+    .markdown-editor-surface .cm-editor.cm-show-indentation-guides,
+    .cm-editor.markdown-editor-surface.cm-show-indentation-guides
+  )
   .indented-wrapped-line::before {
   background-image: repeating-linear-gradient(
     to right,
@@ -181,8 +211,10 @@
   width: calc(var(--indent-guide-count, 0) * var(--indent-size, 4) * 1ch);
 }
 
-.markdown-editor-surface
-  .cm-editor.cm-show-indentation-guides
+:is(
+    .markdown-editor-surface .cm-editor.cm-show-indentation-guides,
+    .cm-editor.markdown-editor-surface.cm-show-indentation-guides
+  )
   .cm-activeLine.indented-wrapped-line::before {
   background-image: repeating-linear-gradient(
     to right,
@@ -208,12 +240,16 @@
   );
 }
 
-.markdown-editor-surface
-  .cm-editor.cm-show-indentation-guides
+:is(
+    .markdown-editor-surface .cm-editor.cm-show-indentation-guides,
+    .cm-editor.markdown-editor-surface.cm-show-indentation-guides
+  )
   .cm-hmd-list-indent
   .cm-indent-guide::before,
-.markdown-editor-surface
-  .cm-editor.cm-show-indentation-guides
+:is(
+    .markdown-editor-surface .cm-editor.cm-show-indentation-guides,
+    .cm-editor.markdown-editor-surface.cm-show-indentation-guides
+  )
   .cm-plain-indent-widget
   .cm-indent-guide::before {
   display: none;

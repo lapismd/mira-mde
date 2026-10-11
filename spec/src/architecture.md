@@ -22,6 +22,11 @@ thin framework adapters.
 
 ## Package boundary
 
+Packed-consumer audit policy remains separate from the committed workspace
+audit under MIRA-ARCH-039. Only the recorded, version-scoped KaTeX exception in
+[Public packages](packages.md) MAY qualify an otherwise failing packed audit;
+normal workspace audits and dependency overrides remain unchanged.
+
 The six-package public graph separates installation products from implementation
 modules. `@lapismd/mira` owns the portable runtime and supported advanced
 subpaths; plugins, the default editor, and adapters depend only on those public
@@ -87,8 +92,33 @@ change cannot land with a known-vulnerable graph. Workspace overrides pin
 transitive patches; public package ranges that ship those dependencies, such as
 Mermaid, MUST declare a patched floor so packed consumers do not reintroduce
 the advisory. Override replacements MUST stay on the requested major line. An
-unbounded `js-yaml` 3.x replacement can resolve to 5.x and break Changesets'
-`read-yaml-file`, which still calls `safeLoad`.
+unbounded `js-yaml` 3.x replacement can resolve to 5.x and break legacy
+`safeLoad` consumers. Changesets 3 uses the maintained Manypkg workspace reader
+with the maintained YAML 2 parser; acceptance MUST discover the real public package graph and
+produce a release plan from an explicit Git commit without requiring a local
+`main` branch, including in a Jujutsu workspace with a shared Git store. The toolchain
+upgrade MUST remove vulnerable `braces` and `sprintf-js` paths rather than
+ignoring their unpatched advisories. Markdown tooling and renderer overrides
+MUST select patched devalue, brace-expansion, DOMPurify, js-yaml 5,
+markdown-it, smol-toml, source-map-js, and KaTeX releases.
+Exported stylesheet dependencies belong to the owning public package's runtime
+manifest, with an isolated packed fixture checking their resolution.
+The private root's Node range MUST match Changesets 3's supported Node versions
+(`^22.11 || ^24 || >=26`); public runtime package ranges remain independent.
+Markdown linting MUST use the maintained `markdownlint-cli` runner and the same
+rule settings and authored-document globs. The specification validator's public
+structured check lane MUST enforce that command; `spec:validate` MUST also run
+it so changing runners does not remove lint enforcement.
+
+Audit-only refreshes of Svelte development ranges may update the private root
+and public package `devDependencies` together so repository checks resolve a
+single patched compiler graph. Those refreshes MUST leave public runtime peer
+ranges and workspace dependency direction unchanged unless the consumer contract
+itself changes.
+
+The workspace consumes the published Spec Validator through `^0.1.4` so merge
+checks use its current Jujutsu range handling and optional search dependency
+contract.
 
 Root quality gates compose the specification, catalog, package, Storybook, and
 browser checks. In particular, `storybook:check` validates catalog metadata and
