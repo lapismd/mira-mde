@@ -93,6 +93,7 @@ function main() {
 
     const fixtureRoot = path.join(temporaryRoot, "fixture");
     mkdirSync(fixtureRoot, { recursive: true });
+    writeFileSync(path.join(fixtureRoot, ".npmrc"), "hoist=false\n");
     writeJson(path.join(fixtureRoot, "package.json"), {
       name: "mira-package-smoke",
       private: true,
@@ -135,6 +136,26 @@ void [createMira, createMiraEditor];
     for (const [filename, source] of Object.entries(fixtures)) {
       writeFileSync(path.join(fixtureRoot, filename), source);
     }
+    writeFileSync(
+      path.join(fixtureRoot, "styles.mjs"),
+      String.raw`import { readFileSync } from "node:fs";
+import { createRequire } from "node:module";
+const require = createRequire(import.meta.url);
+const visited = new Set();
+function check(file) {
+  if (visited.has(file)) return;
+  visited.add(file);
+  const resolve = createRequire(file).resolve;
+  for (const match of readFileSync(file, "utf8").matchAll(/@import\s+["']([^"']+)["']/g)) {
+    check(resolve(match[1]));
+  }
+}
+for (const name of ["@lapismd/mira", "@lapismd/mira-editor", "@lapismd/mira-react"]) {
+  check(require.resolve(name + "/styles.css"));
+}
+console.log("All public stylesheet imports resolve without hoisted dependencies.");
+`,
+    );
     writeJson(path.join(fixtureRoot, "tsconfig.json"), {
       compilerOptions: {
         jsx: "react-jsx",
@@ -175,6 +196,9 @@ void [createMira, createMiraEditor];
       ],
       fixtureRoot,
     );
+
+    console.log(run("node", ["styles.mjs"], fixtureRoot).trim());
+    run("pnpm", ["audit", "--prod"], fixtureRoot);
 
     console.log(
       "Mira tarballs validated: six packages installed together; Svelte, React, Vanilla, CSS, and leak checks passed.",

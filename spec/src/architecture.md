@@ -90,7 +90,8 @@ the advisory. Override replacements MUST stay on the requested major line. An
 unbounded `js-yaml` 3.x replacement can resolve to 5.x and break legacy
 `safeLoad` consumers. Changesets 3 uses the maintained Manypkg workspace reader
 with the maintained YAML 2 parser; acceptance MUST discover the real public package graph and
-produce a release plan without requiring a local `main` branch. The toolchain
+produce a release plan from an explicit Git commit without requiring a local
+`main` branch, including in a Jujutsu workspace with a shared Git store. The toolchain
 upgrade MUST remove vulnerable `braces` and `sprintf-js` paths rather than
 ignoring their unpatched advisories. Markdown tooling and renderer overrides
 MUST select patched devalue, brace-expansion, DOMPurify, js-yaml 5,
@@ -107,6 +108,10 @@ and public package `devDependencies` together so repository checks resolve a
 single patched compiler graph. Those refreshes MUST leave public runtime peer
 ranges and workspace dependency direction unchanged unless the consumer contract
 itself changes.
+
+The workspace consumes the published Spec Validator through `^0.1.4` so merge
+checks use its current Jujutsu range handling and optional search dependency
+contract.
 
 Root quality gates compose the specification, catalog, package, Storybook, and
 browser checks. In particular, `storybook:check` validates catalog metadata and

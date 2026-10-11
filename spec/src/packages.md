@@ -77,6 +77,10 @@ currently pins 0.18.10. Since `rehype-katex@7` still declares KaTeX 0.16,
 this override is repository-local;
 packed-consumer security acceptance MUST report that upstream range limitation
 separately from the workspace audit.
+The packed fixture MUST run its own production dependency audit without renderer
+overrides; a workspace-only audit pass does not qualify registry publication.
+Public stylesheet imports MUST resolve from the packed manifests without relying
+on hoisted transitive dependencies or repository development dependencies.
 
 Svelte remains a public peer range of `^5.0.0`; repository-owned Svelte
 `devDependencies` may move to a patched compiler range for audit validation

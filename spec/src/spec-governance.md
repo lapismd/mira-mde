@@ -1,5 +1,11 @@
 # Specification Governance
 
+Release CLI fixtures resolve the repository's Git store explicitly, including
+Jujutsu workspaces, and use a commit ID as the base reference. They copy only
+package metadata and use a controlled Changeset in a disposable fixture, so the
+same reader test passes before and after versioning. They perform read-only Git
+queries; release planning must not depend on a local named base checkout.
+
 Specification changes precede or accompany protected implementation changes.
 The gate is intentionally package-aware: updating an unrelated chapter does not
 satisfy a plugin or package contract change.
