@@ -1,6 +1,6 @@
 {
   "name": "@lapismd/mira-editor",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Batteries-included Svelte Markdown editor, toolbar, features, and default styling for Mira.",
   "author": "Steve Juma <help@lapis.md>",
   "license": "Apache-2.0",

@@ -1,5 +1,24 @@
 # @lapismd/mira
 
+## 0.0.3
+
+### Patch Changes
+
+- [#3](https://github.com/lapismd/mira-mde/pull/3) [`31e2502`](https://github.com/lapismd/mira-mde/commit/31e2502e185f883390165851e146a3823c6b9274) Thanks [@stevejuma](https://github.com/stevejuma)! - Relicense the public Mira packages to Apache 2.0.
+
+- [#7](https://github.com/lapismd/mira-mde/pull/7) [`215a690`](https://github.com/lapismd/mira-mde/commit/215a6906130dbcf06f0a649e8a76074c6e24612f) Thanks [@stevejuma](https://github.com/stevejuma)! - Render list bullets, hanging indentation, and indentation guides when a consumer
+  mounts a Markdown editor directly on CodeMirror's root. Wrapped editors retain
+  the same marker geometry and caret behavior.
+
+- [#7](https://github.com/lapismd/mira-mde/pull/7) [`215a690`](https://github.com/lapismd/mira-mde/commit/215a6906130dbcf06f0a649e8a76074c6e24612f) Thanks [@stevejuma](https://github.com/stevejuma)! - Preserve inline checkbox labels in live-preview editors embedded inside rendered
+  Markdown by excluding CodeMirror cursor-buffer images from Markdown image styles.
+
+  Refresh the repository's renderer and release-tool dependencies to patched
+  versions, retaining math rendering and trust restrictions in regression coverage.
+
+- [#7](https://github.com/lapismd/mira-mde/pull/7) [`215a690`](https://github.com/lapismd/mira-mde/commit/215a6906130dbcf06f0a649e8a76074c6e24612f) Thanks [@stevejuma](https://github.com/stevejuma)! - Declare the reviewed KaTeX stylesheet package as a runtime dependency so public
+  Mira, editor, and React CSS resolves in isolated package-manager installations.
+
 ## 0.0.2
 
 ### Patch Changes

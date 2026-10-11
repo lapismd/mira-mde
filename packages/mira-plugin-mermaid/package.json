@@ -1,6 +1,6 @@
 {
   "name": "@lapismd/mira-plugin-mermaid",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Mermaid language, preview, and diagram controls for Mira.",
   "author": "Steve Juma <help@lapis.md>",
   "license": "Apache-2.0",
