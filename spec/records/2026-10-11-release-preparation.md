@@ -47,3 +47,40 @@ Representative logs: `/tmp/mira-release-check-all.log`,
 `/tmp/mira-release-pack-final.log`. Remote PRs can review this preparation;
 merging for publication requires the dependency blocker to be resolved or
 explicitly accepted. No npm publication has occurred.
+
+## Isolated stylesheet regression and final qualification
+
+Draft PR #7's first Linux package job found one missing `katex/dist/katex.css`
+import. Explicitly selecting the isolated pnpm linker locally reproduced that
+exact failure once; the earlier local fixture inherited a hoisted linker even
+with hoisting disabled. KaTeX 0.18.10 moves from Mira's development graph into
+its runtime manifest. This supplies the public stylesheet without changing its
+reviewed version or CSS.
+
+The next packed run passed the direct Mira import but found one stale nested
+registry Mira copy under a companion package. The fixture now declares its
+six tarball overrides in its own `pnpm-workspace.yaml`, so sibling dependencies
+and peers also use the packed source. Final `pnpm packages:pack` passes all
+framework types and isolated public stylesheet imports, then fails on only the
+known unique KaTeX advisory. These are fixture-only archive references; published
+manifests retain portable npm specifications. Logs:
+`/tmp/mira-release-isolated-css-before.log`,
+`/tmp/mira-release-isolated-css-after.log`, and
+`/tmp/mira-release-isolated-graph-final.log`.
+
+The full Storybook rerun found one timing failure in
+`Property actions and suggestions` (155 passed / 1 failed): an immediate menu
+lookup raced asynchronous portal creation after ArrowRight. The exact isolated
+target passed unchanged, confirming intermittent timing, then passed again
+after switching the two menu lookups to `findByRole`. Visibility, keyboard,
+type state, geometry, hit testing, and mutation assertions remain intact.
+The full serial Storybook rerun passes all 156 tests in 35 files. Logs:
+`/tmp/mira-release-frontmatter-before.log`,
+`/tmp/mira-release-frontmatter-after.log`, and
+`/tmp/mira-release-storybook-portal-final.log`.
+
+Final `pnpm check:all` passes all checks/builds and 418 unit tests; the refreshed
+cold browser suite passes all 49 tests. Package/release checks pass all 30 tests.
+The first final spec-first attempt reported one missing mapped Markdown chapter;
+MIRA-MD-040 now records portal settlement alongside the catalog requirement.
+No timeout, assertion, audit severity, or visual baseline is weakened.
