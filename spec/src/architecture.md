@@ -23,7 +23,7 @@ thin framework adapters.
 ## Package boundary
 
 Packed-consumer audit policy remains separate from the committed workspace
-audit under MIRA-ARCH-039. Only the recorded, version-scoped KaTeX exception in
+audit under MIRA-ARCH-039. Only the recorded, advisory-specific KaTeX exception in
 [Public packages](packages.md) MAY qualify an otherwise failing packed audit;
 normal workspace audits and dependency overrides remain unchanged.
 

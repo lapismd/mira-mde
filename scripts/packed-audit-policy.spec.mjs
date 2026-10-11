@@ -54,18 +54,21 @@ test("accepts only the recorded KaTeX advisory during preparation and release", 
   }
 });
 
-test("exception expires for every package's next release or missing scope", () => {
+test("known KaTeX acceptance persists across subsequent package releases", () => {
   for (const name of Object.keys(release)) {
-    assert.throws(
-      () => checkPackedAudit(result(report()), { ...release, [name]: "0.0.4" }),
-      /expired/,
+    assert.match(
+      checkPackedAudit(result(report()), { ...release, [name]: "0.0.4" }),
+      /Accepted release exception: GHSA-238p-pmpm-9mq7/,
     );
   }
-  assert.throws(() => checkPackedAudit(result(report()), {}), /expired/);
+  assert.match(
+    checkPackedAudit(result(report())),
+    /Accepted release exception/,
+  );
 });
 
-test("rejects different low and high advisories alongside the accepted advisory", () => {
-  for (const severity of ["low", "high"]) {
+test("rejects other advisories at every severity alongside the accepted advisory", () => {
+  for (const severity of ["info", "low", "moderate", "high", "critical"]) {
     const value = report();
     value.advisories.other = {
       ...value.advisories[1241206],
@@ -120,7 +123,7 @@ test("rejects failed commands, malformed responses, suppressed and inconsistent 
   assert.throws(() => checkPackedAudit(result(value), release), /unaccepted/);
 });
 
-test("clean audits pass beyond the exception's versions without using it", () => {
+test("clean audits pass without using the exception", () => {
   const value = report();
   value.advisories = {};
   value.metadata.vulnerabilities.low = 0;

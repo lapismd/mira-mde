@@ -1,14 +1,7 @@
-// Explicitly accepted on 2026-10-11; remove once upstream math ranges are patched.
+// User accepted this known advisory across releases on 2026-10-11.
+// Keep the finding visible; remove once upstream math ranges are patched.
 const advisoryId = "GHSA-238p-pmpm-9mq7";
 const advisoryUrl = `https://github.com/advisories/${advisoryId}`;
-const approvedVersions = {
-  "@lapismd/mira": ["0.0.2", "0.0.3"],
-  "@lapismd/mira-editor": ["0.0.1", "0.0.2"],
-  "@lapismd/mira-plugin-ai": ["0.0.1", "0.0.2"],
-  "@lapismd/mira-plugin-mermaid": ["0.0.1", "0.0.2"],
-  "@lapismd/mira-react": ["0.0.1", "0.0.2"],
-  "@lapismd/mira-vanilla": ["0.0.1", "0.0.2"],
-};
 
 function fail(message) {
   throw new Error(`Packed production dependency audit failed: ${message}`);
@@ -18,7 +11,7 @@ function isObject(value) {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
 
-export function checkPackedAudit(result, versions) {
+export function checkPackedAudit(result) {
   if (result.error || result.signal || ![0, 1].includes(result.status)) {
     fail(
       `audit command failed: ${result.error || result.stderr || result.status}`,
@@ -78,14 +71,5 @@ export function checkPackedAudit(result, versions) {
       fail(`unaccepted advisory: ${entry.github_advisory_id ?? entry.title}`);
     }
   }
-  if (
-    !isObject(versions) ||
-    Object.keys(versions).length !== Object.keys(approvedVersions).length ||
-    Object.entries(approvedVersions).some(
-      ([name, allowed]) => !allowed.includes(versions[name]),
-    )
-  ) {
-    fail("KaTeX exception expired outside approved Mira release versions");
-  }
-  return `Accepted release exception: ${advisoryId} (low, KaTeX); Mira 0.0.3 and companion 0.0.2 releases only, including preparation versions. Full audit evidence: .release/production-consumer-audit.json.`;
+  return `Accepted release exception: ${advisoryId} (low, KaTeX); user-approved across releases until upstream math dependencies are patched. The vulnerability remains present. Full audit evidence: .release/production-consumer-audit.json.`;
 }
