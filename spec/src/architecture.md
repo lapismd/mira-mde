@@ -96,6 +96,8 @@ upgrade MUST remove vulnerable `braces` and `sprintf-js` paths rather than
 ignoring their unpatched advisories. Markdown tooling and renderer overrides
 MUST select patched devalue, brace-expansion, DOMPurify, js-yaml 5,
 markdown-it, smol-toml, source-map-js, and KaTeX releases.
+Exported stylesheet dependencies belong to the owning public package's runtime
+manifest, with an isolated packed fixture checking their resolution.
 The private root's Node range MUST match Changesets 3's supported Node versions
 (`^22.11 || ^24 || >=26`); public runtime package ranges remain independent.
 Markdown linting MUST use the maintained `markdownlint-cli` runner and the same

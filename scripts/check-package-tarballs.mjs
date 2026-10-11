@@ -93,7 +93,16 @@ function main() {
 
     const fixtureRoot = path.join(temporaryRoot, "fixture");
     mkdirSync(fixtureRoot, { recursive: true });
-    writeFileSync(path.join(fixtureRoot, ".npmrc"), "hoist=false\n");
+    writeFileSync(
+      path.join(fixtureRoot, ".npmrc"),
+      "node-linker=isolated\nhoist=false\n",
+    );
+    // Keep all public-package references on these archives, including peers.
+    writeJson(path.join(fixtureRoot, "pnpm-workspace.yaml"), {
+      overrides: Object.fromEntries(
+        [...tarballs].map(([name, tarball]) => [name, `file:${tarball}`]),
+      ),
+    });
     writeJson(path.join(fixtureRoot, "package.json"), {
       name: "mira-package-smoke",
       private: true,
@@ -108,11 +117,6 @@ function main() {
         "react-dom": "^19.0.0",
         svelte: "^5.46.1",
         typescript: "^5.9.3",
-      },
-      pnpm: {
-        overrides: Object.fromEntries(
-          [...tarballs].map(([name, tarball]) => [name, `file:${tarball}`]),
-        ),
       },
     });
 
@@ -176,6 +180,8 @@ console.log("All public stylesheet imports resolve without hoisted dependencies.
         "--prefer-offline",
         "--ignore-scripts",
         "--no-frozen-lockfile",
+        "--config.node-linker=isolated",
+        "--config.hoist=false",
       ],
       fixtureRoot,
     );
