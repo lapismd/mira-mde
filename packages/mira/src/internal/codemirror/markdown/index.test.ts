@@ -9,6 +9,25 @@ describe("createMarkdownCodeMirrorExtensions", () => {
     expect(createMarkdownCodeMirrorExtensions()).toHaveLength(3);
   });
 
+  it("parses bare http urls as autolinks", () => {
+    const state = EditorState.create({
+      doc: "See https://example.com for details.",
+      extensions: createMarkdownCodeMirrorExtensions(),
+    });
+
+    const tree = syntaxTree(state);
+    expect(tree.toString()).toContain("URL");
+    let url = "";
+    tree.iterate({
+      enter(node) {
+        if (node.name === "URL") {
+          url = state.sliceDoc(node.from, node.to);
+        }
+      },
+    });
+    expect(url).toBe("https://example.com");
+  });
+
   it("parses Lapis-style grid tables", () => {
     const state = EditorState.create({
       doc: [

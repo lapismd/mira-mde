@@ -840,17 +840,17 @@ function decorateInlineTokenPart(
   ranges: Range<Decoration>[],
 ): void {
   if (name === "URL") {
-    ranges.push(
-      (parentName === "Link" ? linkTargetMark : externalLinkMark).range(
-        from,
-        to,
-      ),
-    );
-    if (parentName !== "Link" && isExternalMarkdownLink(source)) {
-      const textRange = getMarkdownLinkTextRange(source, from, to);
-      if (textRange) {
-        ranges.push(linkTextMark.range(textRange.from, textRange.to));
-      }
+    if (parentName === "Link") {
+      ranges.push(linkTargetMark.range(from, to));
+      return;
+    }
+    if (!isExternalMarkdownLink(source)) {
+      return;
+    }
+    ranges.push(externalLinkMark.range(from, to));
+    const textRange = getMarkdownLinkTextRange(source, from, to);
+    if (textRange) {
+      ranges.push(linkTextMark.range(textRange.from, textRange.to));
     }
     return;
   }

@@ -11,7 +11,7 @@ import {
   ViewPlugin,
   type ViewUpdate,
 } from "@codemirror/view";
-import { Table } from "@lezer/markdown";
+import { Autolink, Table } from "@lezer/markdown";
 import { getTaskMarkerRange } from "../rich/utils/tasks";
 import { GenericDirectives } from "./directives";
 import { GridTable } from "./grid-table";
@@ -60,6 +60,7 @@ export function createMiraMarkdownLanguage(
       codeLanguages: [...languages, ...codeLanguages],
       extensions: [
         ListAfterLazyBlockquote,
+        Autolink,
         Table,
         GridTable,
         GenericDirectives,
