@@ -47,6 +47,11 @@ Catalog examples import consolidated runtime surfaces through the supported
 implementation-workspace imports or reach into `packages/mira/src/internal`.
 
 Every public or Storybook-visible styled surface has a concise catalog page.
+The pending property-menu teardown story covers MIRA-ARCH-043 by mounting and
+destroying a real public dropdown in the same task. Its play and native browser
+acceptance preserve Svelte diagnostics, require repeated successful teardown,
+and verify that no portal or body pointer lock remains. It stays visual-pending.
+
 Compound primitives share family pages, and React and Vanilla wrappers point
 to the Svelte/Mira Editor surface they adapt.
 

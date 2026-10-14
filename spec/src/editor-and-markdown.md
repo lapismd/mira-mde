@@ -56,6 +56,11 @@ MUST remain inline and zero-width rather than adopting authored image styling.
 | MIRA-MD-040 | Activating a rendered frontmatter property type control MUST expose its complete type-and-action menu in a portalled overlay. Choosing a type MUST update the property through the existing controller and close the menu. Interaction acceptance MUST observe accessible portal settlement after activation before checking menu state and geometry. |
 | MIRA-MD-041 | An unfocused frontmatter text property MUST reconcile its contenteditable DOM text when the controller receives a later record revision, including after the user previously edited that control. A focused control MUST retain its in-progress text until focus leaves so an external revision does not overwrite active input. |
 
+Frontmatter property editors can replace their menu owner while an overlay is
+opening. Their public Mira primitives follow MIRA-ARCH-043 in
+[Public packages](packages.md), including destruction before pending layer work
+settles.
+
 ## Lapis reference boundary
 
 Portable DOM shape, class hooks, spacing, icons, menus, source toggles, table

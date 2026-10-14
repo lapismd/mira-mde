@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/svelte-vite";
 import { expect, fireEvent, userEvent, waitFor, within } from "storybook/test";
 import { catalogParameters } from "../catalog/catalog.mjs";
 import UiPrimitiveStory from "./UiPrimitiveStory.svelte";
+import OverlayTeardownStory from "./OverlayTeardownStory.svelte";
 
 function parameters(catalogId: string, description: string) {
   return {
@@ -32,6 +33,62 @@ const meta = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
+
+export const PendingOverlayTeardown: Story = {
+  name: "Pending property-menu teardown",
+  tags: [
+    "visual-pending",
+    "!visual-approved",
+    "!visual-ready",
+    "!visual-failed",
+  ],
+  render: () => ({ Component: OverlayTeardownStory }),
+  parameters: parameters(
+    "ui-dropdown-menu",
+    "Destroying a property menu before deferred registration settles must release its layers without reading destroyed reactive state.",
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const diagnostics: string[] = [];
+    const originalWarn = console.warn;
+    console.warn = (...args: unknown[]) => {
+      originalWarn(...args);
+      const message = args.map(String).join(" ");
+      if (/\[svelte\]|svelte\.dev\/e\//u.test(message))
+        diagnostics.push(message);
+    };
+    try {
+      for (let iteration = 1; iteration <= 3; iteration += 1) {
+        await userEvent.click(
+          canvas.getByRole("button", {
+            name: "Mount and destroy property menu",
+          }),
+        );
+        await waitFor(() =>
+          expect(canvas.getByRole("status")).toHaveTextContent(
+            `Completed teardown: ${iteration}`,
+          ),
+        );
+        await new Promise<void>((resolve) =>
+          requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+        );
+        await waitFor(() => {
+          expect(
+            canvasElement.ownerDocument.querySelector(
+              '[data-slot="dropdown-menu-content"]',
+            ),
+          ).toBeNull();
+          expect(
+            getComputedStyle(canvasElement.ownerDocument.body).pointerEvents,
+          ).not.toBe("none");
+        });
+        expect(diagnostics).toEqual([]);
+      }
+    } finally {
+      console.warn = originalWarn;
+    }
+  },
+};
 
 export const ButtonsAndSeparators: Story = {
   tags: [
