@@ -84,12 +84,14 @@
     | ((replacement: string, from: number, to: number) => void)
     | undefined = $state(undefined);
 
-  const writeMarkdown = $derived(
-    fileAdapter.writeMarkdown &&
-      (file.kind === undefined || file.kind === "markdown")
-      ? (nextValue: string) => fileAdapter.writeMarkdown?.(file, nextValue)
-      : undefined,
-  );
+  const writeMarkdown = $derived.by(() => {
+    const adapter = fileAdapter,
+      target = file;
+    return adapter.writeMarkdown &&
+      (target.kind === undefined || target.kind === "markdown")
+      ? (nextValue: string) => adapter.writeMarkdown?.(target, nextValue)
+      : undefined;
+  });
 
   $effect(() => {
     const currentFile = file;

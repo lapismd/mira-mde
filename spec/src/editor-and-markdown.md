@@ -1,5 +1,11 @@
 # Portable Markdown and Editor
 
+## External editing protection
+
+| ID          | Requirement                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| MIRA-MD-042 | Writable Markdown previews MUST register source-bound editing sessions when their file adapter supplies that capability. Protection MUST immediately block new edits and join pending persistence before admitting an external operation; independent protection leases MUST release independently. A failed flush MUST preserve the dirty buffer and reject admission. Teardown MUST retain a discoverable session until its pending persistence succeeds. |
+
 Mira provides the portable part of the Lapis Markdown editing contract without
 its application runtime. The `@lapismd/mira` package that ships that contract is
 licensed Apache-2.0. The renderer and editor surfaces share syntax, resolvers,

@@ -492,7 +492,18 @@ export function resolveMiraListCallouts(
   }));
 }
 
+/** A portable persistence barrier owned by one source-bound Markdown writer. */
+export type MiraMarkdownEditingSession = {
+  readonly dirty: boolean;
+  flush: () => Promise<void>;
+  protect: () => Promise<() => void>;
+};
+
 export type MiraFileAdapter = {
+  registerEditingSession?: (
+    sourcePath: string,
+    session: MiraMarkdownEditingSession,
+  ) => void | (() => void);
   resolveLink: (
     target: MiraFileTarget,
   ) => MiraFileRef | null | Promise<MiraFileRef | null>;

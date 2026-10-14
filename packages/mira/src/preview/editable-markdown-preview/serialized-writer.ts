@@ -1,4 +1,5 @@
 export type SerializedMarkdownWriterState = {
+  readonly: boolean;
   dirty: boolean;
   saving: boolean;
   error: Error | null;
@@ -30,6 +31,10 @@ export class SerializedMarkdownWriter {
 
   private saving = false;
 
+  private protections = 0;
+
+  private destroyed = false;
+
   private error: Error | null = null;
 
   constructor(options: Options) {
@@ -43,6 +48,7 @@ export class SerializedMarkdownWriter {
 
   get state(): SerializedMarkdownWriterState {
     return {
+      readonly: this.protections > 0 || this.destroyed,
       dirty: this.value !== this.persistedValue,
       saving: this.saving,
       error: this.error,
@@ -51,11 +57,33 @@ export class SerializedMarkdownWriter {
     };
   }
 
-  update(value: string): void {
+  update(value: string): boolean {
+    if (this.protections > 0 || this.destroyed) return false;
     this.value = value;
     this.error = null;
     this.schedule();
     this.emit();
+    return true;
+  }
+
+  async protect(): Promise<() => void> {
+    this.protections++;
+    this.emit();
+    let released = false;
+    const release = () => {
+      if (released) return;
+      released = true;
+      this.protections--;
+      this.emit();
+    };
+    try {
+      if (!(await this.flush()))
+        throw this.error ?? new Error("Unable to protect unsaved Markdown");
+      return release;
+    } catch (error) {
+      release();
+      throw error;
+    }
   }
 
   replaceExternal(value: string): boolean {
@@ -89,7 +117,9 @@ export class SerializedMarkdownWriter {
   }
 
   destroy(): void {
+    this.destroyed = true;
     this.clearTimer();
+    this.emit();
     if (this.state.dirty) {
       void this.flush();
     }

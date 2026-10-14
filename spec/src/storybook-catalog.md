@@ -4,6 +4,11 @@ Storybook is Mira's sole browsable documentation, demo, and component test host.
 Its catalog data is repository-owned test/documentation input, not a published
 runtime dependency.
 
+Cold browser verification prebundles CommonJS `aria-query` through the owning
+Vitest configuration. Fresh sessions must load Storybook/test annotations
+before exercising the portable editor; built public package outputs remain
+the source of the catalog's package imports.
+
 ## Requirements
 
 | ID           | Requirement                                                                                                                                                                                                                                                                                                                                                                                                         |
