@@ -20,6 +20,10 @@ thin framework adapters.
 | MIRA-ARCH-030 | The `@lapismd/mira` root MUST export `MiraCodeEditor`, `MiraCodeEditorProps`, and `MiraCodeEditorHandle`. Mira's primary Markdown surface and editable preview editor MUST consume that shell, while downstream packages MAY supply language and domain extensions through the public CodeMirror extension prop and bridge their theme from an ancestor through the shell's inheritable public background, focus-ring, search-control, and syntax tokens. |
 | MIRA-ARCH-039 | The root `check` and `check:all` commands MUST run `pnpm audit` against the committed lockfile before package validation. Fixable findings MUST be resolved with declared ranges or workspace overrides in the same change; `pnpm.auditConfig.ignoreCves` MAY list only unpatched advisories. Override replacements MUST stay on the same major line as the selector they replace so a security pin cannot substitute an incompatible API.                |
 
+Overlay lifecycle ownership follows MIRA-ARCH-043 in [Public packages](packages.md).
+The portable Mira dependency declaration owns dismissal, registration, and focus
+cleanup for its public UI primitives; downstream hosts own when to destroy them.
+
 ## Package boundary
 
 Packed-consumer audit policy remains separate from the committed workspace

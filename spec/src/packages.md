@@ -49,6 +49,16 @@ List selectors in the exported source stylesheet support Markdown surface and mo
 on the CodeMirror root, as used by directly composed API editors. List bullets
 and indentation retain the wrapped editor's styling without consumer overrides.
 
+## Overlay lifecycle
+
+| ID            | Requirement                                                                                                                                                                                                                                                                |
+| ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| MIRA-ARCH-043 | The published Mira UI dependency graph MUST support destroying an open overlay before registration or focus callbacks settle. Teardown MUST cancel pending layer work without reading destroyed reactive state, retaining a portal, or leaving body pointer events locked. |
+
+The core package pins the published Bits UI version that satisfies
+MIRA-ARCH-043. Consumers MUST receive this behavior through the released Mira
+dependency declaration rather than a consumer patch or copied overlay code.
+
 ## Public graph
 
 | Package                        | Responsibility                                                                                    |
