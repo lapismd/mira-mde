@@ -22,6 +22,7 @@
 
   type Props = {
     value: string;
+    readonly?: boolean;
     extensions?: MiraExtension[];
     sourcePath?: string;
     linkResolver?: MiraLinkResolver;
@@ -40,6 +41,7 @@
 
   let {
     value,
+    readonly = false,
     extensions = [],
     sourcePath,
     linkResolver,
@@ -63,13 +65,14 @@
   const resolvedExtensions = $derived(
     resolveMiraExtensions(extensions, {
       mode: "live-preview",
-      readonly: false,
+      readonly,
       sourcePath,
     }),
   );
   const extensionSignature = $derived(
     [
       sourcePath,
+      readonly,
       frontmatterOpen,
       JSON.stringify({ authoring, frontmatterConfig, imageConfig }),
       extensions.map((extension) => extension.name).join(","),
@@ -85,15 +88,17 @@
     return {
       view,
       mode: "live-preview",
-      readonly: false,
+      readonly,
       sourcePath,
       getValue: () => activeEditor?.getValue() ?? value,
       setValue(nextValue) {
+        if (readonly) return;
         activeEditor?.setValue(nextValue);
         onChange?.(nextValue);
       },
       focus: () => activeEditor?.focus(),
       insertMarkdown(markdown, selection) {
+        if (readonly) return;
         activeEditor?.replaceSelection(markdown, selection);
         activeEditor?.focus();
       },
@@ -104,7 +109,7 @@
     return createMiraCodeMirrorExtensions({
       includeBaseExtensions: false,
       mode: "live-preview",
-      readonly: false,
+      readonly,
       lineWrapping: true,
       spellcheck: true,
       blockControls: false,
@@ -122,6 +127,7 @@
       frontmatterConfig,
       runtimeContext: (view) => runtimeContext(codeEditor, view),
       onChange(replacement, from, to) {
+        if (readonly) return;
         codeEditor?.getView()?.dispatch({
           changes: { from, to, insert: replacement },
         });
@@ -212,6 +218,7 @@
   <MiraCodeEditor
     bind:this={codeEditor}
     {value}
+    {readonly}
     extensions={codeMirrorExtensions}
     lineWrapping={true}
     spellcheck={true}
@@ -223,6 +230,8 @@
     height="fill"
     minHeight="100%"
     class="mira-editable-markdown-preview__editor-host"
-    onChange={(nextValue) => onChange?.(nextValue)}
+    onChange={(nextValue) => {
+      if (!readonly) onChange?.(nextValue);
+    }}
   />
 </div>

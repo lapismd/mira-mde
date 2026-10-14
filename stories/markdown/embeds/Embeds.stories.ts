@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/svelte-vite";
-import { expect, userEvent, within } from "storybook/test";
+import { expect, userEvent, within, waitFor } from "storybook/test";
 import EditorModeStory from "../_shared/EditorModeStory.svelte";
 import MarkdownPreviewStory from "../_shared/MarkdownPreviewStory.svelte";
 import {
@@ -9,6 +9,7 @@ import {
 import { embedsMarkdown } from "../fixtures";
 import AdapterInvalidationStory from "./AdapterInvalidationStory.svelte";
 import EditablePreviewStory from "./EditablePreviewStory.svelte";
+import EditingProtectionStory from "./EditingProtectionStory.svelte";
 import PortableSurfacesStory from "./PortableSurfacesStory.svelte";
 
 const meta = {
@@ -276,5 +277,137 @@ export const EditablePreview: Story = {
         canvas.getByRole("heading", { name: "Saved Preview" }),
       ).toBeVisible();
     });
+  },
+};
+
+export const EditingProtection: Story = {
+  name: "External editing protection",
+  render: () => ({ Component: EditingProtectionStory }),
+  tags: [
+    "visual-pending",
+    "!visual-approved",
+    "!visual-ready",
+    "!visual-failed",
+  ],
+  parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/markdown/embeds/editing-protection-chromium.png",
+      ],
+    },
+    docs: {
+      description: {
+        story:
+          "A registered Markdown session drains in-flight persistence and becomes read-only before external apply. A pending draft keeps its original document when the preview switches files.",
+      },
+      source: {
+        language: "svelte",
+        type: "code",
+        code: `<script lang="ts">
+  import { EditableMarkdownPreview } from "@lapismd/mira/preview";
+  import type { MiraMarkdownEditingSession } from "@lapismd/mira/extensions";
+
+  const sessions = new Map<string, Set<MiraMarkdownEditingSession>>();
+  const fileAdapter = {
+    ...adapter,
+    registerEditingSession(path, session) {
+      const entries = sessions.get(path) ?? new Set();
+      entries.add(session);
+      sessions.set(path, entries);
+      return () => { entries.delete(session); };
+    },
+  };
+  async function updateFromOutside(path, apply) {
+    const releases = [];
+    try {
+      for (const session of sessions.get(path) ?? [])
+        releases.push(await session.protect());
+      await apply();
+    } finally {
+      releases.reverse().forEach(release => release());
+    }
+  }
+</script>
+
+<EditableMarkdownPreview {file} {fileAdapter} />`,
+      },
+    },
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    await waitFor(() =>
+      expect(
+        canvasElement.querySelector('[data-session-registered="true"]'),
+      ).toBeInTheDocument(),
+    );
+    await userEvent.click(
+      canvas.getByText("Edit this note before an external update."),
+    );
+    const content = () =>
+      canvasElement.querySelector<HTMLElement>(".cm-content")!;
+    await step("join a held save and block further typing", async () => {
+      await userEvent.click(
+        canvas.getByRole("button", { name: "Pause persistence" }),
+      );
+      await userEvent.click(content());
+      await userEvent.keyboard("{Control>}a{/Control}# Local draft");
+      await userEvent.click(
+        canvas.getByRole("button", { name: "Protect editor" }),
+      );
+      await expect(canvas.getByLabelText("Protection state")).toHaveTextContent(
+        "Waiting for persistence",
+      );
+      await expect(
+        canvas.getByLabelText("Original Markdown"),
+      ).toHaveTextContent("# First");
+      await userEvent.click(
+        canvas.getByRole("button", { name: "Finish save" }),
+      );
+      await waitFor(() =>
+        expect(canvas.getByLabelText("Protection state")).toHaveTextContent(
+          "Protected",
+        ),
+      );
+      await expect(content()).toHaveAttribute("contenteditable", "false");
+      await expect(
+        canvas.getByLabelText("Original Markdown"),
+      ).toHaveTextContent("# Local draft");
+      await userEvent.click(content());
+      await userEvent.keyboard("blocked");
+      await expect(content()).toHaveTextContent("Local draft");
+      await userEvent.click(
+        canvas.getByRole("button", { name: "Apply external change" }),
+      );
+      await waitFor(() => expect(content()).toHaveTextContent("Incoming"));
+      await userEvent.click(
+        canvas.getByRole("button", { name: "Release editor" }),
+      );
+      await waitFor(() =>
+        expect(content()).toHaveAttribute("contenteditable", "true"),
+      );
+    });
+    await step(
+      "preserve the original persistence destination on document switch",
+      async () => {
+        await userEvent.click(content());
+        await userEvent.keyboard("{Control>}a{/Control}# First final");
+        await userEvent.click(
+          canvas.getByRole("button", { name: "Switch document" }),
+        );
+        await waitFor(() =>
+          expect(canvas.getByLabelText("Original Markdown")).toHaveTextContent(
+            "# First final",
+          ),
+        );
+        await expect(canvas.getByLabelText("Other Markdown")).toHaveTextContent(
+          "# Second",
+        );
+        await waitFor(() =>
+          expect(
+            canvasElement.querySelector("[data-editable-markdown-preview]"),
+          ).toHaveTextContent("Second"),
+        );
+      },
+    );
   },
 };

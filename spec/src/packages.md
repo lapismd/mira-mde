@@ -1,5 +1,12 @@
 # Public Packages and Entry Points
 
+## Editing-session adapter capability
+
+| ID            | Requirement                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| MIRA-ARCH-040 | `MiraFileAdapter` MUST expose an optional source-path editing-session registration hook with observable dirty state, awaited flush and temporary protection. The hook MUST remain independent of application, vault and synchronization protocols. Registration failure MUST disable the writer before returning an error. Registered writers MUST retain their original persistence destination and MUST NOT update a replacement surface through late callbacks. |
+| MIRA-ARCH-041 | Published Mira tarballs MUST exclude executable unit/spec tests and their emitted declarations while preserving every declared public entry point.                                                                                                                                                                                                                                                                                                                 |
+
 Mira exposes six public packages under the `@lapismd` scope. Runtime
 implementation layers are consolidated into `@lapismd/mira`; consumers do not
 install internal CodeMirror, renderer, UI, or theme workspaces separately.

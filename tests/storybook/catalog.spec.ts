@@ -470,9 +470,10 @@ test("the narrow main toolbar scrolls without scrollbar chrome", async ({
 
 test("the narrow main toolbar exposes coarse-pointer touch targets", async ({
   browser,
+  baseURL,
 }) => {
   const context = await browser.newContext({
-    baseURL: "http://127.0.0.1:7007",
+    baseURL,
     hasTouch: true,
     isMobile: true,
     viewport: { width: 360, height: 740 },

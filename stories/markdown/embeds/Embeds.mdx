@@ -13,6 +13,16 @@ import * as EmbedsStories from "./Embeds.stories";
 
 Embed another note or asset with Obsidian-style embed syntax. Both image assets and Markdown notes resolve through `MiraFileAdapter`.
 
+## External editing protection
+
+File adapters can register a portable editing session to join pending saves
+and protect a writable preview before applying external content. The session
+remains discoverable while teardown persistence is pending or has failed.
+
+<Canvas of={EmbedsStories.EditingProtection} meta={EmbedsStories} />
+
+<Source of={EmbedsStories.EditingProtection} language="svelte" />
+
 ## Usage
 
 Docs source shows the public Mira APIs (not story wrapper components).

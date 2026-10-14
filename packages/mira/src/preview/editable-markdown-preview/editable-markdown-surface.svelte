@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onDestroy, tick, untrack, type Snippet } from "svelte";
+  import { tick, untrack, type Snippet } from "svelte";
   import type {
     MiraAssetResolver,
     MiraExtension,
@@ -14,6 +14,7 @@
     shouldReturnEditableMarkdownPreviewOnBlur,
   } from "./behavior";
   import EditorSurface from "./editor-surface.svelte";
+  import { attachMarkdownEditingSession } from "./editing-session";
   import {
     SerializedMarkdownWriter,
     type SerializedMarkdownWriterState,
@@ -83,6 +84,7 @@
   let buffer = $state("");
   let pendingOffset = $state<number | null>(null);
   let writerState = $state<SerializedMarkdownWriterState>({
+    readonly: false,
     dirty: false,
     saving: false,
     error: null,
@@ -94,7 +96,7 @@
   let previewScrollRatio = 0;
   let editorScrollRatio = 0;
 
-  const writable = $derived(Boolean(writeMarkdown));
+  const writable = $derived(Boolean(writeMarkdown) && !writerState.readonly);
 
   $effect(() => {
     previewOnChange = writable ? updatePreviewRange : undefined;
@@ -106,15 +108,16 @@
   $effect(() => {
     const write = writeMarkdown;
     const key = sourcePath;
+    const adapter = fileAdapter;
     const initialValue = untrack(() => value);
     key;
 
-    writer?.destroy();
     writer = null;
     buffer = initialValue;
     lastExternalValue = initialValue;
     lastPersistedNotification = initialValue;
     writerState = {
+      readonly: false,
       dirty: false,
       saving: false,
       error: null,
@@ -127,10 +130,12 @@
       return;
     }
 
+    let current = true;
     const activeWriter = new SerializedMarkdownWriter({
       value: initialValue,
       write,
       onStateChange(state) {
+        if (!current) return;
         writerState = state;
         buffer = state.value;
         if (state.persistedValue !== lastPersistedNotification) {
@@ -140,9 +145,18 @@
       },
     });
     writer = activeWriter;
+    const attached = attachMarkdownEditingSession({
+      writer: activeWriter,
+      sourcePath: key,
+      register: adapter?.registerEditingSession
+        ? (path, session) => adapter.registerEditingSession?.(path, session)
+        : undefined,
+      synchronizeProtection: tick,
+    });
 
     return () => {
-      activeWriter.destroy();
+      current = false;
+      attached.detach();
       if (writer === activeWriter) {
         writer = null;
       }
@@ -251,8 +265,8 @@
   }
 
   function updateBuffer(nextValue: string): void {
+    if (!writer?.update(nextValue)) return;
     buffer = nextValue;
-    writer?.update(nextValue);
   }
 
   function updatePreviewRange(
@@ -316,10 +330,6 @@
     await leaveEditing("blur");
     return !editing;
   }
-
-  onDestroy(() => {
-    writer?.destroy();
-  });
 </script>
 
 <div
@@ -342,6 +352,7 @@
     >
       <EditorSurface
         value={buffer}
+        readonly={writerState.readonly}
         {extensions}
         {sourcePath}
         {linkResolver}
