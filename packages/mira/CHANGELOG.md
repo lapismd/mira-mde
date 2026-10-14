@@ -1,5 +1,12 @@
 # @lapismd/mira
 
+## 0.0.4
+
+### Patch Changes
+
+- [#10](https://github.com/lapismd/mira-mde/pull/10) [`32cd876`](https://github.com/lapismd/mira-mde/commit/32cd876b208dffd703d614bb66fc21b0b787d086) Thanks [@stevejuma](https://github.com/stevejuma)! - Update Bits UI so destroying an opening property menu cancels pending overlay
+  registration and focus work without Svelte lifecycle warnings or pointer locks.
+
 ## 0.0.3
 
 ### Patch Changes
