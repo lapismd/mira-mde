@@ -1,5 +1,14 @@
 # @lapismd/mira
 
+## 0.0.5
+
+### Patch Changes
+
+- [#12](https://github.com/lapismd/mira-mde/pull/12) [`91f88d8`](https://github.com/lapismd/mira-mde/commit/91f88d8e4c2afab3b18a5a7596bec0fde872ce3a) Thanks [@stevejuma](https://github.com/stevejuma)! - Add optional source-bound Markdown editing sessions to file adapters so hosts
+  can drain pending saves and protect embedded editors during external updates.
+  Retain failed teardown saves for retry, preserve the original write destination,
+  and exclude emitted test modules from published tarballs.
+
 ## 0.0.4
 
 ### Patch Changes
