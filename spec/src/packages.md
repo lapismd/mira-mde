@@ -1,5 +1,10 @@
 # Public Packages and Entry Points
 
+The public `@lapismd/mira/extensions` file-adapter contract includes optional
+bound Markdown writes and portable text-recovery leases under MIRA-MD-046 and
+MIRA-MD-047. These callbacks carry source-session identity and state; they do
+not import host application, vault, database or conflict-presentation types.
+
 ## Editing-session adapter capability
 
 | ID            | Requirement                                                                                                                                                                                                                                                                                                                                                                                                                                                        |

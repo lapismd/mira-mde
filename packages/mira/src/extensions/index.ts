@@ -3,6 +3,18 @@ import type { Extension as CodeMirrorExtension } from "@codemirror/state";
 import { keymap, type EditorView, type KeyBinding } from "@codemirror/view";
 import type { Component } from "svelte";
 import type { Pluggable } from "unified";
+import type {
+  MiraMarkdownEditingBinding,
+  MiraMarkdownEditingSession,
+} from "./markdown-editing";
+
+export type {
+  MiraMarkdownEditingBinding,
+  MiraMarkdownEditingSession,
+  MiraMarkdownRecoveryLease,
+  MiraMarkdownTextSession,
+  MiraMarkdownTextState,
+} from "./markdown-editing";
 
 export {
   defaultMiraDoodleDividerPalette,
@@ -500,14 +512,11 @@ export function resolveMiraListCallouts(
   }));
 }
 
-/** A portable persistence barrier owned by one source-bound Markdown writer. */
-export type MiraMarkdownEditingSession = {
-  readonly dirty: boolean;
-  flush: () => Promise<void>;
-  protect: () => Promise<() => void>;
-};
-
 export type MiraFileAdapter = {
+  bindMarkdownEditingSession?: (
+    sourcePath: string,
+    session: MiraMarkdownEditingSession,
+  ) => MiraMarkdownEditingBinding;
   registerEditingSession?: (
     sourcePath: string,
     session: MiraMarkdownEditingSession,
