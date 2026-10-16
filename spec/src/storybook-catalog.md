@@ -1,5 +1,10 @@
 # Storybook Catalog
 
+Inline-link examples use the standard Mira Editor icon toolbar for view modes
+and inline renderer instances for small comparison links. Reference-definition
+and reference-image coverage belongs to the existing Links and Images stories;
+their changed live-preview visuals remain pending separate approval.
+
 ## Bundled inline-link examples
 
 | ID           | Requirement                                                                                                                                                                                                                                                                                                                                                                             |

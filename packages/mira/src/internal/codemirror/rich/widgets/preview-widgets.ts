@@ -29,6 +29,22 @@ const frontmatterDisclosureByView = new WeakMap<
   { configuredOpen: boolean; open: boolean }
 >();
 
+function appendReferenceLabel(
+  container: HTMLElement,
+  label: string,
+  image: boolean,
+) {
+  container.dataset.referenceLabel = label;
+  container.classList.add(
+    image ? "mira-reference--image" : "mira-reference--link",
+  );
+  const badge = container.ownerDocument.createElement("span");
+  badge.className = "mira-reference__label";
+  badge.textContent = label;
+  badge.title = `Reference: ${label}`;
+  container.append(badge);
+}
+
 export class BlockPreviewWidget extends WidgetType {
   constructor(
     private readonly config: {
@@ -39,6 +55,8 @@ export class BlockPreviewWidget extends WidgetType {
       markdownIndentLength?: number;
       markdownIndentedLineStarts?: number[];
       nodeName: string;
+      referenceLabel?: string;
+      referenceImage?: boolean;
       options: MiraRichEditorOptions;
     },
   ) {
@@ -55,6 +73,8 @@ export class BlockPreviewWidget extends WidgetType {
       JSON.stringify(this.config.markdownIndentedLineStarts) ===
         JSON.stringify(other.config.markdownIndentedLineStarts) &&
       this.config.nodeName === other.config.nodeName &&
+      this.config.referenceLabel === other.config.referenceLabel &&
+      this.config.referenceImage === other.config.referenceImage &&
       this.config.options.frontmatterOpen ===
         other.config.options.frontmatterOpen &&
       this.config.options.readonly === other.config.options.readonly &&
@@ -75,6 +95,14 @@ export class BlockPreviewWidget extends WidgetType {
       "markdown-rendered",
     ].join(" ");
     container.dataset.node = this.config.nodeName;
+    if (this.config.nodeName === "ReferenceDefinition")
+      container.classList.add("mira-reference-definition");
+    if (this.config.referenceLabel)
+      appendReferenceLabel(
+        container,
+        this.config.referenceLabel,
+        this.config.referenceImage || this.config.nodeName === "Image",
+      );
     if (this.config.options.readonly) {
       container.dataset.readonly = "true";
     }
@@ -134,6 +162,11 @@ export class BlockPreviewWidget extends WidgetType {
       props: {
         value: this.config.markdown,
         embed: true,
+        inline:
+          this.config.nodeName === "ReferenceDefinition" &&
+          !this.config.referenceImage,
+        htmlPolicy:
+          this.config.nodeName === "ReferenceDefinition" ? "safe" : undefined,
         sourcePath: this.config.options.sourcePath,
         extensions: this.config.options.extensions ?? [],
         linkResolver: this.config.options.linkResolver,
@@ -336,6 +369,7 @@ export class InlineMarkdownWidget extends WidgetType {
       from: number;
       to: number;
       markdown: string;
+      referenceLabel?: string;
       options: MiraRichEditorOptions;
     },
   ) {
@@ -347,6 +381,7 @@ export class InlineMarkdownWidget extends WidgetType {
       this.config.from === other.config.from &&
       this.config.to === other.config.to &&
       this.config.markdown === other.config.markdown &&
+      this.config.referenceLabel === other.config.referenceLabel &&
       this.config.options.extensions === other.config.options.extensions &&
       this.config.options.readonly === other.config.options.readonly
     );
@@ -355,6 +390,8 @@ export class InlineMarkdownWidget extends WidgetType {
   override toDOM(view: EditorView): HTMLElement {
     const container = document.createElement("span");
     container.className = "mira-inline-markdown-widget markdown-rendered";
+    if (this.config.referenceLabel)
+      appendReferenceLabel(container, this.config.referenceLabel, true);
 
     const component = mount(MarkdownPreview, {
       target: container,

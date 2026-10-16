@@ -32,7 +32,9 @@ import {
   findMarkdownImageRanges,
   isStandaloneMarkdownImageLine,
   resolveMarkdownImageWidgetSource,
+  markdownImageReferenceLabel,
 } from "./utils/images";
+import { markdownReferenceDefinitions } from "./utils/references";
 import {
   findInlineCodeRanges,
   isPositionInsideRanges,
@@ -370,6 +372,31 @@ function buildBlockPreviewDecorations(
     },
   });
 
+  for (const reference of markdownReferenceDefinitions(state.doc)) {
+    const from = state.doc.lineAt(reference.from).from;
+    const to = state.doc.lineAt(reference.to).to;
+    if (
+      rangeContainsSelectionCursor(state, from, to) ||
+      replacedRanges.some((range) => rangesOverlap(range, { from, to }))
+    )
+      continue;
+    ranges.push(
+      Decoration.replace({
+        block: true,
+        widget: new BlockPreviewWidget({
+          from,
+          to,
+          markdown: reference.markdown,
+          nodeName: "ReferenceDefinition",
+          referenceLabel: reference.label,
+          referenceImage: reference.image,
+          options,
+        }),
+      }).range(from, to),
+    );
+    replacedRanges.push({ from, to });
+  }
+
   for (let lineNumber = 1; lineNumber <= state.doc.lines; lineNumber += 1) {
     const line = state.doc.line(lineNumber);
     const standaloneEmbed = isStandaloneEmbedLine(line.text);
@@ -389,7 +416,7 @@ function buildBlockPreviewDecorations(
 
     const markdown = standaloneEmbed
       ? line.text.trim()
-      : resolveMarkdownImageWidgetSource(line.text, state.doc.toString());
+      : resolveMarkdownImageWidgetSource(line.text, state.doc);
     if (!markdown) {
       continue;
     }
@@ -402,6 +429,9 @@ function buildBlockPreviewDecorations(
           to,
           markdown,
           nodeName: standaloneEmbed ? "EmbedLink" : "Image",
+          referenceLabel: standaloneImage
+            ? markdownImageReferenceLabel(line.text, state.doc)
+            : undefined,
           options,
         }),
       }).range(from, to),
@@ -643,6 +673,10 @@ function decorateInlineSyntax(
       from: visibleRange.from,
       to: visibleRange.to,
       enter(node) {
+        if (node.name === "LinkReference") {
+          activeSourceRanges.push({ from: node.from, to: node.to });
+          return false;
+        }
         const parent = node.node.parent;
         const parentName = parent?.name;
         const parentFrom = parent?.from ?? node.from;
@@ -758,7 +792,7 @@ function decorateInlineMarkdownWidgets(
     );
   }
 
-  for (const image of findMarkdownImageRanges(text, state.doc.toString())) {
+  for (const image of findMarkdownImageRanges(text, state.doc)) {
     const from = lineStart + image.from;
     const to = lineStart + image.to;
     if (
@@ -775,6 +809,7 @@ function decorateInlineMarkdownWidgets(
           from,
           to,
           markdown: image.source,
+          referenceLabel: image.referenceLabel,
           options,
         }),
       }).range(from, to),

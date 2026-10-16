@@ -1,5 +1,15 @@
 # Portable Markdown and Editor
 
+## Reference definitions in live preview
+
+| ID          | Requirement                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| MIRA-MD-045 | Inactive top-level Markdown reference definitions MUST render as a compact reference name and destination, or as a framed image with the reference name in a corner badge when used by an image. Names MUST preserve the definition's spelling and case, including on image usages whose reference case differs. Reference images MUST retain authored alternative text. Editing a definition MUST reveal its complete syntax without partially hidden brackets and preserve the authored document. Code, source mode, safe navigation, image resolution and ordinary reading output MUST retain their existing behavior. |
+
+Definition ownership comes from parsed Markdown, including multiline titles and
+case-insensitive reference matching. Selecting source retains the original
+definition range rather than replacing it with generated preview Markdown.
+
 ## Bundled inline links
 
 | ID          | Requirement                                                                                                                                                                                                                                                                                                                                                             |

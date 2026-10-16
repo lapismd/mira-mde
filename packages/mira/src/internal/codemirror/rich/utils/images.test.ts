@@ -3,9 +3,29 @@ import {
   findMarkdownImageRanges,
   isStandaloneMarkdownImageLine,
   resolveMarkdownImageWidgetSource,
+  markdownImageReferenceLabel,
 } from "./images";
 
 describe("markdown image helpers", () => {
+  it.each(["![photo][photo]", "![photo][]", "![photo]"])(
+    "resolves %s without leaking matcher state",
+    (usage) => {
+      const doc = `${usage}\n\n[PHOTO]: </a file.svg>\n  "Title"`;
+      expect(markdownImageReferenceLabel(usage, doc)).toBe("PHOTO");
+      const first = findMarkdownImageRanges(usage, doc);
+      expect(first).toHaveLength(1);
+      expect(first[0]?.referenceLabel).toBe("PHOTO");
+      expect(first[0]?.source).toContain("[PHOTO]: </a file.svg>");
+      expect(findMarkdownImageRanges(usage, doc)).toEqual(first);
+    },
+  );
+  it("does not resolve definitions inside code and retains undefined references", () => {
+    expect(
+      findMarkdownImageRanges("![photo][ref]", "```md\n[ref]: /a.svg\n```"),
+    ).toEqual([]);
+    expect(findMarkdownImageRanges("![missing][]")).toEqual([]);
+    expect(markdownImageReferenceLabel("![direct](/a.svg)")).toBeUndefined();
+  });
   it("finds inline destination images and skips wiki embeds / code", () => {
     expect(
       findMarkdownImageRanges(
@@ -35,7 +55,9 @@ describe("markdown image helpers", () => {
         {
           from: 0,
           to: 31,
-          source: "![Reference base64](data:image/png;base64,abc=)",
+          source:
+            "![Reference base64][base64-red]\n\n[base64-red]: data:image/png;base64,abc=",
+          referenceLabel: "base64-red",
         },
       ],
     );

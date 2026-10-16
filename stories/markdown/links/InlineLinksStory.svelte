@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Mira } from "@lapismd/mira";
+  import { MiraEditor } from "@lapismd/mira-editor";
   import {
     InlineLink,
     LinkSiteIcon,
@@ -11,7 +11,7 @@
     type MiraMode,
   } from "@lapismd/mira/extensions";
   let {
-    mode = "preview",
+    mode = $bindable("preview"),
     variant = "default",
     narrow = false,
   }: {
@@ -41,7 +41,7 @@
     }),
   );
   const extensions = $derived([inlineLinksExtension({ registry })]);
-  const value = `Intro: local icons and original Markdown labels.
+  let value = $state(`Intro: local icons and original Markdown labels.
 
 [**issue** #42](https://github.com/lapismd/mira-mde/issues/42) and [GitLab](https://gitlab.com/lapismd/mira).
 
@@ -61,10 +61,14 @@ https://code.forgejo.org/forgejo/forgejo
 | [Grid](https://gitlab.com/team/repo)   |
 +----------------------------------------+
 
-[Reference][ref] and [*formatted* \`label\`](https://linear.app/team/issue/ABC-42).
+[Reference][forge docs] and [*formatted* \`label\`](https://linear.app/team/issue/ABC-42).
 
-[ref]: https://codeberg.org/forgejo/forgejo
-`;
+[Forge Docs]: https://codeberg.org/forgejo/forgejo
+
+![Mira landscape][landscape]
+
+[Landscape]: /mira-markdown-demo.svg "Local reference image"
+`);
 </script>
 
 <div
@@ -76,14 +80,14 @@ https://code.forgejo.org/forgejo/forgejo
     >Replace GitHub icon</button
   >
   <section aria-label="Configured links">
-    {#if mode === "preview"}<MarkdownPreview
-        {value}
-        {extensions}
-        htmlPolicy="safe"
-      />
-    {:else}<Mira {value} {mode} {extensions} height="44rem" />{/if}
+    <div class="inline-links-demo__editor">
+      <MiraEditor bind:value bind:mode {extensions} htmlPolicy="safe" />
+    </div>
   </section>
-  <section aria-label="Standalone components">
+  <section
+    class="markdown-preview-surface markdown-preview-surface--embedded markdown-rendered"
+    aria-label="Standalone components"
+  >
     <p>
       <InlineLink href="https://github.com/lapismd/mira-mde" {registry}
         ><em>Standalone GitHub</em></InlineLink
@@ -91,14 +95,22 @@ https://code.forgejo.org/forgejo/forgejo
       <LinkSiteIcon href="https://forgejo.org" {registry} />
     </p>
   </section>
-  <section aria-label="Independent default registry">
+  <section
+    class="markdown-preview-surface markdown-preview-surface--embedded markdown-rendered"
+    aria-label="Independent default registry"
+  >
     <MarkdownPreview
+      inline
       value="[Independent GitHub](https://github.com/lapismd/mira-mde)"
       extensions={[inlineLinksExtension()]}
     />
   </section>
-  <section aria-label="Mira default link styling">
+  <section
+    class="markdown-preview-surface markdown-preview-surface--embedded markdown-rendered"
+    aria-label="Mira default link styling"
+  >
     <MarkdownPreview
+      inline
       value="[Ordinary Mira link](https://github.com/lapismd/mira-mde)"
     />
   </section>
@@ -110,6 +122,19 @@ https://code.forgejo.org/forgejo/forgejo
     color: var(--mira-foreground);
     background: var(--mira-background);
     min-width: 0;
+  }
+  .inline-links-demo__editor {
+    height: min(44rem, 75vh);
+    min-height: 18rem;
+  }
+  .inline-links-demo > button {
+    margin-block-end: 0.75rem;
+  }
+  section + section {
+    margin-block-start: 0.75rem;
+  }
+  p {
+    margin: 0;
   }
   button {
     color: var(--mira-foreground);

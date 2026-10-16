@@ -1,5 +1,9 @@
 # Styling and CSS Tokens
 
+| ID           | Requirement                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| MIRA-CSS-044 | Live reference rows and image frames MUST use class-scoped shipped CSS and existing theme tokens. Reference names MUST retain their authored case and remain legible, with long names bounded by the available width. Image badges MUST occupy the upper trailing corner and source controls MUST remain keyboard accessible. Inline demonstration links MUST use the renderer's inline surface rather than acquiring full document padding. |
+
 ## Inline link icons
 
 Rendered SVG geometry must preserve case-sensitive `viewBox` and

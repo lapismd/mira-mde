@@ -1,5 +1,9 @@
 # Public Packages and Entry Points
 
+Reference-definition presentation remains in Mira's owned rich-editor and
+preview layers. It reuses the existing renderer, asset resolver and source
+selection contracts without new public packages or entry points.
+
 ## Bundled inline-link entry points
 
 | ID            | Requirement                                                                                                                                                                                                                                                                                                                                                                                          |
