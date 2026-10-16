@@ -1,9 +1,12 @@
 import { findInlineCodeRanges, isPositionInsideRanges } from "./inline-code";
 import type { RangeBoundary } from "./ranges";
+import type { Text } from "@codemirror/state";
+import { markdownReferenceTarget } from "./references";
 
 export type MarkdownImageRange = RangeBoundary & {
-  /** Markdown passed to the preview widget (destination form when possible). */
+  /** Complete preview fragment, including the definition for a reference. */
   source: string;
+  referenceLabel?: string;
 };
 
 /**
@@ -15,9 +18,20 @@ export type MarkdownImageRange = RangeBoundary & {
 const MARKDOWN_DESTINATION_IMAGE_PATTERN =
   /!\[((?:\\.|[^\]\\])*)\]\(((?:\\.|[^)\\])*)\)/gu;
 
-/** Reference-style image: `![alt][label]`. */
+/** Full, collapsed and shortcut references; rendering still requires a definition. */
 const MARKDOWN_REFERENCE_IMAGE_PATTERN =
-  /!\[((?:\\.|[^\]\\])*)\]\[([^\]]+)\]/gu;
+  /!\[((?:\\.|[^\]\\])*)\](?:\[([^\]]*)\])?/gu;
+
+export function markdownImageReferenceLabel(
+  markdown: string,
+  documentText: string | Text = markdown,
+): string | undefined {
+  MARKDOWN_REFERENCE_IMAGE_PATTERN.lastIndex = 0;
+  const match = MARKDOWN_REFERENCE_IMAGE_PATTERN.exec(markdown.trim());
+  return match && match[0] === markdown.trim()
+    ? markdownReferenceTarget(documentText, match[2] || match[1] || "")?.label
+    : undefined;
+}
 
 export function isStandaloneMarkdownImageLine(text: string): boolean {
   const trimmed = text.trim();
@@ -40,7 +54,7 @@ export function isStandaloneMarkdownImageLine(text: string): boolean {
 
 export function resolveMarkdownImageWidgetSource(
   imageMarkdown: string,
-  documentText: string,
+  documentText: string | Text,
 ): string | null {
   const trimmed = imageMarkdown.trim();
 
@@ -56,25 +70,23 @@ export function resolveMarkdownImageWidgetSource(
     return null;
   }
 
-  const alt = reference[1] ?? "";
-  const label = reference[2] ?? "";
-  const definition = findMarkdownLinkDefinition(documentText, label);
+  const label = reference[2] || reference[1] || "";
+  const definition = markdownReferenceTarget(documentText, label);
   if (!definition) {
     return null;
   }
 
-  return definition.title
-    ? `![${alt}](${definition.destination} "${definition.title}")`
-    : `![${alt}](${definition.destination})`;
+  return `${trimmed}\n\n${definition.definition}`;
 }
 
 export function findMarkdownImageRanges(
   text: string,
-  documentText: string = text,
+  documentText: string | Text = text,
 ): MarkdownImageRange[] {
   const ranges: MarkdownImageRange[] = [];
   const codeRanges = findInlineCodeRanges(text);
 
+  MARKDOWN_DESTINATION_IMAGE_PATTERN.lastIndex = 0;
   for (const match of text.matchAll(MARKDOWN_DESTINATION_IMAGE_PATTERN)) {
     const localFrom = match.index ?? 0;
     const localTo = localFrom + match[0].length;
@@ -92,6 +104,7 @@ export function findMarkdownImageRanges(
     });
   }
 
+  MARKDOWN_REFERENCE_IMAGE_PATTERN.lastIndex = 0;
   for (const match of text.matchAll(MARKDOWN_REFERENCE_IMAGE_PATTERN)) {
     const localFrom = match.index ?? 0;
     const localTo = localFrom + match[0].length;
@@ -112,37 +125,9 @@ export function findMarkdownImageRanges(
       from: localFrom,
       to: localTo,
       source: resolved,
+      referenceLabel: markdownImageReferenceLabel(match[0], documentText),
     });
   }
 
   return ranges;
-}
-
-function findMarkdownLinkDefinition(
-  documentText: string,
-  label: string,
-): { destination: string; title: string | null } | null {
-  const normalizedLabel = normalizeReferenceLabel(label);
-  const definitionPattern =
-    /^\s*\[([^\]]+)\]:\s*<?([^\s>]+)>?(?:\s+(?:"([^"]*)"|'([^']*)'|\(([^)]*)\)))?\s*$/gm;
-
-  for (const match of documentText.matchAll(definitionPattern)) {
-    if (normalizeReferenceLabel(match[1] ?? "") !== normalizedLabel) {
-      continue;
-    }
-    const destination = match[2] ?? "";
-    if (!destination) {
-      continue;
-    }
-    return {
-      destination,
-      title: match[3] ?? match[4] ?? match[5] ?? null,
-    };
-  }
-
-  return null;
-}
-
-function normalizeReferenceLabel(label: string): string {
-  return label.trim().replace(/\s+/g, " ").toLowerCase();
 }

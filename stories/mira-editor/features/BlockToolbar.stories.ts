@@ -75,6 +75,7 @@ async function setupBlock(
       ".mira-block-toolbar-trigger--active",
     );
     expect(trigger).not.toBeNull();
+    expect(trigger!.closest('[aria-hidden="true"]')).toBeNull();
     return trigger!;
   });
 }

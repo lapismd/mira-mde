@@ -1,6 +1,7 @@
 <script lang="ts">
   // @ts-nocheck
   import { TableNode } from "./table-node";
+  import type { MiraExtension } from "../extensions";
   import * as Table from "@lapismd/mira/ui/table";
   import { cn } from "./utils";
   import ColumnEditor from "./editor-column.svelte";
@@ -45,12 +46,14 @@
     onDelete = () => {},
     onMouseUp = () => {},
     selectedCells = [],
+    extensions = [],
   }: {
     node: TableNode;
     onChange?: (data: string, props?: Record<string, any>) => void;
     onDelete?: (evt: Event) => void;
     onMouseUp?: (evt: MouseEvent) => void;
     selectedCells?: Array<[number, number]>;
+    extensions?: MiraExtension[];
   } = $props();
   let tableVersion = $state(0);
   let mdastNode = $derived.by(() => {
@@ -765,6 +768,7 @@
                     hProperties.displayColIndex ?? index}
                   {@const id = [sourceRowIndex, sourceColIndex].join(",")}
                   <MarkdownTableDataCell
+                    {extensions}
                     node={col}
                     {rowIndex}
                     colIndex={displayColIndex}

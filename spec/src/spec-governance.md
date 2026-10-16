@@ -1,5 +1,10 @@
 # Specification Governance
 
+Bundled inline-links coverage extends the comprehensive opt-in extension list
+and the existing preview export checks under MIRA-GOV-012. It does not add a
+publishable package or alter the six-package release graph. The catalog must
+continue rejecting missing component exports and missing comprehensive imports.
+
 Release CLI fixtures resolve the repository's Git store explicitly, including
 Jujutsu workspaces, and use a commit ID as the base reference. They copy only
 package metadata and use a controlled Changeset in a disposable fixture, so the
@@ -123,6 +128,14 @@ All repository workflows configure Node.js 24 and Node.js 24-compatible action
 majors. The generated Changesets version pull request does not repeat
 source-change governance; ordinary pull requests still compare their exact base
 and head revisions through the validator's native argument parser.
+
+Ordinary pull-request CI runs the Storybook interaction/accessibility suite
+(`pnpm test:storybook`) as well as static Storybook browser acceptance
+(`pnpm test:e2e`). These lanes remain separate from package tests and packed
+consumer checks. Both test steps run after an earlier failure unless the job
+was cancelled, so a failed interaction does not hide browser results. Local
+qualification may be deferred explicitly to CI, but unrun and failing gates
+must stay visible in the evidence record until CI reports their outcome.
 
 Rename-aware working-copy validation evaluates both the removed and added path
 of a Jujutsu or Git rename. Consolidating a protected workspace therefore

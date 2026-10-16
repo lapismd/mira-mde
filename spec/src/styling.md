@@ -1,5 +1,25 @@
 # Styling and CSS Tokens
 
+| ID           | Requirement                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| MIRA-CSS-044 | Live reference rows and image frames MUST use class-scoped shipped CSS and existing theme tokens. Reference names MUST retain their authored case and remain legible, with long names bounded by the available width. Image badges MUST occupy the upper trailing corner and source controls MUST remain keyboard accessible. Inline demonstration links MUST use the renderer's inline surface rather than acquiring full document padding. |
+
+## Inline link icons
+
+Rendered SVG geometry must preserve case-sensitive `viewBox` and
+`preserveAspectRatio` attributes. Hyphenated presentation properties such as
+`stroke-width` retain their normal attribute conversion.
+
+Link foreground and hover colors use Mira's existing Markdown external-link
+and link-hover tokens. The extension does not introduce an alternate link
+palette, and its examples inherit the selected Storybook palette.
+When a source label carries both hashtag and link syntax, its nested link
+token inherits the hashtag foreground so the tag background retains contrast.
+
+| ID           | Requirement                                                                                                                                                                                                                                                                                                                                     |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| MIRA-CSS-043 | Bundled inline links MUST ship class-scoped plain CSS through existing Mira stylesheets, with approximately one-em decorative icons, baseline alignment, natural wrapping, underlined labels and visible keyboard focus. Only decorated links suppress the trailing external-link arrow; disabled extensions MUST retain existing link styling. |
+
 Exported package styling works without Tailwind processing. Packages ship plain
 CSS and stable semantic hooks, with Mira variables preferred for consumer
 customization and Obsidian-compatible aliases retained as a compatibility layer.

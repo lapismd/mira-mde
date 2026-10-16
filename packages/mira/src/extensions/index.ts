@@ -3,6 +3,35 @@ import type { Extension as CodeMirrorExtension } from "@codemirror/state";
 import { keymap, type EditorView, type KeyBinding } from "@codemirror/view";
 import type { Component } from "svelte";
 import type { Pluggable } from "unified";
+import type {
+  MiraMarkdownEditingBinding,
+  MiraMarkdownEditingSession,
+} from "./markdown-editing";
+
+export type {
+  MiraMarkdownEditingBinding,
+  MiraMarkdownEditingSession,
+  MiraMarkdownRecoveryLease,
+  MiraMarkdownTextSession,
+  MiraMarkdownTextState,
+} from "./markdown-editing";
+
+export {
+  inlineLinksExtension,
+  type MiraInlineLinksOptions,
+} from "./inline-links";
+export {
+  createLinkIconRegistry,
+  defaultMiraLinkIcons,
+  defaultMiraLinkHosts,
+  defaultMiraLinkFallbackIcon,
+  defaultMiraLinkIconRegistry,
+  type MiraLinkIconDefinition,
+  type MiraLinkIconPath,
+  type MiraLinkIconRegistry,
+  type MiraLinkIconRegistryOptions,
+  type MiraResolvedLinkIcon,
+} from "../internal/inline-links/registry";
 
 export {
   defaultMiraDoodleDividerPalette,
@@ -356,9 +385,17 @@ export type MiraFileWatchTarget = MiraFileTarget & {
 export function parseMiraFileTarget(
   href: string,
   sourcePath?: string,
+  options: { decodeUri?: boolean } = {},
 ): MiraFileTarget {
   const hashIndex = href.indexOf("#");
-  const path = (hashIndex === -1 ? href : href.slice(0, hashIndex)).trim();
+  let path = (hashIndex === -1 ? href : href.slice(0, hashIndex)).trim();
+  if (options.decodeUri) {
+    try {
+      path = decodeURIComponent(path);
+    } catch {
+      // Invalid URI sequences can be literal filename characters.
+    }
+  }
   const subpath =
     hashIndex === -1
       ? undefined
@@ -492,14 +529,11 @@ export function resolveMiraListCallouts(
   }));
 }
 
-/** A portable persistence barrier owned by one source-bound Markdown writer. */
-export type MiraMarkdownEditingSession = {
-  readonly dirty: boolean;
-  flush: () => Promise<void>;
-  protect: () => Promise<() => void>;
-};
-
 export type MiraFileAdapter = {
+  bindMarkdownEditingSession?: (
+    sourcePath: string,
+    session: MiraMarkdownEditingSession,
+  ) => MiraMarkdownEditingBinding;
   registerEditingSession?: (
     sourcePath: string,
     session: MiraMarkdownEditingSession,
@@ -510,6 +544,8 @@ export type MiraFileAdapter = {
   readMarkdown?: (file: MiraFileRef) => string | null | Promise<string | null>;
   writeMarkdown?: (file: MiraFileRef, value: string) => void | Promise<void>;
   readAssetUrl?: (file: MiraFileRef) => string | null | Promise<string | null>;
+  /** Releases one URL acquired through readAssetUrl, including a cancelled read. */
+  releaseAssetUrl?: (url: string) => void;
   openFile?: (file: MiraFileRef, event?: MouseEvent) => void | Promise<void>;
   renderEmbed?: (
     target: MiraFileTarget & {
@@ -557,6 +593,8 @@ export type MiraExtensionContext = {
   readonly mode: MiraMode;
   readonly readonly: boolean;
   readonly sourcePath?: string;
+  /** Full composition for extension-owned nested preview surfaces. */
+  readonly extensions?: readonly MiraExtension[];
 };
 
 export type MiraExtensionContribution =
@@ -627,7 +665,7 @@ export function resolveMiraExtensions(
   const resolved = emptyResolvedMiraExtensions();
 
   for (const extension of extensions) {
-    const codeMirror = extension.codeMirror?.(context);
+    const codeMirror = extension.codeMirror?.({ ...context, extensions });
     if (codeMirror) {
       resolved.codeMirror.push(...[codeMirror].flat());
     }

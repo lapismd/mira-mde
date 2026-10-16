@@ -5,6 +5,7 @@
   import { cn } from "./utils";
   import type * as Mdast from "mdast";
   import ColumnEditor from "./editor-column.svelte";
+  import type { MiraExtension } from "../extensions";
   import type { MarkdownTableDragSource } from "./markdown-table-dnd";
   import {
     dropIndicatorClasses,
@@ -14,6 +15,7 @@
 
   type Props = {
     node: Mdast.Nodes;
+    extensions?: MiraExtension[];
     rowIndex: number;
     colIndex: number;
     sourceRowIndex?: number;
@@ -33,6 +35,7 @@
 
   let {
     node,
+    extensions = [],
     rowIndex,
     colIndex,
     sourceRowIndex = rowIndex,
@@ -109,6 +112,7 @@
   )}
 >
   <ColumnEditor
+    {extensions}
     {node}
     {onContentChange}
     {readonly}

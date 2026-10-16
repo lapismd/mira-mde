@@ -1,5 +1,10 @@
 # Architecture and Boundaries
 
+Inline site-icon links follow the bundled opt-in extension boundary, alongside
+doodle dividers and selection toolbars. Their registry is local presentation
+data; it does not depend on forge accounts or application preferences. Public
+package identities and dependency direction remain unchanged.
+
 Mira is a pnpm monorepo of independently buildable public products. The
 workspace root, six public packages, and private adapters are licensed
 Apache-2.0. Supported entry points are defined in

@@ -10,6 +10,7 @@
     selectMarkdownEmbedFragment,
   } from "../embed-target";
   import EmbeddedMarkdownPreview from "./embedded-markdown-preview.svelte";
+  import { createAssetUrlLease } from "../asset-url-lease";
 
   type Props = {
     href?: string;
@@ -43,7 +44,9 @@
 
   const target = $derived(id || href);
   const activeSourcePath = $derived(sourcePath || markdown.sourcePath);
-  const parsedTarget = $derived(parseMiraFileTarget(target, activeSourcePath));
+  const parsedTarget = $derived(
+    parseMiraFileTarget(target, activeSourcePath, { decodeUri: !id }),
+  );
   const imageDetails = $derived(
     parseMiraImageDetails(
       text || label,
@@ -162,10 +165,11 @@
     }
 
     let cancelled = false;
-    Promise.all([
-      adapter.readMarkdown ? Promise.resolve(adapter.readMarkdown(file)) : null,
-      adapter.readAssetUrl ? Promise.resolve(adapter.readAssetUrl(file)) : null,
-    ]).then(
+    const nextMarkdown = Promise.resolve().then(
+      () => adapter.readMarkdown?.(file) ?? null,
+    );
+    const asset = createAssetUrlLease(adapter, file);
+    Promise.all([nextMarkdown, asset.result]).then(
       ([nextMarkdown, nextAssetUrl]) => {
         if (!cancelled) {
           if (nextMarkdown !== null) {
@@ -189,6 +193,7 @@
 
     return () => {
       cancelled = true;
+      asset.release();
     };
   });
 </script>

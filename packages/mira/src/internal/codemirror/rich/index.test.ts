@@ -1,6 +1,11 @@
+import { readFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { history, undo } from "@codemirror/commands";
+import { syntaxHighlighting } from "@codemirror/language";
 import { describe, expect, it, vi } from "vitest";
 import { EditorView } from "@codemirror/view";
+import { miraClassHighlighter } from "../base";
 import {
   defineMiraExtension,
   doodleDividersExtension,
@@ -8,8 +13,54 @@ import {
 import { createMarkdownCodeMirrorExtensions } from "../markdown";
 import { createRichEditorExtensions } from ".";
 
+const externalLinkIconStyles = readFileSync(
+  resolve(
+    dirname(fileURLToPath(import.meta.url)),
+    "../../../preview/styles/links-embeds-tags.css",
+  ),
+  "utf8",
+);
+
 function nextFrame(): Promise<void> {
   return new Promise((resolve) => requestAnimationFrame(() => resolve()));
+}
+
+function installExternalLinkIconStyles(): () => void {
+  const style = document.createElement("style");
+  style.dataset.externalLinkIcon = "true";
+  style.textContent = externalLinkIconStyles;
+  document.head.append(style);
+  return () => style.remove();
+}
+
+function outermostMatch(
+  root: ParentNode,
+  selector: string,
+  text: string,
+): HTMLElement | undefined {
+  return [...root.querySelectorAll<HTMLElement>(selector)].find(
+    (element) =>
+      (element.textContent || "").includes(text) &&
+      !element.parentElement?.closest(selector),
+  );
+}
+
+function visibleExternalLinkIcons(root: HTMLElement): HTMLElement[] {
+  return [root, ...root.querySelectorAll<HTMLElement>("*")].filter(
+    (element) => {
+      const style = getComputedStyle(element);
+      if (!style.backgroundImage.includes("data:image/svg+xml")) {
+        return false;
+      }
+      if (style.display === "none" || style.visibility === "hidden") {
+        return false;
+      }
+      return !(
+        Number.parseFloat(style.width) === 0 &&
+        Number.parseFloat(style.height) === 0
+      );
+    },
+  );
 }
 
 describe("createRichEditorExtensions", () => {
@@ -463,6 +514,87 @@ After`;
 
     view.destroy();
     parent.remove();
+  });
+
+  it("shows one external-link icon while a live-preview link is edited", async () => {
+    const removeStyles = installExternalLinkIconStyles();
+    const parent = document.createElement("div");
+    document.body.append(parent);
+    const labeledLink = "[external links](https://example.com)";
+    const source = `[relative links](notes/markdown.md), ${labeledLink}, and automatic links like https://example.com.`;
+    const caret = source.indexOf(labeledLink) + "[external links](".length;
+    const view = new EditorView({
+      doc: source,
+      selection: { anchor: caret },
+      extensions: [
+        syntaxHighlighting(miraClassHighlighter),
+        createMarkdownCodeMirrorExtensions(),
+        createRichEditorExtensions({ livePreview: true }),
+      ],
+      parent,
+    });
+    await nextFrame();
+    await nextFrame();
+
+    const externalLink = outermostMatch(
+      parent,
+      ".cm-external-link",
+      "external links",
+    );
+    const autolink = [
+      ...parent.querySelectorAll<HTMLElement>(".cm-external-link"),
+    ].find(
+      (element) =>
+        element.textContent === "https://example.com" &&
+        !element.parentElement?.closest(".cm-external-link"),
+    );
+    const relativeLink = outermostMatch(
+      parent,
+      ".cm-internal-link",
+      "relative links",
+    );
+
+    expect(externalLink).toBeDefined();
+    expect(autolink).toBeDefined();
+    expect(autolink?.querySelector(".cm-url")).not.toBeNull();
+    expect(relativeLink).toBeDefined();
+    expect(externalLink?.textContent).toContain("https://example.com");
+    expect(
+      [...(externalLink?.querySelectorAll(".cm-formatting-hidden") ?? [])].some(
+        (node) => (node.textContent || "").includes("https://example.com"),
+      ),
+    ).toBe(false);
+    expect(visibleExternalLinkIcons(externalLink!)).toHaveLength(1);
+    expect(visibleExternalLinkIcons(autolink!)).toHaveLength(1);
+    expect(visibleExternalLinkIcons(relativeLink!)).toHaveLength(0);
+
+    const externalLabel =
+      externalLink?.querySelector<HTMLElement>(".cm-link-text");
+    const relativeLabel =
+      relativeLink?.querySelector<HTMLElement>(".cm-link-text");
+    const autolinkUrl = autolink?.querySelector<HTMLElement>(".cm-url");
+    expect(externalLabel).toBeTruthy();
+    expect(relativeLabel).toBeTruthy();
+    expect(autolinkUrl).toBeTruthy();
+    const relativeText = relativeLabel?.querySelector<HTMLElement>(".cm-link");
+    expect(relativeText).toBeTruthy();
+    expect(getComputedStyle(externalLabel!).textDecorationLine).toBe(
+      getComputedStyle(relativeLabel!).textDecorationLine,
+    );
+    expect(
+      getComputedStyle(externalLabel!.querySelector(".cm-link")!)
+        .textDecorationLine,
+    ).toBe(getComputedStyle(relativeText!).textDecorationLine);
+    expect(getComputedStyle(autolinkUrl!).textDecorationLine).toBe(
+      getComputedStyle(relativeText!).textDecorationLine,
+    );
+    expect(getComputedStyle(autolink!).textDecorationLine).toBe(
+      getComputedStyle(relativeLabel!).textDecorationLine,
+    );
+
+    view.destroy();
+    parent.remove();
+    removeStyles();
   });
 
   it("keeps hidden heading syntax out of the live-preview line box", async () => {

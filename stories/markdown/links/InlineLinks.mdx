@@ -1,0 +1,45 @@
+import { Meta, Canvas, Source } from "@storybook/addon-docs/blocks";
+import * as InlineLinksStories from "./InlineLinks.stories";
+
+<Meta of={InlineLinksStories} />
+
+# Bundled inline links
+
+Enable local site icons with the existing Mira extension API. The canonical
+contract is [Bundled inline links](?path=/docs/mira-specification-portable-markdown-and-editor--docs).
+Import the normal `@lapismd/mira/styles.css`; no additional package is needed.
+Use Storybook's palette and light/dark controls to review each example's theme.
+The standard Mira Editor toolbar changes the reading, source, live and split
+views. Inactive reference definitions show their defined name and destination; selecting source reveals
+the complete definition for editing.
+
+```ts
+import {
+  createLinkIconRegistry,
+  inlineLinksExtension,
+} from "@lapismd/mira/extensions";
+
+const registry = createLinkIconRegistry({
+  icons: { github: replacementSvg, companyDocs: companySvg },
+  hosts: { "git.example.com": "gitlab", "docs.example.com": "companyDocs" },
+  subdomains: { "docs.example.com": "companyDocs" },
+});
+const extensions = [inlineLinksExtension({ registry })];
+```
+
+SVG definitions have `viewBox` and `paths` with `d`, optional `fill`, `stroke`,
+`strokeWidth`, `strokeLinecap`, `strokeLinejoin` and `fillRule`. Colors use
+`currentColor` or `none`. Use `null` to disable an icon or host mapping,
+`fallback: null` to omit unknown icons, and `defaults: false` for custom-only
+registries. Replace the registry/extension to update configuration. Registries
+copy and freeze input data and never change another editor's icons.
+
+<Canvas of={InlineLinksStories.Default} />
+<Canvas of={InlineLinksStories.OverridesAndPrivateHosts} />
+<Canvas of={InlineLinksStories.CustomOnly} />
+<Canvas of={InlineLinksStories.LivePreview} />
+
+`InlineLink` and `LinkSiteIcon` are exported from `@lapismd/mira/preview` for
+standalone Svelte usage, accepting the same optional `registry`. Labelled links
+reveal their destination on focus/hover. Icons are decorative and locally
+bundled; the extension never fetches metadata or favicons.

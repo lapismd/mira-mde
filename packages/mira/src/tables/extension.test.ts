@@ -1,4 +1,4 @@
-import { syntaxTree } from "@codemirror/language";
+import { forceParsing, syntaxTree } from "@codemirror/language";
 import { EditorState } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
 import { describe, expect, it } from "vitest";
@@ -92,6 +92,9 @@ describe("table extension", () => {
 
   it("decorates every grid-table source row as monospaced table syntax", () => {
     const view = createGridTableEditor(gridTableMarkdown.indexOf("Feature"));
+    // The initial parser has a time budget; inspect decorations only after its
+    // tree has been published to the view, including under full-suite load.
+    expect(forceParsing(view, view.state.doc.length)).toBe(true);
     const tableLines = view.dom.querySelectorAll(
       ".cm-line.cm-table.cm-formatting-table.cm-formatting-grid-table",
     );

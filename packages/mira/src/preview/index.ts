@@ -1,4 +1,6 @@
 import MarkdownPreview from "./markdown-preview.svelte";
+export { default as InlineLink } from "./components/inline-link.svelte";
+export { default as LinkSiteIcon } from "./components/link-site-icon.svelte";
 import MarkdownOutline from "./markdown-outline.svelte";
 import Markdown from "./renderer/markdown.svelte";
 import FileEmbed from "./file-embed.svelte";

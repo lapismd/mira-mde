@@ -141,6 +141,7 @@ test("requires every first-party plugin and opt-in toolbar in the comprehensive 
 import { mermaidExtension } from "@lapismd/mira-plugin-mermaid";
 doodleDividersExtension();
 selectionToolbarExtension();
+inlineLinksExtension();
 const featureConfigs = { [MiraFeature.BlockControls]: { toolbar: true } };
 <Mira {blockControls} />;
 `,
@@ -150,7 +151,7 @@ const featureConfigs = { [MiraFeature.BlockControls]: { toolbar: true } };
     const valid = validateComprehensivePluginCoverage({ repoRoot });
     assert.equal(valid.ok, true);
     assert.equal(valid.stats.pluginPackages, 2);
-    assert.equal(valid.stats.optInExtensions, 2);
+    assert.equal(valid.stats.optInExtensions, 3);
 
     writeFileSync(
       storyPath,

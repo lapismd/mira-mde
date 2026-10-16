@@ -265,6 +265,24 @@ describe("extension runtime contributions", () => {
 });
 
 describe("portable file targets", () => {
+  it("decodes URI paths once while preserving the authored href and malformed percent names", () => {
+    const href = "assets/caf%C3%A9%20%2520.png#Heading";
+    expect(
+      parseMiraFileTarget(href, "note.md", { decodeUri: true }),
+    ).toMatchObject({
+      href,
+      path: "assets/café %20.png",
+      sourcePath: "note.md",
+      subpath: "Heading",
+    });
+    expect(
+      parseMiraFileTarget("assets/100%done.png", undefined, { decodeUri: true })
+        .path,
+    ).toBe("assets/100%done.png");
+    expect(parseMiraFileTarget("assets/literal%20name.png").path).toBe(
+      "assets/literal%20name.png",
+    );
+  });
   it("separates paths from heading and block fragments", () => {
     expect(parseMiraFileTarget("notes/plan.md#Next Steps", "daily.md")).toEqual(
       {

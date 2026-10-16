@@ -7,6 +7,7 @@
   import { useMarkdownContext } from "../renderer/context.svelte";
   import { isImageDataUri } from "../remark";
   import { parseMiraImageDetails } from "../embed-target";
+  import { createAssetUrlLease } from "../asset-url-lease";
 
   type Props = {
     src?: string;
@@ -24,7 +25,9 @@
   let targetRevision = $state(0);
   let contentRevision = $state(0);
 
-  const target = $derived(parseMiraFileTarget(src, markdown.sourcePath));
+  const target = $derived(
+    parseMiraFileTarget(src, markdown.sourcePath, { decodeUri: true }),
+  );
   const imageDetails = $derived(parseMiraImageDetails(alt));
   const resolvedAlt = $derived(imageDetails.alt);
 
@@ -108,7 +111,8 @@
     contentRevision;
     if (resolvedFile && markdown.fileAdapter?.readAssetUrl) {
       let cancelled = false;
-      Promise.resolve(markdown.fileAdapter.readAssetUrl(resolvedFile)).then(
+      const asset = createAssetUrlLease(markdown.fileAdapter, resolvedFile);
+      asset.result.then(
         (url) => {
           if (!cancelled) {
             adapterSrc = url ?? null;
@@ -122,6 +126,7 @@
       );
       return () => {
         cancelled = true;
+        asset.release();
       };
     }
   });

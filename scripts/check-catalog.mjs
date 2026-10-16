@@ -12,6 +12,7 @@ export const INTERNAL_STYLE_TOKENS = new Set(["--mira-property-depth"]);
 export const COMPREHENSIVE_OPT_IN_EXTENSIONS = [
   "doodleDividersExtension",
   "selectionToolbarExtension",
+  "inlineLinksExtension",
 ];
 
 export const PUBLIC_SURFACES = [
@@ -36,6 +37,8 @@ export const PUBLIC_SURFACES = [
       "FileEmbed",
       "MarkdownEmbed",
       "NoteLink",
+      "InlineLink",
+      "LinkSiteIcon",
     ],
   },
   {

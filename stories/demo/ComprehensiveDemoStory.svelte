@@ -10,6 +10,7 @@
   } from "@lapismd/mira-editor";
   import {
     doodleDividersExtension,
+    inlineLinksExtension,
     selectionToolbarExtension,
     type MiraBlockControlsOptions,
     type MiraColorMode,
@@ -58,14 +59,16 @@
 
   const selectionToolbar = selectionToolbarExtension();
   const doodleDividers = doodleDividersExtension();
+  const inlineLinks = inlineLinksExtension();
   const ai = aiExtension({
     run: async () =>
       "Mira comprehensive demo: deterministic local AI response.",
   });
-  const defaultExtensions = [selectionToolbar, doodleDividers, ai];
+  const defaultExtensions = [selectionToolbar, doodleDividers, inlineLinks, ai];
   const extensions = $derived([
     selectionToolbar,
     doodleDividers,
+    inlineLinks,
     ai,
     ...(mermaidEnabled ? [mermaidExtension()] : []),
   ]);
@@ -104,7 +107,7 @@
   class:light={colorMode === "light"}
   class:theme-light={colorMode === "light"}
   class="mira-comprehensive"
-  data-mira-comprehensive-extensions="selection-toolbar doodle-dividers"
+  data-mira-comprehensive-extensions="selection-toolbar doodle-dividers inline-links"
   data-mira-comprehensive-plugins={mermaidEnabled ? "ai mermaid" : "ai"}
   data-mira-theme={theme?.trim() ? theme : undefined}
   data-mira-color-mode={colorMode === "inherit" ? undefined : colorMode}

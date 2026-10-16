@@ -1,0 +1,72 @@
+.mira-reference-definition.mira-reference--link {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5em;
+  min-width: 0;
+  padding-block: 0.25em;
+}
+
+.mira-reference--link .mira-reference__label {
+  color: var(--mira-muted-foreground);
+  flex: none;
+  font-size: 0.75em;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  max-inline-size: 40%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mira-reference--link > p {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.mira-reference--image {
+  position: relative;
+  display: inline-block;
+  box-sizing: border-box;
+  max-width: 100%;
+  border: 1px solid var(--mira-border);
+  border-radius: var(--mira-radius, 8px);
+  padding: 0.75rem;
+  background: var(--mira-background);
+}
+
+/* Give percentage-constrained SVGs a definite containing width in block frames. */
+.mira-rich-widget--block.mira-reference--image .mira-markdown-image-root,
+.mira-rich-widget--block.mira-reference--image .mira-markdown-image__trigger {
+  display: block;
+}
+
+.mira-rich-widget--block.mira-reference--image .mira-markdown-image__trigger {
+  width: 100%;
+}
+
+.mira-reference--image > .mira-reference__label {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-end: 0;
+  z-index: 1;
+  border-end-start-radius: var(--mira-radius, 8px);
+  border-start-end-radius: calc(var(--mira-radius, 8px) - 1px);
+  background: var(--mira-accent);
+  color: var(--mira-accent-foreground);
+  font-size: 0.75em;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  padding: 0.35em 0.65em;
+  box-sizing: border-box;
+  max-inline-size: 75%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.mira-reference--image .mira-rich-widget__source-toggle {
+  inset-inline-start: 0.25rem;
+  inset-inline-end: auto;
+}

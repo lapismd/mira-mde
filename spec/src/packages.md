@@ -1,5 +1,37 @@
 # Public Packages and Entry Points
 
+Reference-definition presentation remains in Mira's owned rich-editor and
+preview layers. It reuses the existing renderer, asset resolver and source
+selection contracts without new public packages or entry points.
+
+## Bundled inline-link entry points
+
+| ID            | Requirement                                                                                                                                                                                                                                                                                                                                                                                          |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| MIRA-ARCH-044 | `@lapismd/mira/extensions` MUST export `inlineLinksExtension`, `createLinkIconRegistry`, immutable default icon definitions and their public types. `@lapismd/mira/preview` MUST export `InlineLink` and `LinkSiteIcon`. This opt-in feature MUST remain inside Mira's existing six-package release set and existing stylesheet exports, without a new public package or consumer source dependency. |
+
+SVG definitions contain local viewBox and path geometry with explicit fill and
+stroke options, never raw SVG markup or external asset URLs. The bundled
+defaults retain Simple Icons and Lucide source/version/license attribution.
+
+The extension runtime context optionally exposes the complete ordered
+`extensions` composition, so extension-owned nested previews retain consumer
+renderers and transformations. Direct callers may omit this additive field.
+
+The public rich-editor exports retain their entrypoints. Interactive gutter
+accessibility now settles after synchronous DOM updates, before the next paint,
+without waiting for geometry measurement.
+
+The public `@lapismd/mira/extensions` file-adapter contract includes optional
+bound Markdown writes and portable text-recovery leases under MIRA-MD-046 and
+MIRA-MD-047. These callbacks carry source-session identity and state; they do
+not import host application, vault, database or conflict-presentation types.
+
+Internal-link previews retain that captured session across equivalent target
+resolutions under MIRA-MD-049. Empty saved text remains a valid editable
+preview under MIRA-MD-050. These corrections preserve the public preview
+entrypoints and keep storage validation in the owning adapter.
+
 ## Editing-session adapter capability
 
 | ID            | Requirement                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
@@ -332,3 +364,7 @@ DOM hooks follow the same hard migration: `mira-mde*`, `mira-default-ui*`, and
 `mira-default-toolbar*` become `mira*`, `mira-editor*`, and
 `mira-editor-toolbar*`. The stable `--mira-*` token namespace and portable
 `markdown-*`, `cm-*`, and Obsidian-compatibility hooks remain unchanged.
+
+Interactive Markdown gutters follow MIRA-MD-043 in [Editor and Markdown](editor-and-markdown.md): the core CodeMirror extension owns accessible controls and restores its attribute changes when removed.
+
+MIRA-MD-044 and MIRA-MD-045 govern public file-target URI normalization and the optional MiraFileAdapter.releaseAssetUrl lifecycle hook. Asset URLs returned by a host remain host-owned resources; previews release each acquired URL without interpreting its protocol.

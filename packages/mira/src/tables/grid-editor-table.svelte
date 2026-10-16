@@ -4,6 +4,7 @@
   import * as Table from "@lapismd/mira/ui/table";
   import { cn } from "./utils";
   import ColumnEditor from "./grid-editor-column.svelte";
+  import type { MiraExtension } from "../extensions";
   import * as Tooltip from "@lapismd/mira/ui/tooltip";
   import Delete from "@lucide/svelte/icons/trash";
   import Elipsis from "@lucide/svelte/icons/ellipsis";
@@ -30,12 +31,14 @@
     onDelete = () => {},
     onMouseUp = () => {},
     selectedCells = [],
+    extensions = [],
   }: {
     node: GridTableNode;
     onChange?: (data: string, props?: Record<string, any>) => void;
     onDelete?: (evt: Event) => void;
     onMouseUp?: (evt: MouseEvent) => void;
     selectedCells?: Array<[number, number]>;
+    extensions?: MiraExtension[];
   } = $props();
   let tableVersion = $state(0);
   let columnCount = $derived.by(() => {
@@ -1107,6 +1110,7 @@
           })}
         >
           <ColumnEditor
+            {extensions}
             content={cell.cell.content}
             class={cn({
               "text-left": cell.cell.align === "left",

@@ -725,6 +725,8 @@ export const catalogEntries = [
       "FileEmbed",
       "MarkdownEmbed",
       "NoteLink",
+      "InlineLink",
+      "LinkSiteIcon",
     ],
     description:
       "Reading, outline, renderer, link, and embed surfaces shared by the editor and standalone preview consumers.",

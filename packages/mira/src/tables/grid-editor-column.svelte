@@ -3,17 +3,20 @@
   import { EditorView, keymap } from "@codemirror/view";
   import { EditorState } from "@codemirror/state";
   import { cn } from "./utils";
-  import { tick } from "svelte";
+  import { tick, onDestroy } from "svelte";
   import { MarkdownPreview } from "@lapismd/mira/preview";
+  import type { MiraExtension } from "../extensions";
   import { createInlineTableMarkdownExtensions } from "./inline-editor-extensions";
 
   let {
     content,
+    extensions = [],
     onContentChange,
     onEdit = () => true,
     class: className,
   }: {
     content: string;
+    extensions?: MiraExtension[];
     class?: string;
     onContentChange: (value: string) => void;
     onEdit?: (evt: MouseEvent) => boolean;
@@ -50,6 +53,7 @@
     }),
   });
 
+  onDestroy(() => view.destroy());
   let editing: boolean = $state(false);
 
   const codeMirror = (node: HTMLDivElement, content: string) => {
@@ -108,7 +112,7 @@
         <div class="cm-scroller">
           <div class="cm-content">
             {#if content}
-              <MarkdownPreview inline value={content} />
+              <MarkdownPreview inline value={content} {extensions} />
             {:else}
               &NonBreakingSpace;
             {/if}
