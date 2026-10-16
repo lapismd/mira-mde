@@ -5,8 +5,10 @@
   import { EditorView } from "@codemirror/view";
   import { EditorState } from "@codemirror/state";
   import { cn } from "./utils";
-  import { tick } from "svelte";
+  import { tick, onDestroy } from "svelte";
   import { toHtml } from "./utils";
+  import { MarkdownPreview } from "@lapismd/mira/preview";
+  import type { MiraExtension } from "../extensions";
   import { createInlineTableMarkdownExtensions } from "./inline-editor-extensions";
 
   let {
@@ -14,6 +16,7 @@
     onContentChange,
     onEdit = () => {},
     readonly = false,
+    extensions = [],
     class: className,
   }: {
     node: Mdast.Nodes;
@@ -21,6 +24,7 @@
     onContentChange: (value: string) => void;
     onEdit?: (evt: MouseEvent) => void;
     readonly?: boolean;
+    extensions?: MiraExtension[];
   } = $props();
   let content = $derived(TableNode.toMarkdown(node).trim());
   let view: EditorView = new EditorView({
@@ -42,6 +46,7 @@
     }),
   });
 
+  onDestroy(() => view.destroy());
   let editing: boolean = $state(false);
 
   const codeMirror = (node: HTMLDivElement, content: string) => {
@@ -97,9 +102,13 @@
         <div class="cm-scroller">
           <div class="cm-content">
             {#if content}
-              {#await toHtml(content) then markup}
-                {@html markup}
-              {/await}
+              {#if extensions.length}<MarkdownPreview
+                  inline
+                  value={content}
+                  {extensions}
+                />{:else}{#await toHtml(content) then markup}
+                  {@html markup}
+                {/await}{/if}
             {:else}
               &NonBreakingSpace;
             {/if}
@@ -115,9 +124,13 @@
         <div class="cm-scroller">
           <div class="cm-content">
             {#if content}
-              {#await toHtml(content) then markup}
-                {@html markup}
-              {/await}
+              {#if extensions.length}<MarkdownPreview
+                  inline
+                  value={content}
+                  {extensions}
+                />{:else}{#await toHtml(content) then markup}
+                  {@html markup}
+                {/await}{/if}
             {:else}
               &NonBreakingSpace;
             {/if}

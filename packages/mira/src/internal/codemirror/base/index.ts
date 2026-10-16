@@ -250,6 +250,9 @@ export const miraEditorTheme = EditorView.theme({
     fontWeight: "550",
     padding: "0.05em 0.35em",
   },
+  ".cm-hashtag .cm-link": {
+    color: "inherit",
+  },
   ".cm-invalid": {
     backgroundColor: "var(--mira-syntax-invalid-background)",
     color: "var(--mira-syntax-invalid)",

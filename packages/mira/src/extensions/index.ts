@@ -5,6 +5,23 @@ import type { Component } from "svelte";
 import type { Pluggable } from "unified";
 
 export {
+  inlineLinksExtension,
+  type MiraInlineLinksOptions,
+} from "./inline-links";
+export {
+  createLinkIconRegistry,
+  defaultMiraLinkIcons,
+  defaultMiraLinkHosts,
+  defaultMiraLinkFallbackIcon,
+  defaultMiraLinkIconRegistry,
+  type MiraLinkIconDefinition,
+  type MiraLinkIconPath,
+  type MiraLinkIconRegistry,
+  type MiraLinkIconRegistryOptions,
+  type MiraResolvedLinkIcon,
+} from "../internal/inline-links/registry";
+
+export {
   defaultMiraDoodleDividerPalette,
   defaultMiraDoodleDividerVariants,
   doodleDividersExtension,
@@ -557,6 +574,8 @@ export type MiraExtensionContext = {
   readonly mode: MiraMode;
   readonly readonly: boolean;
   readonly sourcePath?: string;
+  /** Full composition for extension-owned nested preview surfaces. */
+  readonly extensions?: readonly MiraExtension[];
 };
 
 export type MiraExtensionContribution =
@@ -627,7 +646,7 @@ export function resolveMiraExtensions(
   const resolved = emptyResolvedMiraExtensions();
 
   for (const extension of extensions) {
-    const codeMirror = extension.codeMirror?.(context);
+    const codeMirror = extension.codeMirror?.({ ...context, extensions });
     if (codeMirror) {
       resolved.codeMirror.push(...[codeMirror].flat());
     }

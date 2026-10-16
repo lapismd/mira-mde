@@ -17,6 +17,7 @@
   "types": "./dist/index.d.ts",
   "files": [
     "CHANGELOG.md",
+    "inline-links-NOTICE.md",
     "dist",
     "!dist/**/*.test.*",
     "!dist/**/*.spec.*",

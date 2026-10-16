@@ -138,7 +138,6 @@ const svgCamelCaseAttributes = new Set([
   "markerEnd",
   "markerMid",
   "markerStart",
-  "preserveAspectRatio",
   "strokeDasharray",
   "strokeDashoffset",
   "strokeLinecap",
@@ -147,7 +146,6 @@ const svgCamelCaseAttributes = new Set([
   "strokeOpacity",
   "strokeWidth",
   "textAnchor",
-  "viewBox",
   "xlinkHref",
 ]);
 

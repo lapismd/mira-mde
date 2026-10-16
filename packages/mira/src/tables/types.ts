@@ -1,3 +1,5 @@
+import type { MiraExtension } from "../extensions";
+
 export const TYPE_TABLE = "gridTable";
 export const TYPE_HEADER = "gtHeader";
 export const TYPE_BODY = "gtBody";
@@ -15,6 +17,7 @@ export type MarkdownTable = {
 
 export type MarkdownTableWidgetOptions = {
   markdown: string;
+  extensions?: MiraExtension[];
   onChange: (nextMarkdown: string) => void;
   onDelete?: () => void;
   onSource?: () => void;

@@ -88,7 +88,7 @@ test("the comprehensive demo enables every first-party plugin and contextual too
   const root = page.locator(".mira-comprehensive");
   await expect(root).toHaveAttribute(
     "data-mira-comprehensive-extensions",
-    "selection-toolbar doodle-dividers",
+    "selection-toolbar doodle-dividers inline-links",
   );
   await expect(root).toHaveAttribute(
     "data-mira-comprehensive-plugins",

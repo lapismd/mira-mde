@@ -6,6 +6,7 @@ import {
 } from "@lapismd/mira/tables";
 import { MarkdownPreview } from "@lapismd/mira/preview";
 import { mount, unmount } from "svelte";
+import { destroyTableWidget } from "../../../../tables/widgets/lifecycle";
 import {
   collectMiraDoodleDividerRules,
   formatMiraDoodleDividerSeed,
@@ -56,7 +57,8 @@ export class BlockPreviewWidget extends WidgetType {
       this.config.nodeName === other.config.nodeName &&
       this.config.options.frontmatterOpen ===
         other.config.options.frontmatterOpen &&
-      this.config.options.readonly === other.config.options.readonly
+      this.config.options.readonly === other.config.options.readonly &&
+      this.config.options.extensions === other.config.options.extensions
     );
   }
 
@@ -88,6 +90,7 @@ export class BlockPreviewWidget extends WidgetType {
       container.append(
         createWidget({
           markdown: this.config.markdown,
+          extensions: this.config.options.extensions,
           onChange: (nextMarkdown) => {
             this.dispatchMarkdownReplacement(view, nextMarkdown);
           },
@@ -312,6 +315,7 @@ export class BlockPreviewWidget extends WidgetType {
   }
 
   override destroy(dom: HTMLElement): void {
+    destroyTableWidget(dom);
     previewWidgetObservers.get(dom)?.disconnect();
     previewWidgetObservers.delete(dom);
     const component = previewWidgetMounts.get(dom);
@@ -342,7 +346,9 @@ export class InlineMarkdownWidget extends WidgetType {
     return (
       this.config.from === other.config.from &&
       this.config.to === other.config.to &&
-      this.config.markdown === other.config.markdown
+      this.config.markdown === other.config.markdown &&
+      this.config.options.extensions === other.config.options.extensions &&
+      this.config.options.readonly === other.config.options.readonly
     );
   }
 
@@ -368,6 +374,7 @@ export class InlineMarkdownWidget extends WidgetType {
 
     const selectSource = (event: MouseEvent) => {
       if (
+        this.config.options.readonly ||
         event.button !== 0 ||
         event.metaKey ||
         event.ctrlKey ||

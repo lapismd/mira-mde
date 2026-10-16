@@ -1,5 +1,10 @@
 # Specification Governance
 
+Bundled inline-links coverage extends the comprehensive opt-in extension list
+and the existing preview export checks under MIRA-GOV-012. It does not add a
+publishable package or alter the six-package release graph. The catalog must
+continue rejecting missing component exports and missing comprehensive imports.
+
 Release CLI fixtures resolve the repository's Git store explicitly, including
 Jujutsu workspaces, and use a commit ID as the base reference. They copy only
 package metadata and use a controlled Changeset in a disposable fixture, so the

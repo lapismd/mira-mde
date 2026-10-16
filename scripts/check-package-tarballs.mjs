@@ -126,15 +126,24 @@ function main() {
 import MiraEditor, { MiraEditorToolbar } from "@lapismd/mira-editor";
 import { mermaidExtension } from "@lapismd/mira-plugin-mermaid";
 import { aiExtension } from "@lapismd/mira-plugin-ai";
+import { inlineLinksExtension, createLinkIconRegistry, defaultMiraLinkIcons } from "@lapismd/mira/extensions";
+import { InlineLink, LinkSiteIcon } from "@lapismd/mira/preview";
+const extensions = [inlineLinksExtension({ registry: createLinkIconRegistry({ icons: { github: defaultMiraLinkIcons.gitlab }, hosts: { "git.example.com": "github" } }) })];
 const props: MiraProps = { value: "# Smoke" };
+props.extensions = extensions;
+void [InlineLink, LinkSiteIcon];
 void [Mira, MiraEditor, MiraEditorToolbar, mermaidExtension, aiExtension, props];
 `,
       "react.tsx": `import { Mira, MiraEditor, MiraEditorToolbar } from "@lapismd/mira-react";
-void <Mira value="# Smoke" />;
+import { inlineLinksExtension, createLinkIconRegistry } from "@lapismd/mira/extensions";
+void <Mira value="# Smoke" extensions={[inlineLinksExtension({ registry: createLinkIconRegistry() })]} />;
 void <MiraEditor value="# Smoke" />;
 void <MiraEditorToolbar />;
 `,
       "vanilla.ts": `import { createMira, createMiraEditor } from "@lapismd/mira-vanilla";
+import { inlineLinksExtension, createLinkIconRegistry } from "@lapismd/mira/extensions";
+const options: Parameters<typeof createMira>[1] = { value: "# Smoke", extensions: [inlineLinksExtension({ registry: createLinkIconRegistry() })] };
+void options;
 void [createMira, createMiraEditor];
 `,
     };

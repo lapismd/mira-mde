@@ -1,5 +1,20 @@
 # Portable Markdown and Editor
 
+## Bundled inline links
+
+| ID          | Requirement                                                                                                                                                                                                                                                                                                                                                             |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| MIRA-MD-043 | The opt-in bundled inline-links extension MUST decorate ordinary HTTP(S) links with local decorative site icons in reading, embedded, split and live-preview surfaces, including nested Markdown and table previews. It MUST preserve formatted labels, navigation, source editing, native/file/media links and code, and MUST NOT request external metadata or images. |
+| MIRA-MD-044 | Link-icon registries MUST be immutable and instance-local. Consumers MAY replace or disable built-in icons, add icons and exact-host or explicit subdomain mappings, disable defaults and configure the unknown-host fallback. Exact hosts MUST precede the most-specific subdomain rule. Unsafe or credential-bearing destinations MUST NOT be decorated.              |
+
+Labelled links expose their full destination on hover and keyboard focus using
+Mira's tooltip infrastructure. Source mode retains authored Markdown. Replacing
+an extension or registry must update visible icons without stale configuration,
+duplicate decorations or leaked editor mounts. Table widgets accept optional
+extensions and forward them into rendered cells without changing existing
+callers or table editing semantics. Preview cards and preference storage remain
+consumer concerns.
+
 ## External editing protection
 
 | ID          | Requirement                                                                                                                                                                                                                                                                                                                                                                                                                                                 |

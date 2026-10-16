@@ -10,6 +10,7 @@
 @import "./styles/blockquotes-footnotes.css";
 @import "./styles/code-katex.css";
 @import "./styles/links-embeds-tags.css";
+@import "./styles/inline-links.css";
 @import "./styles/callouts.css";
 @import "./styles/images.css";
 @import "./styles/tables.css";

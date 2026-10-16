@@ -1,5 +1,11 @@
 # Storybook Catalog
 
+## Bundled inline-link examples
+
+| ID           | Requirement                                                                                                                                                                                                                                                                                                                                                                             |
+| ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| MIRA-CAT-016 | Storybook MUST demonstrate bundled inline links with defaults, icon overrides, private hosts, custom-only registries, source/live/split modes, narrow layouts, themes and standalone components. Interaction acceptance MUST cover keyboard destinations, reconfiguration isolation, table propagation and zero external requests. New visual results remain pending separate approval. |
+
 Storybook is Mira's sole browsable documentation, demo, and component test host.
 Its catalog data is repository-owned test/documentation input, not a published
 runtime dependency.

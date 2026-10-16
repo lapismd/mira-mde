@@ -1,5 +1,19 @@
 # Public Packages and Entry Points
 
+## Bundled inline-link entry points
+
+| ID            | Requirement                                                                                                                                                                                                                                                                                                                                                                                          |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| MIRA-ARCH-044 | `@lapismd/mira/extensions` MUST export `inlineLinksExtension`, `createLinkIconRegistry`, immutable default icon definitions and their public types. `@lapismd/mira/preview` MUST export `InlineLink` and `LinkSiteIcon`. This opt-in feature MUST remain inside Mira's existing six-package release set and existing stylesheet exports, without a new public package or consumer source dependency. |
+
+SVG definitions contain local viewBox and path geometry with explicit fill and
+stroke options, never raw SVG markup or external asset URLs. The bundled
+defaults retain Simple Icons and Lucide source/version/license attribution.
+
+The extension runtime context optionally exposes the complete ordered
+`extensions` composition, so extension-owned nested previews retain consumer
+renderers and transformations. Direct callers may omit this additive field.
+
 ## Editing-session adapter capability
 
 | ID            | Requirement                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
