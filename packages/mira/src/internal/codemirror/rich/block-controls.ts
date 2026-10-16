@@ -27,6 +27,7 @@ import type {
   MiraToolbarIconName,
 } from "@lapismd/mira/extensions";
 import type { MiraRichEditorOptions } from "./types";
+import { accessibleBlockGutters } from "./block-gutter-accessibility";
 import {
   applyBlockToolbarItem,
   blockPresentation,
@@ -161,6 +162,7 @@ export function blockControlExtensions(
       : [],
     blockHighlightStateField,
     blockHandleGutter(Boolean(resolvedBlockControls.toolbar)),
+    accessibleBlockGutters,
     Prec.highest(keymap.of(blockControlKeymap())),
     ViewPlugin.fromClass(
       class extends BlockControlsPlugin {

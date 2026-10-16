@@ -356,9 +356,17 @@ export type MiraFileWatchTarget = MiraFileTarget & {
 export function parseMiraFileTarget(
   href: string,
   sourcePath?: string,
+  options: { decodeUri?: boolean } = {},
 ): MiraFileTarget {
   const hashIndex = href.indexOf("#");
-  const path = (hashIndex === -1 ? href : href.slice(0, hashIndex)).trim();
+  let path = (hashIndex === -1 ? href : href.slice(0, hashIndex)).trim();
+  if (options.decodeUri) {
+    try {
+      path = decodeURIComponent(path);
+    } catch {
+      // Invalid URI sequences can be literal filename characters.
+    }
+  }
   const subpath =
     hashIndex === -1
       ? undefined
@@ -510,6 +518,8 @@ export type MiraFileAdapter = {
   readMarkdown?: (file: MiraFileRef) => string | null | Promise<string | null>;
   writeMarkdown?: (file: MiraFileRef, value: string) => void | Promise<void>;
   readAssetUrl?: (file: MiraFileRef) => string | null | Promise<string | null>;
+  /** Releases one URL acquired through readAssetUrl, including a cancelled read. */
+  releaseAssetUrl?: (url: string) => void;
   openFile?: (file: MiraFileRef, event?: MouseEvent) => void | Promise<void>;
   renderEmbed?: (
     target: MiraFileTarget & {

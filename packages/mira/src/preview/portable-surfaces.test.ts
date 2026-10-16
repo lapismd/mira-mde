@@ -249,7 +249,9 @@ describe("portable preview surfaces", () => {
 
   it("does not repeat an image embed caption as its alternative text", async () => {
     const target = document.createElement("div");
+    const releaseAssetUrl = vi.fn();
     const imageAdapter: MiraFileAdapter = {
+      releaseAssetUrl,
       resolveLink() {
         return {
           kind: "image",
@@ -276,6 +278,9 @@ describe("portable preview surfaces", () => {
     );
     expect(target.querySelector<HTMLImageElement>("img")?.alt).toBe("");
     await unmount(component);
+    expect(releaseAssetUrl).toHaveBeenCalledExactlyOnceWith(
+      "/service-topology.svg",
+    );
   });
 
   it("loads internal-link preview content only after interaction", async () => {

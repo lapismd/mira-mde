@@ -332,3 +332,7 @@ DOM hooks follow the same hard migration: `mira-mde*`, `mira-default-ui*`, and
 `mira-default-toolbar*` become `mira*`, `mira-editor*`, and
 `mira-editor-toolbar*`. The stable `--mira-*` token namespace and portable
 `markdown-*`, `cm-*`, and Obsidian-compatibility hooks remain unchanged.
+
+Interactive Markdown gutters follow MIRA-MD-043 in [Editor and Markdown](editor-and-markdown.md): the core CodeMirror extension owns accessible controls and restores its attribute changes when removed.
+
+MIRA-MD-044 and MIRA-MD-045 govern public file-target URI normalization and the optional MiraFileAdapter.releaseAssetUrl lifecycle hook. Asset URLs returned by a host remain host-owned resources; previews release each acquired URL without interpreting its protocol.

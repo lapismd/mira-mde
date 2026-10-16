@@ -19,6 +19,7 @@
   import { useMarkdownContext } from "../renderer/context.svelte";
   import EditableMarkdownSurface from "../editable-markdown-preview/editable-markdown-surface.svelte";
   import EmbeddedMarkdownPreview from "./embedded-markdown-preview.svelte";
+  import { createAssetUrlLease } from "../asset-url-lease";
 
   type Props = {
     href?: string;
@@ -69,7 +70,9 @@
   const target = $derived(id || href);
   const displayText = $derived(text || label || target);
   const activeSourcePath = $derived(sourcePath || markdown.sourcePath);
-  const parsedTarget = $derived(parseMiraFileTarget(target, activeSourcePath));
+  const parsedTarget = $derived(
+    parseMiraFileTarget(target, activeSourcePath, { decodeUri: !id }),
+  );
   const hasFileAdapter = $derived(Boolean(markdown.fileAdapter));
   const isExternal = $derived(isExternalHref(target));
   const resolvedHref = $derived(
@@ -174,14 +177,12 @@
     }
 
     let cancelled = false;
-    const markdownPromise = adapter.readMarkdown
-      ? Promise.resolve(adapter.readMarkdown(file))
-      : Promise.resolve(null);
-    const assetPromise = adapter.readAssetUrl
-      ? Promise.resolve(adapter.readAssetUrl(file))
-      : Promise.resolve(null);
+    const markdownPromise = Promise.resolve().then(
+      () => adapter.readMarkdown?.(file) ?? null,
+    );
+    const asset = createAssetUrlLease(adapter, file);
 
-    Promise.all([markdownPromise, assetPromise]).then(
+    Promise.all([markdownPromise, asset.result]).then(
       ([nextMarkdown, nextAssetUrl]) => {
         if (cancelled) {
           return;
@@ -205,6 +206,7 @@
 
     return () => {
       cancelled = true;
+      asset.release();
       stopWatching?.();
     };
   });
