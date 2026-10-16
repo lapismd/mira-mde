@@ -1,5 +1,9 @@
 # Public Packages and Entry Points
 
+The public rich-editor exports retain their entrypoints. Interactive gutter
+accessibility now settles after synchronous DOM updates, before the next paint,
+without waiting for geometry measurement.
+
 The public `@lapismd/mira/extensions` file-adapter contract includes optional
 bound Markdown writes and portable text-recovery leases under MIRA-MD-046 and
 MIRA-MD-047. These callbacks carry source-session identity and state; they do

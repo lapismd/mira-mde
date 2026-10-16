@@ -6,6 +6,40 @@ import { createRichEditorExtensions } from ".";
 const frame = () =>
   new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
 
+it("exposes newly mounted keyboard controls before the next animation frame", async () => {
+  const parent = document.createElement("div");
+  document.body.append(parent);
+  const view = new EditorView({
+    state: EditorState.create({
+      doc: "# Heading\n\nParagraph",
+      extensions: [
+        lineNumbers(),
+        createRichEditorExtensions({ blockControls: true, livePreview: false }),
+      ],
+    }),
+    parent,
+  });
+  try {
+    await Promise.resolve();
+    const handle =
+      parent.querySelector<HTMLButtonElement>(".mira-block-handle")!;
+    expect(handle).not.toBeNull();
+    expect(handle.closest('[aria-hidden="true"]')).toBeNull();
+    handle.focus();
+    expect(document.activeElement).toBe(handle);
+    view.dispatch({ changes: { from: 0, insert: "New paragraph\n\n" } });
+    await Promise.resolve();
+    expect(
+      parent
+        .querySelector(".mira-block-handle")
+        ?.closest('[aria-hidden="true"]'),
+    ).toBeNull();
+  } finally {
+    view.destroy();
+    parent.remove();
+  }
+});
+
 it("exposes keyboard block controls and restores decorative gutter ownership after reconfiguration", async () => {
   const parent = document.createElement("div");
   document.body.append(parent);
