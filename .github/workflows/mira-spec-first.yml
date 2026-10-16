@@ -127,5 +127,10 @@ jobs:
       - name: Build static Storybook
         run: pnpm build-storybook
 
+      - name: Run Storybook interactions and accessibility
+        if: ${{ !cancelled() }}
+        run: pnpm test:storybook
+
       - name: Run Storybook acceptance
+        if: ${{ !cancelled() }}
         run: pnpm test:e2e

@@ -131,9 +131,10 @@
     }
 
     let current = true;
+    let persist = write;
     const activeWriter = new SerializedMarkdownWriter({
       value: initialValue,
-      write,
+      write: (contents) => persist(contents),
       onStateChange(state) {
         if (!current) return;
         writerState = state;
@@ -151,8 +152,12 @@
       register: adapter?.registerEditingSession
         ? (path, session) => adapter.registerEditingSession?.(path, session)
         : undefined,
+      bind: adapter?.bindMarkdownEditingSession
+        ? (path, session) => adapter.bindMarkdownEditingSession!(path, session)
+        : undefined,
       synchronizeProtection: tick,
     });
+    persist = attached.write ?? write;
 
     return () => {
       current = false;

@@ -4,7 +4,7 @@ The enclosing JJ change owns this record. Base: `18661c45`. Implementation is
 isolated in the `inline-links` workspace and preserves the prior external-link
 icon/underline fixes. The public release set remains six packages.
 
-Requirements: MIRA-MD-043, MIRA-MD-044, MIRA-ARCH-044, MIRA-CSS-043,
+Requirements: MIRA-MD-051, MIRA-MD-052, MIRA-ARCH-044, MIRA-CSS-043,
 MIRA-CAT-016 and the existing MIRA-GOV-012 catalog boundary.
 
 ## Scope and acceptance
@@ -105,3 +105,7 @@ Visual approval, npm publication, external consumer adoption and additional
 platform qualification remain separate. Mira-only scope does not establish a
 released jj-store or Lapis integration. No existing consumer manifests or user
 fixtures were changed.
+
+Integration note: source change `e3d1870b` used MIRA-MD-043/044 before its
+parallel branch was combined. Canonical inline-link IDs are now MIRA-MD-051/052;
+the earlier numbers remain assigned to the older native accessibility work.

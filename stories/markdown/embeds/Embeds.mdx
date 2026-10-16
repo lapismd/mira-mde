@@ -6,6 +6,7 @@ import {
   Source,
 } from "@storybook/addon-docs/blocks";
 import * as EmbedsStories from "./Embeds.stories";
+import * as BoundRecoveryStories from "./BoundRecovery.stories";
 
 <Meta of={EmbedsStories} />
 
@@ -22,6 +23,16 @@ remains discoverable while teardown persistence is pending or has failed.
 <Canvas of={EmbedsStories.EditingProtection} meta={EmbedsStories} />
 
 <Source of={EmbedsStories.EditingProtection} language="svelte" />
+
+## Bound writes and recovery
+
+An adapter can bind persistence to each source session and use its portable text
+state to recover a failed write. Recovery holds editing while the storage owner
+validates the external snapshot; detached failures retain the original session.
+
+<Canvas of={BoundRecoveryStories.BoundRecovery} />
+
+<Source of={BoundRecoveryStories.BoundRecovery} language="svelte" />
 
 ## Usage
 

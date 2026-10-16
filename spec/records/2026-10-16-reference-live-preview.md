@@ -5,7 +5,7 @@ The enclosing JJ change is the revision for this record. The workspace is
 
 ## Scope and review
 
-MIRA-MD-045 and MIRA-CSS-044 govern definition rows and named image frames.
+MIRA-MD-053 and MIRA-CSS-044 govern definition rows and named image frames.
 The definition's original spelling and case are displayed even when a usage
 has different case. The renderer retains alternative text, titles, navigation
 policy and authored Markdown. Source mode and code remain literal.
@@ -93,7 +93,7 @@ tests/storybook/inline-links.spec.ts` passed all 6 cases.
 - `pnpm lint` passed after the browser-regression updates. Package policy
   validation includes 5 boundary and 36 release tests, all passing.
 
-Review of MIRA-MD-045 and MIRA-CSS-044 is complete: source editing, named
+Review of MIRA-MD-053 and MIRA-CSS-044 is complete: source editing, named
 presentation, theme tokens, keyboard controls and narrow layouts are qualified.
 MIRA-ARCH-044 and MIRA-CAT-016 remain unchanged. The full check/test/build gate
 passed before the last image sizing rule; the final package check, lint,
@@ -110,3 +110,7 @@ macOS ARM64. Final document formatting and `pnpm spec:check` also passed.
 Publication, consumer adoption, additional platform qualification and
 visual-baseline approval remain separate. The review server remains on port
 7027; task verification did not alter the other workspace or its services.
+
+Integration note: source change `b46e9fd1` used MIRA-MD-045 before the parallel
+branches were combined. The canonical named-reference requirement is now
+MIRA-MD-053; the earlier number remains assigned to native asset URL ownership.
