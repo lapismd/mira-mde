@@ -568,6 +568,30 @@ After`;
     expect(visibleExternalLinkIcons(autolink!)).toHaveLength(1);
     expect(visibleExternalLinkIcons(relativeLink!)).toHaveLength(0);
 
+    const externalLabel =
+      externalLink?.querySelector<HTMLElement>(".cm-link-text");
+    const relativeLabel =
+      relativeLink?.querySelector<HTMLElement>(".cm-link-text");
+    const autolinkUrl = autolink?.querySelector<HTMLElement>(".cm-url");
+    expect(externalLabel).toBeTruthy();
+    expect(relativeLabel).toBeTruthy();
+    expect(autolinkUrl).toBeTruthy();
+    const relativeText = relativeLabel?.querySelector<HTMLElement>(".cm-link");
+    expect(relativeText).toBeTruthy();
+    expect(getComputedStyle(externalLabel!).textDecorationLine).toBe(
+      getComputedStyle(relativeLabel!).textDecorationLine,
+    );
+    expect(
+      getComputedStyle(externalLabel!.querySelector(".cm-link")!)
+        .textDecorationLine,
+    ).toBe(getComputedStyle(relativeText!).textDecorationLine);
+    expect(getComputedStyle(autolinkUrl!).textDecorationLine).toBe(
+      getComputedStyle(relativeText!).textDecorationLine,
+    );
+    expect(getComputedStyle(autolink!).textDecorationLine).toBe(
+      getComputedStyle(relativeLabel!).textDecorationLine,
+    );
+
     view.destroy();
     parent.remove();
     removeStyles();

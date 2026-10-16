@@ -44,7 +44,6 @@
   color: var(--markdown-link-external-color);
   filter: var(--markdown-link-external-filter);
   padding-inline-end: 0.9em;
-  text-decoration-line: var(--markdown-link-external-decoration);
 }
 
 .mira-link-preview {
