@@ -157,3 +157,57 @@ export const BoundRecovery: Story = {
     );
   },
 };
+
+export const InternalLinkRecovery: Story = {
+  name: "Internal link recovery",
+  args: { internalLink: true },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Re-resolving the same internal link retains its failed editor and applies explicit recovery to that visible session.",
+      },
+      source: BoundRecovery.parameters!.docs.source,
+    },
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/markdown/embeds/internal-link-recovery-chromium.png",
+      ],
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const body = within(canvasElement.ownerDocument.body);
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Fail persistence" }),
+    );
+    const trigger = await canvas.findByRole("button", {
+      name: "Original",
+      exact: true,
+    });
+    trigger.focus();
+    await userEvent.click(
+      await body.findByRole("button", { name: "Edit Original", exact: true }),
+    );
+    const content = () =>
+      canvasElement.ownerDocument.querySelector<HTMLElement>(
+        "[data-mira-link-preview-content] .cm-content",
+      )!;
+    await userEvent.click(content());
+    await userEvent.keyboard("{Control>}a{/Control}{Backspace}");
+    await waitFor(() => expect(content().textContent).toBe(""));
+    await userEvent.keyboard("Failed internal link draft.");
+    await waitFor(() =>
+      expect(body.getByRole("alert")).toHaveTextContent(
+        "External file changed",
+      ),
+    );
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Refresh link resolution" }),
+    );
+    await waitFor(() =>
+      expect(canvas.getByLabelText("Bound sessions")).toHaveTextContent("1"),
+    );
+    await expect(content()).toHaveTextContent("Failed internal link draft.");
+  },
+};

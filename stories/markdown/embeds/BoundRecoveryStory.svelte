@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
+  import Mira from "@lapismd/mira";
   import { EditableMarkdownPreview } from "@lapismd/mira/preview";
   import type {
     MiraFileAdapter,
@@ -7,6 +8,8 @@
     MiraMarkdownEditingSession,
     MiraMarkdownRecoveryLease,
   } from "@lapismd/mira/extensions";
+
+  let { internalLink = false }: { internalLink?: boolean } = $props();
 
   const file: MiraFileRef = {
     kind: "markdown",
@@ -21,11 +24,12 @@
   let rejectWrites = false;
   const sessions = new Set<MiraMarkdownEditingSession>();
   const watchers = new Set<() => void>();
+  const targetWatchers = new Set<() => void>();
   let recovery:
     | { session: MiraMarkdownEditingSession; lease: MiraMarkdownRecoveryLease }
     | undefined;
   const fileAdapter: MiraFileAdapter = {
-    resolveLink: () => file,
+    resolveLink: () => ({ ...file }),
     readMarkdown: () => disk,
     writeMarkdown() {
       throw new Error("A bound preview must not use ordinary persistence");
@@ -53,6 +57,10 @@
     watchFile(_target, refresh) {
       watchers.add(refresh);
       return () => watchers.delete(refresh);
+    },
+    watchTarget(_target, refresh) {
+      targetWatchers.add(refresh);
+      return () => targetWatchers.delete(refresh);
     },
   };
   async function protect() {
@@ -89,6 +97,11 @@
   <button onclick={() => resolve(false)}>Accept retained draft</button>
   <button
     onclick={() => {
+      for (const refresh of targetWatchers) refresh();
+    }}>Refresh link resolution</button
+  >
+  <button
+    onclick={() => {
       visible = false;
     }}>Detach preview</button
   >
@@ -101,11 +114,20 @@
   <output aria-label="Draft Markdown">{draft}</output>
   <output aria-label="Bound sessions">{registered}</output>
   {#if visible}
-    <EditableMarkdownPreview
-      {file}
-      {fileAdapter}
-      returnToPreviewOnBlur={false}
-    />
+    {#if internalLink}
+      <Mira
+        value="[[Original]]"
+        mode="preview"
+        sourcePath="Home.md"
+        {fileAdapter}
+      />
+    {:else}
+      <EditableMarkdownPreview
+        {file}
+        {fileAdapter}
+        returnToPreviewOnBlur={false}
+      />
+    {/if}
   {/if}
   <output aria-label="Disk Markdown">{disk}</output>
 </div>

@@ -5,6 +5,11 @@ bound Markdown writes and portable text-recovery leases under MIRA-MD-046 and
 MIRA-MD-047. These callbacks carry source-session identity and state; they do
 not import host application, vault, database or conflict-presentation types.
 
+Internal-link previews retain that captured session across equivalent target
+resolutions under MIRA-MD-049. Empty saved text remains a valid editable
+preview under MIRA-MD-050. These corrections preserve the public preview
+entrypoints and keep storage validation in the owning adapter.
+
 ## Editing-session adapter capability
 
 | ID            | Requirement                                                                                                                                                                                                                                                                                                                                                                                                                                                        |

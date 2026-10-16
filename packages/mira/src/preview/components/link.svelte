@@ -129,6 +129,14 @@
     ).then(
       (file) => {
         if (!cancelled) {
+          if (
+            resolvedFile?.path === file?.path &&
+            resolvedFile?.name === file?.name &&
+            resolvedFile?.extension === file?.extension &&
+            resolvedFile?.kind === file?.kind
+          ) {
+            return;
+          }
           if (resolvedFile?.path !== file?.path) {
             previewMarkdown = null;
             previewAssetUrl = null;
@@ -326,7 +334,7 @@
               src={previewAssetUrl}
               alt={resolvedFile.name || displayText}
             />
-          {:else if previewMarkdown}
+          {:else if previewMarkdown !== null}
             {#snippet renderedPreview(value: string)}
               <EmbeddedMarkdownPreview
                 class="mira-link-preview__markdown"

@@ -2,6 +2,12 @@
 
 ## External editing protection
 
+### Empty resolved notes
+
+| ID          | Requirement                                                                                                                                                                                 |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| MIRA-MD-050 | A resolved Markdown preview MUST treat empty text as valid content. Saving an empty document MUST retain its editing session and editable surface so subsequent input can persist normally. |
+
 ### Bound writes and explicit recovery
 
 | ID          | Requirement                                                                                                                                                                                                                                                                                                                                                                                               |
@@ -9,6 +15,7 @@
 | MIRA-MD-046 | A writable preview MUST use an optional adapter-provided Markdown editing binding for its captured source session instead of its ordinary write and registration callbacks. Missing source authority or an invalid binding MUST reject without an ordinary-write fallback. Detached failed bindings MUST retain their session until persistence or explicit recovery succeeds.                            |
 | MIRA-MD-047 | A source session MAY expose portable text state, subscriptions and explicit recovery leases. Recovery MUST block editing and ordinary external refresh synchronously, settle in-flight persistence without retrying a failed write, and retain failure until a protected acknowledgement or external replacement. Expired leases MUST reject mutation, and independent leases MUST release independently. |
 | MIRA-MD-048 | Failed Markdown persistence MUST remain a flush barrier when the buffer is edited back to its previous saved value. External refresh MUST NOT clear that failure. Only successful persistence or an explicit protected recovery MAY acknowledge or discard the failed draft.                                                                                                                              |
+| MIRA-MD-049 | Re-resolving an internal link to an equivalent file reference MUST retain its existing preview editing session and draft. A refreshed reference MUST NOT detach a failed writer or redirect recovery to an invisible session. An accepted external version MUST replace the visible editor text and permit later saving.                                                                                  |
 
 | ID          | Requirement                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
