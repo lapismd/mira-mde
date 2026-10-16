@@ -1,5 +1,31 @@
 # @lapismd/mira
 
+## 0.1.0
+
+### Minor Changes
+
+- [#14](https://github.com/lapismd/mira-mde/pull/14) [`5add37f`](https://github.com/lapismd/mira-mde/commit/5add37fed32dcbc24c1e99fc7e3a4bdae6870078) Thanks [@stevejuma](https://github.com/stevejuma)! - Add the opt-in bundled inline-links extension, immutable site-icon registries,
+  consumer SVG/host overrides, and standalone InlineLink/LinkSiteIcon components.
+  Preserve formatted Markdown and source editing across preview/editor surfaces,
+  including optional extension forwarding into table widgets.
+
+### Patch Changes
+
+- [#14](https://github.com/lapismd/mira-mde/pull/14) [`cc46795`](https://github.com/lapismd/mira-mde/commit/cc4679504c91cd9469b64a81cc883b5e90d173ce) Thanks [@stevejuma](https://github.com/stevejuma)! - Expose mounted keyboard block controls before the next paint instead of waiting for a layout measurement.
+
+- [#14](https://github.com/lapismd/mira-mde/pull/14) [`cf2e5b7`](https://github.com/lapismd/mira-mde/commit/cf2e5b7d380add00b5481f783f05ab89cbf774c8) Thanks [@stevejuma](https://github.com/stevejuma)! - Expose keyboard-operable block gutter controls to assistive technology while keeping decorative gutters hidden. Decode file-target URI paths once and add optional asset URL release ownership for image, embed, and link previews, including cancelled reads.
+
+- [#14](https://github.com/lapismd/mira-mde/pull/14) [`92d8601`](https://github.com/lapismd/mira-mde/commit/92d860136fdcffc5a76dd8a343ef55c6284ff895) Thanks [@stevejuma](https://github.com/stevejuma)! - Keep a single external-link icon in live preview, including while a labeled link is edited. Style plain https URLs as external links, and underline them once, the same as other links.
+
+- [#14](https://github.com/lapismd/mira-mde/pull/14) [`3861e91`](https://github.com/lapismd/mira-mde/commit/3861e915786e00f2878aa2693437209f79e1bbef) Thanks [@stevejuma](https://github.com/stevejuma)! - Expose optional source-bound Markdown write bindings and protected recovery leases. Retain failed drafts and detached editing sessions until persistence or explicit recovery succeeds.
+
+- [#14](https://github.com/lapismd/mira-mde/pull/14) [`832ba35`](https://github.com/lapismd/mira-mde/commit/832ba35f6c8967446eff9a591e30ed1e8f4c7255) Thanks [@stevejuma](https://github.com/stevejuma)! - Render reference definitions and reference images clearly in live preview with
+  their defined reference names, while preserving complete source editing and existing image and
+  link resolution.
+
+- [#14](https://github.com/lapismd/mira-mde/pull/14) [`307481b`](https://github.com/lapismd/mira-mde/commit/307481ba05cc4494d740e3de570ffa1724f50596) Thanks [@stevejuma](https://github.com/stevejuma)! - Retain the visible Markdown preview session across equivalent link resolutions
+  and empty saves so protected external recovery updates the active editor.
+
 ## 0.0.5
 
 ### Patch Changes
