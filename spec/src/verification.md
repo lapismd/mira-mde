@@ -8,6 +8,9 @@ This matrix is both requirement traceability and the implementation progress
 artifact. The Storybook-only host, six-package public architecture, and
 authorized baseline regeneration migrations are complete.
 
+The native qualification's pnpm provenance is corrected in
+[the toolchain record](../records/2026-10-16-native-toolchain-correction.md).
+
 | Requirements                                                                                            | Evidence                                                                                                                                                                                            | Status                                                                                             |
 | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
 | MIRA-MD-044, MIRA-MD-045                                                                                | [Source qualification](../records/2026-10-16-native-gutter-accessibility.md): 18 asset tests; full unit, story, browser and pack gates pass.                                                        | Implemented                                                                                        |
