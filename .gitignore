@@ -11,6 +11,7 @@ test-results
 storybook-static
 storybook-static-check
 .release/
+.local/
 spec/book
 .visual-delta/artifacts/
 .visual-delta/cache/
