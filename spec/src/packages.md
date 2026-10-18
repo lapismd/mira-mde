@@ -1,5 +1,10 @@
 # Public Packages and Entry Points
 
+MIRA-ARCH-008 includes the additive `/tables` TableReader export. It composes
+the existing parser and preview with host cell/row snippets for immutable
+annotated tables. Existing Table, Column and editable widget exports retain
+their authoring behavior; the reader owns no persistence or comment model.
+
 Safe preview highlighting remains inside the existing `@lapismd/mira/preview`
 renderer. Its sanitizer preserves generated syntax classes without changing
 exports, manifest ranges, HTML policy options or archive layout.
