@@ -1,5 +1,10 @@
 # Portable Markdown and Editor
 
+For MIRA-MD-002, safe embedded previews MUST preserve generated code language,
+highlight token and code-line classes while continuing to strip scripts,
+event-handler attributes and unsafe destinations. Highlighting never authorizes
+executable HTML.
+
 ## Reference definitions in live preview
 
 | ID          | Requirement                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |

@@ -1,5 +1,9 @@
 # Public Packages and Entry Points
 
+Safe preview highlighting remains inside the existing `@lapismd/mira/preview`
+renderer. Its sanitizer preserves generated syntax classes without changing
+exports, manifest ranges, HTML policy options or archive layout.
+
 Reference-definition presentation remains in Mira's owned rich-editor and
 preview layers. It reuses the existing renderer, asset resolver and source
 selection contracts without new public packages or entry points.

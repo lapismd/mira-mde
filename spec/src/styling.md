@@ -1,5 +1,9 @@
 # Styling and CSS Tokens
 
+Fenced Markdown headings use the existing `--mira-syntax-heading` color through
+the generated `hljs-section` token. Safe and ordinary preview surfaces share
+the same token styles; no consumer selector or theme override is required.
+
 | ID           | Requirement                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | MIRA-CSS-044 | Live reference rows and image frames MUST use class-scoped shipped CSS and existing theme tokens. Reference names MUST retain their authored case and remain legible, with long names bounded by the available width. Image badges MUST occupy the upper trailing corner and source controls MUST remain keyboard accessible. Inline demonstration links MUST use the renderer's inline surface rather than acquiring full document padding. |

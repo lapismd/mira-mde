@@ -1,5 +1,11 @@
 # Verification
 
+Safe embedded code highlighting (MIRA-MD-002) is covered by the actual preview
+mount in `packages/mira/src/preview/safe-code-preview.test.ts` and the focused
+Notes transcript consumer. See
+`spec/records/2026-10-18-safe-preview-highlighting.md`; broad qualification and
+visual baselines retain their existing gates.
+
 The default workspace combines the inline-link and native recovery branches.
 Fresh combined-tree qualification is recorded in
 `spec/records/2026-10-16-main-workspace-integration.md`; earlier rows retain
