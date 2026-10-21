@@ -1,5 +1,11 @@
 # Verification
 
+Completed Wave 3 publication is tracked in
+[six-package publication](../records/2026-10-21-publication.md), binding the
+qualified version source, archive checksums and verified public outcomes under
+unchanged MIRA-GOV-010 and MIRA-ARCH-006/007/016. Earlier pending records retain
+their historical results. Actual downstream adoption remains a later wave.
+
 On 2026-10-21 the user removes screenshot comparisons from CI and release gates.
 The policy and workflow regression are recorded in
 [functional CI qualification](../records/2026-10-21-functional-ci-only.md).
