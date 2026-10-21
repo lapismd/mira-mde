@@ -1,5 +1,28 @@
 # Verification
 
+On 2026-10-21 the user removes screenshot comparisons from CI and release gates.
+The policy and workflow regression are recorded in
+[functional CI qualification](../records/2026-10-21-functional-ci-only.md).
+Existing screenshot evidence remains historical. Static Storybook,
+interaction/accessibility and functional browser acceptance stay required.
+
+The released cold Linux runner correction and original strict-comparison rerun
+are tracked in [tooling adoption](../records/2026-10-21-released-visual-runner.md).
+MIRA-CAT-006 and MIRA-GOV-010 remain unchanged. Baseline review, package
+publication and actual public-consumer qualification stay separate.
+
+Wave 3's exact-source publication guard, source reconciliation, dependency audit
+and TableReader catalog coverage are recorded in
+[release preparation](../records/2026-10-21-wave3-release-preparation.md).
+MIRA-GOV-010 retains pending hosted/package/public-consumer gates until their
+actual results are recorded; this preparation does not claim public publication.
+
+Safe embedded code highlighting (MIRA-MD-002) is covered by the actual preview
+mount in `packages/mira/src/preview/safe-code-preview.test.ts` and the focused
+Notes transcript consumer. See
+`spec/records/2026-10-18-safe-preview-highlighting.md`; broad qualification and
+visual baselines retain their existing gates.
+
 The default workspace combines the inline-link and native recovery branches.
 Fresh combined-tree qualification is recorded in
 `spec/records/2026-10-16-main-workspace-integration.md`; earlier rows retain
@@ -245,8 +268,9 @@ approved baseline.
   code, styles, or wrappers change.
 - Catalog change: Storybook browser tests and `pnpm build-storybook`.
 - Interaction/geometry change: Storybook browser tests plus focused Playwright.
-- Visual change: compare-only validation first; baseline mutation requires a
-  separate approved review step through the installed Visual Delta suite.
+- Presentation change: Storybook interactions/accessibility and functional
+  browser acceptance. Screenshot comparisons are not CI/release gates; manual
+  baseline mutation requires separate approval through installed Visual Delta.
 
 The 2026-08-02 canonical-host migration included an authorized full baseline
 regeneration because the addon's capture implementation and density supersede

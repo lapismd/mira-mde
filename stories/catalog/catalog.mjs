@@ -238,6 +238,12 @@ const semanticTokens = [
     "CodeMirror scroller content.",
   ),
   token(
+    "--mira-table-reader-cell-padding",
+    "Immutable table cell inset.",
+    "0.375rem 0.625rem",
+    "TableReader header and body cells.",
+  ),
+  token(
     "--mira-preview-padding",
     "Reading surface content padding.",
     "2rem in theme; 2.25rem in preview bridge",
@@ -736,7 +742,7 @@ export const catalogEntries = [
   },
   {
     id: "tables",
-    name: "Editable table surfaces",
+    name: "Table surfaces",
     packageName: "@lapismd/mira/tables",
     importPath: "@lapismd/mira/tables",
     components: [
@@ -744,11 +750,12 @@ export const catalogEntries = [
       "EditorColumn",
       "GridEditorTable",
       "GridEditorColumn",
+      "TableReader",
     ],
     description:
-      "Pipe-table and grid-table widgets, cells, menus, and editing chrome.",
+      "Editable pipe/grid tables and immutable source-row annotated table reading.",
     spec: "editor-and-markdown.md#requirements",
-    tokens: markdownTokens,
+    tokens: [...markdownTokens, "--mira-table-reader-cell-padding"],
     publicSurface: true,
   },
   {

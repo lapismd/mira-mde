@@ -5,6 +5,12 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      publish:
+        description: Publish the reviewed artifact after exact-source approval
+        required: true
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -116,6 +122,8 @@ jobs:
 
       - name: Select protected publication mode
         id: mode
+        env:
+          MIRA_PUBLISH_REQUESTED: ${{ github.event_name == 'workflow_dispatch' && inputs.publish == true }}
         run: |
           node --input-type=module <<'NODE'
           import { appendFileSync, readFileSync } from "node:fs";
@@ -123,7 +131,8 @@ jobs:
           if (process.env.GITHUB_REF !== "refs/heads/main") {
             throw new Error("Releases must run from refs/heads/main");
           }
-          const shouldPublish = plan.selected.length > 0 && !plan.bootstrapRequired;
+          const shouldPublish = process.env.MIRA_PUBLISH_REQUESTED === "true" &&
+            plan.selected.length > 0 && !plan.bootstrapRequired;
           const output = [
             `artifact_name=mira-release-${process.env.GITHUB_SHA}`,
             `bootstrap_required=${plan.bootstrapRequired}`,
@@ -192,6 +201,8 @@ jobs:
       - name: Publish exact verified tarballs
         env:
           MIRA_RELEASE_APPROVED: "1"
+          MIRA_PUBLISH_REQUESTED: ${{ github.event_name == 'workflow_dispatch' && inputs.publish == true }}
+          MIRA_RELEASE_APPROVED_SOURCE: ${{ vars.MIRA_RELEASE_APPROVED_SOURCE }}
         run: pnpm release:publish .release/release-manifest.json
 
   verify:

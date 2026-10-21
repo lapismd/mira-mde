@@ -87,9 +87,10 @@
   color: var(--mira-syntax-keyword);
 }
 
-.markdown-preview-surface :is(.hljs-title, .hljs-title.function_),
-.markdown-rendered :is(.hljs-title, .hljs-title.function_),
-.markdown-widget-shell :is(.hljs-title, .hljs-title.function_) {
+.markdown-preview-surface
+  :is(.hljs-title, .hljs-title.function_, .hljs-section),
+.markdown-rendered :is(.hljs-title, .hljs-title.function_, .hljs-section),
+.markdown-widget-shell :is(.hljs-title, .hljs-title.function_, .hljs-section) {
   color: var(--mira-syntax-heading);
 }
 

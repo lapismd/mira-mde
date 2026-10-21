@@ -90,11 +90,24 @@ export async function publishVerifiedPackages(
   return results;
 }
 
-function approvedEnvironment(manifest) {
-  if (process.env.CI !== "true" || process.env.MIRA_RELEASE_APPROVED !== "1") {
+export function assertPublicationApproval(manifest, env = process.env) {
+  if (env.CI !== "true" || env.MIRA_RELEASE_APPROVED !== "1") {
     throw new Error(
       "Publishing requires an approved CI environment (MIRA_RELEASE_APPROVED=1)",
     );
+  }
+  if (
+    env.GITHUB_REF !== "refs/heads/main" ||
+    env.GITHUB_EVENT_NAME !== "workflow_dispatch" ||
+    env.MIRA_PUBLISH_REQUESTED !== "true"
+  ) {
+    throw new Error("Publishing requires an explicit manual main dispatch");
+  }
+  if (
+    !/^[a-f0-9]{40}$/.test(manifest.commit ?? "") ||
+    env.MIRA_RELEASE_APPROVED_SOURCE !== manifest.commit
+  ) {
+    throw new Error("Publishing requires exact-source protected approval");
   }
   if (manifest.bootstrapRequired === true) {
     throw new Error(
@@ -102,8 +115,8 @@ function approvedEnvironment(manifest) {
     );
   }
   if (
-    !process.env.ACTIONS_ID_TOKEN_REQUEST_URL ||
-    !process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN
+    !env.ACTIONS_ID_TOKEN_REQUEST_URL ||
+    !env.ACTIONS_ID_TOKEN_REQUEST_TOKEN
   ) {
     throw new Error(
       "Trusted publication requires GitHub OIDC token permission",
@@ -135,7 +148,7 @@ async function main() {
     expectedCommit: commit,
   });
   if (!validation.ok) throw new Error(validation.errors.join("\n"));
-  approvedEnvironment(manifest);
+  assertPublicationApproval(manifest);
 
   const registry = manifest.registry ?? DEFAULT_REGISTRY;
   const results = await publishVerifiedPackages(manifest, {

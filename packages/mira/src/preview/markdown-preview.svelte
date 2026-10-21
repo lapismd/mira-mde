@@ -215,6 +215,17 @@
         "data-sourcepos",
       ],
       img: [...(defaultSchema.attributes?.img ?? []), "src", "alt", "title"],
+      code: [
+        ...(defaultSchema.attributes?.code ?? []).filter(
+          (attribute) =>
+            !Array.isArray(attribute) || attribute[0] !== "className",
+        ),
+        ["className", /^language-/, "hljs"],
+      ],
+      span: [
+        ...(defaultSchema.attributes?.span ?? []),
+        ["className", /^hljs-/, "code-line", "highlighted-code-line"],
+      ],
       a: [
         ...(defaultSchema.attributes?.a ?? []),
         "href",

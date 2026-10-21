@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import * as publishing from "./publish-release.mjs";
 
 import {
   parsePublishedIntegrity,
@@ -72,5 +73,44 @@ test("rejects ambiguous npm integrity output", () => {
   assert.throws(
     () => parsePublishedIntegrity('["sha512-verified", "sha512-unexpected"]'),
     /unexpected response/,
+  );
+});
+
+test("admits only manual main publication bound to the approved source", () => {
+  assert.equal(typeof publishing.assertPublicationApproval, "function");
+  const commit = "a".repeat(40);
+  const manifest = { commit, bootstrapRequired: false };
+  const env = {
+    CI: "true",
+    GITHUB_REF: "refs/heads/main",
+    GITHUB_EVENT_NAME: "workflow_dispatch",
+    MIRA_PUBLISH_REQUESTED: "true",
+    MIRA_RELEASE_APPROVED: "1",
+    MIRA_RELEASE_APPROVED_SOURCE: commit,
+    ACTIONS_ID_TOKEN_REQUEST_URL: "https://oidc.invalid",
+    ACTIONS_ID_TOKEN_REQUEST_TOKEN: "synthetic-test-only",
+  };
+  assert.doesNotThrow(() =>
+    publishing.assertPublicationApproval(manifest, env),
+  );
+  for (const patch of [
+    { GITHUB_EVENT_NAME: "push" },
+    { GITHUB_REF: "refs/heads/proposal" },
+    { MIRA_PUBLISH_REQUESTED: "false" },
+    { MIRA_RELEASE_APPROVED_SOURCE: "" },
+    { MIRA_RELEASE_APPROVED_SOURCE: "b".repeat(40) },
+    { MIRA_RELEASE_APPROVED: "0" },
+    { CI: "false" },
+    { ACTIONS_ID_TOKEN_REQUEST_TOKEN: "" },
+  ]) {
+    assert.throws(() =>
+      publishing.assertPublicationApproval(manifest, { ...env, ...patch }),
+    );
+  }
+  assert.throws(() =>
+    publishing.assertPublicationApproval(
+      { ...manifest, bootstrapRequired: true },
+      env,
+    ),
   );
 });

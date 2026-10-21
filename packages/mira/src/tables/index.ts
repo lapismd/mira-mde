@@ -13,6 +13,7 @@ export { $convertTableElement, TableNode } from "./table-node";
 
 import EditorColumn from "./editor-column.svelte";
 import EditorTable from "./editor-table.svelte";
+export { default as TableReader } from "./table-reader.svelte";
 import GridEditorColumn from "./grid-editor-column.svelte";
 import GridEditorTable from "./grid-editor-table.svelte";
 

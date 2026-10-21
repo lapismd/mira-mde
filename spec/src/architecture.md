@@ -1,5 +1,12 @@
 # Architecture and Boundaries
 
+The Visual Delta 0.0.9 adoption preserves MIRA-ARCH-020: only the root npm
+development tool and its lock identity change. It remains outside the six
+public packages; runtime entry points, dependency direction and consumer
+ownership are unchanged. Static Storybook and functional browser checks qualify
+the tooling independently of Mira package publication; screenshot comparisons
+are excluded from CI and release qualification by MIRA-CAT-006.
+
 Inline site-icon links follow the bundled opt-in extension boundary, alongside
 doodle dividers and selection toolbars. Their registry is local presentation
 data; it does not depend on forge accounts or application preferences. Public
@@ -63,13 +70,20 @@ resolution.
 Storybook infrastructure dependencies are root-only development tools and MUST
 NOT leak into a public package manifest or emitted package output. Visual Delta
 is developed independently from Mira's six-package runtime graph and remains
-subject to the catalog's build and compare-only gates. Mira resolves the
+subject to the catalog's build and functional browser gates. Mira resolves the
 published package through a root-only npm semver dependency; that tooling
 dependency MUST NOT enter any public package graph. The Visual Delta package
 MUST own the clean-stage worker
 fallback, generated-cache exclusions, canonical build identity, and runner
 behavior required by those gates; Mira does not maintain a downstream pnpm
 patch for behavior available in the reviewed upstream release.
+
+Wave 3 consumes the released Visual Delta 0.0.8 with Playwright 1.62.1,
+matching the approved immutable browser image profile rather than a new image.
+Vite and Markdown-it audit repairs retain their existing major versions.
+These are portable registry resolutions, with no sibling paths or new public
+package graph edges. Full hosted package/browser lanes qualify this shared
+tooling update; local checks begin with exact preview/table and release guards.
 
 Specification validation follows the same root-only boundary but resolves from
 the published `@lapismd/spec-validator` npm package once available. Mira owns
@@ -136,10 +150,9 @@ Storybook browser acceptance. `build-storybook` first builds every workspace
 package so the static host and canonical container capture do not depend on
 stale local `dist` output. Its explicit 4 GB Node heap ceiling fits within the
 pinned capture profile while accommodating the complete catalog bundle. The
-initial `0.0.1` npm bootstrap release has a documented visual-gate exception:
-`pnpm test:visual` remains an explicit Visual Delta review command, but it is
-not release-blocking until the current `visual-pending` stories receive
-separate human-approved baselines.
+user's 2026-10-21 decision excludes screenshot comparisons from CI and release
+gates. `pnpm test:visual` remains available only for explicitly requested manual
+review; existing `visual-pending` stories retain separate baseline approval.
 
 The private root also owns Changesets and release orchestration. One shared
 public-package graph supplies package-boundary validation, tarball validation,

@@ -11,6 +11,25 @@ package metadata and use a controlled Changeset in a disposable fixture, so the
 same reader test passes before and after versioning. They perform read-only Git
 queries; release planning must not depend on a local named base checkout.
 
+Wave 3 source preparation retains the six-package graph and existing Version
+Packages pull request. Ordinary pushes maintain version proposals; manual
+qualification prepares artifacts without publication. Only an explicit publish
+dispatch and protected `MIRA_RELEASE_APPROVED_SOURCE` matching the artifact's
+commit admit OIDC publication. Clear that variable after release. Missing or
+stale approval fails before registry reads or uploads; immutable recovery and
+all audit/package/browser gates remain required. Manual CI dispatch can qualify
+the bot-maintained version branch without bypassing any product lane.
+The user's 2026-10-21 instruction removes screenshot comparison from CI and
+release qualification under MIRA-CAT-006. Workflow validation MUST reject its
+reintroduction into ordinary CI, release, Pages or additional workflow files.
+Static Storybook, interaction/accessibility, functional browser, package,
+audit, protected publication and public-consumer gates remain required.
+The cold-runner correction is consumed as public Visual Delta 0.0.9 with its
+verified registry archive. It changes development tooling only and retains
+MIRA-CAT-006/MIRA-GOV-010, the existing version proposal and separate baseline
+approval. Owner publication and Mira functional consumer checks are distinct
+evidence; screenshot comparison is not a required consumer gate.
+
 Specification changes precede or accompany protected implementation changes.
 The gate is intentionally package-aware: updating an unrelated chapter does not
 satisfy a plugin or package contract change.
@@ -28,7 +47,7 @@ satisfy a plugin or package contract change.
 | MIRA-GOV-007 | Generated mdBook output MUST remain untracked.                                                                                                                                                                                                                                                                                                                                                          |
 | MIRA-GOV-008 | Package-boundary validation MUST reject unapproved public products, invalid dependency direction, legacy package imports, and leaked internal runtime references.                                                                                                                                                                                                                                       |
 | MIRA-GOV-009 | A protected public-package change MUST include a Changeset or an explicit empty Changeset, and the Version Packages workflow MUST preserve independent package versions and per-package changelogs. Release tests MUST prove Changesets can still read workspace YAML after workspace audit pins, without requiring a local `main` branch.                                                              |
-| MIRA-GOV-010 | Stable npm publication MUST require the protected `npm-production` environment, GitHub OIDC provenance, and a verified immutable artifact containing only exact unpublished package versions.                                                                                                                                                                                                           |
+| MIRA-GOV-010 | Stable npm publication MUST require an explicit manual publish dispatch, protected `npm-production` approval bound to the manifest's exact source commit, GitHub OIDC provenance, and a verified immutable artifact containing only exact unpublished package versions. Source pushes and qualification-only dispatches MUST NOT publish packages or create release tags.                               |
 | MIRA-GOV-011 | Release automation MUST be retry-safe, normalize npm's scalar and single-result JSON integrity responses before exact comparison, fail closed on ambiguous responses, publish in dependency order, reject registry/version/integrity disagreement, create package-version tags and GitHub releases, and verify clean consumer installation and provenance without automatically unpublishing a release. |
 | MIRA-GOV-012 | Every new public root component and shipped `--mira-*` token MUST be registered in the catalog contract, mapped to its canonical specification, and checked against package exports and source styles. The spec-first gate MUST reject implementation or catalog changes that omit any mapped chapter.                                                                                                  |
 | MIRA-GOV-013 | Repository agent guidance MUST resolve published LapisMD dependencies through npm semver ranges, keep external repositories outside this pnpm workspace, preserve portable published manifests, and route dependency defects to the owning repository before consuming a released version.                                                                                                              |
