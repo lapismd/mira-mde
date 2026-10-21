@@ -5,13 +5,11 @@ and inline renderer instances for small comparison links. Reference-definition
 and reference-image coverage belongs to the existing Links and Images stories;
 their changed live-preview visuals remain pending separate approval.
 
-Wave 3 requires the released Visual Delta 0.0.9 cold Linux runner correction
-with Playwright 1.62.1. Adoption must resolve from the public registry, then
-rerun the original strict native comparison; zero targets before a cold build
-and a failed private-stage cleanup cannot qualify that gate.
-The static Storybook, interactions/accessibility, browser acceptance and
-compare-only visual checks remain distinct gates. No baseline changes are
-authorized by dependency preparation or source integration.
+Wave 3 consumes public Visual Delta 0.0.9 with Playwright 1.62.1. On 2026-10-21
+the user explicitly removes screenshot comparisons from CI and release gates.
+Static Storybook, interactions/accessibility and functional browser acceptance
+remain required. Existing visual records stay historical; baseline changes
+still require separate authorization.
 
 The TableReader public export and cell-padding token are registered in the
 table catalog. The annotated-row story mounts the actual public component and
@@ -44,7 +42,7 @@ the source of the catalog's package imports.
 | MIRA-CAT-003 | Focused fixtures and the comprehensive demo document MUST live under the Storybook catalog with no manually synchronized copies.                                                                                                                                                                                                                                                                                    |
 | MIRA-CAT-004 | The comprehensive demo MUST provide fixed source, live-preview, preview, and split stories using identical Markdown and adapter data.                                                                                                                                                                                                                                                                               |
 | MIRA-CAT-005 | Every testable public story MUST render in the Storybook browser test project; meaningful stateful behavior MUST use a `play` interaction. The Storybook host MUST resolve CodeMirror and Lezer peer packages through one canonical Mira workspace instance so parser, state, view, and language-support identities remain compatible across stories and first-party plugins.                                       |
-| MIRA-CAT-006 | New visual stories MUST enter review as `visual-pending`; baseline mutation MUST use the installed Visual Delta suite and requires a separate authorized review. Visual Delta upgrades MUST pass the Storybook build and compare-only visual gates before adoption.                                                                                                                                                 |
+| MIRA-CAT-006 | New visual stories MUST enter review as `visual-pending`; baseline mutation MUST use the installed Visual Delta suite and requires a separate authorized review. Screenshot comparisons MUST NOT run in CI or block release qualification. Tooling updates MUST pass the static Storybook, interaction/accessibility and functional browser gates.                                                                  |
 | MIRA-CAT-007 | Every shipped `@lapismd/mira/ui` primitive family MUST have representative rendered Storybook coverage with interaction or semantic assertions.                                                                                                                                                                                                                                                                     |
 | MIRA-CAT-008 | Public opt-in preview surfaces MUST have a discoverable focused story, and the comprehensive demo MUST expose the same option wherever it materially changes a supported view.                                                                                                                                                                                                                                      |
 | MIRA-CAT-009 | Storybook MUST expose independent built-in-palette and light/dark globals, render ordinary stories through inherited page appearance, and provide fixed built-in, system, custom-extension, and targeted-overlay verification stories.                                                                                                                                                                              |

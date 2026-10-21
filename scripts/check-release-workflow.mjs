@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
@@ -18,8 +18,23 @@ export function validateReleaseWorkflows({
   releaseSource,
   ciSource,
   pagesSource,
+  additionalSources = {},
 }) {
   const errors = [];
+  for (const [name, source] of Object.entries({
+    release: releaseSource,
+    CI: ciSource,
+    Pages: pagesSource,
+    ...additionalSources,
+  })) {
+    if (
+      /\bvisual-delta\s+(?:test|update|interaction-update)\b|\b(?:pnpm|npm)(?:\s+run)?\s+test:visual(?::[a-z-]+)?\b|--update-snapshots\b/.test(
+        source,
+      )
+    ) {
+      errors.push(`${name}: screenshot comparisons must not run in CI`);
+    }
+  }
   for (const [name, source] of [
     ["release", releaseSource],
     ["CI", ciSource],
@@ -159,6 +174,7 @@ export function validateReleaseWorkflows({
     "pnpm audit",
     "pnpm check:all",
     "pnpm build-storybook",
+    "pnpm test:storybook",
     "pnpm test:e2e",
   ]) {
     requireText(ciSource, new RegExp(command), `CI ${command}`, errors);
@@ -188,10 +204,21 @@ export function validateReleaseWorkflows({
 }
 
 export function checkReleaseWorkflows(repoRoot = DEFAULT_REPO_ROOT) {
+  const known = new Set([RELEASE_WORKFLOW, CI_WORKFLOW, PAGES_WORKFLOW]);
+  const additionalSources = Object.fromEntries(
+    readdirSync(path.join(repoRoot, ".github/workflows"), {
+      withFileTypes: true,
+    })
+      .filter((entry) => entry.isFile() && /\.ya?ml$/.test(entry.name))
+      .map((entry) => `.github/workflows/${entry.name}`)
+      .filter((file) => !known.has(file))
+      .map((file) => [file, readFileSync(path.join(repoRoot, file), "utf8")]),
+  );
   return validateReleaseWorkflows({
     releaseSource: readFileSync(path.join(repoRoot, RELEASE_WORKFLOW), "utf8"),
     ciSource: readFileSync(path.join(repoRoot, CI_WORKFLOW), "utf8"),
     pagesSource: readFileSync(path.join(repoRoot, PAGES_WORKFLOW), "utf8"),
+    additionalSources,
   });
 }
 

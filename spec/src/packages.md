@@ -19,8 +19,9 @@ audit remain authoritative.
 
 The released runner correction changes no public package entry, archive layout
 or runtime version proposal. MIRA-ARCH-008 and the six-package boundary remain
-unchanged; strict comparison is required for this root-only development tool
-before adopting it. See the released-runner record for public archive evidence.
+unchanged; static Storybook, interaction/accessibility and functional browser
+checks qualify this root-only development tool. CI screenshot comparisons are
+excluded by MIRA-CAT-006. See the released-runner record for archive evidence.
 
 Reference-definition presentation remains in Mira's owned rich-editor and
 preview layers. It reuses the existing renderer, asset resolver and source

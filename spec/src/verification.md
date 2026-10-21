@@ -1,5 +1,11 @@
 # Verification
 
+On 2026-10-21 the user removes screenshot comparisons from CI and release gates.
+The policy and workflow regression are recorded in
+[functional CI qualification](../records/2026-10-21-functional-ci-only.md).
+Existing screenshot evidence remains historical. Static Storybook,
+interaction/accessibility and functional browser acceptance stay required.
+
 The released cold Linux runner correction and original strict-comparison rerun
 are tracked in [tooling adoption](../records/2026-10-21-released-visual-runner.md).
 MIRA-CAT-006 and MIRA-GOV-010 remain unchanged. Baseline review, package
@@ -262,8 +268,9 @@ approved baseline.
   code, styles, or wrappers change.
 - Catalog change: Storybook browser tests and `pnpm build-storybook`.
 - Interaction/geometry change: Storybook browser tests plus focused Playwright.
-- Visual change: compare-only validation first; baseline mutation requires a
-  separate approved review step through the installed Visual Delta suite.
+- Presentation change: Storybook interactions/accessibility and functional
+  browser acceptance. Screenshot comparisons are not CI/release gates; manual
+  baseline mutation requires separate approval through installed Visual Delta.
 
 The 2026-08-02 canonical-host migration included an authorized full baseline
 regeneration because the addon's capture implementation and density supersede

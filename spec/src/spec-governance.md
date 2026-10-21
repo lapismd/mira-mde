@@ -19,16 +19,16 @@ commit admit OIDC publication. Clear that variable after release. Missing or
 stale approval fails before registry reads or uploads; immutable recovery and
 all audit/package/browser gates remain required. Manual CI dispatch can qualify
 the bot-maintained version branch without bypassing any product lane.
-The hosted compare-only visual job uses the published canonical image, fails
-strictly on comparison failures and never updates baselines. It separately
-qualifies the Visual Delta dependency update under MIRA-CAT-006.
-The visual job runs on native Ubuntu ARM64 because the reviewed canonical
-image/profile is ARM64. It must not substitute an x64 profile or rely on CPU
-emulation to conceal an image/runner mismatch.
+The user's 2026-10-21 instruction removes screenshot comparison from CI and
+release qualification under MIRA-CAT-006. Workflow validation MUST reject its
+reintroduction into ordinary CI, release, Pages or additional workflow files.
+Static Storybook, interaction/accessibility, functional browser, package,
+audit, protected publication and public-consumer gates remain required.
 The cold-runner correction is consumed as public Visual Delta 0.0.9 with its
 verified registry archive. It changes development tooling only and retains
 MIRA-CAT-006/MIRA-GOV-010, the existing version proposal and separate baseline
-approval. Owner publication and Mira consumer comparison are distinct evidence.
+approval. Owner publication and Mira functional consumer checks are distinct
+evidence; screenshot comparison is not a required consumer gate.
 
 Specification changes precede or accompany protected implementation changes.
 The gate is intentionally package-aware: updating an unrelated chapter does not

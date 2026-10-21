@@ -11,6 +11,61 @@ test("accepts the repository release and CI workflows", () => {
   assert.deepEqual(checkReleaseWorkflows(), { ok: true, errors: [] });
 });
 
+test("rejects screenshot comparison in every workflow", () => {
+  const sources = {
+    releaseSource: readFileSync(".github/workflows/release.yml", "utf8"),
+    ciSource: readFileSync(".github/workflows/mira-spec-first.yml", "utf8"),
+    pagesSource: readFileSync(
+      ".github/workflows/publish-storybook-pages.yml",
+      "utf8",
+    ),
+  };
+  for (const command of [
+    "pnpm exec visual-delta test --all",
+    "pnpm test:visual",
+    "npm run test:visual",
+    "pnpm exec playwright test --update-snapshots",
+  ]) {
+    for (const field of Object.keys(sources)) {
+      const result = validateReleaseWorkflows({
+        ...sources,
+        [field]: `${sources[field]}\nrun: ${command}\n`,
+      });
+      assert.equal(result.ok, false);
+      assert.match(result.errors.join("\n"), /screenshot comparisons/);
+    }
+    const result = validateReleaseWorkflows({
+      ...sources,
+      additionalSources: { "new-workflow.yml": `run: ${command}\n` },
+    });
+    assert.equal(result.ok, false);
+    assert.match(result.errors.join("\n"), /screenshot comparisons/);
+  }
+});
+
+test("retains static Storybook, interaction/accessibility and functional browser checks", () => {
+  const sources = {
+    releaseSource: readFileSync(".github/workflows/release.yml", "utf8"),
+    ciSource: readFileSync(".github/workflows/mira-spec-first.yml", "utf8"),
+    pagesSource: readFileSync(
+      ".github/workflows/publish-storybook-pages.yml",
+      "utf8",
+    ),
+  };
+  for (const command of [
+    "pnpm build-storybook",
+    "pnpm test:storybook",
+    "pnpm test:e2e",
+  ]) {
+    const result = validateReleaseWorkflows({
+      ...sources,
+      ciSource: sources.ciSource.replace(command, "pnpm omitted"),
+    });
+    assert.equal(result.ok, false);
+    assert.match(result.errors.join("\n"), new RegExp(command));
+  }
+});
+
 test("rejects automatic publication or missing protected source approval", () => {
   const source = readFileSync(".github/workflows/release.yml", "utf8");
   const ciSource = readFileSync(
