@@ -268,7 +268,7 @@
           type: "element",
           tagName: "wikilink",
           properties: linkNodeProperties(node),
-          children: state.all(node),
+          children: Array.isArray(node.children) ? state.all(node) : [],
         });
       },
       link(state: any, node: any) {
@@ -307,7 +307,7 @@
           type: "element",
           tagName: "pathlink",
           properties: linkNodeProperties(node),
-          children: state.all(node),
+          children: Array.isArray(node.children) ? state.all(node) : [],
         });
       },
       embed(state: any, node: any) {
@@ -315,7 +315,7 @@
           type: "element",
           tagName: "embed",
           properties: linkNodeProperties(node),
-          children: state.all(node),
+          children: Array.isArray(node.children) ? state.all(node) : [],
         });
       },
     } as any,

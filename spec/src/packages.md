@@ -1,5 +1,9 @@
 # Public Packages and Entry Points
 
+The preview leaf-child repair retains MIRA-ARCH-008's public package boundary:
+no entry point, schema, dependency range or archive layout changes. The
+existing preview handlers accept optional empty child fields from extensions.
+
 MIRA-ARCH-008 includes the additive `/tables` TableReader export. It composes
 the existing parser and preview with host cell/row snippets for immutable
 annotated tables. Existing Table, Column and editable widget exports retain

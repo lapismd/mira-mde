@@ -1,5 +1,10 @@
 # Verification
 
+The optional leaf-child regression under unchanged MIRA-MD-002/004 is recorded
+in [preview leaf links](../records/2026-10-21-preview-leaf-links.md). Actual
+preview mounts, package checks/tests and public builds are separate from
+Desktop's cold consumer acceptance and package publication.
+
 Completed Wave 3 publication is tracked in
 [six-package publication](../records/2026-10-21-publication.md), binding the
 qualified version source, archive checksums and verified public outcomes under

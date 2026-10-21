@@ -1,5 +1,10 @@
 # Portable Markdown and Editor
 
+MIRA-MD-002/004 retain their existing link and adapter contracts. Preview
+handlers MUST accept path, wiki and embed leaf nodes with absent or explicitly
+undefined optional children, preserve their declared labels and leave
+navigation and file authority with the host.
+
 Wave 3 retains MIRA-MD-002's complete inline-table Markdown syntax contract.
 Its parser regression explicitly completes CodeMirror's budgeted incremental
 parse before checking every existing syntax node; a partial initial tree under
