@@ -14,6 +14,8 @@ The TableReader public export and cell-padding token are registered in the
 table catalog. The annotated-row story mounts the actual public component and
 checks split fragments, original source-row context and absence of authoring
 controls; its visual result remains pending separate approval.
+Reader annotations use the foreground token for readable text; the muted surface
+token is a background color and cannot substitute for accessible text contrast.
 
 ## Bundled inline-link examples
 

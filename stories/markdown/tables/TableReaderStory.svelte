@@ -24,6 +24,6 @@
     padding: 0.75rem;
     border: 1px solid var(--mira-border);
     border-radius: var(--mira-radius);
-    color: var(--mira-muted);
+    color: var(--mira-muted-foreground);
   }
 </style>
