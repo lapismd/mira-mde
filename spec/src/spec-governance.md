@@ -22,6 +22,9 @@ the bot-maintained version branch without bypassing any product lane.
 The hosted compare-only visual job uses the published canonical image, fails
 strictly on comparison failures and never updates baselines. It separately
 qualifies the Visual Delta dependency update under MIRA-CAT-006.
+The visual job runs on native Ubuntu ARM64 because the reviewed canonical
+image/profile is ARM64. It must not substitute an x64 profile or rely on CPU
+emulation to conceal an image/runner mismatch.
 
 Specification changes precede or accompany protected implementation changes.
 The gate is intentionally package-aware: updating an unrelated chapter does not
