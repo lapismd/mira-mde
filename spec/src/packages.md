@@ -11,11 +11,16 @@ exports, manifest ranges, HTML policy options or archive layout.
 
 Wave 3 combines these two local fixes with GitHub main without resetting its
 released package versions. Changesets retains the pending `0.1.0` core and
-dependent package proposals. Repository-only Visual Delta 0.0.8 and Playwright
+dependent package proposals. Repository-only Visual Delta 0.0.9 and Playwright
 1.62.1 use the already qualified browser profile. Audited Vite 7/8 and Markdown-it
 resolutions stay on their existing major lines with patched versions; published
 runtime ranges, the existing narrowly scoped KaTeX policy and packed-consumer
 audit remain authoritative.
+
+The released runner correction changes no public package entry, archive layout
+or runtime version proposal. MIRA-ARCH-008 and the six-package boundary remain
+unchanged; strict comparison is required for this root-only development tool
+before adopting it. See the released-runner record for public archive evidence.
 
 Reference-definition presentation remains in Mira's owned rich-editor and
 preview layers. It reuses the existing renderer, asset resolver and source

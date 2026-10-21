@@ -25,6 +25,10 @@ qualifies the Visual Delta dependency update under MIRA-CAT-006.
 The visual job runs on native Ubuntu ARM64 because the reviewed canonical
 image/profile is ARM64. It must not substitute an x64 profile or rely on CPU
 emulation to conceal an image/runner mismatch.
+The cold-runner correction is consumed as public Visual Delta 0.0.9 with its
+verified registry archive. It changes development tooling only and retains
+MIRA-CAT-006/MIRA-GOV-010, the existing version proposal and separate baseline
+approval. Owner publication and Mira consumer comparison are distinct evidence.
 
 Specification changes precede or accompany protected implementation changes.
 The gate is intentionally package-aware: updating an unrelated chapter does not

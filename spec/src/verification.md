@@ -1,5 +1,10 @@
 # Verification
 
+The released cold Linux runner correction and original strict-comparison rerun
+are tracked in [tooling adoption](../records/2026-10-21-released-visual-runner.md).
+MIRA-CAT-006 and MIRA-GOV-010 remain unchanged. Baseline review, package
+publication and actual public-consumer qualification stay separate.
+
 Wave 3's exact-source publication guard, source reconciliation, dependency audit
 and TableReader catalog coverage are recorded in
 [release preparation](../records/2026-10-21-wave3-release-preparation.md).

@@ -1,5 +1,11 @@
 # Architecture and Boundaries
 
+The Visual Delta 0.0.9 adoption preserves MIRA-ARCH-020: only the root npm
+development tool and its lock identity change. It remains outside the six
+public packages; runtime entry points, dependency direction and consumer
+ownership are unchanged. Strict native comparison qualifies the repaired
+tooling independently of Mira package publication.
+
 Inline site-icon links follow the bundled opt-in extension boundary, alongside
 doodle dividers and selection toolbars. Their registry is local presentation
 data; it does not depend on forge accounts or application preferences. Public

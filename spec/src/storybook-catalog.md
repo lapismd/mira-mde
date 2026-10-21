@@ -5,7 +5,10 @@ and inline renderer instances for small comparison links. Reference-definition
 and reference-image coverage belongs to the existing Links and Images stories;
 their changed live-preview visuals remain pending separate approval.
 
-Wave 3 aligns the published Visual Delta 0.0.8 tool with Playwright 1.62.1.
+Wave 3 requires the released Visual Delta 0.0.9 cold Linux runner correction
+with Playwright 1.62.1. Adoption must resolve from the public registry, then
+rerun the original strict native comparison; zero targets before a cold build
+and a failed private-stage cleanup cannot qualify that gate.
 The static Storybook, interactions/accessibility, browser acceptance and
 compare-only visual checks remain distinct gates. No baseline changes are
 authorized by dependency preparation or source integration.
