@@ -53,6 +53,18 @@ export function validateReleaseWorkflows({
     errors,
   );
   requireText(releaseSource, /id-token: write/, "OIDC permission", errors);
+  requireText(
+    releaseSource,
+    /publish:\s*\n\s+description:[^\n]+\n\s+required: true\n\s+default: false\n\s+type: boolean/,
+    "manual publication input defaulting to false",
+    errors,
+  );
+  requireText(
+    releaseSource,
+    /const shouldPublish = process\.env\.MIRA_PUBLISH_REQUESTED === "true" &&/,
+    "manual request controls artifact publication mode",
+    errors,
+  );
   if ((releaseSource.match(/id-token: write/g) ?? []).length !== 1) {
     errors.push("only the production publish job may request OIDC permission");
   }
@@ -80,6 +92,20 @@ export function validateReleaseWorkflows({
   if (!production) errors.push("missing publish-production job");
   else if (/NPM_BOOTSTRAP_TOKEN|NODE_AUTH_TOKEN/.test(production)) {
     errors.push("production job must not receive npm token credentials");
+  }
+  if (production) {
+    requireText(
+      production,
+      /MIRA_PUBLISH_REQUESTED: \$\{\{ github\.event_name == 'workflow_dispatch' && inputs\.publish == true \}\}/,
+      "explicit manual publication request",
+      errors,
+    );
+    requireText(
+      production,
+      /MIRA_RELEASE_APPROVED_SOURCE: \$\{\{ vars\.MIRA_RELEASE_APPROVED_SOURCE \}\}/,
+      "protected source approval",
+      errors,
+    );
   }
   const notes = releaseSource.match(/notes:[\s\S]*$/)?.[0];
   if (!notes) {

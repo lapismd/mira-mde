@@ -71,6 +71,13 @@ fallback, generated-cache exclusions, canonical build identity, and runner
 behavior required by those gates; Mira does not maintain a downstream pnpm
 patch for behavior available in the reviewed upstream release.
 
+Wave 3 consumes the released Visual Delta 0.0.8 with Playwright 1.62.1,
+matching the approved immutable browser image profile rather than a new image.
+Vite and Markdown-it audit repairs retain their existing major versions.
+These are portable registry resolutions, with no sibling paths or new public
+package graph edges. Full hosted package/browser lanes qualify this shared
+tooling update; local checks begin with exact preview/table and release guards.
+
 Specification validation follows the same root-only boundary but resolves from
 the published `@lapismd/spec-validator` npm package once available. Mira owns
 its validator configuration, requirement IDs, paths, and evidence locally; it

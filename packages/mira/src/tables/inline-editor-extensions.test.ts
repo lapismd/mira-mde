@@ -1,4 +1,4 @@
-import { syntaxTree } from "@codemirror/language";
+import { ensureSyntaxTree } from "@codemirror/language";
 import { EditorState } from "@codemirror/state";
 import { describe, expect, it } from "vitest";
 import { createInlineTableMarkdownExtensions } from "./inline-editor-extensions";
@@ -12,7 +12,9 @@ describe("createInlineTableMarkdownExtensions", () => {
       ].join("\n"),
       extensions: createInlineTableMarkdownExtensions(),
     });
-    const tree = syntaxTree(state).toString();
+    // Initial CodeMirror parsing is budgeted and can return a partial tree.
+    // This regression verifies the complete parser output, not that budget.
+    const tree = ensureSyntaxTree(state, state.doc.length, 1_000)?.toString();
 
     expect(tree).toContain("StrongEmphasis");
     expect(tree).toContain("Emphasis");

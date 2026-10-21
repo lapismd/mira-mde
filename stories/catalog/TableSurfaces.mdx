@@ -3,13 +3,16 @@ import { SvelteDocsBridge } from "./SvelteDocsBridge";
 import CatalogPage from "./CatalogPage.svelte";
 
 <Meta
-  title="Mira/Catalog/Editable table surfaces"
+  title="Mira/Catalog/Table surfaces"
   parameters={{ layout: "fullscreen" }}
 />
 
-# Editable table surfaces
+# Table surfaces
 
 Pipe and grid table components share the rendered Markdown token contract while
 retaining their rich editor menus, cells, selection, and drag chrome.
+`TableReader` renders immutable table fragments with source-row annotations and
+an inheritable cell-padding token. Its reader story demonstrates comments
+between rows without authoring controls.
 
 <SvelteDocsBridge component={CatalogPage} props={{ entryIds: ["tables"] }} />

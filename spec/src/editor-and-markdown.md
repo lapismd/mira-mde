@@ -1,5 +1,22 @@
 # Portable Markdown and Editor
 
+Wave 3 retains MIRA-MD-002's complete inline-table Markdown syntax contract.
+Its parser regression explicitly completes CodeMirror's budgeted incremental
+parse before checking every existing syntax node; a partial initial tree under
+parallel test load is not the parser's final output. Runtime parsing, editing
+behavior and all original syntax assertions remain unchanged.
+
+For MIRA-MD-002, safe embedded previews MUST preserve generated code language,
+highlight token and code-line classes while continuing to strip scripts,
+event-handler attributes and unsafe destinations. Highlighting never authorizes
+executable HTML.
+
+For MIRA-MD-005, the public `/tables` TableReader MUST reuse the table parser
+and cell preview for immutable tables. Hosts MAY supply source-aware cell
+snippets and split after exact source-row indices to insert annotations outside
+the table. Splits MUST retain column alignment, original row order and no
+authoring menus, drag handles or mutation callbacks.
+
 ## Reference definitions in live preview
 
 | ID          | Requirement                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |

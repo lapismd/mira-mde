@@ -49,6 +49,7 @@ export const PUBLIC_SURFACES = [
       "EditorColumn",
       "GridEditorTable",
       "GridEditorColumn",
+      "TableReader",
     ],
   },
   {

@@ -5,6 +5,16 @@ and inline renderer instances for small comparison links. Reference-definition
 and reference-image coverage belongs to the existing Links and Images stories;
 their changed live-preview visuals remain pending separate approval.
 
+Wave 3 aligns the published Visual Delta 0.0.8 tool with Playwright 1.62.1.
+The static Storybook, interactions/accessibility, browser acceptance and
+compare-only visual checks remain distinct gates. No baseline changes are
+authorized by dependency preparation or source integration.
+
+The TableReader public export and cell-padding token are registered in the
+table catalog. The annotated-row story mounts the actual public component and
+checks split fragments, original source-row context and absence of authoring
+controls; its visual result remains pending separate approval.
+
 ## Bundled inline-link examples
 
 | ID           | Requirement                                                                                                                                                                                                                                                                                                                                                                             |
