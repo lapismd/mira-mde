@@ -1,5 +1,10 @@
 # Public Packages and Entry Points
 
+MIRA-ARCH-008 includes the additive `MiraProps.lineNumbers` boolean, defaulting
+to true. A false value MUST omit MiraCodeEditor's line-number extension rather
+than hiding its output with consumer CSS. Focused evidence is recorded in
+`spec/records/2026-10-22-composer-line-numbers.md`.
+
 The preview leaf-child repair retains MIRA-ARCH-008's public package boundary:
 no entry point, schema, dependency range or archive layout changes. The
 existing preview handlers accept optional empty child fields from extensions.

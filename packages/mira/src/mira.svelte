@@ -45,6 +45,7 @@
     readonly = false,
     placeholder = "Start writing Markdown...",
     lineWrapping = true,
+    lineNumbers = true,
     spellcheck = true,
     blockControls = false,
     indentGuides = true,
@@ -525,6 +526,7 @@
           {readonly}
           {placeholder}
           {lineWrapping}
+          {lineNumbers}
           {spellcheck}
           {indentWithTabs}
           {indentWidth}

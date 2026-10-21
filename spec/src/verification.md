@@ -836,3 +836,7 @@ refreshed. The Storybook continuation-paragraph acceptance now avoids a
 duplicated parent-glyph comparison that proved CI-renderer-sensitive while
 retaining anchored-continuation, wrapped-row stability, and the separate
 caret-state content-column regression.
+
+The embedded composer follow-up to MIRA-ARCH-008 exposes `MiraProps.lineNumbers`.
+See `spec/records/2026-10-22-composer-line-numbers.md` for the focused public
+component regression, build and temporary consumer archive evidence.

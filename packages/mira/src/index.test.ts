@@ -8,6 +8,20 @@ describe("Mira", () => {
     expect(Mira).toBeTruthy();
   });
 
+  it("omits the line-number extension when explicitly disabled", async () => {
+    const target = document.createElement("div");
+    document.body.append(target);
+    const component = mount(Mira, {
+      target,
+      props: { value: "First line\nSecond line", lineNumbers: false },
+    });
+    await tick();
+    expect(target.querySelector(".cm-content")).not.toBeNull();
+    expect(target.querySelector(".cm-lineNumbers")).toBeNull();
+    await unmount(component);
+    target.remove();
+  });
+
   it("renders opaque theme tokens and an independent color mode", async () => {
     const target = document.createElement("div");
     document.body.append(target);
