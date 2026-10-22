@@ -1,5 +1,10 @@
 # Verification
 
+Safe task-marker follow-up: `src/preview/safe-tasks.test.ts` covers standard
+checked/unchecked and custom task identities in trusted and safe read-only
+previews; Agent UI Files supplies the browser paint acceptance for the public
+packed Mira output. Broader qualification remains deferred for screen review.
+
 Live-preview list and task insets, asterisk bullets at rest, and wrapped-row
 alignment under MIRA-MD-007 are tracked in
 [list indentation qualification](../records/2026-10-22-live-list-indentation.md).

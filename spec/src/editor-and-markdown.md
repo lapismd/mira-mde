@@ -25,6 +25,10 @@ highlight token and code-line classes while continuing to strip scripts,
 event-handler attributes and unsafe destinations. Highlighting never authorizes
 executable HTML.
 
+Safe previews MUST preserve list-item task markers produced by the Markdown
+parser so checked and custom tasks keep their shipped artwork while remaining
+read-only when no change callback is supplied.
+
 For MIRA-MD-005, the public `/tables` TableReader MUST reuse the table parser
 and cell preview for immutable tables. Hosts MAY supply source-aware cell
 snippets and split after exact source-row indices to insert annotations outside

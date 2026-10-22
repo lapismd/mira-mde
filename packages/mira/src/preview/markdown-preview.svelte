@@ -215,6 +215,7 @@
         "data-sourcepos",
       ],
       img: [...(defaultSchema.attributes?.img ?? []), "src", "alt", "title"],
+      li: [...(defaultSchema.attributes?.li ?? []), "dataTask"],
       code: [
         ...(defaultSchema.attributes?.code ?? []).filter(
           (attribute) =>

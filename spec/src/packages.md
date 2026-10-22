@@ -1,5 +1,9 @@
 # Public Packages and Entry Points
 
+The public Mira preview output MUST preserve safe list-item task metadata so
+read-only consumers retain checked and custom checkbox artwork without adding
+consumer styles or enabling Markdown writes.
+
 The `@lapismd/mira` list-indentation repair stays within shipped preview CSS
 and the internal CodeMirror measurement extension. Public entry points and
 consumer configuration remain unchanged; list and task spacing must work from
