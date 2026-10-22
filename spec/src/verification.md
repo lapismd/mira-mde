@@ -1,5 +1,9 @@
 # Verification
 
+Live-preview list and task insets, asterisk bullets at rest, and wrapped-row
+alignment under MIRA-MD-007 are tracked in
+[list indentation qualification](../records/2026-10-22-live-list-indentation.md).
+
 The optional leaf-child regression under unchanged MIRA-MD-002/004 is recorded
 in [preview leaf links](../records/2026-10-21-preview-leaf-links.md). Actual
 preview mounts, package checks/tests and public builds are separate from

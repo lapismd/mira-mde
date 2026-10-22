@@ -1,5 +1,14 @@
 # Portable Markdown and Editor
 
+For MIRA-MD-007, live-preview unordered lists MUST retain reading mode's
+three-character marker inset, including top-level lists after formatted prose.
+Rendered tasks MUST retain the same list inset when the checkbox replaces the
+source marker, and wrapped task rows MUST align beneath their label. Toggling a
+checkbox and revealing then hiding its source MUST preserve that alignment.
+Parsed list markers MUST remain owned by list chrome: an asterisk bullet MUST
+NOT be hidden as inline emphasis, including on the active line. Its wrapped
+rows MUST retain the same hanging alignment as dash-authored items.
+
 MIRA-MD-002/004 retain their existing link and adapter contracts. Preview
 handlers MUST accept path, wiki and embed leaf nodes with absent or explicitly
 undefined optional children, preserve their declared labels and leave

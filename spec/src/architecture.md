@@ -91,7 +91,10 @@ its validator configuration, requirement IDs, paths, and evidence locally; it
 does not require the validator sibling checkout for normal repository checks.
 
 The root keeps the `storybook`, accessibility, docs, themes, Vitest, and Svelte
-Vite packages on one reviewed patch line; the current set is `10.5.6`.
+Vite packages on one reviewed patch line; the declared floor is `10.6.2` and
+the lockfile resolves `10.6.3`.
+Vitest and its browser/mocker tooling use `4.1.12` to address the October 22
+origin-validation and mocker traversal advisories without disabling audit.
 Storybook MCP, Svelte CSF, icons, and third-party addons retain their own release
 lines and are not version-coupled to the core patch. A Storybook patch change
 MUST pass the root quality gates and a complete static Storybook build without

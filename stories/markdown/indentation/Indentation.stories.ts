@@ -11,6 +11,7 @@ import {
   configurableIndentWidthMarkdown,
   continuationParagraphsMarkdown,
   nestedListsAndQuotesMarkdown,
+  topLevelListsMarkdown,
   wrappedListItemsMarkdown,
 } from "./fixtures";
 
@@ -39,6 +40,14 @@ const meta = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
+
+export const TopLevelListsLivePreview: Story = {
+  args: { value: topLevelListsMarkdown, mode: "live-preview" },
+};
+
+export const TopLevelListsReading: Story = {
+  args: { value: topLevelListsMarkdown, mode: "preview" },
+};
 
 export const BareCodeMirrorLivePreview: Story = {
   tags: ["visual-pending", "!autodocs"],

@@ -654,6 +654,31 @@ After`;
     parent.remove();
   });
 
+  it("keeps asterisk list markers out of hidden inline formatting", async () => {
+    const parent = document.createElement("div");
+    document.body.append(parent);
+    const source = "* Keep *italic* content\n\nAfter";
+    const view = new EditorView({
+      doc: source,
+      selection: { anchor: source.length },
+      extensions: [
+        createMarkdownCodeMirrorExtensions(),
+        createRichEditorExtensions({ livePreview: true }),
+        syntaxHighlighting(miraClassHighlighter),
+      ],
+      parent,
+    });
+    await nextFrame();
+    const marker = parent.querySelector(".cm-formatting-list-ul > .cm-meta");
+    expect(marker?.textContent).toBe("*");
+    expect(marker?.closest(".cm-formatting-hidden")).toBeNull();
+    expect(parent.querySelector(".cm-emphasis")?.textContent).toContain(
+      "italic",
+    );
+    view.destroy();
+    parent.remove();
+  });
+
   it("keeps a blockquote-nested task marker complete while it is edited", async () => {
     const parent = document.createElement("div");
     document.body.append(parent);

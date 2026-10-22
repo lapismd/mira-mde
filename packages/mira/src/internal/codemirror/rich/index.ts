@@ -673,7 +673,9 @@ function decorateInlineSyntax(
       from: visibleRange.from,
       to: visibleRange.to,
       enter(node) {
-        if (node.name === "LinkReference") {
+        // List markers belong to indentation chrome. In particular, `*` must
+        // not be collapsed by the fallback inline-formatting matcher.
+        if (node.name === "LinkReference" || node.name === "ListMark") {
           activeSourceRanges.push({ from: node.from, to: node.to });
           return false;
         }

@@ -1,5 +1,15 @@
 # Public Packages and Entry Points
 
+The `@lapismd/mira` list-indentation repair stays within shipped preview CSS
+and the internal CodeMirror measurement extension. Public entry points and
+consumer configuration remain unchanged; list and task spacing must work from
+the packaged styles without consumer overrides.
+The internal inline-formatting pass preserves parsed list-marker ranges so
+asterisk bullets cannot lose their marker or measured hanging indentation.
+
+Root-only Storybook `10.6.3` and Vitest `4.1.12` updates repair the mandatory
+development audit gate; they do not change the public package graph.
+
 MIRA-ARCH-008 includes the additive `MiraProps.lineNumbers` boolean, defaulting
 to true. A false value MUST omit MiraCodeEditor's line-number extension rather
 than hiding its output with consumer CSS. Focused evidence is recorded in

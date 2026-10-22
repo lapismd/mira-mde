@@ -1,5 +1,15 @@
 /** Focused fixtures adapted from Lapis's Markdown indentation regressions. */
 
+export const topLevelListsMarkdown = [
+  "Keep **bold**, _italic_, ~~strikethrough~~, ||spoilers|| and [ordinary links](https://example.com/docs).",
+  "",
+  "- This is the end of the day",
+  "- are you sure you want this",
+  "",
+  "- [ ] An unchecked task with enough text to wrap across several visual rows and keep every continuation aligned beneath its label rather than beneath the checkbox.",
+  "- [x] A completed task",
+].join("\n");
+
 export const wrappedListItemsMarkdown = [
   "# Wrapped list items",
   "",

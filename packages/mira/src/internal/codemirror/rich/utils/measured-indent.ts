@@ -134,6 +134,20 @@ function measureTextNodeWidth(node: Text): number | null {
 }
 
 function measureMarkerWidth(line: HTMLElement): number {
+  const checkbox = line.querySelector<HTMLElement>(".task-list-label");
+  if (checkbox) {
+    // The checkbox replaces the list marker as well as its task delimiter.
+    // Include its margins and the surviving separator so wrapped rows hang
+    // under the task text, rather than under the checkbox.
+    const contentOffset = measureFirstContentOffset(line);
+    const checkboxOffset =
+      checkbox.getBoundingClientRect().left - line.getBoundingClientRect().left;
+    const margin =
+      Number.parseFloat(getComputedStyle(checkbox).marginInlineStart) || 0;
+    if (contentOffset !== null) {
+      return Math.max(0, contentOffset - checkboxOffset + margin);
+    }
+  }
   const marker = line.querySelector<HTMLElement>(
     ".cm-formatting-list-ul, .cm-formatting-list-ol",
   );
@@ -246,7 +260,7 @@ function firstContentTextNode(line: HTMLElement): Text | null {
       continue;
     }
     const skipped = node.parentElement?.closest(
-      ".cm-hmd-list-indent, .cm-plain-indent-widget, .cm-formatting-list-ul, .cm-formatting-list-ol, .cm-blockquote-border, .cm-formatting-quote",
+      ".cm-hmd-list-indent, .cm-plain-indent-widget, .cm-formatting-list-ul, .cm-formatting-list-ol, .cm-blockquote-border, .cm-formatting-quote, .task-list-label",
     );
     if (skipped && skipped !== line) {
       continue;
