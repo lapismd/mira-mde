@@ -522,11 +522,10 @@
 }
 
 .markdown-editor-surface .cm-line .cm-fold-indicator {
-  display: inline-block;
+  display: inline;
   opacity: 0;
   overflow: visible;
   position: relative;
-  vertical-align: middle;
   width: 0;
 }
 
@@ -552,7 +551,7 @@
   padding-inline-end: 0;
   position: absolute;
   top: 50%;
-  transform: translateY(calc(-50% - 2px));
+  transform: translateY(-50%);
   width: 1rem;
 }
 

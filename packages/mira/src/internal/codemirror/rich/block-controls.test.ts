@@ -476,6 +476,40 @@ describe("block controls", () => {
     parent.remove();
   });
 
+  it("targets the current block when replacement precedes the next render frame", async () => {
+    const parent = document.createElement("div");
+    document.body.append(parent);
+    const view = new EditorView({
+      doc: "# Long heading\n\nA longer paragraph",
+      extensions: [
+        createRichEditorExtensions({
+          blockControls: { toolbar: true },
+          livePreview: false,
+        }),
+      ],
+      parent,
+    });
+    try {
+      await nextFrame();
+      view.dispatch({
+        changes: { from: 0, to: view.state.doc.length, insert: "Paragraph" },
+      });
+      const trigger = parent.querySelector<HTMLButtonElement>(
+        ".mira-block-toolbar-trigger--active",
+      );
+      expect(trigger).not.toBeNull();
+      trigger!.click();
+      const menu = document.body.querySelector<HTMLElement>(
+        '[role="menu"][aria-label="Change block type"]',
+      );
+      expect(menu?.hidden).toBe(false);
+      expect(view.state.doc.toString()).toBe("Paragraph");
+    } finally {
+      view.destroy();
+      parent.remove();
+    }
+  });
+
   it("opens block actions from the handle context menu", async () => {
     const parent = document.createElement("div");
     document.body.append(parent);

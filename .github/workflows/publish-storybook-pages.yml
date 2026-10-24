@@ -18,6 +18,9 @@ concurrency:
   group: github-pages
   cancel-in-progress: true
 
+env:
+  MIRA_VALIDATION_RUNTIME: native
+
 jobs:
   build:
     name: Build static Storybook

@@ -1,5 +1,10 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "globalEnv": ["CI", "MIRA_VALIDATION_WORKER"],
+  "globalPassThroughEnv": [
+    "MIRA_VALIDATION_RUNTIME",
+    "PLAYWRIGHT_BROWSERS_PATH"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],

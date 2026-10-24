@@ -343,8 +343,8 @@ export const NestedListsAndQuotesSource: Story = {
 
 export const NestedListsAndQuotesLivePreview: Story = {
   tags: [
-    "visual-approved",
-    "!visual-pending",
+    "visual-pending",
+    "!visual-approved",
     "!visual-ready",
     "!visual-failed",
   ],

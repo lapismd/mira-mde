@@ -67,6 +67,10 @@ async function expectRawTableTypography(
   await expect(tableStyle.whiteSpace).toBe("pre");
   await expect(proseStyle.fontFamily).not.toBe(monoFontFamily);
 
+  // Font faces can arrive after CodeMirror renders on a cold browser host.
+  // Compare column geometry only once both regular and header faces settle.
+  await ownerDocument.fonts.ready;
+
   const pipeOffsets = tableLines.map((line) => {
     const lineLeft = line.getBoundingClientRect().left;
     const walker = ownerDocument.createTreeWalker(

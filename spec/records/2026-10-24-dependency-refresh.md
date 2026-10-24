@@ -15,6 +15,13 @@ rerun reports zero known vulnerabilities, down from six. Changed-file
 formatting, all four specification lanes and all 40 release-tool tests pass.
 Full source, package and browser qualification follows in the dependency PR.
 
+The refreshed source branch is merged into this dependency branch without
+rewriting its existing published commit. The combined tree matches the locally
+qualified candidate: audit has zero findings, 499 package tests, 14 runner
+regressions, 170 interaction/accessibility cases and 60 cold browser cases pass,
+alongside specification, builds and six-package packed consumers. Hosted CI
+must qualify this updated dependency head before it merges into source PR #18.
+
 No open Dependabot PR exists to supersede. This audit-driven update is isolated
 in a dependency-only PR against the release source branch, to merge before the
 release source PR is finalized. No audit exception or test threshold changes.

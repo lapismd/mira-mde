@@ -689,6 +689,12 @@ test("keeps list collapse controls beside first-row markers", async ({
         return {
           inlineGap: markerRect.left - controlRect.right,
           text: line.textContent?.trim(),
+          signedVerticalDelta:
+            (controlRect.top +
+              controlRect.bottom -
+              markerRect.top -
+              markerRect.bottom) /
+            2,
           verticalDelta: Math.abs(
             (controlRect.top + controlRect.bottom) / 2 -
               (markerRect.top + markerRect.bottom) / 2,
