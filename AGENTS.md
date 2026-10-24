@@ -24,6 +24,32 @@ repo unless a more specific `AGENTS.md` is added deeper in the tree.
 - If a LapisMD dependency needs a source fix, make the change in the owning
   repository, verify it there, and consume a released package version here.
 
+## Release and push preflight
+
+- Before every release, fetch the release remote and run `jj workspace list`.
+  Inspect each registered workspace's status and compare its committed and
+  uncommitted work with the proposed release revision. Record every workspace
+  and whether its work is included, already equivalent, or still unmerged.
+- Integrate ready unmerged work needed for the release before versioning, then
+  validate the combined candidate. Do not silently omit relevant work, merge
+  unrelated unfinished work, overwrite another workspace, or delete workspaces.
+  Resolve uncertain release scope with the user before publication.
+- Before every push, query the repository's open Dependabot pull requests.
+  Consolidate their applicable dependency updates into one separate
+  dependency-only pull request for this repository, including lockfile changes,
+  required specification/Changeset evidence, and relevant validation.
+- Push and verify that consolidated pull request, then merge it before the
+  release candidate is finalized. Close superseded Dependabot pull requests
+  only after their updates are verified in the merged replacement; identify
+  the replacement pull request in the closure record. Do not close an update
+  that was omitted or failed qualification.
+- Keep dependency consolidation separate from product and versioning pull
+  requests. If no Dependabot pull requests are open, record that result and do
+  not create an empty dependency pull request. Recheck before subsequent pushes.
+- Retain the workspace inventory, dependency disposition, exact release source,
+  and validation evidence in the release record. Existing task authorization
+  still governs pushes and publication.
+
 ## Styling Model
 
 - Exported package styling must work without requiring consumers to run
