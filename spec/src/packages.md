@@ -146,6 +146,10 @@ dependency declaration rather than a consumer patch or copied overlay code.
 
 ## Public graph
 
+Docker validation is private root tooling. It MUST retain the six-package
+public graph and registry-portable manifests and lockfile; its isolated outputs
+and ignored configuration MUST NOT enter public archives.
+
 | Package                        | Responsibility                                                                                    |
 | ------------------------------ | ------------------------------------------------------------------------------------------------- |
 | `@lapismd/mira`                | Composable Svelte editor, controllers, extension SDK, Markdown rendering, tables, UI, and styles. |

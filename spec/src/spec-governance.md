@@ -71,6 +71,11 @@ Dependabot queue requires a recorded check, not an empty pull request.
 
 ## Change map
 
+Validation runner scripts, image recipes and local-artifact exclusions map to
+the architecture and package chapters. Hosted workflows explicitly opt into
+native execution, preserving the same specification and audit gates inside
+Docker. Ignored validation reports are evidence, never canonical authority.
+
 | Protected area                                                                  | Required chapter                               |
 | ------------------------------------------------------------------------------- | ---------------------------------------------- |
 | Mira controller, extension, CodeMirror, preview, and table source               | `editor-and-markdown.md`, `packages.md`        |
