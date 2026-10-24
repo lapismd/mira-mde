@@ -1,5 +1,9 @@
 # Public Packages and Entry Points
 
+Release dependency qualification refreshes DOMPurify and Undici within their
+current major lines. MIRA-ARCH-039 retains the complete workspace audit and
+independent packed-production audit; these updates add no package or public API.
+
 The public Mira preview output MUST preserve safe list-item task metadata so
 read-only consumers retain checked and custom checkbox artwork without adding
 consumer styles or enabling Markdown writes.

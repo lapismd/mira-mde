@@ -1,5 +1,10 @@
 # Architecture and Boundaries
 
+The 0.1.1 release retains the six-package graph and existing public runtime
+ranges. Workspace-only audit overrides keep DOMPurify on patched 3.x and Undici
+on patched 7.x/8.x; the independently installed public archives remain subject
+to the production-consumer audit.
+
 The Visual Delta 0.0.9 adoption preserves MIRA-ARCH-020: only the root npm
 development tool and its lock identity change. It remains outside the six
 public packages; runtime entry points, dependency direction and consumer
