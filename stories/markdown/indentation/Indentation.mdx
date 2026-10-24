@@ -31,6 +31,19 @@ visible for their separate runtime repair and later baseline review.
 
 ## Wrapped list items
 
+The top-level cases cover formatted prose followed by ordinary bullets and
+checkboxes. The browser regression compares their inset with reading mode and
+checks wrapped task text, checkbox toggling, and source-marker editing.
+
+<Canvas
+  of={IndentationStories.TopLevelListsLivePreview}
+  meta={IndentationStories}
+/>
+<Canvas
+  of={IndentationStories.TopLevelListsReading}
+  meta={IndentationStories}
+/>
+
 <Primary />
 
 <Canvas

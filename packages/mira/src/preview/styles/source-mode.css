@@ -10,6 +10,14 @@
   );
 }
 
+:is(
+  .markdown-live-preview-mode .cm-editor,
+  .cm-editor.markdown-live-preview-mode
+) {
+  /* Match the inset owned by reading-mode list items. */
+  --hmd-unordered-list-marker-slot-width: 3ch;
+}
+
 /* Keep authored pipe-table columns aligned without changing rendered tables. */
 :is(
     .markdown-source-mode .cm-editor.markdown-source-view,
@@ -140,6 +148,28 @@
         )
       )
   );
+}
+
+:is(
+    .markdown-live-preview-mode .cm-editor,
+    .cm-editor.markdown-live-preview-mode
+  )
+  .cm-task-line:has(.task-list-label) {
+  padding-inline-start: calc(
+    var(
+        --hmd-indent-padding-measured,
+        var(--hmd-indent-padding-fallback, 0px)
+      ) +
+      3ch
+  );
+}
+
+:is(
+    .markdown-live-preview-mode .cm-editor,
+    .cm-editor.markdown-live-preview-mode
+  )
+  .task-list-label {
+  display: inline-flex;
 }
 
 :is(.markdown-editor-surface .cm-editor, .cm-editor.markdown-editor-surface)
@@ -492,11 +522,10 @@
 }
 
 .markdown-editor-surface .cm-line .cm-fold-indicator {
-  display: inline-block;
+  display: inline;
   opacity: 0;
   overflow: visible;
   position: relative;
-  vertical-align: middle;
   width: 0;
 }
 
@@ -522,7 +551,7 @@
   padding-inline-end: 0;
   position: absolute;
   top: 50%;
-  transform: translateY(calc(-50% - 2px));
+  transform: translateY(-50%);
   width: 1rem;
 }
 

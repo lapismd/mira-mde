@@ -1,5 +1,15 @@
 # Styling and CSS Tokens
 
+Live-preview collapse controls MUST center on their inline marker without a
+fixed upward font offset, retaining the existing 1.5px browser alignment bound
+on both Linux and macOS.
+
+Live-preview unordered marker slots use the reading list's `3ch` inset. Task
+lines retain that inset after marker replacement; their checkbox widget uses
+inline flex layout so component whitespace does not widen the prefix under
+CodeMirror's preformatted whitespace. Measured hanging indentation includes
+the checkbox and its separator while keeping line and gutter margins unchanged.
+
 Fenced Markdown headings use the existing `--mira-syntax-heading` color through
 the generated `hljs-section` token. Safe and ordinary preview surfaces share
 the same token styles; no consumer selector or theme override is required.

@@ -1,5 +1,10 @@
 # Architecture and Boundaries
 
+The 0.1.1 release retains the six-package graph and existing public runtime
+ranges. Workspace-only audit overrides keep DOMPurify on patched 3.x and Undici
+on patched 7.x/8.x; the independently installed public archives remain subject
+to the production-consumer audit.
+
 The Visual Delta 0.0.9 adoption preserves MIRA-ARCH-020: only the root npm
 development tool and its lock identity change. It remains outside the six
 public packages; runtime entry points, dependency direction and consumer
@@ -23,6 +28,7 @@ thin framework adapters.
 
 | ID            | Requirement                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| MIRA-ARCH-045 | Root checks, builds and functional/browser tests MUST default to isolated Docker execution with fingerprinted reusable toolchains, frozen dependencies, bounded resources, exact tracked source/history and retained reports; explicit native execution MUST remain available without silent fallback or visual-baseline mutation.                                                                                                                        |
 | MIRA-ARCH-001 | Packages MUST preserve their documented public entrypoints unless a breaking change is explicitly authorized.                                                                                                                                                                                                                                                                                                                                             |
 | MIRA-ARCH-002 | Portable packages MUST NOT depend on Lapis vault, workspace, route, sidebar, metadata-worker, settings-persistence, or plugin-registry services.                                                                                                                                                                                                                                                                                                          |
 | MIRA-ARCH-003 | Extensions MUST integrate through Mira callbacks, resolvers, adapters, commands, renderer hooks, and CodeMirror extensions rather than application singletons.                                                                                                                                                                                                                                                                                            |
@@ -37,6 +43,14 @@ The portable Mira dependency declaration owns dismissal, registration, and focus
 cleanup for its public UI primitives; downstream hosts own when to destroy them.
 
 ## Package boundary
+
+Root validation defaults to Docker under MIRA-ARCH-045. The runner preserves
+the original native commands, exact tracked source and parent history, frozen
+registry dependencies, bounded resources, reusable toolchain images and caches,
+and collected failure reports. Native execution requires an explicit override;
+Docker failures never silently run a suite on the host. Hosted CI explicitly
+selects its already provisioned native runner. Development servers and manual
+Visual Delta commands retain their existing platform and approval boundaries.
 
 Packed-consumer audit policy remains separate from the committed workspace
 audit under MIRA-ARCH-039. Only the recorded, advisory-specific KaTeX exception in
@@ -91,7 +105,10 @@ its validator configuration, requirement IDs, paths, and evidence locally; it
 does not require the validator sibling checkout for normal repository checks.
 
 The root keeps the `storybook`, accessibility, docs, themes, Vitest, and Svelte
-Vite packages on one reviewed patch line; the current set is `10.5.6`.
+Vite packages on one reviewed patch line; the declared floor is `10.6.2` and
+the lockfile resolves `10.6.3`.
+Vitest and its browser/mocker tooling use `4.1.12` to address the October 22
+origin-validation and mocker traversal advisories without disabling audit.
 Storybook MCP, Svelte CSF, icons, and third-party addons retain their own release
 lines and are not version-coupled to the core patch. A Storybook patch change
 MUST pass the root quality gates and a complete static Storybook build without

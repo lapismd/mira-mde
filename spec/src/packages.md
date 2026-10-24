@@ -1,5 +1,35 @@
 # Public Packages and Entry Points
 
+The core patch release keeps block-control actions synchronized with document
+replacement without changing the public editor or block-toolbar APIs.
+
+Release dependency qualification refreshes DOMPurify and Undici within their
+current major lines. MIRA-ARCH-039 retains the complete workspace audit and
+independent packed-production audit; these updates add no package or public API.
+
+The public Mira preview output MUST preserve safe list-item task metadata so
+read-only consumers retain checked and custom checkbox artwork without adding
+consumer styles or enabling Markdown writes.
+
+The `@lapismd/mira` list-indentation repair stays within shipped preview CSS
+and the internal CodeMirror measurement extension. Public entry points and
+consumer configuration remain unchanged; list and task spacing must work from
+the packaged styles without consumer overrides.
+The internal inline-formatting pass preserves parsed list-marker ranges so
+asterisk bullets cannot lose their marker or measured hanging indentation.
+
+Root-only Storybook `10.6.3` and Vitest `4.1.12` updates repair the mandatory
+development audit gate; they do not change the public package graph.
+
+MIRA-ARCH-008 includes the additive `MiraProps.lineNumbers` boolean, defaulting
+to true. A false value MUST omit MiraCodeEditor's line-number extension rather
+than hiding its output with consumer CSS. Focused evidence is recorded in
+`spec/records/2026-10-22-composer-line-numbers.md`.
+
+The preview leaf-child repair retains MIRA-ARCH-008's public package boundary:
+no entry point, schema, dependency range or archive layout changes. The
+existing preview handlers accept optional empty child fields from extensions.
+
 MIRA-ARCH-008 includes the additive `/tables` TableReader export. It composes
 the existing parser and preview with host cell/row snippets for immutable
 annotated tables. Existing Table, Column and editable widget exports retain
@@ -122,6 +152,10 @@ MIRA-ARCH-043. Consumers MUST receive this behavior through the released Mira
 dependency declaration rather than a consumer patch or copied overlay code.
 
 ## Public graph
+
+Docker validation is private root tooling. It MUST retain the six-package
+public graph and registry-portable manifests and lockfile; its isolated outputs
+and ignored configuration MUST NOT enter public archives.
 
 | Package                        | Responsibility                                                                                    |
 | ------------------------------ | ------------------------------------------------------------------------------------------------- |

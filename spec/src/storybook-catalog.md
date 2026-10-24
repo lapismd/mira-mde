@@ -1,5 +1,9 @@
 # Storybook Catalog
 
+Cold table typography acceptance MUST await the owning document's font faces
+before comparing pipe-column geometry, while preserving the existing pixel
+alignment assertions and complete interaction coverage.
+
 Inline-link examples use the standard Mira Editor icon toolbar for view modes
 and inline renderer instances for small comparison links. Reference-definition
 and reference-image coverage belongs to the existing Links and Images stories;

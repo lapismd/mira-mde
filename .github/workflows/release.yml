@@ -19,6 +19,9 @@ concurrency:
   group: mira-public-release
   cancel-in-progress: false
 
+env:
+  MIRA_VALIDATION_RUNTIME: native
+
 jobs:
   version:
     name: Update Version Packages pull request
@@ -97,6 +100,9 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: test "$(gh api "repos/${GITHUB_REPOSITORY}" --jq .visibility)" = public
+
+      - name: Install checksum-verified Jujutsu for runner regressions
+        run: node scripts/validation/install-tools.mjs --ci
 
       - name: Revalidate release source
         run: |

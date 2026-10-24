@@ -307,6 +307,79 @@ async function expectContentColumnToSettle(
   );
 }
 
+test("matches reading indentation for top-level bullets and checkboxes", async ({
+  page,
+}) => {
+  const labels = [
+    "This is the end of the day",
+    "are you sure you want this",
+    "An unchecked task",
+    "A completed task",
+  ];
+  const offsets: Record<string, number[]> = {};
+  for (const mode of ["reading", "live-preview"]) {
+    await gotoStory(page, `markdown-indentation--top-level-lists-${mode}`);
+    offsets[mode] = await page.evaluate(
+      ({ labels, mode }) => {
+        const root = document.querySelector(
+          mode === "reading" ? ".markdown-rendered" : ".cm-content",
+        )!;
+        const textLeft = (label: string) => {
+          const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+          while (walker.nextNode()) {
+            const node = walker.currentNode as Text;
+            const start = node.data.indexOf(label);
+            if (start < 0) continue;
+            const range = document.createRange();
+            range.setStart(node, start);
+            range.setEnd(node, start + 1);
+            return range.getBoundingClientRect().left;
+          }
+          throw new Error(`Missing text: ${label}`);
+        };
+        const proseLeft = textLeft("Keep ");
+        return labels.map((label) => textLeft(label) - proseLeft);
+      },
+      { labels, mode },
+    );
+  }
+  for (let index = 0; index < labels.length; index++) {
+    expect(offsets["reading"]![index], labels[index]).toBeGreaterThan(0);
+    expect
+      .soft(offsets["live-preview"]![index], labels[index])
+      .toBeCloseTo(offsets["reading"]![index]!, 0);
+  }
+});
+
+test("keeps wrapped task text aligned when toggling and revealing its marker", async ({
+  page,
+}) => {
+  await gotoStory(page, "markdown-indentation--top-level-lists-live-preview");
+  const line = lineContaining(page, "An unchecked task");
+  const before = await lineMetrics(line);
+  expectStableRowLefts(before);
+  const checkbox = line.getByRole("checkbox", { name: "Toggle task" });
+  await checkbox.check();
+  await expect(checkbox).toBeChecked();
+  await settleLayout(page);
+  expectStableRowLefts(await lineMetrics(line));
+  await line.locator(".cm-list-1").last().click();
+  await page.keyboard.press("Home");
+  await page.keyboard.press("Home");
+  await settleLayout(page);
+  await expect
+    .poll(async () =>
+      (await line.locator(".cm-formatting-task").allTextContents()).join(""),
+    )
+    .toBe("[x]");
+  await placeCaretAtLineOffset(page, lineContaining(page, "Keep "), 0);
+  await expect(checkbox).toBeChecked();
+  await settleLayout(page);
+  const after = await lineMetrics(line);
+  expectStableRowLefts(after);
+  expect(after.contentLeft).toBeCloseTo(before.contentLeft!, 0);
+});
+
 test("keeps wrapped ordered and unordered item rows aligned in both editor modes", async ({
   page,
 }) => {
@@ -319,6 +392,7 @@ test("keeps wrapped ordered and unordered item rows aligned in both editor modes
     for (const snippet of [
       "Navigate to the workspace",
       "Keep this unordered item",
+      "Keep this asterisk-authored item",
     ]) {
       const line = lineContaining(page, snippet);
       await expect(line).toBeVisible();
@@ -378,6 +452,7 @@ test("renders inactive dash and asterisk markers as live-preview bullets", async
   ]) {
     const line = lineContaining(page, snippet);
     const marker = line.locator(".cm-formatting-list-ul:has(> span.cm-meta)");
+    await expect(marker).toBeVisible();
     await expect(marker).toHaveClass(/cm-formatting-list-bullet/u);
     const markerMetrics = await marker.evaluate((element) => {
       const source = element.querySelector<HTMLElement>("span.cm-meta");
@@ -401,15 +476,42 @@ test("renders inactive dash and asterisk markers as live-preview bullets", async
   }
 
   const dashLine = lineContaining(page, "Keep this unordered item");
-  const dashMarker = dashLine.locator(
-    ".cm-formatting-list-ul:has(> span.cm-meta)",
-  );
-  await placeCaretAtLineOffset(page, dashLine, 0);
-  await expect(dashMarker).not.toHaveClass(/cm-formatting-list-bullet/u);
-  await expect(dashMarker.locator("span.cm-meta")).toHaveText("-");
+  const asteriskLine = lineContaining(page, "Keep this asterisk-authored item");
+  const dashMetrics = await lineMetrics(dashLine);
+  const asteriskMetrics = await lineMetrics(asteriskLine);
+  expectStableRowLefts(dashMetrics);
+  expectStableRowLefts(asteriskMetrics);
+  expect(asteriskMetrics.contentLeft).toBeCloseTo(dashMetrics.contentLeft!, 0);
 
-  await placeCaretAtLineOffset(page, dashLine, 2);
-  await expect(dashMarker).toHaveClass(/cm-formatting-list-bullet/u);
+  for (const [line, source] of [
+    [dashLine, "-"],
+    [asteriskLine, "*"],
+  ] as const) {
+    const marker = line.locator(".cm-formatting-list-ul:has(> span.cm-meta)");
+    await placeCaretAtLineOffset(page, line, 0);
+    await expect(marker).not.toHaveClass(/cm-formatting-list-bullet/u);
+    await expect(marker.locator("span.cm-meta")).toHaveText(source);
+    expectStableRowLefts(await lineMetrics(line));
+
+    await placeCaretAtLineOffset(page, line, 2);
+    await expect(marker).toBeVisible();
+    await expect(marker).toHaveClass(/cm-formatting-list-bullet/u);
+    expectStableRowLefts(await lineMetrics(line));
+
+    await placeCaretAtLineOffset(
+      page,
+      lineContaining(page, "Navigate to the workspace"),
+      0,
+    );
+    await expect(marker).toBeVisible();
+    await expect(marker).toHaveClass(/cm-formatting-list-bullet/u);
+    const inactiveMetrics = await lineMetrics(line);
+    expectStableRowLefts(inactiveMetrics);
+    expect(inactiveMetrics.contentLeft).toBeCloseTo(
+      dashMetrics.contentLeft!,
+      0,
+    );
+  }
 });
 
 test("covers authored continuation prefixes and the preformatted exception", async ({
@@ -587,6 +689,12 @@ test("keeps list collapse controls beside first-row markers", async ({
         return {
           inlineGap: markerRect.left - controlRect.right,
           text: line.textContent?.trim(),
+          signedVerticalDelta:
+            (controlRect.top +
+              controlRect.bottom -
+              markerRect.top -
+              markerRect.bottom) /
+            2,
           verticalDelta: Math.abs(
             (controlRect.top + controlRect.bottom) / 2 -
               (markerRect.top + markerRect.bottom) / 2,

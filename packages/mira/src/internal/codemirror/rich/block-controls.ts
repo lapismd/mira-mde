@@ -495,6 +495,9 @@ class BlockControlsPlugin implements PluginValue {
 
   update(update: ViewUpdate): void {
     if (update.docChanged) {
+      // Gutter buttons update synchronously; their IDs may be reused before
+      // the next geometry frame, so actions must already use current ranges.
+      this.handles = collectMarkdownBlockHandles(update.state);
       this.closeMenu();
       this.closeToolbarMenu();
       this.scheduleRender();

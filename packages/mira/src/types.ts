@@ -31,6 +31,8 @@ export type MiraProps = {
   readonly?: boolean;
   placeholder?: string;
   lineWrapping?: boolean;
+  /** Show editor line numbers; defaults to true. */
+  lineNumbers?: boolean;
   spellcheck?: boolean;
   blockControls?: boolean | MiraBlockControlsOptions;
   indentGuides?: boolean;

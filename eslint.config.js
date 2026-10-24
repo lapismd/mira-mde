@@ -14,6 +14,7 @@ export default tseslint.config(
       "storybook-static/**",
       ".visual-delta/cache/**",
       "node_modules/**",
+      ".local/**",
     ],
   },
   js.configs.recommended,

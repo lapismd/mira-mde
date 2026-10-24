@@ -14,6 +14,9 @@ concurrency:
   group: mira-ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  MIRA_VALIDATION_RUNTIME: native
+
 jobs:
   governance:
     name: Specification and release intent
@@ -86,6 +89,9 @@ jobs:
 
       - name: Audit dependencies
         run: pnpm audit
+
+      - name: Install checksum-verified Jujutsu for runner regressions
+        run: node scripts/validation/install-tools.mjs --ci
 
       - name: Run full non-browser validation
         run: pnpm check:all

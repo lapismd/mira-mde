@@ -59,7 +59,22 @@ relationship between every chapter link indexed by `SUMMARY.md`, raw Markdown
 Storybook mirrors, and the internal-link registry. Mirror MDX files contain
 composition only; they do not copy normative prose.
 
+## Release preflight
+
+MIRA-GOV-013 also governs release preparation and pushing: agents must inventory
+all registered Jujutsu workspaces against the candidate, integrate relevant
+unmerged work before versioning, and record any unresolved scope. Before each
+push they must check open Dependabot pull requests, consolidate applicable
+updates in one separate dependency-only pull request, validate and merge it,
+and close only the superseded requests with a replacement reference. An empty
+Dependabot queue requires a recorded check, not an empty pull request.
+
 ## Change map
+
+Validation runner scripts, image recipes and local-artifact exclusions map to
+the architecture and package chapters. Hosted workflows explicitly opt into
+native execution, preserving the same specification and audit gates inside
+Docker. Ignored validation reports are evidence, never canonical authority.
 
 | Protected area                                                                  | Required chapter                               |
 | ------------------------------------------------------------------------------- | ---------------------------------------------- |

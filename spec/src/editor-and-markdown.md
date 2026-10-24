@@ -1,5 +1,26 @@
 # Portable Markdown and Editor
 
+Contextual block controls under MIRA-MD-034 MUST resolve actions against the
+current document immediately after replacement, before the next geometry
+frame. Reused gutter IDs MUST NOT select ranges cached from an older document.
+
+The MIRA-MD-007 fold-control scenarios retain their marker-alignment tolerance
+on Linux as well as macOS, independently of screenshot-baseline review.
+
+For MIRA-MD-007, live-preview unordered lists MUST retain reading mode's
+three-character marker inset, including top-level lists after formatted prose.
+Rendered tasks MUST retain the same list inset when the checkbox replaces the
+source marker, and wrapped task rows MUST align beneath their label. Toggling a
+checkbox and revealing then hiding its source MUST preserve that alignment.
+Parsed list markers MUST remain owned by list chrome: an asterisk bullet MUST
+NOT be hidden as inline emphasis, including on the active line. Its wrapped
+rows MUST retain the same hanging alignment as dash-authored items.
+
+MIRA-MD-002/004 retain their existing link and adapter contracts. Preview
+handlers MUST accept path, wiki and embed leaf nodes with absent or explicitly
+undefined optional children, preserve their declared labels and leave
+navigation and file authority with the host.
+
 Wave 3 retains MIRA-MD-002's complete inline-table Markdown syntax contract.
 Its parser regression explicitly completes CodeMirror's budgeted incremental
 parse before checking every existing syntax node; a partial initial tree under
@@ -10,6 +31,10 @@ For MIRA-MD-002, safe embedded previews MUST preserve generated code language,
 highlight token and code-line classes while continuing to strip scripts,
 event-handler attributes and unsafe destinations. Highlighting never authorizes
 executable HTML.
+
+Safe previews MUST preserve list-item task markers produced by the Markdown
+parser so checked and custom tasks keep their shipped artwork while remaining
+read-only when no change callback is supplied.
 
 For MIRA-MD-005, the public `/tables` TableReader MUST reuse the table parser
 and cell preview for immutable tables. Hosts MAY supply source-aware cell

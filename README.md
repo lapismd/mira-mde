@@ -1,5 +1,8 @@
 # Mira
 
+Root validation defaults to Docker; see [Docker-first validation](docs/validation.md)
+for reusable images, context configuration and the explicit native override.
+
 [![Mira CI](https://github.com/lapismd/mira-mde/actions/workflows/mira-spec-first.yml/badge.svg)](https://github.com/lapismd/mira-mde/actions/workflows/mira-spec-first.yml)
 [![Release public packages](https://github.com/lapismd/mira-mde/actions/workflows/release.yml/badge.svg)](https://github.com/lapismd/mira-mde/actions/workflows/release.yml)
 [![Storybook](https://img.shields.io/badge/Storybook-live-ff4785?logo=storybook&logoColor=white)](https://lapismd.github.io/mira-mde/)

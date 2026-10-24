@@ -1,5 +1,19 @@
 # Verification
 
+Safe task-marker follow-up: `src/preview/safe-tasks.test.ts` covers standard
+checked/unchecked and custom task identities in trusted and safe read-only
+previews; Agent UI Files supplies the browser paint acceptance for the public
+packed Mira output. Broader qualification remains deferred for screen review.
+
+Live-preview list and task insets, asterisk bullets at rest, and wrapped-row
+alignment under MIRA-MD-007 are tracked in
+[list indentation qualification](../records/2026-10-22-live-list-indentation.md).
+
+The optional leaf-child regression under unchanged MIRA-MD-002/004 is recorded
+in [preview leaf links](../records/2026-10-21-preview-leaf-links.md). Actual
+preview mounts, package checks/tests and public builds are separate from
+Desktop's cold consumer acceptance and package publication.
+
 Completed Wave 3 publication is tracked in
 [six-package publication](../records/2026-10-21-publication.md), binding the
 qualified version source, archive checksums and verified public outcomes under
@@ -52,6 +66,8 @@ authorized baseline regeneration migrations are complete.
 
 | Requirements                                                                                            | Evidence                                                                                                                                                                                                                                                                                | Status                                                                                             |
 | ------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| MIRA-MD-007, MIRA-MD-034                                                                                | [Linux release repairs](../records/2026-10-24-linux-release-repairs.md): immediate block ranges, settled table fonts, 170 stories, 60 browser cases and macOS fold acceptance.                                                                                                          | Implemented; visual pending                                                                        |
+| MIRA-ARCH-045                                                                                           | Runner regressions and Docker acceptance in [Docker validation qualification](../records/2026-10-24-docker-validation.md).                                                                                                                                                              | Implemented                                                                                        |
 | MIRA-MD-046                                                                                             | [Bound recovery qualification](../records/2026-10-16-markdown-write-recovery.md): 12 exact cases, 25 writer/session cases, 159 interactions, 51 cold browser cases and public packs pass.                                                                                               | Implemented                                                                                        |
 | MIRA-MD-047                                                                                             | [Bound recovery qualification](../records/2026-10-16-markdown-write-recovery.md): Protected flights, subscriptions, independent leases and expired-lease rejection pass.                                                                                                                | Implemented                                                                                        |
 | MIRA-MD-048                                                                                             | [Bound recovery qualification](../records/2026-10-16-markdown-write-recovery.md): Retained failure after undo and blocked ordinary external refresh pass.                                                                                                                               | Implemented                                                                                        |
@@ -831,3 +847,7 @@ refreshed. The Storybook continuation-paragraph acceptance now avoids a
 duplicated parent-glyph comparison that proved CI-renderer-sensitive while
 retaining anchored-continuation, wrapped-row stability, and the separate
 caret-state content-column regression.
+
+The embedded composer follow-up to MIRA-ARCH-008 exposes `MiraProps.lineNumbers`.
+See `spec/records/2026-10-22-composer-line-numbers.md` for the focused public
+component regression, build and temporary consumer archive evidence.
