@@ -51,6 +51,10 @@ and collected failure reports. Native execution requires an explicit override;
 Docker failures never silently run a suite on the host. Hosted CI explicitly
 selects its already provisioned native runner. Development servers and manual
 Visual Delta commands retain their existing platform and approval boundaries.
+Source export MUST support colocated checkouts and separate Jujutsu workspaces.
+Report collection MUST receive the complete archive before extraction so macOS
+tar's early padding exit does not falsely fail a worker; corrupt archives and
+nonzero transfer exits MUST remain errors.
 
 Packed-consumer audit policy remains separate from the committed workspace
 audit under MIRA-ARCH-039. Only the recorded, advisory-specific KaTeX exception in

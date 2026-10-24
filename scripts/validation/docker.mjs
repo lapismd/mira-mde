@@ -1,4 +1,8 @@
 import { execFileSync, spawn } from "node:child_process";
+import { createWriteStream } from "node:fs";
+import { mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { pipeline } from "node:stream/promises";
 import { execute } from "./process.mjs";
 export function contextArguments(config, args) {
@@ -91,15 +95,20 @@ export async function sendDirectory(config, args, directory) {
 }
 export async function receiveDirectory(config, args, directory) {
   const [cmd, argv] = dockerCommand(config, args);
-  const child = spawn(cmd, argv, { stdio: ["ignore", "pipe", "inherit"] });
-  const tar = spawn("tar", ["-C", directory, "-xf", "-"], {
-    stdio: ["pipe", "inherit", "inherit"],
-  });
-  await Promise.all([
-    pipeline(child.stdout, tar.stdin),
-    finished(child),
-    finished(tar),
-  ]);
+  const temporary = await mkdtemp(join(tmpdir(), "mira-validation-report-"));
+  try {
+    const archive = join(temporary, "reports.tar");
+    const child = spawn(cmd, argv, { stdio: ["ignore", "pipe", "inherit"] });
+    // BSD tar can exit at the end marker before Docker finishes archive padding.
+    // Drain and validate the complete transfer before asking tar to extract it.
+    await Promise.all([
+      pipeline(child.stdout, createWriteStream(archive)),
+      finished(child),
+    ]);
+    await execute("tar", ["-C", directory, "-xf", archive]);
+  } finally {
+    await rm(temporary, { recursive: true, force: true });
+  }
 }
 function finished(child) {
   return new Promise((accept, reject) => {

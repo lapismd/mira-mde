@@ -16,6 +16,16 @@ const jj = (root, args) =>
     encoding: "utf8",
     maxBuffer: 64 * 1024 * 1024,
   }).trim();
+export function snapshotFile(root, revision, path) {
+  return execFileSync(
+    "jj",
+    ["--no-pager", "file", "show", "-r", revision, "--", path],
+    {
+      cwd: root,
+      maxBuffer: 64 * 1024 * 1024,
+    },
+  );
+}
 export async function snapshot(root, directory, archiveManifest) {
   await mkdir(directory, { recursive: true });
   const revision = jj(root, [
@@ -48,10 +58,15 @@ export async function snapshot(root, directory, archiveManifest) {
     throw Error(
       "Private/local files must not be tracked in the source snapshot",
     );
-  const pack = spawn("git", ["pack-objects", "--revs", "--stdout"], {
-    cwd: root,
-    stdio: ["pipe", "pipe", "inherit"],
-  });
+  const gitDirectory = jj(root, ["git", "root"]);
+  const pack = spawn(
+    "git",
+    ["--git-dir", gitDirectory, "pack-objects", "--revs", "--stdout"],
+    {
+      cwd: root,
+      stdio: ["pipe", "pipe", "inherit"],
+    },
+  );
   const done = new Promise((accept, reject) => {
     pack.once("error", reject);
     pack.once("exit", (code) =>

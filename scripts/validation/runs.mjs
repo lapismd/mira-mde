@@ -1,11 +1,10 @@
 import { readFile, writeFile, mkdir, rm, open } from "node:fs/promises";
 import { join } from "node:path";
-import { execFileSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { root, localRoot, json } from "./paths.mjs";
 import { hash, imageKey, laneImage, label } from "./model.mjs";
 import { image } from "./images.mjs";
-import { snapshot } from "./source.mjs";
+import { snapshot, snapshotFile } from "./source.mjs";
 import { execute } from "./process.mjs";
 import {
   docker,
@@ -69,11 +68,7 @@ async function performRun(config, lane, args, selected, workspace) {
   for (const file of ["worker.mjs", "model.mjs", "process.mjs"])
     await writeFile(
       join(input, file),
-      execFileSync(
-        "git",
-        ["show", `${source.revision}:scripts/validation/${file}`],
-        { cwd: root },
-      ),
+      snapshotFile(root, source.revision, `scripts/validation/${file}`),
     );
   const dependencies = imageKey({
     image: selected.id,

@@ -293,7 +293,11 @@ export const PropertyActions: Story = {
         }),
       ).not.toBeInTheDocument();
 
+      await waitFor(() =>
+        expect(optionsMenu).not.toHaveAttribute("data-starting-style"),
+      );
       propertyType.focus();
+      await waitFor(() => expect(propertyType).toHaveFocus());
       await userEvent.keyboard("{ArrowRight}");
       const typeMenu = await page.findByRole("menu", {
         name: "Property type for status",
@@ -365,7 +369,7 @@ export const PropertyActions: Story = {
       ).getByRole("menuitem", { name: "Property type" });
       await userEvent.hover(propertyType);
       await expect(
-        page.getByRole("menu", { name: "Property type for title" }),
+        await page.findByRole("menu", { name: "Property type for title" }),
       ).toBeVisible();
     });
   },
