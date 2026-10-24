@@ -1,5 +1,12 @@
 # Portable Markdown and Editor
 
+Contextual block controls under MIRA-MD-034 MUST resolve actions against the
+current document immediately after replacement, before the next geometry
+frame. Reused gutter IDs MUST NOT select ranges cached from an older document.
+
+The MIRA-MD-007 fold-control scenarios retain their marker-alignment tolerance
+on Linux as well as macOS, independently of screenshot-baseline review.
+
 For MIRA-MD-007, live-preview unordered lists MUST retain reading mode's
 three-character marker inset, including top-level lists after formatted prose.
 Rendered tasks MUST retain the same list inset when the checkbox replaces the

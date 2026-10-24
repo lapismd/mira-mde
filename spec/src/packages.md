@@ -1,5 +1,8 @@
 # Public Packages and Entry Points
 
+The core patch release keeps block-control actions synchronized with document
+replacement without changing the public editor or block-toolbar APIs.
+
 The public Mira preview output MUST preserve safe list-item task metadata so
 read-only consumers retain checked and custom checkbox artwork without adding
 consumer styles or enabling Markdown writes.
