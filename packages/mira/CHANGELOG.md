@@ -1,5 +1,21 @@
 # @lapismd/mira
 
+## 0.1.1
+
+### Patch Changes
+
+- [#18](https://github.com/lapismd/mira-mde/pull/18) [`bbbf943`](https://github.com/lapismd/mira-mde/commit/bbbf943ce79148d07ba5cf2b06252b7401488510) Thanks [@stevejuma](https://github.com/stevejuma)! - Keep block-toolbar actions on current document ranges after replacement and
+  align live-preview collapse controls without a fixed font offset.
+
+- [#18](https://github.com/lapismd/mira-mde/pull/18) [`89be5a6`](https://github.com/lapismd/mira-mde/commit/89be5a696f5e3d7b401b089eb0ac064ec5449492) Thanks [@stevejuma](https://github.com/stevejuma)! - Expose the existing editor line-number option on Mira so embedded composers can disable the extension without CSS overrides.
+
+- [#18](https://github.com/lapismd/mira-mde/pull/18) [`1f65315`](https://github.com/lapismd/mira-mde/commit/1f65315f7d77b799d4fd1e8fc564eb9f06386065) Thanks [@stevejuma](https://github.com/stevejuma)! - Align live-preview list and checkbox indentation with reading mode, keep wrapped task text aligned beneath its label, and preserve asterisk bullets during inline formatting.
+
+- [#18](https://github.com/lapismd/mira-mde/pull/18) [`fef951d`](https://github.com/lapismd/mira-mde/commit/fef951d8f78989c174a18e188a814e1443a5c1bb) Thanks [@stevejuma](https://github.com/stevejuma)! - Render path, wiki and embed leaf nodes when an extension preserves an explicitly
+  undefined optional children field, avoiding a crash in forwarded chat context.
+
+- [#18](https://github.com/lapismd/mira-mde/pull/18) [`bce7ba8`](https://github.com/lapismd/mira-mde/commit/bce7ba8ed344824f577d5a0917ac66b9f65ec50f) Thanks [@stevejuma](https://github.com/stevejuma)! - Preserve checked and custom task-checkbox artwork in safe Markdown previews by retaining parser-produced task metadata through sanitization.
+
 ## 0.1.0
 
 ### Minor Changes
