@@ -364,9 +364,15 @@ export const PropertyActions: Story = {
         canvas.getByRole("button", { name: "Property options for title" }),
       );
       const page = within(canvasElement.ownerDocument.body);
-      const propertyType = within(
-        page.getByRole("menu", { name: "Property options for title" }),
-      ).getByRole("menuitem", { name: "Property type" });
+      const optionsMenu = await page.findByRole("menu", {
+        name: "Property options for title",
+      });
+      await waitFor(() =>
+        expect(optionsMenu).not.toHaveAttribute("data-starting-style"),
+      );
+      const propertyType = within(optionsMenu).getByRole("menuitem", {
+        name: "Property type",
+      });
       await userEvent.hover(propertyType);
       await expect(
         await page.findByRole("menu", { name: "Property type for title" }),

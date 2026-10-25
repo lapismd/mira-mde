@@ -1,5 +1,10 @@
 # Verification
 
+The post-0.1.1 overlay dependency intake and its source/package qualification
+are tracked in [Bits intake](../records/2026-10-25-bits-dependency-intake.md).
+Released-version alignment and the upstream delayed-selection callback repair
+retain separate evidence and acceptance gates under MIRA-ARCH-043.
+
 Safe task-marker follow-up: `src/preview/safe-tasks.test.ts` covers standard
 checked/unchecked and custom task identities in trusted and safe read-only
 previews; Agent UI Files supplies the browser paint acceptance for the public
@@ -185,7 +190,7 @@ authorized baseline regeneration migrations are complete.
 | MIRA-MD-041, MIRA-ARCH-038                                                                              | Portable FrontmatterEditor regression plus linked Lapis File Properties interaction acceptance                                                                                                                                                                                          | Implemented by external frontmatter text reconciliation                                            |
 | MIRA-CSS-042                                                                                            | Task States Embedded Live Preview checks checkbox/label overlap, zero-width inline cursor buffers, preserved authored-image styling, and checkbox interaction beneath a rendered Markdown ancestor.                                                                                     | Implemented; visual pending                                                                        |
 | MIRA-ARCH-033                                                                                           | Public Mira package build plus linked Roles Source story axe coverage                                                                                                                                                                                                                   | Implemented                                                                                        |
-| MIRA-ARCH-043                                                                                           | Cold teardown regression (one failure to one pass), 157 Storybook interactions, 50 native browser cases, six-package packs, and packed-provider Linux File Properties acceptance.                                                                                                       | Implemented; production publication pending                                                        |
+| MIRA-ARCH-043                                                                                           | [Released dependency intake](../records/2026-10-25-bits-dependency-intake.md): original teardown, 499 package cases, 170 interactions, 60 cold browser cases and six public packs pass; delayed-selection callback repair remains separately governed upstream.                         | Partial; dependency intake verified; delayed callback publication pending                          |
 
 The selective-release slice defines the exact six-package graph once, configures
 independent Changesets versions and package-owned changelogs, and uses

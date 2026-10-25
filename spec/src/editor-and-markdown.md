@@ -1,5 +1,11 @@
 # Portable Markdown and Editor
 
+MIRA-MD-040 retains the existing frontmatter type-selection and menu-dismissal
+behavior. Closure acceptance MUST wait for the animated presence lifecycle to
+remove the closed menu, rather than assuming reactive ticks complete a browser
+animation frame. The same menu-absence and selected controller-value assertions
+remain required after the released overlay dependency intake.
+
 Contextual block controls under MIRA-MD-034 MUST resolve actions against the
 current document immediately after replacement, before the next geometry
 frame. Reused gutter IDs MUST NOT select ranges cached from an older document.

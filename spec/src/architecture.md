@@ -41,6 +41,10 @@ thin framework adapters.
 Overlay lifecycle ownership follows MIRA-ARCH-043 in [Public packages](packages.md).
 The portable Mira dependency declaration owns dismissal, registration, and focus
 cleanup for its public UI primitives; downstream hosts own when to destroy them.
+The pending post-0.1.1 intake aligns the exact Bits UI declaration with released
+2.20.2 while retaining every public entry point. This dependency alignment does
+not qualify the separately discovered delayed LinkPreview selection callback;
+that upstream source repair and its packed-consumer acceptance remain distinct.
 
 ## Package boundary
 

@@ -147,9 +147,11 @@ and indentation retain the wrapped editor's styling without consumer overrides.
 | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | MIRA-ARCH-043 | The published Mira UI dependency graph MUST support destroying an open overlay before registration or focus callbacks settle. Teardown MUST cancel pending layer work without reading destroyed reactive state, retaining a portal, or leaving body pointer events locked. |
 
-The core package pins the published Bits UI version that satisfies
-MIRA-ARCH-043. Consumers MUST receive this behavior through the released Mira
-dependency declaration rather than a consumer patch or copied overlay code.
+The core package pins released Bits UI 2.20.2 for the current dependency intake.
+Consumers MUST receive MIRA-ARCH-043 through the released Mira dependency
+declaration rather than a consumer patch or copied overlay code. The additional
+delayed LinkPreview selection callback regression remains an upstream release
+gate; merely aligning this declaration does not establish its repair.
 
 ## Public graph
 
