@@ -96,6 +96,15 @@ entrypoints and keep storage validation in the owning adapter.
 
 ## Editing-session adapter capability
 
+Frontmatter record commits expose MIRA-MD-056's read-only `previousRecord`.
+`FrontmatterController.updateProperty` accepts an optional rendered prior record;
+existing callers continue to use the controller's current record. MIRA-MD-057
+retains that record through focused text editing without host or storage policy.
+Packed consumer fixtures verify both exported signatures and reject reassignment
+or mutation of the captured previous record.
+The existing frontmatter action-error callback additionally accepts `edit` for
+MIRA-MD-058 target-change refusal; no replacement target receives the old edit.
+
 MIRA-MD-055 keeps binding and registration callback observations outside the
 preview writer's tracked lifetime. The explicit source path, adapter and write
 capability continue to own replacement; this repair changes no public entry or

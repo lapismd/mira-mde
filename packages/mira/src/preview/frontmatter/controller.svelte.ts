@@ -1,4 +1,5 @@
 import { parseFrontmatterYaml } from "./parse";
+import { snapshotFrontmatterRecord } from "./record-snapshot";
 import {
   addFrontmatterRecordProperty,
   mergeFrontmatterRecordProperties,
@@ -21,6 +22,7 @@ import {
 } from "./manager";
 
 export type FrontmatterControllerCommit = {
+  readonly previousRecord: Readonly<Record<string, unknown>>;
   record: Record<string, unknown>;
   yaml: string;
   replacement: string;
@@ -122,6 +124,9 @@ export class FrontmatterController {
     if (!options.commit && nextYaml === this.yaml && this.revision > 0) {
       return;
     }
+    const previousRecord = options.commit
+      ? snapshotFrontmatterRecord(this.record)
+      : undefined;
     const parsed = parseFrontmatterYaml(nextYaml);
     this.yaml = nextYaml;
     if (parsed.ok) {
@@ -133,7 +138,7 @@ export class FrontmatterController {
     }
     this.revision += 1;
     if (options.commit) {
-      void this.commitCurrent();
+      void this.commitCurrent(previousRecord!);
     }
   }
 
@@ -141,16 +146,27 @@ export class FrontmatterController {
     nextRecord: Record<string, unknown>,
     options: { commit?: boolean } = {},
   ): void {
+    this.replaceRecord(nextRecord, options);
+  }
+
+  private replaceRecord(
+    nextRecord: Record<string, unknown>,
+    options: { commit?: boolean },
+    priorRecord: Readonly<Record<string, unknown>> = this.record,
+  ): void {
     const nextYaml = serializeFrontmatterRecord(nextRecord);
     if (!options.commit && nextYaml === this.yaml && this.revision > 0) {
       return;
     }
+    const previousRecord = options.commit
+      ? snapshotFrontmatterRecord(priorRecord)
+      : undefined;
     this.record = cloneRecord(nextRecord);
     this.yaml = nextYaml;
     this.parseError = null;
     this.revision += 1;
     if (options.commit) {
-      void this.commitCurrent();
+      void this.commitCurrent(previousRecord!);
     }
   }
 
@@ -162,11 +178,19 @@ export class FrontmatterController {
     this.syncRecord(nextRecord, { commit: true });
   }
 
-  updateProperty(path: FrontmatterPathSegment[], nextValue: unknown): void {
+  updateProperty(
+    path: FrontmatterPathSegment[],
+    nextValue: unknown,
+    previousRecord: Readonly<Record<string, unknown>> = this.record,
+  ): void {
     if (this.parseError) {
       return;
     }
-    this.commitRecord(updateFrontmatterRecord(this.record, path, nextValue));
+    this.replaceRecord(
+      updateFrontmatterRecord(previousRecord, path, nextValue),
+      { commit: true },
+      previousRecord,
+    );
   }
 
   addProperty(kind: FrontmatterPropertyKind = "text"): string | null {
@@ -230,7 +254,9 @@ export class FrontmatterController {
     );
   }
 
-  private async commitCurrent(): Promise<void> {
+  private async commitCurrent(
+    previousRecord: Readonly<Record<string, unknown>>,
+  ): Promise<void> {
     if (this.suppressCommit) {
       return;
     }
@@ -251,6 +277,7 @@ export class FrontmatterController {
         : undefined;
 
     const commit: FrontmatterControllerCommit = {
+      previousRecord,
       record: cloneRecord(this.record),
       yaml,
       replacement,

@@ -134,6 +134,21 @@ props.extensions = extensions;
 void [InlineLink, LinkSiteIcon];
 void [Mira, MiraEditor, MiraEditorToolbar, mermaidExtension, aiExtension, props];
 `,
+      "frontmatter.ts": `import { FrontmatterController, type FrontmatterControllerCommit, type FrontmatterConfig } from "@lapismd/mira/preview";
+type IsAny<T> = 0 extends (1 & T) ? true : false;
+const resolved: IsAny<FrontmatterControllerCommit> = false;
+const controller = new FrontmatterController({ record: { status: "ready" } });
+function consume(commit: FrontmatterControllerCommit) {
+  const prior: Readonly<Record<string, unknown>> = commit.previousRecord;
+  controller.updateProperty(["status"], "local", prior);
+  // @ts-expect-error A captured previous-record field cannot be reassigned.
+  commit.previousRecord = {};
+  // @ts-expect-error The captured record cannot be mutated by its consumer.
+  commit.previousRecord.status = "changed";
+}
+const config: FrontmatterConfig = { onActionError(_error, action) { if (action === "edit") return; } };
+void [consume, resolved, config];
+`,
       "react.tsx": `import { Mira, MiraEditor, MiraEditorToolbar } from "@lapismd/mira-react";
 import { inlineLinksExtension, createLinkIconRegistry } from "@lapismd/mira/extensions";
 void <Mira value="# Smoke" extensions={[inlineLinksExtension({ registry: createLinkIconRegistry() })]} />;
@@ -181,6 +196,13 @@ console.log("All public stylesheet imports resolve without hoisted dependencies.
         target: "ES2022",
       },
       include: ["*.ts", "*.tsx"],
+      exclude: ["frontmatter.ts"],
+    });
+    writeJson(path.join(fixtureRoot, "tsconfig.frontmatter.json"), {
+      extends: "./tsconfig.json",
+      compilerOptions: { module: "ESNext", moduleResolution: "Bundler" },
+      include: ["frontmatter.ts"],
+      exclude: [],
     });
 
     run(
@@ -196,6 +218,11 @@ console.log("All public stylesheet imports resolve without hoisted dependencies.
       fixtureRoot,
     );
     run("pnpm", ["exec", "tsc", "-p", "tsconfig.json"], fixtureRoot);
+    run(
+      "pnpm",
+      ["exec", "tsc", "-p", "tsconfig.frontmatter.json"],
+      fixtureRoot,
+    );
     run(
       "node",
       [

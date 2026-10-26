@@ -80,6 +80,17 @@ consumer concerns.
 
 ## External editing protection
 
+### Rendered Properties authority
+
+MIRA-MD-058 rejects a captured edit when its controller changes source target;
+the existing action-error callback receives `edit` without mutating the new view.
+
+| ID          | Requirement                                                                                                                                                                                                                                                                                                                                                                        |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| MIRA-MD-056 | Every logical frontmatter record commit MUST expose an independent, deeply immutable `previousRecord` snapshot captured before mutation. Property mutation MAY accept a captured rendered record and MUST build both the mutation and its prior-record acknowledgement from that record, even after external controller synchronization.                                           |
+| MIRA-MD-057 | A focused frontmatter text value MUST retain its local DOM through external record refresh. Its commit MUST capture the edit callback and event-time text before deferred blur work. The callback MUST retain the rendered record that owned the edit; later reactive callbacks or DOM replacements MUST NOT redirect that commit.                                                 |
+| MIRA-MD-058 | Rendered property callbacks MUST retain their source target. If the owning controller changes source path before a focused or deferred edit commits, the callback MUST refuse before mutation and report through the existing `edit` action-error hook. Neither the original nor replacement writer may receive that stale edit, and the replacement record MUST remain unchanged. |
+
 ### Input leases
 
 | ID          | Requirement                                                                                                                                                                                                                                                                                                                                                              |

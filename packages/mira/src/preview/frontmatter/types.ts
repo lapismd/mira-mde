@@ -78,7 +78,7 @@ export type FrontmatterConfig = {
   clipboard?: FrontmatterClipboard;
   onActionError?: (
     error: unknown,
-    action: "copy" | "cut" | "paste" | "remove",
+    action: "copy" | "cut" | "paste" | "remove" | "edit",
   ) => void;
 };
 
