@@ -1,5 +1,9 @@
 # Public Packages and Entry Points
 
+`MiraMarkdownEditingSession` MAY expose an optional synchronous `hold()` method
+through the existing public extensions entry. Its input lease follows
+MIRA-MD-054 without changing the ordinary flush or recovery contracts.
+
 The core patch release keeps block-control actions synchronized with document
 replacement without changing the public editor or block-toolbar APIs.
 

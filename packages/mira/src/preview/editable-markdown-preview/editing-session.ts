@@ -37,6 +37,7 @@ export function attachMarkdownEditingSession(options: {
     }
   }
   const session: MiraMarkdownEditingSession = {
+    hold: () => writer.hold(),
     get dirty() {
       const state = writer.state;
       return (

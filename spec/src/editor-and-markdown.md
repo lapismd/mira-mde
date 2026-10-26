@@ -75,6 +75,12 @@ consumer concerns.
 
 ## External editing protection
 
+### Input leases
+
+| ID          | Requirement                                                                                                                                                                                                                                                                                                                                                              |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| MIRA-MD-054 | Source sessions MAY expose synchronous input leases. Each lease MUST immediately block new edits, release idempotently and compose with independent protection. Acquisition and release MUST NOT trigger persistence, clear failures, accept or discard drafts, or replace flush and recovery. Accepted saves and explicit flush MUST remain usable while input is held. |
+
 ### Empty resolved notes
 
 | ID          | Requirement                                                                                                                                                                                 |

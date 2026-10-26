@@ -119,16 +119,20 @@ export class SerializedMarkdownWriter {
     }
   }
 
-  async protect(): Promise<() => void> {
+  hold(): () => void {
     this.protections++;
     this.emit();
     let released = false;
-    const release = () => {
+    return () => {
       if (released) return;
       released = true;
       this.protections--;
       this.emit();
     };
+  }
+
+  async protect(): Promise<() => void> {
+    const release = this.hold();
     try {
       if (!(await this.flush()))
         throw this.error ?? new Error("Unable to protect unsaved Markdown");
