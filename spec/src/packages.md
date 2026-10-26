@@ -96,6 +96,11 @@ entrypoints and keep storage validation in the owning adapter.
 
 ## Editing-session adapter capability
 
+MIRA-MD-055 keeps binding and registration callback observations outside the
+preview writer's tracked lifetime. The explicit source path, adapter and write
+capability continue to own replacement; this repair changes no public entry or
+editing-session signature.
+
 | ID            | Requirement                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | MIRA-ARCH-040 | `MiraFileAdapter` MUST expose an optional source-path editing-session registration hook with observable dirty state, awaited flush and temporary protection. The hook MUST remain independent of application, vault and synchronization protocols. Registration failure MUST disable the writer before returning an error. Registered writers MUST retain their original persistence destination and MUST NOT update a replacement surface through late callbacks. |
