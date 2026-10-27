@@ -1,5 +1,14 @@
 # Verification
 
+MIRA-CSS-045 is verified by `Mira/Code Editor/Find beneath host overlay`, the
+focused search suite and linked Plugins `Editing Search Settings` stories.
+Full repository suites and wider consumer qualification are deferred by the
+user for this slice.
+
+| Requirement  | Evidence                                                                         | Status      |
+| ------------ | -------------------------------------------------------------------------------- | ----------- |
+| MIRA-CSS-045 | Real browser overlay hit testing and query preservation in the Code Editor story | Implemented |
+
 The post-0.1.1 overlay dependency intake and its source/package qualification
 are tracked in [Bits intake](../records/2026-10-25-bits-dependency-intake.md).
 Released-version alignment and the upstream delayed-selection callback repair

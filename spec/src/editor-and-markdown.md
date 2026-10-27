@@ -1,5 +1,10 @@
 # Portable Markdown and Editor
 
+The search-panel behavior under MIRA-MD-033 uses the shared editor stacking
+boundary in MIRA-CSS-045. Host overlays cover the in-editor panel and gutters;
+dismissal retains the active query. Existing portaled block and link controls
+keep their separate ownership and lifecycle.
+
 MIRA-MD-040 retains the existing frontmatter type-selection and menu-dismissal
 behavior. Closure acceptance MUST wait for the animated presence lifecycle to
 remove the closed menu, rather than assuming reactive ticks complete a browser

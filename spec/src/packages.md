@@ -1,5 +1,10 @@
 # Public Packages and Entry Points
 
+The existing `@lapismd/mira/codemirror` base-extension entry supplies the
+editor-local stacking boundary required by MIRA-CSS-045. Consumers composing
+the base extensions directly receive the same containment as MiraCodeEditor;
+no new option, entry point or host-specific selector is introduced.
+
 `MiraMarkdownEditingSession` MAY expose an optional synchronous `hold()` method
 through the existing public extensions entry. Its input lease follows
 MIRA-MD-054 without changing the ordinary flush or recovery contracts.
