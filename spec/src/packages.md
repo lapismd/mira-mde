@@ -30,6 +30,12 @@ asterisk bullets cannot lose their marker or measured hanging indentation.
 Root-only Storybook `10.6.3` and Vitest `4.1.12` updates repair the mandatory
 development audit gate; they do not change the public package graph.
 
+Workspace `auditConfig.ignoreGhsas` MAY list only
+[GHSA-gcqx-w48m-w2h4](https://github.com/advisories/GHSA-gcqx-w48m-w2h4)
+(deepmerge via `@sveltejs/vite-plugin-svelte`) while no patched release exists.
+That advisory is development-tooling only; packed-production audit policy and
+the KaTeX exception below stay unchanged.
+
 MIRA-ARCH-008 includes the additive `MiraProps.lineNumbers` boolean, defaulting
 to true. A false value MUST omit MiraCodeEditor's line-number extension rather
 than hiding its output with consumer CSS. Focused evidence is recorded in
