@@ -310,7 +310,8 @@ manifest or packed dependency graph.
 
 The root consumes `@lapismd/spec-validator` from npm as development tooling
 while retaining Mira's package graph, requirement IDs, paths, and enforcement
-policy in this repository. The shared validator MUST NOT enter any public
+policy in this repository.
+The declared development range is `^0.2.0`. The shared validator MUST NOT enter any public
 package's manifest or packed dependency graph, and normal repository checks MUST
 not require the sibling validator checkout.
 

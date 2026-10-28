@@ -165,9 +165,9 @@ single patched compiler graph. Those refreshes MUST leave public runtime peer
 ranges and workspace dependency direction unchanged unless the consumer contract
 itself changes.
 
-The workspace consumes the published Spec Validator through `^0.1.4` so merge
-checks use its current Jujutsu range handling and optional search dependency
-contract.
+The workspace consumes the published Spec Validator through `^0.2.0` so merge
+checks use its current Node runtime, Jujutsu range handling, and optional search
+dependency contract.
 
 Root quality gates compose the specification, catalog, package, Storybook, and
 browser checks. In particular, `storybook:check` validates catalog metadata and
