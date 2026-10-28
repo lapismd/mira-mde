@@ -4,6 +4,11 @@ Cold table typography acceptance MUST await the owning document's font faces
 before comparing pipe-column geometry, while preserving the existing pixel
 alignment assertions and complete interaction coverage.
 
+Frontmatter keyboard and pointer submenu acceptance MUST await the parent
+menu's opening transition before interaction. The dependency intake retains
+the same focus, menu geometry, selection and pointer-event cleanup assertions;
+an unchanged cold retry alone does not establish a readiness repair.
+
 Inline-link examples use the standard Mira Editor icon toolbar for view modes
 and inline renderer instances for small comparison links. Reference-definition
 and reference-image coverage belongs to the existing Links and Images stories;

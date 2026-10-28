@@ -1,5 +1,16 @@
 # Portable Markdown and Editor
 
+The search-panel behavior under MIRA-MD-033 uses the shared editor stacking
+boundary in MIRA-CSS-045. Host overlays cover the in-editor panel and gutters;
+dismissal retains the active query. Existing portaled block and link controls
+keep their separate ownership and lifecycle.
+
+MIRA-MD-040 retains the existing frontmatter type-selection and menu-dismissal
+behavior. Closure acceptance MUST wait for the animated presence lifecycle to
+remove the closed menu, rather than assuming reactive ticks complete a browser
+animation frame. The same menu-absence and selected controller-value assertions
+remain required after the released overlay dependency intake.
+
 Contextual block controls under MIRA-MD-034 MUST resolve actions against the
 current document immediately after replacement, before the next geometry
 frame. Reused gutter IDs MUST NOT select ranges cached from an older document.
@@ -69,6 +80,23 @@ consumer concerns.
 
 ## External editing protection
 
+### Rendered Properties authority
+
+MIRA-MD-058 rejects a captured edit when its controller changes source target;
+the existing action-error callback receives `edit` without mutating the new view.
+
+| ID          | Requirement                                                                                                                                                                                                                                                                                                                                                                        |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| MIRA-MD-056 | Every logical frontmatter record commit MUST expose an independent, deeply immutable `previousRecord` snapshot captured before mutation. Property mutation MAY accept a captured rendered record and MUST build both the mutation and its prior-record acknowledgement from that record, even after external controller synchronization.                                           |
+| MIRA-MD-057 | A focused frontmatter text value MUST retain its local DOM through external record refresh. Its commit MUST capture the edit callback and event-time text before deferred blur work. The callback MUST retain the rendered record that owned the edit; later reactive callbacks or DOM replacements MUST NOT redirect that commit.                                                 |
+| MIRA-MD-058 | Rendered property callbacks MUST retain their source target. If the owning controller changes source path before a focused or deferred edit commits, the callback MUST refuse before mutation and report through the existing `edit` action-error hook. Neither the original nor replacement writer may receive that stale edit, and the replacement record MUST remain unchanged. |
+
+### Input leases
+
+| ID          | Requirement                                                                                                                                                                                                                                                                                                                                                              |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| MIRA-MD-054 | Source sessions MAY expose synchronous input leases. Each lease MUST immediately block new edits, release idempotently and compose with independent protection. Acquisition and release MUST NOT trigger persistence, clear failures, accept or discard drafts, or replace flush and recovery. Accepted saves and explicit flush MUST remain usable while input is held. |
+
 ### Empty resolved notes
 
 | ID          | Requirement                                                                                                                                                                                 |
@@ -77,12 +105,16 @@ consumer concerns.
 
 ### Bound writes and explicit recovery
 
+Preview writer attachment follows MIRA-MD-055. Adapter callbacks remain
+imperative lifecycle operations even when their host observes reactive state.
+
 | ID          | Requirement                                                                                                                                                                                                                                                                                                                                                                                               |
 | ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | MIRA-MD-046 | A writable preview MUST use an optional adapter-provided Markdown editing binding for its captured source session instead of its ordinary write and registration callbacks. Missing source authority or an invalid binding MUST reject without an ordinary-write fallback. Detached failed bindings MUST retain their session until persistence or explicit recovery succeeds.                            |
 | MIRA-MD-047 | A source session MAY expose portable text state, subscriptions and explicit recovery leases. Recovery MUST block editing and ordinary external refresh synchronously, settle in-flight persistence without retrying a failed write, and retain failure until a protected acknowledgement or external replacement. Expired leases MUST reject mutation, and independent leases MUST release independently. |
 | MIRA-MD-048 | Failed Markdown persistence MUST remain a flush barrier when the buffer is edited back to its previous saved value. External refresh MUST NOT clear that failure. Only successful persistence or an explicit protected recovery MAY acknowledge or discard the failed draft.                                                                                                                              |
 | MIRA-MD-049 | Re-resolving an internal link to an equivalent file reference MUST retain its existing preview editing session and draft. A refreshed reference MUST NOT detach a failed writer or redirect recovery to an invisible session. An accepted external version MUST replace the visible editor text and permit later saving.                                                                                  |
+| MIRA-MD-055 | A preview writer's lifetime MUST follow its explicit source path, adapter and write capability. Reactive reads inside adapter binding or registration callbacks MUST NOT become writer-lifetime dependencies. Admission and unrelated observations MUST retain the source session and its existing input, flush and recovery ownership.                                                                   |
 
 | ID          | Requirement                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -144,7 +176,7 @@ MUST remain inline and zero-width rather than adopting authored image styling.
 | MIRA-MD-037 | `FrontmatterConfig` MAY supply `valueSuggestions(key, query)`. Tags, aliases, and multitext pill inputs MUST offer those values as autocomplete. When Markdown context is absent, `FrontmatterEditor` MAY accept a `fileAdapter` and MUST install a minimal context so wikilink pills resolve through the portable Link. |
 | MIRA-MD-038 | Loading Mira's portable Markdown and UI styles MUST NOT change the paint of consumer-owned portaled tooltips. Mira tooltip declarations MUST require a Mira-owned overlay marker in addition to the shared `data-slot="tooltip-content"` hook. |
 | MIRA-MD-039 | Live-preview hidden formatting MUST hide Markdown delimiter tokens only. Ordinary parentheses in prose and headings MUST remain visible. A bare `)` MUST NOT receive `cm-formatting-hidden`. Real link, image, and wikilink closers MUST remain hidden until the caret intersects that construct. |
-| MIRA-MD-040 | Activating a rendered frontmatter property type control MUST expose its complete type-and-action menu in a portalled overlay. Choosing a type MUST update the property through the existing controller and close the menu. Interaction acceptance MUST observe accessible portal settlement after activation before checking menu state and geometry. |
+| MIRA-MD-040 | Activating a rendered frontmatter property type control MUST expose its complete type-and-action menu in a portalled overlay. Choosing a type MUST update the property through the existing controller and close the menu. Interaction acceptance MUST observe accessible portal settlement and actual menu-item focus after activation before checking menu state and geometry. |
 | MIRA-MD-041 | An unfocused frontmatter text property MUST reconcile its contenteditable DOM text when the controller receives a later record revision, including after the user previously edited that control. A focused control MUST retain its in-progress text until focus leaves so an external revision does not overwrite active input. |
 
 Frontmatter property editors can replace their menu owner while an overlay is

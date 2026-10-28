@@ -31,6 +31,7 @@
   let suggestionVersion = 0;
   let suggestions = $state<string[]>([]);
   let committedSuggestion: string | null = null;
+  let editCommit: Props["onCommit"] | undefined;
 
   const filteredSuggestions = $derived(
     filterFrontmatterValueSuggestions(suggestions, query),
@@ -88,7 +89,9 @@
     }
     committedSuggestion = suggestion;
     open = false;
-    onCommit(suggestion);
+    const commit = editCommit ?? onCommit;
+    editCommit = undefined;
+    commit(suggestion);
   }
 
   function handleBlur(event: FocusEvent): void {
@@ -96,16 +99,19 @@
     if (nextFocus?.dataset.propertyValueSuggestion === "true") {
       return;
     }
+    const nextValue = currentValue();
+    const commit = editCommit ?? onCommit;
+    const alreadyCommitted = nextValue === committedSuggestion;
     queueMicrotask(() => {
       if (editorEl?.ownerDocument.activeElement !== editorEl) {
         open = false;
-        const nextValue = currentValue();
-        if (nextValue === committedSuggestion) {
+        editCommit = undefined;
+        if (alreadyCommitted) {
           committedSuggestion = null;
           return;
         }
         committedSuggestion = null;
-        onCommit(nextValue);
+        commit(nextValue);
       }
     });
   }
@@ -179,12 +185,14 @@
           void loadSuggestions(query);
         }}
         onfocus={() => {
+          editCommit = onCommit;
           query = currentValue();
           open = true;
           activeIndex = -1;
           void loadSuggestions(query);
         }}
         oninput={() => {
+          editCommit ??= onCommit;
           committedSuggestion = null;
           query = currentValue();
           open = true;
@@ -193,9 +201,7 @@
         }}
         onblur={handleBlur}
         onkeydown={handleKeydown}
-      >
-        {value}
-      </div>
+      ></div>
     {/snippet}
   </Popover.Trigger>
 

@@ -577,11 +577,13 @@ describe("portable preview surfaces", () => {
     await settle();
 
     expect(trigger?.getAttribute("aria-expanded")).toBe("false");
-    expect(
-      document.body.querySelector(
-        '[role="menu"][aria-label="Property options for title"]',
-      ),
-    ).toBeNull();
+    await vi.waitFor(() => {
+      expect(
+        document.body.querySelector(
+          '[role="menu"][aria-label="Property options for title"]',
+        ),
+      ).toBeNull();
+    });
     expect(
       controller.propertyManager.properties(controller.getRecord())[0]?.kind,
     ).toBe("number");

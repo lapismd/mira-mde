@@ -56,3 +56,28 @@ Screenshot comparisons and baseline updates remain outside this release.
 Changed-file Prettier and all four `pnpm spec:check` lanes pass. The focused
 leaf-link, public-index, safe-task, rich-editor and indentation unit targets
 pass 38 tests in five files with two workers and zero failures.
+
+## Completed publication
+
+Dependency PR #19, source PR #18 and Version Packages PR #20 are merged.
+Hosted CI passed all three lanes on the combined source and the version PR.
+The final release source is `57d6d4409eb61f5b2288ca2d8c4782b88d1b9513`.
+All six workspaces were rechecked after fetching main; each secondary workspace
+remains clean, with only its empty head outside the release ancestry.
+
+[Release run 40127946289](https://github.com/lapismd/mira-mde/actions/runs/40127946289)
+prepared immutable artifact `12573945022`, which contains only
+`@lapismd/mira@0.1.1`. Its manifest, archive integrity and public `lineNumbers`
+declaration were inspected before exact-source protected publication approval.
+The first attempt published successfully but exceeded the two-minute registry
+visibility window. Once npm exposed identical integrity, the failed stages were
+rerun against the same retained artifact without rebuilding or republishing.
+The second attempt passed publication, clean installation, npm signatures and
+SLSA provenance verification, then created the
+[mira@0.1.1 release](https://github.com/lapismd/mira-mde/releases/tag/mira%400.1.1).
+
+The npm `latest` version is 0.1.1 with verified integrity
+`sha512-8u53kwNYy/yYsG1pk8YRUcNo55ByVQhTq6M29H9Rku54SLU9bC0EXzUiYPEttUIZTXv151bvScoRnMZywyZkYA==`.
+Companion versions remain 0.0.3. Design Core's registry integration and Docker
+qualification continue in its owning repository; no Design Core publication or
+visual-baseline update was included in this release.

@@ -130,6 +130,9 @@ export const miraClassHighlighter = tagHighlighter([
 
 export const miraEditorTheme = EditorView.theme({
   "&": {
+    // CodeMirror's panel/gutter z-indices are internal to this editor, so they
+    // cannot outrank a surrounding host's settings or other modal overlays.
+    isolation: "isolate",
     height: "100%",
     color: "var(--mira-foreground)",
     backgroundColor: "var(--mira-editor-background)",

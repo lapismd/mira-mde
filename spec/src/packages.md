@@ -1,5 +1,14 @@
 # Public Packages and Entry Points
 
+The existing `@lapismd/mira/codemirror` base-extension entry supplies the
+editor-local stacking boundary required by MIRA-CSS-045. Consumers composing
+the base extensions directly receive the same containment as MiraCodeEditor;
+no new option, entry point or host-specific selector is introduced.
+
+`MiraMarkdownEditingSession` MAY expose an optional synchronous `hold()` method
+through the existing public extensions entry. Its input lease follows
+MIRA-MD-054 without changing the ordinary flush or recovery contracts.
+
 The core patch release keeps block-control actions synchronized with document
 replacement without changing the public editor or block-toolbar APIs.
 
@@ -20,6 +29,12 @@ asterisk bullets cannot lose their marker or measured hanging indentation.
 
 Root-only Storybook `10.6.3` and Vitest `4.1.12` updates repair the mandatory
 development audit gate; they do not change the public package graph.
+
+Workspace `auditConfig.ignoreGhsas` MAY list only
+[GHSA-gcqx-w48m-w2h4](https://github.com/advisories/GHSA-gcqx-w48m-w2h4)
+(deepmerge via `@sveltejs/vite-plugin-svelte`) while no patched release exists.
+That advisory is development-tooling only; packed-production audit policy and
+the KaTeX exception below stay unchanged.
 
 MIRA-ARCH-008 includes the additive `MiraProps.lineNumbers` boolean, defaulting
 to true. A false value MUST omit MiraCodeEditor's line-number extension rather
@@ -87,6 +102,20 @@ entrypoints and keep storage validation in the owning adapter.
 
 ## Editing-session adapter capability
 
+Frontmatter record commits expose MIRA-MD-056's read-only `previousRecord`.
+`FrontmatterController.updateProperty` accepts an optional rendered prior record;
+existing callers continue to use the controller's current record. MIRA-MD-057
+retains that record through focused text editing without host or storage policy.
+Packed consumer fixtures verify both exported signatures and reject reassignment
+or mutation of the captured previous record.
+The existing frontmatter action-error callback additionally accepts `edit` for
+MIRA-MD-058 target-change refusal; no replacement target receives the old edit.
+
+MIRA-MD-055 keeps binding and registration callback observations outside the
+preview writer's tracked lifetime. The explicit source path, adapter and write
+capability continue to own replacement; this repair changes no public entry or
+editing-session signature.
+
 | ID            | Requirement                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | MIRA-ARCH-040 | `MiraFileAdapter` MUST expose an optional source-path editing-session registration hook with observable dirty state, awaited flush and temporary protection. The hook MUST remain independent of application, vault and synchronization protocols. Registration failure MUST disable the writer before returning an error. Registered writers MUST retain their original persistence destination and MUST NOT update a replacement surface through late callbacks. |
@@ -147,12 +176,16 @@ and indentation retain the wrapped editor's styling without consumer overrides.
 | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | MIRA-ARCH-043 | The published Mira UI dependency graph MUST support destroying an open overlay before registration or focus callbacks settle. Teardown MUST cancel pending layer work without reading destroyed reactive state, retaining a portal, or leaving body pointer events locked. |
 
-The core package pins the published Bits UI version that satisfies
-MIRA-ARCH-043. Consumers MUST receive this behavior through the released Mira
-dependency declaration rather than a consumer patch or copied overlay code.
+The core package pins released Bits UI 2.20.2 for the current dependency intake.
+Consumers MUST receive MIRA-ARCH-043 through the released Mira dependency
+declaration rather than a consumer patch or copied overlay code. The additional
+delayed LinkPreview selection callback regression remains an upstream release
+gate; merely aligning this declaration does not establish its repair.
 
 ## Public graph
 
+Docker snapshot and archive-transfer portability repairs stay in private root
+tooling and MUST NOT change published archives, entry points or runtime versions.
 Docker validation is private root tooling. It MUST retain the six-package
 public graph and registry-portable manifests and lockfile; its isolated outputs
 and ignored configuration MUST NOT enter public archives.
@@ -277,7 +310,8 @@ manifest or packed dependency graph.
 
 The root consumes `@lapismd/spec-validator` from npm as development tooling
 while retaining Mira's package graph, requirement IDs, paths, and enforcement
-policy in this repository. The shared validator MUST NOT enter any public
+policy in this repository.
+The declared development range is `^0.2.0`. The shared validator MUST NOT enter any public
 package's manifest or packed dependency graph, and normal repository checks MUST
 not require the sibling validator checkout.
 

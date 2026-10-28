@@ -146,17 +146,21 @@
       },
     });
     writer = activeWriter;
-    const attached = attachMarkdownEditingSession({
-      writer: activeWriter,
-      sourcePath: key,
-      register: adapter?.registerEditingSession
-        ? (path, session) => adapter.registerEditingSession?.(path, session)
-        : undefined,
-      bind: adapter?.bindMarkdownEditingSession
-        ? (path, session) => adapter.bindMarkdownEditingSession!(path, session)
-        : undefined,
-      synchronizeProtection: tick,
-    });
+    // Adapter observations must not become dependencies of this source lifetime.
+    const attached = untrack(() =>
+      attachMarkdownEditingSession({
+        writer: activeWriter,
+        sourcePath: key,
+        register: adapter?.registerEditingSession
+          ? (path, session) => adapter.registerEditingSession?.(path, session)
+          : undefined,
+        bind: adapter?.bindMarkdownEditingSession
+          ? (path, session) =>
+              adapter.bindMarkdownEditingSession!(path, session)
+          : undefined,
+        synchronizeProtection: tick,
+      }),
+    );
     persist = attached.write ?? write;
 
     return () => {

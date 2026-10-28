@@ -19,6 +19,7 @@
   import Link from "./link.svelte";
   import FrontmatterPropertyNameInput from "./frontmatter-property-name-input.svelte";
   import FrontmatterPropertyTextInput from "./frontmatter-property-text-input.svelte";
+  import { snapshotFrontmatterRecord } from "../frontmatter/record-snapshot";
   import FrontmatterPropertyValueInput from "./frontmatter-property-value-input.svelte";
   import * as DropdownMenu from "../../ui/dropdown-menu/index.js";
   import type { MiraFileAdapter } from "@lapismd/mira/extensions";
@@ -122,12 +123,20 @@
   });
 
   const parseError = $derived(controller.parseError);
+  const renderedTextCommits = new WeakMap<
+    FrontmatterProperty,
+    (value: string) => void
+  >();
   const rows = $derived.by(() => {
     controller.revision;
     if (controller.parseError) {
       return [] as FrontmatterProperty[];
     }
-    return manager.properties(controller.getRecord());
+    const owner = controller;
+    const previousRecord = snapshotFrontmatterRecord(owner.getRecord());
+    const properties = manager.properties(previousRecord);
+    bindRenderedTextCommits(properties, owner, previousRecord);
+    return properties;
   });
   const typeOptions = $derived.by(() => {
     controller.revision;
@@ -152,6 +161,32 @@
     nextValue: unknown,
   ): void {
     controller.updateProperty(property.path, nextValue);
+  }
+
+  function bindRenderedTextCommits(
+    properties: FrontmatterProperty[],
+    owner: FrontmatterController,
+    previousRecord: Readonly<Record<string, unknown>>,
+  ): void {
+    const sourcePath = owner.sourcePath;
+    const onActionError = manager.config.onActionError;
+    for (const property of properties) {
+      const path = [...property.path];
+      renderedTextCommits.set(property, (value) => {
+        if (owner.sourcePath !== sourcePath) {
+          onActionError?.(new Error("Frontmatter edit target changed"), "edit");
+          return;
+        }
+        owner.updateProperty(path, value, previousRecord);
+      });
+      bindRenderedTextCommits(property.children, owner, previousRecord);
+    }
+  }
+
+  function renderedTextCommit(property: FrontmatterProperty) {
+    const commit = renderedTextCommits.get(property);
+    if (!commit) throw new Error("Rendered frontmatter edit is unavailable");
+    return commit;
   }
 
   function addProperty(): void {
@@ -319,7 +354,7 @@
 
   function handleActionError(
     error: unknown,
-    action: "copy" | "cut" | "paste" | "remove",
+    action: "copy" | "cut" | "paste" | "remove" | "edit",
   ): void {
     config.onActionError?.(error, action);
   }
@@ -646,7 +681,7 @@
             {config}
             ariaLabel={`${property.pathString} value`}
             class={`metadata-input metadata-input-longtext metadata-property-value-item min-w-0 grow bg-transparent px-2 py-1 outline-none ${valueClass(property.kind)}`}
-            onCommit={(next) => updateProperty(property, next)}
+            onCommit={renderedTextCommit(property)}
           />
         {:else if toBuiltinFrontmatterKind(property.kind) === "number"}
           <input

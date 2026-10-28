@@ -23,6 +23,8 @@ export type MiraMarkdownTextSession = {
 /** A portable persistence barrier owned by one source-bound Markdown writer. */
 export type MiraMarkdownEditingSession = {
   readonly dirty: boolean;
+  /** Block new input synchronously without flushing or acknowledging text. */
+  hold?(): () => void;
   flush(): Promise<void>;
   protect(): Promise<() => void>;
   readonly text?: MiraMarkdownTextSession;

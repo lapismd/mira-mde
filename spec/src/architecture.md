@@ -26,21 +26,25 @@ thin framework adapters.
 
 ## Requirements
 
-| ID            | Requirement                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| MIRA-ARCH-045 | Root checks, builds and functional/browser tests MUST default to isolated Docker execution with fingerprinted reusable toolchains, frozen dependencies, bounded resources, exact tracked source/history and retained reports; explicit native execution MUST remain available without silent fallback or visual-baseline mutation.                                                                                                                        |
-| MIRA-ARCH-001 | Packages MUST preserve their documented public entrypoints unless a breaking change is explicitly authorized.                                                                                                                                                                                                                                                                                                                                             |
-| MIRA-ARCH-002 | Portable packages MUST NOT depend on Lapis vault, workspace, route, sidebar, metadata-worker, settings-persistence, or plugin-registry services.                                                                                                                                                                                                                                                                                                          |
-| MIRA-ARCH-003 | Extensions MUST integrate through Mira callbacks, resolvers, adapters, commands, renderer hooks, and CodeMirror extensions rather than application singletons.                                                                                                                                                                                                                                                                                            |
-| MIRA-ARCH-004 | Every workspace package MUST expose deterministic check, test where applicable, and build behavior compatible with root orchestration.                                                                                                                                                                                                                                                                                                                    |
-| MIRA-ARCH-005 | Storybook MUST be the only repository application used for browsable documentation, demos, component examples, and interaction scenarios.                                                                                                                                                                                                                                                                                                                 |
-| MIRA-ARCH-020 | Root Storybook tooling MUST resolve the published `@lapismd/storybook-addon-visual-delta` package from npm once available, while specification tooling MUST resolve published `@lapismd/spec-validator` from npm once available; both dependencies MUST remain outside the six-package public graph.                                                                                                                                                      |
-| MIRA-ARCH-030 | The `@lapismd/mira` root MUST export `MiraCodeEditor`, `MiraCodeEditorProps`, and `MiraCodeEditorHandle`. Mira's primary Markdown surface and editable preview editor MUST consume that shell, while downstream packages MAY supply language and domain extensions through the public CodeMirror extension prop and bridge their theme from an ancestor through the shell's inheritable public background, focus-ring, search-control, and syntax tokens. |
-| MIRA-ARCH-039 | The root `check` and `check:all` commands MUST run `pnpm audit` against the committed lockfile before package validation. Fixable findings MUST be resolved with declared ranges or workspace overrides in the same change; `pnpm.auditConfig.ignoreCves` MAY list only unpatched advisories. Override replacements MUST stay on the same major line as the selector they replace so a security pin cannot substitute an incompatible API.                |
+| ID            | Requirement                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| MIRA-ARCH-045 | Root checks, builds and functional/browser tests MUST default to isolated Docker execution with fingerprinted reusable toolchains, frozen dependencies, bounded resources, exact tracked source/history and retained reports; explicit native execution MUST remain available without silent fallback or visual-baseline mutation.                                                                                                                              |
+| MIRA-ARCH-001 | Packages MUST preserve their documented public entrypoints unless a breaking change is explicitly authorized.                                                                                                                                                                                                                                                                                                                                                   |
+| MIRA-ARCH-002 | Portable packages MUST NOT depend on Lapis vault, workspace, route, sidebar, metadata-worker, settings-persistence, or plugin-registry services.                                                                                                                                                                                                                                                                                                                |
+| MIRA-ARCH-003 | Extensions MUST integrate through Mira callbacks, resolvers, adapters, commands, renderer hooks, and CodeMirror extensions rather than application singletons.                                                                                                                                                                                                                                                                                                  |
+| MIRA-ARCH-004 | Every workspace package MUST expose deterministic check, test where applicable, and build behavior compatible with root orchestration.                                                                                                                                                                                                                                                                                                                          |
+| MIRA-ARCH-005 | Storybook MUST be the only repository application used for browsable documentation, demos, component examples, and interaction scenarios.                                                                                                                                                                                                                                                                                                                       |
+| MIRA-ARCH-020 | Root Storybook tooling MUST resolve the published `@lapismd/storybook-addon-visual-delta` package from npm once available, while specification tooling MUST resolve published `@lapismd/spec-validator` from npm once available; both dependencies MUST remain outside the six-package public graph.                                                                                                                                                            |
+| MIRA-ARCH-030 | The `@lapismd/mira` root MUST export `MiraCodeEditor`, `MiraCodeEditorProps`, and `MiraCodeEditorHandle`. Mira's primary Markdown surface and editable preview editor MUST consume that shell, while downstream packages MAY supply language and domain extensions through the public CodeMirror extension prop and bridge their theme from an ancestor through the shell's inheritable public background, focus-ring, search-control, and syntax tokens.       |
+| MIRA-ARCH-039 | The root `check` and `check:all` commands MUST run `pnpm audit` against the committed lockfile before package validation. Fixable findings MUST be resolved with declared ranges or workspace overrides in the same change; `auditConfig.ignoreGhsas` in `pnpm-workspace.yaml` MAY list only unpatched advisories. Override replacements MUST stay on the same major line as the selector they replace so a security pin cannot substitute an incompatible API. |
 
 Overlay lifecycle ownership follows MIRA-ARCH-043 in [Public packages](packages.md).
 The portable Mira dependency declaration owns dismissal, registration, and focus
 cleanup for its public UI primitives; downstream hosts own when to destroy them.
+The pending post-0.1.1 intake aligns the exact Bits UI declaration with released
+2.20.2 while retaining every public entry point. This dependency alignment does
+not qualify the separately discovered delayed LinkPreview selection callback;
+that upstream source repair and its packed-consumer acceptance remain distinct.
 
 ## Package boundary
 
@@ -51,11 +55,16 @@ and collected failure reports. Native execution requires an explicit override;
 Docker failures never silently run a suite on the host. Hosted CI explicitly
 selects its already provisioned native runner. Development servers and manual
 Visual Delta commands retain their existing platform and approval boundaries.
+Source export MUST support colocated checkouts and separate Jujutsu workspaces.
+Report collection MUST receive the complete archive before extraction so macOS
+tar's early padding exit does not falsely fail a worker; corrupt archives and
+nonzero transfer exits MUST remain errors.
 
 Packed-consumer audit policy remains separate from the committed workspace
 audit under MIRA-ARCH-039. Only the recorded, advisory-specific KaTeX exception in
 [Public packages](packages.md) MAY qualify an otherwise failing packed audit;
-normal workspace audits and dependency overrides remain unchanged.
+workspace `ignoreGhsas` entries cover unpatched development advisories and do
+not weaken packed-production acceptance.
 
 The six-package public graph separates installation products from implementation
 modules. `@lapismd/mira` owns the portable runtime and supported advanced
@@ -156,9 +165,9 @@ single patched compiler graph. Those refreshes MUST leave public runtime peer
 ranges and workspace dependency direction unchanged unless the consumer contract
 itself changes.
 
-The workspace consumes the published Spec Validator through `^0.1.4` so merge
-checks use its current Jujutsu range handling and optional search dependency
-contract.
+The workspace consumes the published Spec Validator through `^0.2.0` so merge
+checks use its current Node runtime, Jujutsu range handling, and optional search
+dependency contract.
 
 Root quality gates compose the specification, catalog, package, Storybook, and
 browser checks. In particular, `storybook:check` validates catalog metadata and

@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/svelte-vite";
 import { expect, userEvent, within } from "storybook/test";
 import { catalogParameters } from "../catalog/catalog.mjs";
 import MiraCodeEditorStory from "./MiraCodeEditorStory.svelte";
+import MiraCodeEditorOverlayStory from "./MiraCodeEditorOverlayStory.svelte";
 
 const meta = {
   title: "Mira/Code Editor",
@@ -95,5 +96,49 @@ export const FindAndReplace: Story = {
     await expect(wholeWord).toHaveAttribute("aria-pressed", "false");
     await userEvent.click(wholeWord);
     await expect(wholeWord).toHaveAttribute("aria-pressed", "true");
+  },
+};
+
+export const HostOverlay: Story = {
+  name: "Find beneath host overlay",
+  render: () => ({ Component: MiraCodeEditorOverlayStory }),
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Editor search and gutters stay beneath an owning host's overlay, retaining the query after dismissal.",
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(
+      canvas.getByRole("textbox", { name: "Overlay test editor" }),
+    );
+    await userEvent.keyboard("{Control>}f{/Control}");
+    if (!canvas.queryByRole("textbox", { name: "Find" })) {
+      await userEvent.keyboard("{Meta>}f{/Meta}");
+    }
+    const find = canvas.getByRole("textbox", { name: "Find" });
+    await userEvent.clear(find);
+    await userEvent.type(find, "Alpha");
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Open host overlay" }),
+    );
+    const overlay = canvas.getByRole("dialog", { name: "Host overlay" });
+    const panel = find.closest(".cm-panels")!;
+    const bounds = panel.getBoundingClientRect();
+    const top = canvasElement.ownerDocument.elementFromPoint(
+      bounds.left + bounds.width / 2,
+      bounds.top + bounds.height / 2,
+    );
+    await expect(overlay.contains(top)).toBe(true);
+    await expect(overlay).toHaveFocus();
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Close host overlay" }),
+    );
+    await expect(find).toHaveValue("Alpha");
+    await userEvent.click(canvas.getByRole("button", { name: "Next match" }));
+    await expect(find).toBeVisible();
   },
 };
