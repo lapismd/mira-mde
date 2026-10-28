@@ -1,5 +1,18 @@
 # @lapismd/mira
 
+## 0.1.2
+
+### Patch Changes
+
+- [#21](https://github.com/lapismd/mira-mde/pull/21) [`377bfc8`](https://github.com/lapismd/mira-mde/commit/377bfc805eac2961fd879f03e28e80273cb8702c) Thanks [@stevejuma](https://github.com/stevejuma)! - Expose immutable previous frontmatter records and retain focused text edits through external metadata refresh and deferred commits.
+
+- [#21](https://github.com/lapismd/mira-mde/pull/21) [`caa2452`](https://github.com/lapismd/mira-mde/commit/caa24527be436a706ef083c63e76694a180044b7) Thanks [@stevejuma](https://github.com/stevejuma)! - Expose an optional synchronous Markdown input lease that leaves persistence and recovery under the existing save barriers.
+
+- [#21](https://github.com/lapismd/mira-mde/pull/21) [`9142fa4`](https://github.com/lapismd/mira-mde/commit/9142fa4ed786d63fc54a04654f3b2c5ef48bfe47) Thanks [@stevejuma](https://github.com/stevejuma)! - Retain preview source sessions when adapter admission or diagnostic callbacks observe reactive state.
+
+- [#21](https://github.com/lapismd/mira-mde/pull/21) [`a7ab556`](https://github.com/lapismd/mira-mde/commit/a7ab556fc55e612210097a060d1b96917fbb2ed3) Thanks [@stevejuma](https://github.com/stevejuma)! - Align the portable overlay runtime with released Bits UI 2.20.2 while preserving
+  the existing public editor and preview contracts.
+
 ## 0.1.1
 
 ### Patch Changes
