@@ -181,3 +181,47 @@ dependencies before package validation. Its job-scoped guard reproduces one
 failure before the repair; complete required new-head CI remains the recovery
 gate. The original failed job `124541176610` and successfully retained early
 audit/diagnostic artifact remain evidence, without a waived check or test change.
+
+## Verified 0.1.4 publication
+
+Source PR #26 passes all three normal jobs in recovery run `41203120667` and
+merges as `11ecdb86089a0bde855776f7111715b9c6f304df`. The bot's actual version
+plan selects only `@lapismd/mira@0.1.4`; the other five packages remain 0.0.3.
+Version Packages PR #27 is reviewed in full and formally approved at exact head
+`13539eabd01992f6296b2fc7d2d9c5ac68705582` (review `5722819959`). All three
+jobs in `41203791057` pass before the checked merge to
+`6658fe563b6ff725a931d339abca727c10263420`. All three main CI jobs then pass in
+`41204586592`. No required check or original expected-failure marker is waived.
+
+After a fresh workspace/Dependabot preflight, the normal production dispatch
+`41205035585` builds immutable artifact `13043527864`. Its tarball is
+byte-identical to the prior qualified main artifact. Source-bound development
+receipts contain zero warnings; production contains exactly the approved single
+warning. Base audit findings remain zero; only the unchanged scoped Mermaid
+cohort finding remains. The exact-source variable and normal protected
+`npm-production` reviewer gate are approved after independent artifact checks.
+
+All five production stages succeed: version preparation, artifact qualification,
+trusted npm publication, clean-install/signature/provenance verification, and
+automatic package tag/GitHub release creation. Registry `latest` is 0.1.4.
+The 356854-byte registry tarball has SHA-256
+`d2c16137900f9512527c699206a5294a3a7ad593f1f59e0f7b7347bd3053ed3e` and SRI
+`sha512-Tt7qqDTrWBrJWdDksJszt0HuBwXPaSlh+ADaKQTGJab9E2J7d2N+STWnbD6OZW0c2B7zUcyvGosA3ehxb23Ogg==`.
+Independent cryptographic Sigstore verification binds those exact bytes to
+the source above, GitHub's Actions issuer,
+`.github/workflows/release.yml@refs/heads/main` and run `41205035585` attempt 1.
+
+A separate fresh registry consumer installs 0.1.4 and reports zero runtime
+vulnerabilities. Initial npm version-list propagation briefly reports ETARGET;
+the retained fresh-cache retry succeeds without source or dependency changes.
+`npm audit signatures --json --include-attestations` reports zero invalid and
+zero missing signatures, with 34 verified entries including Mira's SLSA
+provenance. Complete reports and original retry logs remain under
+`/tmp/lapis-mira-014-release-20261031/`.
+
+Tag `mira@0.1.4` points exactly to the published source. Its normal non-draft
+[GitHub release](https://github.com/lapismd/mira-mde/releases/tag/mira%400.1.4)
+is published; this workflow uses the immutable Actions artifact and does not
+attach release assets. This closes Mira's publication gate. Core and other
+consumers still require their own released-minimum refresh and registry
+acceptance; they do not inherit Mira's Mermaid cohort acceptance.
