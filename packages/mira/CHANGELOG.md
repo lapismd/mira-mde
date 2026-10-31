@@ -1,5 +1,19 @@
 # @lapismd/mira
 
+## 0.1.4
+
+### Patch Changes
+
+- [#26](https://github.com/lapismd/mira-mde/pull/26) [`c69a7cf`](https://github.com/lapismd/mira-mde/commit/c69a7cf6288fb3b189c648a1111aa2f8d90dda82) Thanks [@stevejuma](https://github.com/stevejuma)! - Bundle the unchanged math adapters and parser helpers behind the existing private
+  preview boundary while retaining patched KaTeX as an explicit runtime dependency.
+  Dispose delayed pipe/grid cell focus work with its owning inline editor so table
+  teardown cannot focus or dispatch into a destroyed CodeMirror view.
+  Preserve browser/Node behavior, development diagnostics and MIT notices without
+  requiring consumers to override vulnerable transitive renderer ranges. Packed
+  production audits require a clean base Mira graph. The existing cohort acceptance
+  is narrowed to the unchanged Mermaid 11/layout-ELK path and does not apply to
+  other consumers or base math rendering.
+
 ## 0.1.3
 
 ### Patch Changes
