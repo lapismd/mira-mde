@@ -128,3 +128,46 @@ before the new owner's first patch. That context check failed atomically without
 overwriting files; the finished edit was re-read and preserved. The coordinator
 confirmed the previous agent was interrupted, with no other writer or active
 worker. All original 25 changed paths and earlier failed reports were preserved.
+
+## Explicit Dnd disposition
+
+The user explicitly approved the prepared scope on 2026-10-31: at most one exact
+`@dnd-kit/svelte@0.4.0` `DragDropProvider.svelte` compiler warning per production
+build, with source SHA-256
+`9750aa31f409e0f6be0e70b3fef6c8d8e8e447ff25b150fbc2dd4bec4781eaab`,
+code/message identity and expiry 2026-11-30. The source-owned fixture now checks
+every field and retains/prints all raw diagnostics, including failed checks.
+Negative guards cover changed source, identity, message, mode, repeated warning
+and expiration. All other fatal gates, runtime assertions and deadlines remain
+unchanged. This explicit decision supersedes the earlier unactivated proposal;
+the original warning and all failed attempts remain retained.
+
+Recovery run `677d5fb8` at `719b24f4` passes both public cold hosts: four Node
+scenarios and 18 browser assertions each, with zero runtime diagnostics. The
+development build emits zero compiler warnings; production emits exactly the
+one approved warning. Both raw receipts are retained and source-bound. The
+base production audit is clean. The cohort metadata reader then fails because
+CommonJS resolution cannot select the adapter's import-only export. The exact
+new fixture reproduces that failure without executing any browser module;
+manifest inspection now follows canonical installed roots and preserves every
+existing identity/advisory check. No package export or Node contract changes.
+
+## Successful final packed acceptance
+
+The exact original `pnpm packages:pack` command passes at
+`b76eac565e23b890d432e735ee9e22de8d486e02`, run
+`mira-validation-a455ea13-9166-4ed6-9d04-9ef9e97d63b9`. All six isolated public
+tarballs, strict private declarations, Svelte/React/Vanilla entrypoints, public
+CSS and leak checks pass. Both cold development and production hosts pass four
+Node scenarios and 18 browser assertions with zero runtime diagnostics.
+The base production audit contains zero findings. The cohort retains only its
+existing scoped finding at actual Mermaid 11.17.2, layout-ELK 0.1.9 with peer
+`^11.0.2` and KaTeX 0.16.47; no consumer or base exception is inherited.
+
+Development compilation emits no warnings. Production emits exactly the one
+approved warning, with its full raw frame, source identity and bounded decision
+retained. The portable worker, CI and immutable release artifact retain those
+receipts even when later checks fail. The retention guard changes one failure
+to one pass; all 13 focused scope/workflow cases and 11 cohort-policy cases pass.
+The original failed attempts remain unchanged. Source/version PR checks and
+actual publication/provenance remain separate pending gates.

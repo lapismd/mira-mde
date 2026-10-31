@@ -1,4 +1,4 @@
-import { realpathSync, writeFileSync } from "node:fs";
+import { copyFileSync, realpathSync, writeFileSync } from "node:fs";
 import path from "node:path";
 
 export function writeMathTypesFixture(directory) {
@@ -66,6 +66,10 @@ export function writeMathPackageFixture(directory, tarball) {
 
 /** A clean public-package host: no source aliases or renderer overrides. */
 export function writeMathRuntimeFixture(directory) {
+  copyFileSync(
+    new URL("./math-compile-diagnostics.mjs", import.meta.url),
+    path.join(directory, "math-compile-diagnostics.mjs"),
+  );
   writeFileSync(
     path.join(directory, "index.html"),
     `<!doctype html>
@@ -107,6 +111,7 @@ import { pathToFileURL } from "node:url";
 import { build, createServer, preview } from "vite";
 import { svelte } from "@sveltejs/vite-plugin-svelte";
 import { chromium } from "playwright";
+import { createMathCompileDiagnostics } from "./math-compile-diagnostics.mjs";
 
 const entry = new URL(import.meta.resolve("@lapismd/mira"));
 const bundle = new URL("./preview/math-plugins.js", entry);
@@ -147,7 +152,7 @@ assert.match(katexVersion, /^0\.18\.(?:[2-9]|\d{2,})$/);
 const mode = process.argv[2];
 const config = {
   root: process.cwd(), configFile: false, logLevel: "warn", clearScreen: false,
-  plugins: [svelte({ onwarn(warning) { throw new Error(warning.message); } })],
+  plugins: [svelte({ onwarn: createMathCompileDiagnostics({ mode, evidencePath: process.argv[3] }) })],
   server: { host: "127.0.0.1", port: 0, strictPort: true },
   preview: { host: "127.0.0.1", port: 0, strictPort: true },
   optimizeDeps: { force: true },

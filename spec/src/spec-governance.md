@@ -118,6 +118,12 @@ MIRA-ARCH-039 and `packages.md`.
 CI and release workflows MUST retain packed audit reports as downloadable
 artifacts, including when a reported finding fails the gate.
 
+The packed production compiler MUST enforce the exact, expiring Dnd diagnostic
+acceptance in `packages.md`, with negative guards for every identity/content,
+mode, count and date boundary. Raw warning receipts MUST survive failed builds
+and be retained by portable validation. This does not waive runtime diagnostics
+or any other required gate.
+
 Changesets owns release intent and version/changelog mutation. Pull requests
 that change a public product must carry either a version-bearing Changeset or an
 explicit empty Changeset. Merging ordinary changes to `main` updates a single

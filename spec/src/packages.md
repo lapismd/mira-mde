@@ -237,6 +237,8 @@ and reject every finding. The 2026-10-11 user acceptance remains valid only for
 low GHSA-238p-pmpm-9mq7 at KaTeX 0.16.47 reached through unchanged Mermaid
 `^11.16.1` and layout-ELK 0.1.9 with Mermaid peer `^11.0.2`, inside the six-product
 Mira cohort. The gate MUST verify installed identities and every finding path.
+Identity inspection MUST follow the installed package roots without executing
+browser modules or requiring a CommonJS condition from import-only exports.
 Base math, downstream consumer paths, changed identities or advisories, severity
 increases, failed commands, muted findings, malformed responses and inconsistent
 counts remain blocking. Full JSON evidence remains at
@@ -244,6 +246,18 @@ counts remain blocking. Full JSON evidence remains at
 Mermaid identities remain beside it. Current registry 0.1.3 still carries
 the upstream adapters' KaTeX 0.16 constraints; source qualification and a new
 verified registry release are required before consumers may raise their floors.
+
+The user explicitly accepted one existing packed-production compiler diagnostic
+on 2026-10-31, through 2026-11-30: `@dnd-kit/svelte@0.4.0`, file
+`dist/core/context/DragDropProvider.svelte`, SHA-256
+`9750aa31f409e0f6be0e70b3fef6c8d8e8e447ff25b150fbc2dd4bec4781eaab`,
+code `state_referenced_locally` and its exact `managerProp` initial-capture
+message. At most one exact match MAY qualify each production build; changed
+identity, path, bytes, code/message, repeated warnings or expiration MUST fail.
+Every raw diagnostic MUST be printed and retained. All other compiler warnings,
+development warnings, runtime errors, Svelte source diagnostics and functional
+or accessibility failures remain fatal. No dependency patch or public API
+change is authorized by this scope.
 Public stylesheet imports MUST resolve from the packed manifests without relying
 on hoisted transitive dependencies or repository development dependencies.
 KaTeX CSS therefore belongs to Mira's declared runtime graph; the packed

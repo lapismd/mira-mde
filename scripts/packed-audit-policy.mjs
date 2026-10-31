@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, realpathSync } from "node:fs";
 import { createRequire } from "node:module";
 import path from "node:path";
 import semver from "semver";
@@ -19,36 +19,28 @@ function isObject(value) {
 
 /** Read identities from the installed cohort, without loading browser modules. */
 export function readMermaidRuntime(directory) {
-  function manifest(entry, name) {
-    let current = path.dirname(entry);
-    while (current !== path.dirname(current)) {
+  function installed(request, name) {
+    for (const search of request.resolve.paths(name) ?? []) {
       try {
-        const value = JSON.parse(
-          readFileSync(path.join(current, "package.json"), "utf8"),
-        );
-        if (value.name === name) return value;
+        const filename = realpathSync(path.join(search, name, "package.json"));
+        const value = JSON.parse(readFileSync(filename, "utf8"));
+        if (value.name !== name) fail(`unexpected installed identity: ${name}`);
+        return { value, request: createRequire(filename) };
       } catch (error) {
         if (error.code !== "ENOENT") throw error;
       }
-      current = path.dirname(current);
     }
     fail(`missing installed package identity: ${name}`);
   }
   const fixture = createRequire(path.join(directory, "package.json"));
-  const adapter = createRequire(
-    fixture.resolve("@lapismd/mira-plugin-mermaid"),
-  );
-  const mermaidEntry = adapter.resolve("mermaid");
-  const elk = manifest(
-    adapter.resolve("@mermaid-js/layout-elk"),
-    "@mermaid-js/layout-elk",
-  );
+  const adapter = installed(fixture, "@lapismd/mira-plugin-mermaid");
+  const mermaid = installed(adapter.request, "mermaid");
+  const elk = installed(adapter.request, "@mermaid-js/layout-elk").value;
   return {
-    mermaid: manifest(mermaidEntry, "mermaid").version,
+    mermaid: mermaid.value.version,
     layoutElk: elk.version,
     layoutElkPeer: elk.peerDependencies?.mermaid,
-    katex: manifest(createRequire(mermaidEntry).resolve("katex"), "katex")
-      .version,
+    katex: installed(mermaid.request, "katex").value.version,
   };
 }
 

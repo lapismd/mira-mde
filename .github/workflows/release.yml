@@ -114,11 +114,16 @@ jobs:
           pnpm packages:pack
 
       - name: Retain packed production audit evidence
-        if: always() && hashFiles('.release/production-consumer-audit.json') != ''
+        if: always() && hashFiles('.release/*-audit.json', '.release/math-*-compile-diagnostics.json') != ''
         uses: actions/upload-artifact@v7
         with:
           name: mira-packed-audit-${{ github.sha }}
-          path: .release/production-consumer-audit.json
+          path: |
+            .release/production-consumer-audit.json
+            .release/base-math-production-audit.json
+            .release/mermaid-runtime-identity.json
+            .release/math-development-compile-diagnostics.json
+            .release/math-production-compile-diagnostics.json
           include-hidden-files: true
           if-no-files-found: error
           retention-days: 14
@@ -164,6 +169,10 @@ jobs:
             .release/release-manifest.json
             .release/tarballs/*.tgz
             .release/production-consumer-audit.json
+            .release/base-math-production-audit.json
+            .release/mermaid-runtime-identity.json
+            .release/math-development-compile-diagnostics.json
+            .release/math-production-compile-diagnostics.json
           include-hidden-files: true
           if-no-files-found: error
           retention-days: 14

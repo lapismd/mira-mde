@@ -75,6 +75,10 @@ KaTeX through Mira's explicit runtime dependency. Conditional parsing,
 development assertions and Node diagnostics remain external runtime boundaries.
 Every bundled MIT license and copyright notice ships with the artifact.
 
+Packed host compilation additionally retains raw diagnostics under the exact
+user-approved, production-only Dnd scope in [Public packages](packages.md).
+Its expiry and all other fatal diagnostic gates remain enforced independently.
+
 The six-package public graph separates installation products from implementation
 modules. `@lapismd/mira` owns the portable runtime and supported advanced
 subpaths; plugins, the default editor, and adapters depend only on those public

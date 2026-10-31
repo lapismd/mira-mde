@@ -86,6 +86,10 @@ export default defineConfig(tableRequirements(), {
           chapters: ["spec/src/packages.md", "spec/src/spec-governance.md"],
         },
         {
+          pattern: "^scripts/math-compile-diagnostics(?:\\.spec)?\\.mjs$",
+          chapters: ["spec/src/packages.md", "spec/src/spec-governance.md"],
+        },
+        {
           pattern: "^scripts/(?:build|check)-math-adapters(?:\\.spec)?\\.mjs$",
           chapters: ["spec/src/architecture.md", "spec/src/packages.md"],
         },

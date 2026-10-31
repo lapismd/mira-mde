@@ -303,9 +303,21 @@ console.log("All public stylesheet imports resolve without hoisted dependencies.
     console.log(`Base Mira: ${checkPackedAudit(mathAudit)}`);
     for (const mode of ["development", "production"]) {
       console.log(
-        run("node", ["math-runtime.mjs", mode], mathRoot, {
-          timeout: 120_000,
-        }).trim(),
+        run(
+          "node",
+          [
+            "math-runtime.mjs",
+            mode,
+            path.join(
+              evidenceDirectory,
+              `math-${mode}-compile-diagnostics.json`,
+            ),
+          ],
+          mathRoot,
+          {
+            timeout: 120_000,
+          },
+        ).trim(),
       );
     }
     const audit = spawnSync("pnpm", ["audit", "--prod", "--json"], {

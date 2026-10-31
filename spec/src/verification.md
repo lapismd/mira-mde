@@ -893,10 +893,13 @@ MIRA-ARCH-039 and MIRA-MD-002 use the unchanged upstream math plugins through a
 private bundled build boundary. Source `c0902e0b` passes the full 525-unit,
 178-case interaction/axe, static/catalog and cold browser matrix, retaining the
 browser lane's existing single expected failure unchanged. Base packed runtime
-audit and development-host acceptance pass; the new production host remains
-blocked on the independently reproduced external Dnd compile diagnostic.
-Its proposed disposition is unactivated. Final package qualification and
-verified registry publication remain pending for this candidate.
+audit and both cold public hosts pass. The user approved the exact bounded
+Dnd disposition through 2026-11-30; negative guards and raw source-bound
+receipts verify zero development warnings and exactly one accepted production
+warning. Final six-package qualification passes at `b76eac56` (run `a455ea13`),
+with zero base audit findings and only the unchanged scoped Mermaid cohort
+finding. Protected source/version checks and verified registry publication
+remain pending for this candidate.
 The original 0.1.3 one-low consumer audit, failing strict-policy regression and
 20 in-memory parity/security checks are retained in
 [the math packaging record](../records/2026-10-31-private-math-runtime.md).

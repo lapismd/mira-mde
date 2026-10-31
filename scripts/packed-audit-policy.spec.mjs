@@ -1,6 +1,54 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { checkPackedAudit } from "./packed-audit-policy.mjs";
+import {
+  checkPackedAudit,
+  readMermaidRuntime,
+} from "./packed-audit-policy.mjs";
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from "node:fs";
+import os from "node:os";
+import path from "node:path";
+
+test("reads import-only cohort identities without executing browser modules", () => {
+  const directory = mkdtempSync(
+    path.join(os.tmpdir(), "mira-cohort-metadata-"),
+  );
+  function install(parent, name, version, extra = {}) {
+    const root = path.join(parent, "node_modules", name);
+    mkdirSync(root, { recursive: true });
+    writeFileSync(
+      path.join(root, "package.json"),
+      JSON.stringify({
+        name,
+        version,
+        type: "module",
+        exports: { import: "./index.js" },
+        ...extra,
+      }),
+    );
+    writeFileSync(
+      path.join(root, "index.js"),
+      "throw new Error('Browser module must not execute');",
+    );
+    return root;
+  }
+  try {
+    writeFileSync(path.join(directory, "package.json"), "{}");
+    const adapter = install(directory, "@lapismd/mira-plugin-mermaid", "0.0.3");
+    const mermaid = install(adapter, "mermaid", "11.17.2");
+    install(adapter, "@mermaid-js/layout-elk", "0.1.9", {
+      peerDependencies: { mermaid: "^11.0.2" },
+    });
+    install(mermaid, "katex", "0.16.47");
+    assert.deepEqual(readMermaidRuntime(directory), {
+      mermaid: "11.17.2",
+      layoutElk: "0.1.9",
+      layoutElkPeer: "^11.0.2",
+      katex: "0.16.47",
+    });
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
 
 function report() {
   return {
