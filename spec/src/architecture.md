@@ -1,5 +1,10 @@
 # Architecture and Boundaries
 
+Recursive-embed qualification preserves MIRA-ARCH-039's mandatory audit. Scoped
+workspace overrides move only ESLint, markdownlint-cli and their lint helpers to
+patched Minimatch 11.x; the six public runtime packages retain their dependency
+graph. Full lint, specification and packed-consumer gates qualify the intake.
+
 The 0.1.1 release retains the six-package graph and existing public runtime
 ranges. Workspace-only audit overrides keep DOMPurify on patched 3.x and Undici
 on patched 7.x/8.x; the independently installed public archives remain subject

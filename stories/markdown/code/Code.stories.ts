@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/svelte-vite";
-import { expect, fn, userEvent, within } from "storybook/test";
+import { expect, fn, userEvent, waitFor, within } from "storybook/test";
 import EditorModeStory from "../_shared/EditorModeStory.svelte";
 import MarkdownPreviewStory from "../_shared/MarkdownPreviewStory.svelte";
 import {
@@ -132,5 +132,84 @@ export const SourceMode: Story = {
         code: markdownEditorDocsSource("codeMarkdown", "source"),
       },
     },
+  },
+};
+
+const directiveCode = [
+  ':::cell{#typescript lang="ts"}',
+  "```ts",
+  "const answer: number = 42;",
+  "```",
+  ":::",
+  "",
+  ':::cell{#query lang="sql"}',
+  "```sql",
+  "SELECT 73 AS answer;",
+  "```",
+  ":::",
+].join("\n");
+
+async function assertDirectiveHighlighting(canvasElement: HTMLElement) {
+  await waitFor(async () => {
+    const keywords = [...canvasElement.querySelectorAll(".cm-keyword")].map(
+      (node) => node.textContent,
+    );
+    await expect(keywords).toContain("const");
+    await expect(keywords).toContain("SELECT");
+    const numbers = [...canvasElement.querySelectorAll(".cm-number")].map(
+      (node) => node.textContent,
+    );
+    await expect(numbers).toContain("42");
+    await expect(numbers).toContain("73");
+  });
+}
+
+export const DirectiveSource: Story = {
+  tags: ["visual-pending"],
+  render: () => ({
+    Component: EditorModeStory,
+    props: { value: directiveCode, mode: "source" },
+  }),
+  parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/markdown/code/directive-source-chromium.png",
+      ],
+    },
+  },
+  play: async ({ canvasElement }) => {
+    await assertDirectiveHighlighting(canvasElement);
+    const editor = canvasElement.querySelector<HTMLElement>(".cm-content")!;
+    await userEvent.click(editor);
+    await userEvent.keyboard("{Control>}{End}{/Control}{Enter}");
+    await assertDirectiveHighlighting(canvasElement);
+  },
+};
+
+export const DirectiveLivePreview: Story = {
+  tags: ["visual-pending"],
+  render: () => ({
+    Component: EditorModeStory,
+    props: { value: directiveCode.split("\n\n")[0]!, mode: "live-preview" },
+  }),
+  parameters: {
+    visualDelta: {
+      images: [
+        "/visual-baselines/stories/markdown/code/directive-live-preview-chromium.png",
+      ],
+    },
+  },
+  play: async ({ canvasElement }) => {
+    await userEvent.click(
+      within(canvasElement).getByRole("button", { name: "Edit source" }),
+    );
+    await waitFor(async () => {
+      await expect(
+        canvasElement.querySelector(".cm-keyword"),
+      ).toHaveTextContent("const");
+      await expect(canvasElement.querySelector(".cm-number")).toHaveTextContent(
+        "42",
+      );
+    });
   },
 };

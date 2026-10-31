@@ -1,5 +1,13 @@
 # Public Packages and Entry Points
 
+Recursive-embed qualification retains the mandatory audit under MIRA-ARCH-039.
+Root lint tooling resolves ESLint and markdownlint-cli's Minimatch dependency to
+the patched 11.x line; runtime package dependencies and public APIs are unchanged.
+
+The directive-fence highlighting repair is internal to the existing
+`@lapismd/mira/codemirror` composition. Built registry-compatible archives
+carry the repair for isolated Notebook acceptance; no public API changes.
+
 The existing `@lapismd/mira/codemirror` base-extension entry supplies the
 editor-local stacking boundary required by MIRA-CSS-045. Consumers composing
 the base extensions directly receive the same containment as MiraCodeEditor;

@@ -1,6 +1,6 @@
 import { markdown } from "@codemirror/lang-markdown";
 import { yamlFrontmatter } from "@codemirror/lang-yaml";
-import type { LanguageDescription } from "@codemirror/language";
+import { syntaxTree, type LanguageDescription } from "@codemirror/language";
 import { languages } from "@codemirror/language-data";
 import type { Extension, Range } from "@codemirror/state";
 import {
@@ -14,6 +14,7 @@ import {
 import { Autolink, Table } from "@lezer/markdown";
 import { getTaskMarkerRange } from "../rich/utils/tasks";
 import { GenericDirectives } from "./directives";
+import { directiveCodeHighlights } from "./directive-code-highlights";
 import { GridTable } from "./grid-table";
 import { ListAfterLazyBlockquote } from "./list-after-lazy-quote";
 import { parseLatex } from "./latex";
@@ -114,14 +115,20 @@ class MarkdownSourceDecorations implements PluginValue {
   }
 
   update(update: ViewUpdate): void {
-    if (update.docChanged || update.viewportChanged) {
+    if (
+      update.docChanged ||
+      update.viewportChanged ||
+      syntaxTree(update.startState) !== syntaxTree(update.state)
+    ) {
       this.decorations = buildDecorations(update.view);
     }
   }
 }
 
 function buildDecorations(view: EditorView): DecorationSet {
-  const ranges: Range<Decoration>[] = [];
+  const ranges: Range<Decoration>[] = directiveCodeHighlights(
+    syntaxTree(view.state),
+  );
   const frontmatter = getFrontmatterRange(view.state.doc.toString());
 
   for (const visibleRange of view.visibleRanges) {

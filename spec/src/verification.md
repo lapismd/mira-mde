@@ -1,5 +1,13 @@
 # Verification
 
+MIRA-MD-002 directive-fence qualification is recorded in
+[the source and consumer record](../records/2026-10-30-directive-fences.md).
+The narrow Source regression initially passed for ordinary JavaScript fences
+and failed for the identical fence inside a cell directive (1 pass, 1 failure).
+The final source gates pass 520 unit cases, 177 Storybook interaction/axe
+stories, 60 browser acceptances, package checks/build/publint, static Storybook
+and spec checks. Source and Live Preview stories remain `visual-pending`.
+
 MIRA-CSS-045 is verified by `Mira/Code Editor/Find beneath host overlay`, the
 focused search suite and linked Plugins `Editing Search Settings` stories.
 Full repository suites and wider consumer qualification are deferred by the
@@ -80,6 +88,7 @@ authorized baseline regeneration migrations are complete.
 
 | Requirements                                                                                            | Evidence                                                                                                                                                                                                                                                                                    | Status                                                                                             |
 | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| MIRA-MD-059                                                                                             | [Recursive embed qualification](../records/2026-10-31-recursive-embeds.md)                                                                                                                                                                                                                  | Implemented; visual pending                                                                        |
 | MIRA-MD-007, MIRA-MD-034                                                                                | [Linux release repairs](../records/2026-10-24-linux-release-repairs.md): immediate block ranges, settled table fonts, 170 stories, 60 browser cases and macOS fold acceptance.                                                                                                              | Implemented; visual pending                                                                        |
 | MIRA-ARCH-045                                                                                           | [Tooling portability](../records/2026-10-25-tooling-portability.md): sixteen runner cases, separate-workspace snapshots, checked archive collection and complete Docker acceptance.                                                                                                         | Implemented                                                                                        |
 | MIRA-MD-046                                                                                             | [Bound recovery qualification](../records/2026-10-16-markdown-write-recovery.md): 12 exact cases, 25 writer/session cases, 159 interactions, 51 cold browser cases and public packs pass.                                                                                                   | Implemented                                                                                        |

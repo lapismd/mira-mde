@@ -11,6 +11,7 @@ import AdapterInvalidationStory from "./AdapterInvalidationStory.svelte";
 import EditablePreviewStory from "./EditablePreviewStory.svelte";
 import EditingProtectionStory from "./EditingProtectionStory.svelte";
 import PortableSurfacesStory from "./PortableSurfacesStory.svelte";
+import RecursiveEmbedsStory from "./RecursiveEmbedsStory.svelte";
 
 const meta = {
   title: "Markdown/Embeds",
@@ -35,6 +36,58 @@ const meta = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
+
+export const RecursiveEmbeds: Story = {
+  name: "Recursive embeds",
+  render: () => ({ Component: RecursiveEmbedsStory }),
+  tags: [
+    "visual-pending",
+    "!visual-approved",
+    "!visual-ready",
+    "!visual-failed",
+  ],
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement);
+    for (let replay = 0; replay < 2; replay += 1) {
+      await step(
+        "withdraw custom rendering without recursive fallback",
+        async () => {
+          await expect(
+            canvas.getAllByText("Custom embed active."),
+          ).toHaveLength(6);
+          await userEvent.click(
+            canvas.getByRole("button", { name: "Withdraw custom renderer" }),
+          );
+          await waitFor(() =>
+            expect(
+              canvasElement.querySelectorAll('[data-embed-state="recursive"]'),
+            ).toHaveLength(3),
+          );
+          await expect(
+            canvas.getAllByText("Repeated sibling content."),
+          ).toHaveLength(2);
+          await expect(
+            canvas.getAllByText("Safe same-note section."),
+          ).toHaveLength(2);
+          await expect(
+            canvas.getAllByText("Safe same-note block."),
+          ).toHaveLength(2);
+          await expect(canvas.getByLabelText("Embed reads")).toHaveAttribute(
+            "data-exceeded",
+            "false",
+          );
+          await expect(
+            Number(canvas.getByLabelText("Embed reads").textContent),
+          ).toBeLessThanOrEqual(12);
+        },
+      );
+      await userEvent.click(
+        canvas.getByRole("button", { name: "Restore custom renderer" }),
+      );
+    }
+    await expect(canvas.getAllByText("Custom embed active.")).toHaveLength(6);
+  },
+};
 
 export const Preview: Story = {
   tags: [

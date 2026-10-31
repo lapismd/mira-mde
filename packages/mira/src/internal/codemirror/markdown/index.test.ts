@@ -1,13 +1,94 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+import { createBaseCodeMirrorExtensions } from "../base";
 import { syntaxTree } from "@codemirror/language";
 import { EditorState } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
 import { createMarkdownCodeMirrorExtensions } from ".";
 
 describe("createMarkdownCodeMirrorExtensions", () => {
+  it.each([false, true])(
+    "highlights fenced JavaScript with container directive %s in source mode",
+    async (nested) => {
+      const parent = document.createElement("div");
+      document.body.append(parent);
+      const view = new EditorView({
+        doc: (nested
+          ? [
+              ':::cell{#code lang="js"}',
+              "```js",
+              "const answer = 42;",
+              "```",
+              ":::",
+            ]
+          : ["```js", "const answer = 42;", "```"]
+        ).join("\n"),
+        extensions: [
+          createBaseCodeMirrorExtensions(),
+          createMarkdownCodeMirrorExtensions({ sourceMode: true }),
+        ],
+        parent,
+      });
+      try {
+        await vi.waitFor(() =>
+          expect(parent.querySelector(".cm-keyword")?.textContent).toBe(
+            "const",
+          ),
+        );
+        expect(parent.querySelector(".cm-number")?.textContent).toBe("42");
+      } finally {
+        view.destroy();
+        parent.remove();
+      }
+    },
+  );
   it("returns markdown language and decoration extensions", () => {
     expect(createMarkdownCodeMirrorExtensions()).toHaveLength(3);
   });
+
+  it.each([
+    ["ts", "const answer: number = 42;", "const"],
+    ["sql", "SELECT 42 AS answer;", "SELECT"],
+  ])(
+    "loads %s highlighting inside nested directives and updates after editing",
+    async (language, source, keyword) => {
+      const parent = document.createElement("div");
+      document.body.append(parent);
+      const doc = [
+        "::::panel",
+        ":::cell{#code}",
+        `\`\`\`${language}`,
+        source,
+        "```",
+        ":::",
+        "::::",
+      ].join("\n");
+      const view = new EditorView({
+        doc,
+        extensions: [
+          createBaseCodeMirrorExtensions(),
+          createMarkdownCodeMirrorExtensions({ sourceMode: true }),
+        ],
+        parent,
+      });
+      try {
+        await vi.waitFor(() =>
+          expect(parent.querySelector(".cm-keyword")?.textContent).toBe(
+            keyword,
+          ),
+        );
+        expect(parent.querySelector(".cm-number")?.textContent).toBe("42");
+        const from = view.state.doc.toString().indexOf("42");
+        view.dispatch({ changes: { from, to: from + 2, insert: "73" } });
+        await vi.waitFor(() =>
+          expect(parent.querySelector(".cm-number")?.textContent).toBe("73"),
+        );
+        expect(parent.querySelector(".cm-keyword")?.textContent).toBe(keyword);
+      } finally {
+        view.destroy();
+        parent.remove();
+      }
+    },
+  );
 
   it("parses bare http urls as autolinks", () => {
     const state = EditorState.create({
