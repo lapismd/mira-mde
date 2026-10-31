@@ -171,3 +171,13 @@ receipts even when later checks fail. The retention guard changes one failure
 to one pass; all 13 focused scope/workflow cases and 11 cohort-policy cases pass.
 The original failed attempts remain unchanged. Source/version PR checks and
 actual publication/provenance remain separate pending gates.
+
+The first hosted PR run `41202593577` passes specification/release intent and
+full non-browser validation, then its independent package job fails before
+browser assertions because Chromium headless shell 1234 is absent. The new
+cold fixture needs a browser in that job as well as Storybook's separate job.
+The owning CI and release-artifact jobs now install pinned Chromium with OS
+dependencies before package validation. Its job-scoped guard reproduces one
+failure before the repair; complete required new-head CI remains the recovery
+gate. The original failed job `124541176610` and successfully retained early
+audit/diagnostic artifact remain evidence, without a waived check or test change.

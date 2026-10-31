@@ -258,6 +258,10 @@ Every raw diagnostic MUST be printed and retained. All other compiler warnings,
 development warnings, runtime errors, Svelte source diagnostics and functional
 or accessibility failures remain fatal. No dependency patch or public API
 change is authorized by this scope.
+
+Every independent CI or release-artifact job executing the cold packed hosts
+MUST install the pinned Playwright Chromium and its operating-system dependencies
+before `packages:pack`; a browser installed by another job cannot satisfy it.
 Public stylesheet imports MUST resolve from the packed manifests without relying
 on hoisted transitive dependencies or repository development dependencies.
 KaTeX CSS therefore belongs to Mira's declared runtime graph; the packed

@@ -104,6 +104,9 @@ jobs:
       - name: Install checksum-verified Jujutsu for runner regressions
         run: node scripts/validation/install-tools.mjs --ci
 
+      - name: Install Chromium for packed hosts
+        run: pnpm exec playwright install --with-deps chromium
+
       - name: Revalidate release source
         run: |
           pnpm spec:check

@@ -123,6 +123,8 @@ acceptance in `packages.md`, with negative guards for every identity/content,
 mode, count and date boundary. Raw warning receipts MUST survive failed builds
 and be retained by portable validation. This does not waive runtime diagnostics
 or any other required gate.
+Workflow guards MUST also verify Chromium provisioning inside each independent
+packed-host job, before its package validation command.
 
 Changesets owns release intent and version/changelog mutation. Pull requests
 that change a public product must carry either a version-bearing Changeset or an

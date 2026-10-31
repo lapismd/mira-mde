@@ -179,6 +179,23 @@ export function validateReleaseWorkflows({
   ]) {
     requireText(ciSource, new RegExp(command), `CI ${command}`, errors);
   }
+  for (const [name, source, key] of [
+    ["CI", ciSource, "packages"],
+    ["release", releaseSource, "artifact"],
+  ]) {
+    const job =
+      source.match(
+        new RegExp(`\\n  ${key}:[\\s\\S]*?(?=\\n {2}[a-z][\\w-]*:|$)`),
+      )?.[0] ?? "";
+    const install = job.indexOf(
+      "run: pnpm exec playwright install --with-deps chromium",
+    );
+    const packed = job.indexOf("pnpm packages:pack");
+    if (install < 0 || packed < install)
+      errors.push(
+        `missing ${name} packed-host Chromium prerequisite before validation`,
+      );
+  }
   for (const [name, source] of [
     ["release", releaseSource],
     ["CI", ciSource],

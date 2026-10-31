@@ -96,6 +96,9 @@ jobs:
       - name: Run full non-browser validation
         run: pnpm check:all
 
+      - name: Install Chromium for packed hosts
+        run: pnpm exec playwright install --with-deps chromium
+
       - name: Validate packed public consumers
         run: pnpm packages:pack
 
