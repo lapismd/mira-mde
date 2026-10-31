@@ -44,3 +44,32 @@ The complete status/head/ancestry inventory is retained under the ignored
 No independent unfinished work is imported, deleted or overwritten. Publication
 must use the repository's verified artifact and manifest workflow; hosted checks,
 version PR, npm publication and registry verification are recorded as they finish.
+
+## Hosted regression correction
+
+The first hosted PR #23 run passes specification/release intent and package
+gates but reports one recursive-embed story failure (177 pass).
+Hosted run `41164858575` retains the failure. A fresh Docker exact reproduction
+with `pnpm test:storybook -- stories/markdown/embeds/Embeds.stories.ts -t '^Recursive embeds$'`
+also fails once, report `mira-validation-dc1e7655-0d49-4977-b249-0a21c2809213`.
+
+Waiting for all fragment reads does not repair it: the exact rerun still has
+one failure, report `mira-validation-e9a25876-a98d-4aee-b1f8-5503f6953d48`.
+Direct browser inspection confirms that the full note retains its `^safe-block`
+marker, while the selected fragment correctly removes it. The global exact-text
+count incorrectly treats these two different strings as identical.
+
+The regression now scopes assertions to the full note and selected block,
+requiring both paragraphs and the fragment's marker removal. The existing
+readiness boundary waits for all independently rendered fragments and custom
+renderer restoration. Recursion counts, repeated siblings, section count,
+bounded reads, two replay cycles, timeout/retry settings and accessibility stay
+mandatory. No production code or visual baseline changes.
+
+After correction, the exact story passes (one pass, seven skipped), the complete
+Embed family passes all eight stories, and the full cold Docker catalog passes
+all 178 interaction/accessibility stories. `pnpm check:all`, `pnpm build-storybook`
+and `pnpm spec:check` also pass. Full catalog report:
+`mira-validation-400cc53b-d3fe-420a-868a-39cc133a4771`; quality:
+`mira-validation-4f1455b3-fd8d-4eca-aca5-5b00176f6e34`; specification:
+`mira-validation-d542e9ad-f82e-49e1-9814-2fda9dccc7a6`.

@@ -52,26 +52,38 @@ export const RecursiveEmbeds: Story = {
       await step(
         "withdraw custom rendering without recursive fallback",
         async () => {
-          await expect(
-            canvas.getAllByText("Custom embed active."),
-          ).toHaveLength(6);
+          await waitFor(() =>
+            expect(canvas.getAllByText("Custom embed active.")).toHaveLength(6),
+          );
           await userEvent.click(
             canvas.getByRole("button", { name: "Withdraw custom renderer" }),
           );
-          await waitFor(() =>
-            expect(
+          await waitFor(async () => {
+            await expect(
               canvasElement.querySelectorAll('[data-embed-state="recursive"]'),
-            ).toHaveLength(3),
-          );
-          await expect(
-            canvas.getAllByText("Repeated sibling content."),
-          ).toHaveLength(2);
-          await expect(
-            canvas.getAllByText("Safe same-note section."),
-          ).toHaveLength(2);
-          await expect(
-            canvas.getAllByText("Safe same-note block."),
-          ).toHaveLength(2);
+            ).toHaveLength(3);
+            await expect(
+              canvas.getAllByText("Repeated sibling content."),
+            ).toHaveLength(2);
+            await expect(
+              canvas.getAllByText("Safe same-note section."),
+            ).toHaveLength(2);
+            await expect(
+              canvasElement.querySelector('[data-embed="Sections.md"]'),
+            ).toContainElement(
+              canvas.getByText("Safe same-note block. ^safe-block"),
+            );
+            const block = canvasElement.querySelector<HTMLElement>(
+              '[data-embed="Sections.md#^safe-block"]',
+            );
+            await expect(block).not.toBeNull();
+            await expect(
+              within(block!).getByText("Safe same-note block."),
+            ).toBeVisible();
+            await expect(block).not.toHaveTextContent(
+              "Safe same-note block. ^safe-block",
+            );
+          });
           await expect(canvas.getByLabelText("Embed reads")).toHaveAttribute(
             "data-exceeded",
             "false",
@@ -85,7 +97,9 @@ export const RecursiveEmbeds: Story = {
         canvas.getByRole("button", { name: "Restore custom renderer" }),
       );
     }
-    await expect(canvas.getAllByText("Custom embed active.")).toHaveLength(6);
+    await waitFor(() =>
+      expect(canvas.getAllByText("Custom embed active.")).toHaveLength(6),
+    );
   },
 };
 
