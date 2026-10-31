@@ -11,7 +11,7 @@
   "check:types": "turbo run check:types",
   "lint": "eslint .",
   "packages:check": "node ./scripts/check-package-boundaries.mjs && node --test ./scripts/check-package-boundaries.spec.mjs && pnpm release:check && pnpm release:test",
-  "packages:pack": "pnpm build && node ./scripts/check-package-tarballs.mjs",
+  "packages:pack": "pnpm build && node --test ./scripts/build-math-adapters.spec.mjs && node ./scripts/check-package-tarballs.mjs",
   "release:check": "node ./scripts/check-release-config.mjs && node ./scripts/check-release-workflow.mjs && node ./scripts/sync-release-versions.mjs --check",
   "release:test": "node --test ./scripts/check-release-changesets.spec.mjs ./scripts/check-release-intent.spec.mjs ./scripts/check-release-workflow.spec.mjs ./scripts/create-github-releases.spec.mjs ./scripts/packed-audit-policy.spec.mjs ./scripts/publish-release.spec.mjs ./scripts/release-manifest.spec.mjs ./scripts/release-plan.spec.mjs ./scripts/sync-release-versions.spec.mjs ./scripts/verify-npm-provenance.spec.mjs",
   "spec:build": "spec-validator build",

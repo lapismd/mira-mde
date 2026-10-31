@@ -2,20 +2,6 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { checkPackedAudit } from "./packed-audit-policy.mjs";
 
-const preparation = {
-  "@lapismd/mira": "0.0.2",
-  "@lapismd/mira-editor": "0.0.1",
-  "@lapismd/mira-plugin-ai": "0.0.1",
-  "@lapismd/mira-plugin-mermaid": "0.0.1",
-  "@lapismd/mira-react": "0.0.1",
-  "@lapismd/mira-vanilla": "0.0.1",
-};
-const release = Object.fromEntries(
-  Object.keys(preparation).map((name) => [
-    name,
-    name === "@lapismd/mira" ? "0.0.3" : "0.0.2",
-  ]),
-);
 function report() {
   return {
     advisories: {
@@ -40,34 +26,90 @@ const result = (value, status = 1) => ({
   stdout: JSON.stringify(value),
   status,
 });
+const runtime = {
+  mermaid: "11.17.2",
+  layoutElk: "0.1.9",
+  layoutElkPeer: "^11.0.2",
+  katex: "0.16.47",
+};
+function mermaidReport(
+  paths = [".>@lapismd/mira-plugin-mermaid>mermaid>katex"],
+) {
+  const value = report();
+  value.advisories[1241206].findings = [{ version: "0.16.47", paths }];
+  return value;
+}
 
-test("accepts only the recorded KaTeX advisory during preparation and release", () => {
-  for (const versions of [preparation, release]) {
-    for (const hasMutedField of [true, false]) {
-      const value = report();
-      if (!hasMutedField) delete value.muted;
-      assert.match(
-        checkPackedAudit(result(value), versions),
-        /Accepted release exception: GHSA-238p-pmpm-9mq7/,
-      );
-    }
-  }
+test("rejects the formerly accepted KaTeX advisory", () => {
+  assert.throws(() => checkPackedAudit(result(report())), /finding|advisory/);
 });
 
-test("known KaTeX acceptance persists across subsequent package releases", () => {
-  for (const name of Object.keys(release)) {
+test("retains only the recorded unchanged Mermaid cohort path", () => {
+  for (const path of [
+    ".>@lapismd/mira-plugin-mermaid>mermaid>katex",
+    ".>@lapismd/mira-editor>@lapismd/mira-plugin-mermaid>mermaid>katex",
+    ".>@lapismd/mira-react>@lapismd/mira-editor>@lapismd/mira-plugin-mermaid>@mermaid-js/layout-elk>mermaid>katex",
+  ]) {
     assert.match(
-      checkPackedAudit(result(report()), { ...release, [name]: "0.0.4" }),
-      /Accepted release exception: GHSA-238p-pmpm-9mq7/,
+      checkPackedAudit(result(mermaidReport([path])), runtime),
+      /existing Mira cohort exception/,
     );
   }
-  assert.match(
-    checkPackedAudit(result(report())),
-    /Accepted release exception/,
-  );
 });
 
-test("rejects other advisories at every severity alongside the accepted advisory", () => {
+test("base production audits never inherit the cohort acceptance", () => {
+  assert.throws(() => checkPackedAudit(result(mermaidReport())), /finding/);
+});
+
+test("mixed base, external consumer and new ELK paths remain blocking", () => {
+  for (const path of [
+    ".>@lapismd/mira>rehype-katex>katex",
+    ".>@lapis-notes/api>@lapismd/mira-plugin-mermaid>mermaid>katex",
+    ".>@lapismd/mira>@lapismd/mira-plugin-mermaid>mermaid>katex",
+    ".>@lapismd/mira-plugin-mermaid>@mermaid-js/layout-elk>katex",
+  ]) {
+    const value = mermaidReport([
+      ".>@lapismd/mira-plugin-mermaid>mermaid>katex",
+      path,
+    ]);
+    assert.throws(() => checkPackedAudit(result(value), runtime), /finding/);
+  }
+});
+
+test("changed runtime identity or vulnerable version cannot use the old scope", () => {
+  for (const changed of [
+    { mermaid: "12.2.0" },
+    { mermaid: "11.15.0" },
+    { layoutElk: "1.0.1" },
+    { layoutElkPeer: "^12.0.0" },
+    { katex: "0.16.48" },
+  ]) {
+    assert.throws(
+      () =>
+        checkPackedAudit(result(mermaidReport()), { ...runtime, ...changed }),
+      /finding/,
+    );
+  }
+  const value = mermaidReport();
+  value.advisories[1241206].findings[0].version = "0.16.48";
+  assert.throws(() => checkPackedAudit(result(value), runtime), /finding/);
+});
+
+test("the cohort scope rejects changed advisory, severity, URL, package and range", () => {
+  for (const [key, changed] of Object.entries({
+    github_advisory_id: "GHSA-other",
+    severity: "moderate",
+    module_name: "other",
+    url: "https://example.com",
+    vulnerable_versions: "*",
+  })) {
+    const value = mermaidReport();
+    value.advisories[1241206][key] = changed;
+    assert.throws(() => checkPackedAudit(result(value), runtime));
+  }
+});
+
+test("rejects other advisories at every severity alongside the former KaTeX advisory", () => {
   for (const severity of ["info", "low", "moderate", "high", "critical"]) {
     const value = report();
     value.advisories.other = {
@@ -76,10 +118,7 @@ test("rejects other advisories at every severity alongside the accepted advisory
       severity,
     };
     value.metadata.vulnerabilities[severity] += 1;
-    assert.throws(
-      () => checkPackedAudit(result(value), release),
-      /unaccepted|severity/,
-    );
+    assert.throws(() => checkPackedAudit(result(value)), /finding|severity/);
   }
 });
 
@@ -92,7 +131,7 @@ test("rejects severity escalation and changed package, URL, or vulnerable range"
   })) {
     const value = report();
     value.advisories[1241206][key] = changed;
-    assert.throws(() => checkPackedAudit(result(value), release));
+    assert.throws(() => checkPackedAudit(result(value)));
   }
 });
 
@@ -104,32 +143,27 @@ test("rejects failed commands, malformed responses, suppressed and inconsistent 
     { status: 0 },
     { stdout: "not JSON" },
   ]) {
-    assert.throws(() =>
-      checkPackedAudit({ ...result(report()), ...command }, release),
-    );
+    assert.throws(() => checkPackedAudit({ ...result(report()), ...command }));
   }
   for (const value of [
     {},
     { ...report(), error: { message: "registry unavailable" } },
     { ...report(), muted: ["hidden"] },
   ]) {
-    assert.throws(() => checkPackedAudit(result(value), release));
+    assert.throws(() => checkPackedAudit(result(value)));
   }
   const value = report();
   value.metadata.vulnerabilities.low = 0;
-  assert.throws(() => checkPackedAudit(result(value), release), /counts/);
+  assert.throws(() => checkPackedAudit(result(value)), /counts/);
   value.metadata.vulnerabilities.low = 1;
   value.advisories[1241206].findings = [];
-  assert.throws(() => checkPackedAudit(result(value), release), /unaccepted/);
+  assert.throws(() => checkPackedAudit(result(value)), /finding/);
 });
 
-test("clean audits pass without using the exception", () => {
+test("clean audits pass with zero findings", () => {
   const value = report();
   value.advisories = {};
   value.metadata.vulnerabilities.low = 0;
-  assert.match(checkPackedAudit(result(value, 0), {}), /zero findings/);
-  assert.throws(
-    () => checkPackedAudit(result(value), release),
-    /without reported/,
-  );
+  assert.match(checkPackedAudit(result(value, 0)), /zero findings/);
+  assert.throws(() => checkPackedAudit(result(value)), /without reported/);
 });

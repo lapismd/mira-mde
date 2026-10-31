@@ -145,6 +145,9 @@ importers:
       '@vitest/browser-playwright':
         specifier: 4.1.12
         version: 4.1.12(playwright@1.62.1)(vite@7.3.7(@types/node@24.13.2)(jiti@2.7.0)(lightningcss@1.32.0)(tsx@4.23.1)(yaml@2.9.0))(vitest@4.1.12)
+      esbuild:
+        specifier: ^0.28.1
+        version: 0.28.1
       eslint:
         specifier: ^9.39.2
         version: 9.39.4(jiti@2.7.0)
@@ -245,12 +248,21 @@ importers:
       '@lucide/svelte':
         specifier: ^0.525.0
         version: 0.525.0(svelte@5.57.2(@typescript-eslint/types@8.62.0))
+      '@types/hast':
+        specifier: ^3.0.4
+        version: 3.0.4
       bits-ui:
         specifier: 2.20.2
         version: 2.20.2(@internationalized/date@3.12.2)(svelte@5.57.2(@typescript-eslint/types@8.62.0))
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      devlop:
+        specifier: ^1.1.0
+        version: 1.1.0
+      hast-util-from-html-isomorphic:
+        specifier: ^2.0.0
+        version: 2.0.0
       hast-util-to-text:
         specifier: ^4.0.2
         version: 4.0.2
@@ -287,9 +299,6 @@ importers:
       rehype-highlight:
         specifier: ^7.0.2
         version: 7.0.2
-      rehype-katex:
-        specifier: ^7.0.1
-        version: 7.0.1
       rehype-parse:
         specifier: ^9.0.1
         version: 9.0.1
@@ -317,9 +326,6 @@ importers:
       remark-gfm:
         specifier: ^4.0.1
         version: 4.0.1
-      remark-math:
-        specifier: ^6.0.0
-        version: 6.0.0
       remark-parse:
         specifier: ^11.0.0
         version: 11.0.0
@@ -341,6 +347,9 @@ importers:
       unist-util-visit:
         specifier: ^5.0.0
         version: 5.1.0
+      unist-util-visit-parents:
+        specifier: ^6.0.2
+        version: 6.0.2
       yaml:
         specifier: ^2.8.1
         version: 2.9.0
@@ -387,9 +396,6 @@ importers:
       '@lezer/markdown':
         specifier: ^1.4.3
         version: 1.6.4
-      '@types/hast':
-        specifier: ^3.0.4
-        version: 3.0.4
       '@types/lodash-es':
         specifier: ^4.17.12
         version: 4.17.12
@@ -399,6 +405,12 @@ importers:
       '@types/unist':
         specifier: ^3.0.3
         version: 3.0.3
+      rehype-katex:
+        specifier: ^7.0.1
+        version: 7.0.1
+      remark-math:
+        specifier: ^6.0.0
+        version: 6.0.0
       svelte:
         specifier: ^5.57.1
         version: 5.57.2(@typescript-eslint/types@8.62.0)

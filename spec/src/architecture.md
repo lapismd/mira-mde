@@ -66,10 +66,14 @@ tar's early padding exit does not falsely fail a worker; corrupt archives and
 nonzero transfer exits MUST remain errors.
 
 Packed-consumer audit policy remains separate from the committed workspace
-audit under MIRA-ARCH-039. Only the recorded, advisory-specific KaTeX exception in
-[Public packages](packages.md) MAY qualify an otherwise failing packed audit;
-workspace `ignoreGhsas` entries cover unpatched development advisories and do
-not weaken packed-production acceptance.
+audit under MIRA-ARCH-039. Base Mira's packed production graph MUST contain zero
+findings. Only the existing unchanged Mermaid 11/layout-ELK cohort scope in
+[Public packages](packages.md) MAY retain its recorded finding; workspace
+`ignoreGhsas` entries do not weaken either gate. The private math bundle
+uses unchanged released adapters and parser helpers while resolving patched
+KaTeX through Mira's explicit runtime dependency. Conditional parsing,
+development assertions and Node diagnostics remain external runtime boundaries.
+Every bundled MIT license and copyright notice ships with the artifact.
 
 The six-package public graph separates installation products from implementation
 modules. `@lapismd/mira` owns the portable runtime and supported advanced

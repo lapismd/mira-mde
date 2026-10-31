@@ -206,6 +206,8 @@ try {
   for (const path of [
     ".release/ci-results",
     ".release/production-consumer-audit.json",
+    ".release/base-math-production-audit.json",
+    ".release/mermaid-runtime-identity.json",
     "test-results",
     "playwright-report",
     "storybook-static",

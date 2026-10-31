@@ -166,7 +166,7 @@ authorized baseline regeneration migrations are complete.
 | MIRA-GOV-013                                                                                            | `AGENTS.md` published dependency policy and portable manifest boundary                                                                                                                                                                                                                                                           | Implemented                                                                                        |
 | MIRA-GOV-014                                                                                            | Release-workflow checker and regression tests for Node.js 24 action majors, generated release PR gating, and spec-first CLI arguments. CI now includes Storybook interaction/axe and browser acceptance; see the 2026-10-16 main-workspace integration record for pending remote proof.                                          | Implemented; added CI execution pending                                                            |
 | MIRA-GOV-015                                                                                            | Release-workflow checker requires `pnpm audit` in pull-request CI and release revalidation                                                                                                                                                                                                                                       | Implemented                                                                                        |
-| MIRA-ARCH-039                                                                                           | Root workspace audit, major-bounded overrides, Changesets YAML reader, advisory-specific packed KaTeX policy across package releases, and fail-closed release-policy tests                                                                                                                                                       | Implemented                                                                                        |
+| MIRA-ARCH-039                                                                                           | Root workspace audit, major-bounded overrides, Changesets YAML reader, strict packed audit and private MIT math bundle, and fail-closed release-policy tests                                                                                                                                                                     | Implemented                                                                                        |
 | MIRA-MD-016                                                                                             | Live-preview table source-reveal typography and geometry interaction                                                                                                                                                                                                                                                             | Implemented by table fallback slice                                                                |
 | MIRA-CSS-017                                                                                            | Shared raw-table source/live selector and computed-style acceptance                                                                                                                                                                                                                                                              | Implemented by table fallback slice                                                                |
 | MIRA-MD-017                                                                                             | Editable list-highlight catalog, mutation, and surface-boundary acceptance                                                                                                                                                                                                                                                       | Implemented by list-highlight slice                                                                |
@@ -880,3 +880,23 @@ caret-state content-column regression.
 The embedded composer follow-up to MIRA-ARCH-008 exposes `MiraProps.lineNumbers`.
 See `spec/records/2026-10-22-composer-line-numbers.md` for the focused public
 component regression, build and temporary consumer archive evidence.
+
+## Private math runtime packaging
+
+MIRA-MD-036 additionally retains the four deterministic table-focus teardown
+regressions and original aggregate failure in
+[the table focus lifetime record](../records/2026-10-31-table-cell-focus-lifetime.md).
+The exact five cases and complete affected source/catalog/browser matrix pass;
+the independent packed production gate remains separate.
+
+MIRA-ARCH-039 and MIRA-MD-002 use the unchanged upstream math plugins through a
+private bundled build boundary. Source `c0902e0b` passes the full 525-unit,
+178-case interaction/axe, static/catalog and cold browser matrix, retaining the
+browser lane's existing single expected failure unchanged. Base packed runtime
+audit and development-host acceptance pass; the new production host remains
+blocked on the independently reproduced external Dnd compile diagnostic.
+Its proposed disposition is unactivated. Final package qualification and
+verified registry publication remain pending for this candidate.
+The original 0.1.3 one-low consumer audit, failing strict-policy regression and
+20 in-memory parity/security checks are retained in
+[the math packaging record](../records/2026-10-31-private-math-runtime.md).

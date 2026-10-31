@@ -4,8 +4,7 @@ import rehypeRaw from "rehype-raw";
 import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import remarkEmoji from "remark-emoji";
 import remarkGfm from "remark-gfm";
-import remarkMath from "remark-math";
-import rehypeKatex from "rehype-katex";
+import { remarkMath, rehypeKatex } from "./math-plugins";
 import {
   TYPE_TABLE,
   mdast2hastGridTablesHandler,
@@ -22,6 +21,29 @@ describe("preview exports", () => {
 });
 
 describe("patched math renderer", () => {
+  it("rejects writable inherited trust while preserving normal math", () => {
+    const descriptor = Object.getOwnPropertyDescriptor(
+      Object.prototype,
+      "trust",
+    );
+    try {
+      Object.defineProperty(Object.prototype, "trust", {
+        value: true,
+        configurable: true,
+        writable: true,
+      });
+      const parser = createParser([remarkMath], [rehypeKatex]);
+      const ast = parser(
+        "Normal $x^2$ and $\\href{https://example.com}{untrusted}$",
+      ) as Root;
+      expect(JSON.stringify(ast)).toContain("katex-mathml");
+      expect(findElement(ast, "a")).toBeUndefined();
+    } finally {
+      if (descriptor)
+        Object.defineProperty(Object.prototype, "trust", descriptor);
+      else Reflect.deleteProperty(Object.prototype, "trust");
+    }
+  });
   it("renders inline and display math through the preview pipeline", () => {
     const parser = createParser([remarkMath], [rehypeKatex]);
     const ast = parser("Inline $x^2$.\n\n$$\nx^2 + y^2 = z^2\n$$") as Root;
@@ -31,7 +53,7 @@ describe("patched math renderer", () => {
     expect(findElement(ast, "math")).toBeDefined();
   });
 
-  it("does not inherit polluted trust options when rendering authored math", () => {
+  it("fails closed when a read-only inherited option prevents rendering", () => {
     const descriptor = Object.getOwnPropertyDescriptor(
       Object.prototype,
       "trust",
@@ -44,6 +66,7 @@ describe("patched math renderer", () => {
       const parser = createParser([remarkMath], [rehypeKatex]);
       const ast = parser("$\\href{https://example.com}{untrusted}$") as Root;
       expect(findElement(ast, "a")).toBeUndefined();
+      expect(JSON.stringify(ast)).toContain("katex-error");
     } finally {
       if (descriptor)
         Object.defineProperty(Object.prototype, "trust", descriptor);

@@ -106,11 +106,15 @@ Apache-2.0 license metadata.
 `pnpm packages:pack` is the corresponding built-artifact gate. It installs the
 six tarballs as consumers see them, compiles adapter-specific fixtures, resolves
 CSS exports, and rejects legacy or internal imports in packed output.
-Its production audit retains complete JSON evidence and reports the explicit
-2026-10-11 KaTeX acceptance governed by MIRA-ARCH-039 and `packages.md`.
-Release-policy tests MUST prove acceptance persists across package releases
-while rejecting unrelated findings, escalated severity, changed vulnerable
-ranges, muted findings, and failed or malformed audits.
+Its base Mira audit retains complete JSON evidence and rejects every finding.
+The existing 2026-10-11 cohort acceptance remains restricted to the verified,
+unchanged Mermaid 11/layout-ELK path in `packages.md`. Release-policy tests MUST
+reject findings in base math or downstream consumers, changed runtime identities,
+all other advisories or severities, muted findings and failed or malformed audits.
+Private math-build guards verify declared
+external imports, bundled license notices, portable declarations and the clean
+production graph. Their source map protects the build boundary under
+MIRA-ARCH-039 and `packages.md`.
 CI and release workflows MUST retain packed audit reports as downloadable
 artifacts, including when a reported finding fails the gate.
 
