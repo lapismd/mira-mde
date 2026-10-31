@@ -898,8 +898,13 @@ Dnd disposition through 2026-11-30; negative guards and raw source-bound
 receipts verify zero development warnings and exactly one accepted production
 warning. Final six-package qualification passes at `b76eac56` (run `a455ea13`),
 with zero base audit findings and only the unchanged scoped Mermaid cohort
-finding. Protected source/version checks and verified registry publication
-remain pending for this candidate.
+finding. Source PR #26 and the formally approved bot Version Packages PR #27
+pass their three required jobs and are merged. Mira 0.1.4 is published from
+`6658fe563b6ff725a931d339abca727c10263420`; production run `41205035585`
+passes all five stages, including clean installation, integrity/provenance
+verification and the automatic package tag/GitHub release. Independent registry
+bytes, Sigstore source/run verification and npm signatures pass; see the
+[publication receipt](../records/2026-10-31-private-math-runtime.md#verified-014-publication).
 The original 0.1.3 one-low consumer audit, failing strict-policy regression and
 20 in-memory parity/security checks are retained in
 [the math packaging record](../records/2026-10-31-private-math-runtime.md).
