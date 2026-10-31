@@ -11,6 +11,7 @@
   } from "../embed-target";
   import EmbeddedMarkdownPreview from "./embedded-markdown-preview.svelte";
   import { createAssetUrlLease } from "../asset-url-lease";
+  import { createEmbedAncestry } from "../embed-ancestry";
 
   type Props = {
     href?: string;
@@ -47,6 +48,16 @@
   const parsedTarget = $derived(
     parseMiraFileTarget(target, activeSourcePath, { decodeUri: !id }),
   );
+  const isRecursive = createEmbedAncestry(() =>
+    resolvedFile
+      ? JSON.stringify([
+          resolvedFile.path,
+          parsedTarget.fragment?.kind,
+          parsedTarget.fragment?.value,
+        ])
+      : null,
+  );
+  const recursive = $derived(isRecursive());
   const imageDetails = $derived(
     parseMiraImageDetails(
       text || label,
@@ -125,6 +136,7 @@
       !file ||
       !host ||
       !adapter.renderEmbed ||
+      recursive ||
       parsedTarget.fragment
     ) {
       return;
@@ -160,7 +172,7 @@
     previewAssetUrl = null;
     fragmentMissing = false;
 
-    if (!adapter || !file || customRendered) {
+    if (!adapter || !file || customRendered || recursive) {
       return;
     }
 
@@ -202,7 +214,11 @@
   bind:this={ref}
   class="mira-embed internal-embed"
   data-embed={target}
-  data-embed-state={resolvedFile ? "resolved" : "unresolved"}
+  data-embed-state={recursive
+    ? "recursive"
+    : resolvedFile
+      ? "resolved"
+      : "unresolved"}
   data-embed-fragment={parsedTarget.fragment?.kind}
 >
   <figcaption>{displayText}</figcaption>
@@ -212,7 +228,9 @@
       class="mira-embed__custom"
       hidden={!customRendered}
     ></div>
-    {#if !customRendered}
+    {#if recursive}
+      <span class="mira-embed__missing">Recursive embed: {displayText}</span>
+    {:else if !customRendered}
       {#if previewAssetUrl}
         <img
           src={previewAssetUrl}

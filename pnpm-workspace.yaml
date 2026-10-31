@@ -13,6 +13,11 @@ minimumReleaseAgeExclude:
   - crelt@1.0.7
   - esrap@2.2.13
 overrides:
+  "eslint>minimatch": "^11.0.1"
+  "@eslint/config-array>minimatch": "^11.0.1"
+  "@eslint/eslintrc>minimatch": "^11.0.1"
+  "@typescript-eslint/typescript-estree>minimatch": "^11.0.1"
+  "markdownlint-cli>minimatch": "^11.0.1"
   "@sveltejs/kit@<=2.69.0": ">=2.69.1"
   "@sveltejs/kit@<=2.70.1": ">=2.70.2"
   "@vitest/mocker@>=4.0.0 <4.1.12": "4.1.12"
