@@ -300,6 +300,11 @@ response shapes before comparison, while empty, multi-result, or non-string
 integrity responses fail closed. Any disagreement fails without publishing
 later dependants.
 
+Approved publication explicitly disables inherited npm dry-run configuration
+and retains npm's response before waiting for registry integrity. A successful
+process exit alone never counts as publication. Exact-source approval, protected
+CI, OIDC, immutable tarballs and post-publication integrity checks remain required.
+
 Package release tags use the unscoped package name plus exact version, for
 example `mira-editor@0.2.0`. Tags target the commit recorded in the artifact and
 their GitHub release body is the exact package changelog entry. Existing tags or

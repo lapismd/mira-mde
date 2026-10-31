@@ -1,5 +1,9 @@
 # Specification Governance
 
+After exact-source CI approval, the publisher explicitly disables inherited
+npm dry-run configuration and records the CLI response. Registry integrity
+remains the publication authority; successful process exit alone is insufficient.
+
 Bundled inline-links coverage extends the comprehensive opt-in extension list
 and the existing preview export checks under MIRA-GOV-012. It does not add a
 publishable package or alter the six-package release graph. The catalog must

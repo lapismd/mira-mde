@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import test from "node:test";
 import * as publishing from "./publish-release.mjs";
 
@@ -12,6 +13,23 @@ const packageRecord = {
   version: "0.0.1",
   integrity: "sha512-verified",
 };
+
+test("approved publication overrides inherited npm dry-run configuration", () => {
+  assert.equal(typeof publishing.publicationEnv, "function");
+  const env = publishing.publicationEnv({
+    ...process.env,
+    npm_config_dry_run: "true",
+    NPM_CONFIG_DRY_RUN: "true",
+    ACTIONS_ID_TOKEN_REQUEST_TOKEN: "synthetic-test-only",
+  });
+  const result = spawnSync("npm", ["config", "get", "dry-run"], {
+    env,
+    encoding: "utf8",
+  });
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(result.stdout.trim(), "false");
+  assert.equal(env.ACTIONS_ID_TOKEN_REQUEST_TOKEN, "synthetic-test-only");
+});
 
 test("publishes missing versions and verifies their exact integrity", async () => {
   const published = [];
