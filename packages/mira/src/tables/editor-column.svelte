@@ -46,7 +46,13 @@
     }),
   });
 
-  onDestroy(() => view.destroy());
+  let destroyed = false;
+  let focusTimer: ReturnType<typeof setTimeout> | undefined;
+  onDestroy(() => {
+    destroyed = true;
+    if (focusTimer !== undefined) clearTimeout(focusTimer);
+    view.destroy();
+  });
   let editing: boolean = $state(false);
 
   const codeMirror = (node: HTMLDivElement, content: string) => {
@@ -75,20 +81,25 @@
   };
 
   function enableEdit(evt: MouseEvent | FocusEvent) {
-    if (readonly) {
+    if (readonly || destroyed) {
       return;
     }
+    const pointer =
+      evt instanceof MouseEvent ? { x: evt.clientX, y: evt.clientY } : null;
     editing = true;
     if (evt instanceof MouseEvent) {
       onEdit(evt);
     }
     tick().then(() => {
-      setTimeout(() => {
+      if (destroyed || !editing) return;
+      if (focusTimer !== undefined) clearTimeout(focusTimer);
+      focusTimer = setTimeout(() => {
+        focusTimer = undefined;
+        if (destroyed || !editing) return;
         view.focus();
-        const pos =
-          evt instanceof MouseEvent
-            ? (view.posAtCoords({ x: evt.clientX, y: evt.clientY }) ?? 0)
-            : view.state.doc.length;
+        const pos = pointer
+          ? (view.posAtCoords(pointer) ?? 0)
+          : view.state.doc.length;
         view.dispatch({ selection: { anchor: pos, head: pos } });
       });
     });

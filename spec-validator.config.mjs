@@ -78,6 +78,22 @@ export default defineConfig(tableRequirements(), {
       ],
       rules: [
         {
+          pattern: "^packages/mira/licenses/math-adapters/",
+          chapters: ["spec/src/architecture.md", "spec/src/packages.md"],
+        },
+        {
+          pattern: "^scripts/check-package-tarballs\\.mjs$",
+          chapters: ["spec/src/packages.md", "spec/src/spec-governance.md"],
+        },
+        {
+          pattern: "^scripts/math-compile-diagnostics(?:\\.spec)?\\.mjs$",
+          chapters: ["spec/src/packages.md", "spec/src/spec-governance.md"],
+        },
+        {
+          pattern: "^scripts/(?:build|check)-math-adapters(?:\\.spec)?\\.mjs$",
+          chapters: ["spec/src/architecture.md", "spec/src/packages.md"],
+        },
+        {
           pattern:
             "^(?:scripts/validation(?:/|\\.mjs$)|\\.prettierignore$|eslint\\.config\\.js$)",
           chapters: ["spec/src/architecture.md", "spec/src/packages.md"],
@@ -138,6 +154,9 @@ export default defineConfig(tableRequirements(), {
         },
       ],
       protected: [
+        "^packages/mira/licenses/math-adapters/",
+        "^scripts/check-package-tarballs\\.mjs$",
+        "^scripts/(?:build|check)-math-adapters(?:\\.spec)?\\.mjs$",
         "^(?:scripts/validation(?:/|\\.mjs$)|\\.prettierignore$|eslint\\.config\\.js$)",
         "^\\.markdownlint\\.json$",
         "^(?:packages/[^/]+/src/|\\.storybook/|stories/catalog/|scripts/(?:check-spec-.+|check-catalog(?:\\.spec)?|check-package-boundaries(?:\\.spec)?|check-release-.+|create-github-releases(?:\\.spec)?|prepare-release|publish-release(?:\\.spec)?|release-manifest(?:\\.spec)?|release-plan(?:\\.spec)?|sync-release-versions(?:\\.spec)?|verify-(?:npm-provenance|release)(?:\\.spec)?)\\.mjs|\\.markdownlint(?:-cli2)?\\.jsonc|spec/book\\.toml|\\.github/workflows/.+\\.ya?ml$|AGENTS\\.md$|spec-validator\\.config\\.mjs$|package\\.json$|pnpm-lock\\.yaml$|pnpm-workspace\\.yaml$|turbo\\.json$|tsconfig(?:\\.[^.]+)*\\.json$|playwright(?:\\.[^.]+)*\\.config\\.ts$)",

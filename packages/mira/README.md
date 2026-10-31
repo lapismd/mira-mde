@@ -50,3 +50,11 @@ documented `--mira-*` token for its own theme token.
 
 See Storybook for examples and `spec/src/packages.md` for the normative package
 contract.
+
+## Math runtime and notices
+
+Math preview bundles its unchanged MIT-licensed adapters and parser helpers.
+The package retains their full copyright/license notices and checksum-bound
+version inventory beside the private build output. KaTeX resolves from Mira's
+explicit patched runtime dependency; consuming applications do not need renderer
+overrides. Public imports, options, styles and plugin behavior stay unchanged.

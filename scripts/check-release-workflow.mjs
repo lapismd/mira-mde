@@ -179,6 +179,52 @@ export function validateReleaseWorkflows({
   ]) {
     requireText(ciSource, new RegExp(command), `CI ${command}`, errors);
   }
+  for (const [name, source, key] of [
+    ["CI", ciSource, "packages"],
+    ["release", releaseSource, "artifact"],
+  ]) {
+    const job =
+      source.match(
+        new RegExp(`\\n  ${key}:[\\s\\S]*?(?=\\n {2}[a-z][\\w-]*:|$)`),
+      )?.[0] ?? "";
+    const install = job.indexOf(
+      "run: pnpm exec playwright install --with-deps chromium",
+    );
+    const packed = job.indexOf("pnpm packages:pack");
+    if (install < 0 || packed < install)
+      errors.push(
+        `missing ${name} packed-host Chromium prerequisite before validation`,
+      );
+  }
+  for (const [name, source] of [
+    ["release", releaseSource],
+    ["CI", ciSource],
+  ]) {
+    const retention =
+      source.match(
+        /- name: Retain packed production audit evidence[\s\S]*?(?=\n {6}- |\n {2}[a-z]|$)/,
+      )?.[0] ?? "";
+    requireText(
+      retention,
+      /if: always\(\)/,
+      `${name} failed-build diagnostic receipt retention`,
+      errors,
+    );
+    requireText(
+      retention,
+      /hashFiles\([^)]*math-\*-compile-diagnostics\.json/,
+      `${name} early diagnostic receipt discovery`,
+      errors,
+    );
+    for (const mode of ["development", "production"]) {
+      requireText(
+        retention,
+        new RegExp(`\\.release/math-${mode}-compile-diagnostics\\.json`),
+        `${name} ${mode} diagnostic receipt`,
+        errors,
+      );
+    }
+  }
   requireText(
     ciSource,
     /github\.head_ref != 'changeset-release\/main'[\s\S]*?pnpm spec:first\s+--base/,

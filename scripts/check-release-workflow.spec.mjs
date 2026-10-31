@@ -11,6 +11,61 @@ test("accepts the repository release and CI workflows", () => {
   assert.deepEqual(checkReleaseWorkflows(), { ok: true, errors: [] });
 });
 
+test("each cold packed-host job installs its own Chromium prerequisite", () => {
+  const sources = {
+    releaseSource: readFileSync(".github/workflows/release.yml", "utf8"),
+    ciSource: readFileSync(".github/workflows/mira-spec-first.yml", "utf8"),
+    pagesSource: readFileSync(
+      ".github/workflows/publish-storybook-pages.yml",
+      "utf8",
+    ),
+  };
+  for (const field of ["releaseSource", "ciSource"]) {
+    const result = validateReleaseWorkflows({
+      ...sources,
+      [field]: sources[field].replace(
+        "      - name: Install Chromium for packed hosts\n        run: pnpm exec playwright install --with-deps chromium\n",
+        "",
+      ),
+    });
+    assert.equal(result.ok, false);
+    assert.match(result.errors.join("\n"), /packed-host Chromium/);
+  }
+});
+
+test("retains raw compiler receipts when either packed build fails", () => {
+  const sources = {
+    releaseSource: readFileSync(".github/workflows/release.yml", "utf8"),
+    ciSource: readFileSync(".github/workflows/mira-spec-first.yml", "utf8"),
+    pagesSource: readFileSync(
+      ".github/workflows/publish-storybook-pages.yml",
+      "utf8",
+    ),
+  };
+  for (const field of ["releaseSource", "ciSource"]) {
+    for (const filename of [
+      "math-development-compile-diagnostics.json",
+      "math-production-compile-diagnostics.json",
+    ]) {
+      const result = validateReleaseWorkflows({
+        ...sources,
+        [field]: sources[field].replaceAll(filename, "omitted.json"),
+      });
+      assert.equal(result.ok, false);
+      assert.match(result.errors.join("\n"), /diagnostic receipt/);
+    }
+    const result = validateReleaseWorkflows({
+      ...sources,
+      [field]: sources[field].replace(
+        "if: always() && hashFiles",
+        "if: success() && hashFiles",
+      ),
+    });
+    assert.equal(result.ok, false);
+    assert.match(result.errors.join("\n"), /diagnostic receipt/);
+  }
+});
+
 test("rejects screenshot comparison in every workflow", () => {
   const sources = {
     releaseSource: readFileSync(".github/workflows/release.yml", "utf8"),

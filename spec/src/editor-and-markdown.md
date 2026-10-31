@@ -59,6 +59,12 @@ snippets and split after exact source-row indices to insert annotations outside
 the table. Splits MUST retain column alignment, original row order and no
 authoring menus, drag handles or mutation callbacks.
 
+For MIRA-MD-036, pipe- and grid-cell delayed focus work MUST belong to the
+mounted inline editor. Teardown MUST cancel pending timers and prevent a pending
+Svelte tick from scheduling more work. Destroyed editors MUST receive no later
+focus or selection dispatch; keyboard focus and pointer coordinates remain
+unchanged for mounted cells.
+
 ## Reference definitions in live preview
 
 | ID          | Requirement                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
@@ -96,6 +102,13 @@ the existing action-error callback receives `edit` without mutating the new view
 | MIRA-MD-056 | Every logical frontmatter record commit MUST expose an independent, deeply immutable `previousRecord` snapshot captured before mutation. Property mutation MAY accept a captured rendered record and MUST build both the mutation and its prior-record acknowledgement from that record, even after external controller synchronization.                                           |
 | MIRA-MD-057 | A focused frontmatter text value MUST retain its local DOM through external record refresh. Its commit MUST capture the edit callback and event-time text before deferred blur work. The callback MUST retain the rendered record that owned the edit; later reactive callbacks or DOM replacements MUST NOT redirect that commit.                                                 |
 | MIRA-MD-058 | Rendered property callbacks MUST retain their source target. If the owning controller changes source path before a focused or deferred edit commits, the callback MUST refuse before mutation and report through the existing `edit` action-error hook. Neither the original nor replacement writer may receive that stale edit, and the replacement record MUST remain unchanged. |
+
+Math preview uses the unchanged upstream adapters through Mira's private build
+boundary. Bundling MUST preserve parsing, plugin order/options, generated
+MathML/HTML, inline/display behavior, source positions, safe/trusted handling and
+rejection of inherited trust options. Public Markdown surfaces and exports do
+not acquire a new renderer API; packed browser and Node consumers exercise the
+same contract under MIRA-MD-002.
 
 ### Input leases
 

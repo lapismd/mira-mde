@@ -217,26 +217,51 @@ reintroduces an advisory fails that gate. Audit overrides that pin `js-yaml`
 MUST keep 3.x consumers on patched 3.x and 4.x consumers on patched 4.x so
 legacy consumers retain their APIs. The maintained Changesets 3 reader MUST
 discover all six public packages and parse the workspace through YAML 2.
-Mira's direct KaTeX runtime dependency and workspace renderer override MUST select
-`>=0.18.2 <0.19`, including the renderer nested under `rehype-katex`. Since
-0.18.11 was deprecated for accidental breaking changes, the reviewed workspace
-currently pins 0.18.10. Since `rehype-katex@7` still declares KaTeX 0.16,
-this override is repository-local;
-packed-consumer security acceptance MUST report that upstream range limitation
-separately from the workspace audit.
-The packed fixture MUST run its own production dependency audit without renderer
-overrides; a workspace-only audit pass does not qualify registry publication.
-The user-approved 2026-10-11 exception MAY accept only low-severity
-[GHSA-238p-pmpm-9mq7](https://github.com/advisories/GHSA-238p-pmpm-9mq7)
-for KaTeX `>=0.11.0 <0.18.2` across current and subsequent public-package
-releases until upstream math dependencies are patched. Package version changes
-MUST NOT expire this advisory-specific acceptance. Different advisories,
-severity increases, changed vulnerable ranges, audit command failures, muted
-findings, malformed responses, or inconsistent counts MUST fail the gate.
-The full report MUST remain at `.release/production-consumer-audit.json`, and
-the gate MUST print any accepted exception; clean audits require no exception.
-The exception accepts a known remaining vulnerability; it does not repair or
-hide it. Remove the policy when upstream math dependencies admit patched KaTeX.
+Mira's direct KaTeX runtime dependency MUST select `>=0.18.2 <0.19`. Since
+0.18.11 was deprecated for accidental breaking changes, the reviewed declaration
+pins 0.18.10. Math adapters and parser helpers MUST be bundled unchanged into a
+private build artifact; `remark-math` and `rehype-katex` remain build dependencies,
+not published runtime requirements. The artifact MUST import only explicitly
+declared runtime dependencies and MUST NOT import either adapter by bare name.
+Its manifest and notices MUST retain the complete bundled MIT license inventory.
+
+The private bundle MUST externalize KaTeX, `devlop`,
+`hast-util-from-html-isomorphic` and `unist-util-visit-parents`. This preserves
+the existing patched renderer, development assertions, browser/Node parsing and
+diagnostic conditions. Public imports, plugin order/options, inline/display
+math, source positions, safe/trusted HTML handling and trust protections remain
+unchanged. Declarations MUST resolve without build-only adapters installed.
+
+The packed fixture MUST audit base Mira independently without renderer overrides
+and reject every finding. The 2026-10-11 user acceptance remains valid only for
+low GHSA-238p-pmpm-9mq7 at KaTeX 0.16.47 reached through unchanged Mermaid
+`^11.16.1` and layout-ELK 0.1.9 with Mermaid peer `^11.0.2`, inside the six-product
+Mira cohort. The gate MUST verify installed identities and every finding path.
+Identity inspection MUST follow the installed package roots without executing
+browser modules or requiring a CommonJS condition from import-only exports.
+Base math, downstream consumer paths, changed identities or advisories, severity
+increases, failed commands, muted findings, malformed responses and inconsistent
+counts remain blocking. Full JSON evidence remains at
+`.release/production-consumer-audit.json`; the separate base report and installed
+Mermaid identities remain beside it. Current registry 0.1.3 still carries
+the upstream adapters' KaTeX 0.16 constraints; source qualification and a new
+verified registry release are required before consumers may raise their floors.
+
+The user explicitly accepted one existing packed-production compiler diagnostic
+on 2026-10-31, through 2026-11-30: `@dnd-kit/svelte@0.4.0`, file
+`dist/core/context/DragDropProvider.svelte`, SHA-256
+`9750aa31f409e0f6be0e70b3fef6c8d8e8e447ff25b150fbc2dd4bec4781eaab`,
+code `state_referenced_locally` and its exact `managerProp` initial-capture
+message. At most one exact match MAY qualify each production build; changed
+identity, path, bytes, code/message, repeated warnings or expiration MUST fail.
+Every raw diagnostic MUST be printed and retained. All other compiler warnings,
+development warnings, runtime errors, Svelte source diagnostics and functional
+or accessibility failures remain fatal. No dependency patch or public API
+change is authorized by this scope.
+
+Every independent CI or release-artifact job executing the cold packed hosts
+MUST install the pinned Playwright Chromium and its operating-system dependencies
+before `packages:pack`; a browser installed by another job cannot satisfy it.
 Public stylesheet imports MUST resolve from the packed manifests without relying
 on hoisted transitive dependencies or repository development dependencies.
 KaTeX CSS therefore belongs to Mira's declared runtime graph; the packed

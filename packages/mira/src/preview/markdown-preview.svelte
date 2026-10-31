@@ -1,7 +1,7 @@
 <script lang="ts">
   import { tick } from "svelte";
   import rehypeHighlight from "rehype-highlight";
-  import rehypeKatex from "rehype-katex";
+  import { rehypeKatex, remarkMath } from "./math-plugins";
   import rehypeRaw from "rehype-raw";
   import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
   import remarkGridTables from "@adobe/remark-gridtables";
@@ -12,7 +12,6 @@
   import remarkDirective from "remark-directive";
   import remarkFrontmatter from "remark-frontmatter";
   import remarkGfm from "remark-gfm";
-  import remarkMath from "remark-math";
   import remarkEmoji from "remark-emoji";
   import type {
     MiraAssetResolver,

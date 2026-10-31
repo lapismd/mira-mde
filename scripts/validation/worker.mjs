@@ -206,6 +206,10 @@ try {
   for (const path of [
     ".release/ci-results",
     ".release/production-consumer-audit.json",
+    ".release/base-math-production-audit.json",
+    ".release/mermaid-runtime-identity.json",
+    ".release/math-development-compile-diagnostics.json",
+    ".release/math-production-compile-diagnostics.json",
     "test-results",
     "playwright-report",
     "storybook-static",

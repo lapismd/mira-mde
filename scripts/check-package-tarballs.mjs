@@ -14,7 +14,15 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { PUBLIC_PACKAGE_GRAPH } from "./public-packages.mjs";
-import { checkPackedAudit } from "./packed-audit-policy.mjs";
+import {
+  checkPackedAudit,
+  readMermaidRuntime,
+} from "./packed-audit-policy.mjs";
+import { checkMathArtifact } from "./build-math-adapters.mjs";
+import {
+  writeMathPackageFixture,
+  writeMathTypesFixture,
+} from "./check-math-adapters.mjs";
 
 const REPO_ROOT = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -23,11 +31,12 @@ const REPO_ROOT = path.resolve(
 const FORBIDDEN_OUTPUT =
   /@mira-mde\/|@mira-internal\/|@lapismd\/mira\/internal(?:\/|["'])/;
 
-function run(command, args, cwd) {
+function run(command, args, cwd, options = {}) {
   const result = spawnSync(command, args, {
     cwd,
     encoding: "utf8",
     stdio: ["ignore", "pipe", "pipe"],
+    timeout: options.timeout,
   });
   if (result.error) throw result.error;
   if (result.status !== 0) {
@@ -52,7 +61,16 @@ function writeJson(file, value) {
   writeFileSync(file, `${JSON.stringify(value, null, 2)}\n`);
 }
 
-function main() {
+async function main() {
+  const evidenceDirectory = path.join(REPO_ROOT, ".release");
+  mkdirSync(evidenceDirectory, { recursive: true });
+  for (const filename of [
+    "production-consumer-audit.json",
+    "base-math-production-audit.json",
+    "mermaid-runtime-identity.json",
+  ]) {
+    rmSync(path.join(evidenceDirectory, filename), { force: true });
+  }
   const temporaryRoot = mkdtempSync(path.join(os.tmpdir(), "mira-pack-"));
   const tarballDirectory = path.join(temporaryRoot, "tarballs");
   mkdirSync(tarballDirectory, { recursive: true });
@@ -83,8 +101,21 @@ function main() {
         ["-xzf", path.join(tarballDirectory, filename), "-C", unpacked],
         REPO_ROOT,
       );
+      if (manifest.name === "@lapismd/mira") {
+        await checkMathArtifact(path.join(unpacked, "package"));
+      }
       for (const file of textFiles(unpacked)) {
-        if (FORBIDDEN_OUTPUT.test(readFileSync(file, "utf8"))) {
+        const content = readFileSync(file, "utf8");
+        if (
+          /(?:\bfrom\s*|\bimport\s*\(\s*|\bimport\s*)["'](?:remark-math|rehype-katex)(?:\/|["'])/.test(
+            content,
+          )
+        ) {
+          throw new Error(
+            `${manifest.name}: build-only math adapter import in ${file}`,
+          );
+        }
+        if (FORBIDDEN_OUTPUT.test(content)) {
           throw new Error(
             `${manifest.name}: leaked private or legacy import in ${path.relative(unpacked, file)}`,
           );
@@ -196,7 +227,7 @@ console.log("All public stylesheet imports resolve without hoisted dependencies.
         target: "ES2022",
       },
       include: ["*.ts", "*.tsx"],
-      exclude: ["frontmatter.ts"],
+      exclude: ["frontmatter.ts", "math-types.ts"],
     });
     writeJson(path.join(fixtureRoot, "tsconfig.frontmatter.json"), {
       extends: "./tsconfig.json",
@@ -217,7 +248,9 @@ console.log("All public stylesheet imports resolve without hoisted dependencies.
       ],
       fixtureRoot,
     );
+    writeMathTypesFixture(fixtureRoot);
     run("pnpm", ["exec", "tsc", "-p", "tsconfig.json"], fixtureRoot);
+    run("pnpm", ["exec", "tsc", "-p", "tsconfig.math.json"], fixtureRoot);
     run(
       "pnpm",
       ["exec", "tsc", "-p", "tsconfig.frontmatter.json"],
@@ -241,18 +274,67 @@ console.log("All public stylesheet imports resolve without hoisted dependencies.
     );
 
     console.log(run("node", ["styles.mjs"], fixtureRoot).trim());
+    const mathRoot = path.join(temporaryRoot, "math-runtime");
+    mkdirSync(mathRoot);
+    writeMathPackageFixture(mathRoot, tarballs.get("@lapismd/mira"));
+    run(
+      "pnpm",
+      [
+        "install",
+        "--prefer-offline",
+        "--ignore-scripts",
+        "--no-frozen-lockfile",
+        "--config.node-linker=isolated",
+        "--config.hoist=false",
+      ],
+      mathRoot,
+    );
+    writeMathTypesFixture(mathRoot);
+    run("pnpm", ["exec", "tsc", "-p", "tsconfig.math.json"], mathRoot);
+    const mathAudit = spawnSync("pnpm", ["audit", "--prod", "--json"], {
+      cwd: mathRoot,
+      encoding: "utf8",
+      timeout: 120_000,
+    });
+    writeFileSync(
+      path.join(evidenceDirectory, "base-math-production-audit.json"),
+      mathAudit.stdout ?? "",
+    );
+    console.log(`Base Mira: ${checkPackedAudit(mathAudit)}`);
+    for (const mode of ["development", "production"]) {
+      console.log(
+        run(
+          "node",
+          [
+            "math-runtime.mjs",
+            mode,
+            path.join(
+              evidenceDirectory,
+              `math-${mode}-compile-diagnostics.json`,
+            ),
+          ],
+          mathRoot,
+          {
+            timeout: 120_000,
+          },
+        ).trim(),
+      );
+    }
     const audit = spawnSync("pnpm", ["audit", "--prod", "--json"], {
       cwd: fixtureRoot,
       encoding: "utf8",
       timeout: 120_000,
     });
-    const evidenceDirectory = path.join(REPO_ROOT, ".release");
-    mkdirSync(evidenceDirectory, { recursive: true });
     writeFileSync(
       path.join(evidenceDirectory, "production-consumer-audit.json"),
       audit.stdout ?? "",
     );
-    console.log(checkPackedAudit(audit));
+    const mermaidRuntime = readMermaidRuntime(fixtureRoot);
+    writeJson(
+      path.join(evidenceDirectory, "mermaid-runtime-identity.json"),
+      mermaidRuntime,
+    );
+    console.log(checkPackedAudit(audit, mermaidRuntime));
 
     console.log(
       "Mira tarballs validated: six packages installed together; Svelte, React, Vanilla, CSS, and leak checks passed.",
@@ -262,4 +344,4 @@ console.log("All public stylesheet imports resolve without hoisted dependencies.
   }
 }
 
-main();
+await main();
