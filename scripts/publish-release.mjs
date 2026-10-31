@@ -11,6 +11,15 @@ import {
 } from "./release-manifest.mjs";
 import { DEFAULT_REGISTRY, resolveReleaseCommit } from "./release-plan.mjs";
 
+export function publicationEnv(inherited = process.env) {
+  const env = { ...inherited };
+  for (const key of Object.keys(env)) {
+    if (key.toLowerCase() === "npm_config_dry_run") delete env[key];
+  }
+  env.npm_config_dry_run = "false";
+  return env;
+}
+
 function run(command, args, options = {}) {
   const result = spawnSync(command, args, {
     cwd: options.cwd,
@@ -156,17 +165,26 @@ async function main() {
       publishedIntegrity(name, version, { registry }),
     publish: (record) => {
       const tarball = path.resolve(releaseRoot, record.tarball);
-      const result = run("npm", [
-        "publish",
-        tarball,
-        "--access",
-        "public",
-        "--tag",
-        "latest",
-        "--provenance",
-        "--registry",
-        registry,
-      ]);
+      console.log(
+        `Publishing ${record.name}@${record.version} from the verified tarball.`,
+      );
+      const result = run(
+        "npm",
+        [
+          "publish",
+          tarball,
+          "--access",
+          "public",
+          "--tag",
+          "latest",
+          "--provenance",
+          "--registry",
+          registry,
+        ],
+        { env: publicationEnv() },
+      );
+      if (result.stdout) process.stdout.write(result.stdout);
+      if (result.stderr) process.stderr.write(result.stderr);
       if (result.status !== 0) {
         throw new Error(
           `npm publish failed for ${record.name}@${record.version}:\n${result.stdout}${result.stderr}`,
