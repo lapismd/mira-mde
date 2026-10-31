@@ -1,5 +1,15 @@
 # @lapismd/mira
 
+## 0.1.3
+
+### Patch Changes
+
+- [#23](https://github.com/lapismd/mira-mde/pull/23) [`7e1f2c0`](https://github.com/lapismd/mira-mde/commit/7e1f2c0747a1cbc4cffb5edb3f233ea3fa1676ef) Thanks [@stevejuma](https://github.com/stevejuma)! - Stop recursive Markdown embeds when a custom renderer is removed, preserving
+  independent sibling embeds and same-file section embeds.
+
+  Restore source and live-preview syntax highlighting for fenced code inside
+  Markdown cell directives.
+
 ## 0.1.2
 
 ### Patch Changes
