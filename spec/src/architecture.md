@@ -1,5 +1,9 @@
 # Architecture and Boundaries
 
+<!-- dependency-automation-policy -->
+
+Dependency update PRs from the trusted LapisMD App, Dependabot or Renovate MAY skip specification checks using the PR author rather than the rerun actor. Functional checks remain required. The shared `lapismd/dependency-automation` coordinator proposes published first-party npm updates with Changeset release intent where required; it does not merge, publish, sign or deploy. This CI policy changes no runtime or public contract in this chapter.
+
 Recursive-embed qualification preserves MIRA-ARCH-039's mandatory audit. Scoped
 workspace overrides move only ESLint, markdownlint-cli and their lint helpers to
 patched Minimatch 11.x; the six public runtime packages retain their dependency

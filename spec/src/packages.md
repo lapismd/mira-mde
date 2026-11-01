@@ -1,12 +1,12 @@
 # Public Packages and Entry Points
 
-Recursive-embed qualification retains the mandatory audit under MIRA-ARCH-039.
-Root lint tooling resolves ESLint and markdownlint-cli's Minimatch dependency to
-the patched 11.x line; runtime package dependencies and public APIs are unchanged.
+<!-- dependency-automation-policy -->
 
-The directive-fence highlighting repair is internal to the existing
-`@lapismd/mira/codemirror` composition. Built registry-compatible archives
-carry the repair for isolated Notebook acceptance; no public API changes.
+Dependency update PRs from the trusted LapisMD App, Dependabot or Renovate MAY skip specification checks using the PR author rather than the rerun actor. Functional checks remain required. The shared `lapismd/dependency-automation` coordinator proposes published first-party npm updates with Changeset release intent where required; it does not merge, publish, sign or deploy. This CI policy changes no runtime or public contract in this chapter.
+
+Recursive-embed qualification retains the mandatory audit under MIRA-ARCH-039. Root lint tooling resolves ESLint and markdownlint-cli's Minimatch dependency to the patched 11.x line; runtime package dependencies and public APIs are unchanged.
+
+The directive-fence highlighting repair is internal to the existing `@lapismd/mira/codemirror` composition. Built registry-compatible archives carry the repair for isolated Notebook acceptance; no public API changes.
 
 The existing `@lapismd/mira/codemirror` base-extension entry supplies the
 editor-local stacking boundary required by MIRA-CSS-045. Consumers composing
