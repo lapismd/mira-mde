@@ -202,7 +202,7 @@ test("rejects deprecated action runtimes and an invalid spec-first separator", (
   const ciSource = readFileSync(
     ".github/workflows/mira-spec-first.yml",
     "utf8",
-  ).replace("pnpm spec:first\n", "pnpm spec:first --\n");
+  ).replace(/pnpm spec:first(?=\s)/, "pnpm spec:first --");
   const pagesSource = readFileSync(
     ".github/workflows/publish-storybook-pages.yml",
     "utf8",
