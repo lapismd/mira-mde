@@ -555,7 +555,8 @@ export type MiraFileAdapter = {
       height?: number;
     },
     element: HTMLElement,
-  ) => false | void | (() => void);
+    context?: { signal: AbortSignal },
+  ) => false | void | (() => void) | Promise<false | void | (() => void)>;
   listFiles?: () => MiraFileRef[] | Promise<MiraFileRef[]>;
   getHeadings?: (
     file: MiraFileRef,

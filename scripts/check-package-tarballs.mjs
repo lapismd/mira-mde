@@ -158,12 +158,27 @@ import MiraEditor, { MiraEditorToolbar } from "@lapismd/mira-editor";
 import { mermaidExtension } from "@lapismd/mira-plugin-mermaid";
 import { aiExtension } from "@lapismd/mira-plugin-ai";
 import { inlineLinksExtension, createLinkIconRegistry, defaultMiraLinkIcons } from "@lapismd/mira/extensions";
+import type { MiraFileAdapter } from "@lapismd/mira/extensions";
 import { InlineLink, LinkSiteIcon } from "@lapismd/mira/preview";
 const extensions = [inlineLinksExtension({ registry: createLinkIconRegistry({ icons: { github: defaultMiraLinkIcons.gitlab }, hosts: { "git.example.com": "github" } }) })];
 const props: MiraProps = { value: "# Smoke" };
 props.extensions = extensions;
 void [InlineLink, LinkSiteIcon];
 void [Mira, MiraEditor, MiraEditorToolbar, mermaidExtension, aiExtension, props];
+const adapter: MiraFileAdapter = {
+  resolveLink: () => null,
+  async renderEmbed(_target, element, context) {
+    if (context?.signal.aborted) return false;
+    element.textContent = "Activated";
+    return () => element.replaceChildren();
+  }
+};
+const rejectedAdapter: MiraFileAdapter = {
+  resolveLink: () => null,
+  // @ts-expect-error Async embed results must retain the renderer cleanup contract.
+  renderEmbed: async () => 123,
+};
+void [adapter, rejectedAdapter];
 `,
       "frontmatter.ts": `import { FrontmatterController, type FrontmatterControllerCommit, type FrontmatterConfig } from "@lapismd/mira/preview";
 type IsAny<T> = 0 extends (1 & T) ? true : false;
