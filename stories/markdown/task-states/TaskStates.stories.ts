@@ -35,8 +35,8 @@ type Story = StoryObj<typeof meta>;
 
 export const Preview: Story = {
   tags: [
-    "visual-approved",
-    "!visual-pending",
+    "!visual-approved",
+    "visual-pending",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -61,17 +61,19 @@ export const Preview: Story = {
     if (!question || !important)
       throw new Error("Custom task-state controls did not render");
 
-    await expect(getComputedStyle(question).backgroundColor).toBe(
-      "rgb(213, 138, 0)",
-    );
-    await expect(getComputedStyle(important).color).toBe("rgb(213, 138, 0)");
+    await waitFor(() => {
+      expect(getComputedStyle(question).backgroundColor).toBe(
+        "rgb(213, 138, 0)",
+      );
+      expect(getComputedStyle(important).color).toBe("rgb(213, 138, 0)");
+    });
   },
 };
 
 export const LivePreview: Story = {
   tags: [
-    "visual-approved",
-    "!visual-pending",
+    "!visual-approved",
+    "visual-pending",
     "!visual-ready",
     "!visual-failed",
   ],

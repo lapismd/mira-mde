@@ -41,6 +41,8 @@
     "spec:first": "node scripts/validation.mjs run spec:first",
     "spec:lint": "node scripts/validation.mjs run spec:lint",
     "spec:serve": "spec-validator serve",
+    "spec:search": "spec-validator search",
+    "spec:index": "spec-validator index",
     "spec:validate": "node scripts/validation.mjs run spec:validate",
     "test": "node scripts/validation.mjs run test",
     "test:e2e": "node scripts/validation.mjs run test:e2e",

@@ -55,6 +55,7 @@
 
 .markdown-preview-surface .task-list-label,
 .markdown-editor-surface .task-list-label {
+  display: inline-flex;
   margin-inline-start: -0.25em;
   padding: 0;
   position: relative;

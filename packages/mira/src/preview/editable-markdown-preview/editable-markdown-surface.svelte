@@ -383,7 +383,7 @@
         </p>
       {/if}
     </div>
-  {:else if writable}
+  {:else if writable && activateOnPreviewInteraction}
     <div
       bind:this={previewSurface}
       class="mira-editable-markdown-preview__preview"

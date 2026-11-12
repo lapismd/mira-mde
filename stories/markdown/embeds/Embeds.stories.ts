@@ -9,6 +9,8 @@ import {
 import { embedsMarkdown } from "../fixtures";
 import AdapterInvalidationStory from "./AdapterInvalidationStory.svelte";
 import EditablePreviewStory from "./EditablePreviewStory.svelte";
+import ControlledActivationStory from "./ControlledActivationStory.svelte";
+import ScrollingPreviewStory from "./ScrollingPreviewStory.svelte";
 import EditingProtectionStory from "./EditingProtectionStory.svelte";
 import PortableSurfacesStory from "./PortableSurfacesStory.svelte";
 import RecursiveEmbedsStory from "./RecursiveEmbedsStory.svelte";
@@ -284,6 +286,94 @@ export const PortableSurfaces: Story = {
 <MarkdownEmbed value="## Embedded Markdown" />`,
       },
     },
+  },
+};
+
+export const ControlledActivation: Story = {
+  name: "Host-controlled preview accessibility",
+  render: () => ({ Component: ControlledActivationStory }),
+  tags: [
+    "visual-pending",
+    "!visual-approved",
+    "!visual-ready",
+    "!visual-failed",
+  ],
+  parameters: {
+    docs: {
+      source: {
+        language: "svelte",
+        type: "code",
+        code: `<script lang="ts">
+  import { EditableMarkdownPreview } from "@lapismd/mira/preview";
+</script>
+<EditableMarkdownPreview {file} {fileAdapter} activateOnPreviewInteraction={false} bind:editing />`,
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await waitFor(() =>
+      expect(canvas.getByRole("link", { name: "A link" })).toBeVisible(),
+    );
+    const preview = canvasElement.querySelector(
+      ".mira-editable-markdown-preview__preview",
+    )!;
+    expect(preview.getAttribute("role")).not.toBe("button");
+    expect(preview.hasAttribute("tabindex")).toBe(false);
+    await userEvent.click(
+      canvas.getByRole("checkbox", { name: "Toggle task" }),
+    );
+    await waitFor(() =>
+      expect(canvas.getByLabelText("Persisted Markdown")).toHaveTextContent(
+        "- [x] A task",
+      ),
+    );
+    expect(
+      canvasElement.querySelector("[data-editable-markdown-editor]"),
+    ).toBeNull();
+    await userEvent.click(canvas.getByRole("button", { name: "Edit card" }));
+    await waitFor(() =>
+      expect(
+        canvasElement.querySelector("[data-editable-markdown-editor]"),
+      ).not.toBeNull(),
+    );
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() =>
+      expect(canvas.getByRole("link", { name: "A link" })).toBeVisible(),
+    );
+  },
+};
+
+export const KeyboardScrolling: Story = {
+  name: "Scrollable preview keyboard access",
+  render: () => ({ Component: ScrollingPreviewStory }),
+  tags: [
+    "visual-pending",
+    "!visual-approved",
+    "!visual-ready",
+    "!visual-failed",
+  ],
+  parameters: {
+    docs: {
+      source: {
+        language: "svelte",
+        type: "code",
+        code: `<script lang="ts">
+  import { MarkdownPreview } from "@lapismd/mira/preview";
+</script>
+<div style="height:120px"><MarkdownPreview {value} sourcePath="Scroll.md" /></div>`,
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const region = await waitFor(() =>
+      canvas.getByRole("region", { name: "Markdown preview: Scroll.md" }),
+    );
+    expect(region.getAttribute("tabindex")).toBe("0");
+    region.focus();
+    expect(region).toHaveFocus();
+    expect(region.scrollHeight).toBeGreaterThan(region.clientHeight);
   },
 };
 

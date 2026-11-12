@@ -1,5 +1,13 @@
 # Portable Markdown and Editor
 
+MIRA-MD-026 controlled activation: when `activateOnPreviewInteraction` is false,
+the preview MUST NOT advertise an edit button or add a tab stop around rendered
+links, task controls or embeds. Explicit host activation MUST remain available,
+and rendered task changes MUST retain the existing adapter persistence path.
+Overflowing rendered Markdown surfaces MUST expose a named keyboard scrolling
+target. Non-overflowing surfaces MUST NOT add that extra tab stop, and resize,
+content changes and disposal MUST retain correct focus ownership.
+
 ## Recursive embeds
 
 | ID          | Requirement                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
@@ -29,6 +37,9 @@ three-character marker inset, including top-level lists after formatted prose.
 Rendered tasks MUST retain the same list inset when the checkbox replaces the
 source marker, and wrapped task rows MUST align beneath their label. Toggling a
 checkbox and revealing then hiding its source MUST preserve that alignment.
+Reading and Live Preview MUST use the same inline-flex checkbox shell so
+incidental component whitespace does not change text spacing. The authored
+separator MUST retain the normal prose font metrics and source ownership.
 Parsed list markers MUST remain owned by list chrome: an asterisk bullet MUST
 NOT be hidden as inline emphasis, including on the active line. Its wrapped
 rows MUST retain the same hanging alignment as dash-authored items.
