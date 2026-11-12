@@ -11,6 +11,16 @@ on:
         required: true
         default: false
         type: boolean
+      source_commit:
+        description: Optional immutable source commit already merged into main
+        required: false
+        default: ""
+        type: string
+      package_versions:
+        description: Exact package versions as a JSON array, required for a historical source
+        required: false
+        default: ""
+        type: string
 
 permissions:
   contents: read
@@ -21,6 +31,7 @@ concurrency:
 
 env:
   MIRA_VALIDATION_RUNTIME: native
+  MIRA_RELEASE_SOURCE: ${{ inputs.source_commit || github.sha }}
 
 jobs:
   version:
@@ -70,13 +81,29 @@ jobs:
       contents: read
     outputs:
       artifact_name: ${{ steps.mode.outputs.artifact_name }}
+      source_commit: ${{ steps.source.outputs.commit }}
       bootstrap_required: ${{ steps.mode.outputs.bootstrap_required }}
       package_count: ${{ steps.mode.outputs.package_count }}
       should_publish: ${{ steps.mode.outputs.should_publish }}
     steps:
-      - name: Check out the release commit
+      - name: Check out release workflow tooling
         uses: actions/checkout@v7
         with:
+          fetch-depth: 0
+
+      - name: Validate requested main source and exact version scope
+        id: source
+        env:
+          MIRA_REQUESTED_SOURCE: ${{ inputs.source_commit || '' }}
+          MIRA_EXPECTED_VERSIONS: ${{ inputs.package_versions || '' }}
+        run: |
+          node scripts/check-release-source.mjs source
+          cp scripts/check-release-source.mjs "$RUNNER_TEMP/mira-check-release-source.mjs"
+
+      - name: Check out the exact validated release source
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ steps.source.outputs.commit }}
           fetch-depth: 0
 
       - name: Set up pnpm
@@ -109,6 +136,7 @@ jobs:
 
       - name: Revalidate release source
         run: |
+          export GITHUB_SHA="$MIRA_RELEASE_SOURCE"
           pnpm spec:check
           pnpm catalog:check
           pnpm packages:check
@@ -132,13 +160,15 @@ jobs:
           retention-days: 14
 
       - name: Plan exact unpublished versions
-        run: pnpm release:plan
+        run: GITHUB_SHA="$MIRA_RELEASE_SOURCE" pnpm release:plan
 
       - name: Select protected publication mode
         id: mode
         env:
           MIRA_PUBLISH_REQUESTED: ${{ github.event_name == 'workflow_dispatch' && inputs.publish == true }}
+          MIRA_RELEASE_EXPECTED_VERSIONS: ${{ steps.source.outputs.versions }}
         run: |
+          node "$RUNNER_TEMP/mira-check-release-source.mjs" selection .release/release-plan.json
           node --input-type=module <<'NODE'
           import { appendFileSync, readFileSync } from "node:fs";
           const plan = JSON.parse(readFileSync(".release/release-plan.json", "utf8"));
@@ -148,7 +178,7 @@ jobs:
           const shouldPublish = process.env.MIRA_PUBLISH_REQUESTED === "true" &&
             plan.selected.length > 0 && !plan.bootstrapRequired;
           const output = [
-            `artifact_name=mira-release-${process.env.GITHUB_SHA}`,
+            `artifact_name=mira-release-${process.env.MIRA_RELEASE_SOURCE}`,
             `bootstrap_required=${plan.bootstrapRequired}`,
             `package_count=${plan.selected.length}`,
             `should_publish=${shouldPublish}`,
@@ -161,7 +191,7 @@ jobs:
 
       - name: Prepare immutable package tarballs
         if: steps.mode.outputs.package_count != '0'
-        run: pnpm release:prepare
+        run: GITHUB_SHA="$MIRA_RELEASE_SOURCE" pnpm release:prepare
 
       - name: Upload verified release artifact
         if: steps.mode.outputs.package_count != '0'
@@ -194,6 +224,8 @@ jobs:
     steps:
       - name: Check out the release commit
         uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.artifact.outputs.source_commit }}
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v6
@@ -220,7 +252,7 @@ jobs:
           MIRA_RELEASE_APPROVED: "1"
           MIRA_PUBLISH_REQUESTED: ${{ github.event_name == 'workflow_dispatch' && inputs.publish == true }}
           MIRA_RELEASE_APPROVED_SOURCE: ${{ vars.MIRA_RELEASE_APPROVED_SOURCE }}
-        run: pnpm release:publish .release/release-manifest.json
+        run: GITHUB_SHA="$MIRA_RELEASE_SOURCE" pnpm release:publish .release/release-manifest.json
 
   verify:
     name: Verify installed packages and provenance
@@ -235,6 +267,8 @@ jobs:
     steps:
       - name: Check out the release commit
         uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.artifact.outputs.source_commit }}
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v6
@@ -258,7 +292,7 @@ jobs:
 
       - name: Verify clean install, integrity, and provenance
         run: >-
-          pnpm release:verify .release/release-manifest.json .release/npm-signatures.json
+          GITHUB_SHA="$MIRA_RELEASE_SOURCE" pnpm release:verify .release/release-manifest.json .release/npm-signatures.json
 
       - name: Retain npm signature evidence
         if: always()
@@ -281,6 +315,8 @@ jobs:
     steps:
       - name: Check out the release commit
         uses: actions/checkout@v7
+        with:
+          ref: ${{ needs.artifact.outputs.source_commit }}
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v6
@@ -303,10 +339,11 @@ jobs:
       - name: Create retry-safe package releases
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: pnpm release:notes .release/release-manifest.json
+        run: GITHUB_SHA="$MIRA_RELEASE_SOURCE" pnpm release:notes .release/release-manifest.json
   notify-dependencies:
     name: Notify dependency consumers
     needs:
+      - artifact
       - verify
     if: always() && needs.verify.result == 'success'
     permissions:
@@ -314,6 +351,6 @@ jobs:
     uses: lapismd/dependency-automation/.github/workflows/notify.yml@ea9d35b12b612467bbabf1c6271ffa41b5eda4ba
     with:
       automation-ref: ea9d35b12b612467bbabf1c6271ffa41b5eda4ba
-      source-sha: ${{ github.sha }}
+      source-sha: ${{ needs.artifact.outputs.source_commit }}
     secrets:
       app-private-key: ${{ secrets.LAPIS_DEPENDENCY_APP_PRIVATE_KEY }}

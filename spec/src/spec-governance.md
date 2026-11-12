@@ -76,6 +76,8 @@ satisfy a plugin or package contract change.
 | MIRA-GOV-013 | Repository agent guidance MUST resolve published LapisMD dependencies through npm semver ranges, keep external repositories outside this pnpm workspace, preserve portable published manifests, and route dependency defects to the owning repository before consuming a released version.                                                                                                              |
 | MIRA-GOV-014 | GitHub workflows MUST use Node.js 24 and action majors whose JavaScript entrypoints run on Node.js 24. Ordinary pull requests MUST run spec-first against their exact base and head without forwarding a literal separator; the generated Changesets release pull request MAY skip source-change and release-intent gates already satisfied by its constituent source commits.                          |
 | MIRA-GOV-015 | Pull-request CI, release revalidation, and the release-workflow checker MUST require `pnpm audit` so every change fails closed on known-vulnerable dependencies.                                                                                                                                                                                                                                        |
+| MIRA-GOV-016 | A historical release source MUST be an immutable commit already merged into main, selected by a manual main dispatch and revalidated before publication. Build, manifest, package tags and dependency notifications MUST retain that exact source. The protected source approval and OIDC requirements remain mandatory.                                                                                |
+| MIRA-GOV-017 | A historical release dispatch MUST provide an explicit set of exact package versions. Planning MUST reject any missing, additional or different version before protected publication. An empty selection MUST NOT authorize a historical release.                                                                                                                                                       |
 
 The configured shared `spec:validate` command also enforces a one-to-one
 relationship between every chapter link indexed by `SUMMARY.md`, raw Markdown
@@ -232,3 +234,9 @@ toolbars.
 5. Run `pnpm spec:check` plus boundary-appropriate validation.
 6. Commit the verified logical slice with a review-quality message. This is a
    standing request; do not wait for the user to ask.
+
+A maintenance publication may select an older merged main commit after main
+has advanced to a separately versioned release. Its dispatch names the exact
+source and package versions, revalidates that source, and retains protected
+source approval. The workflow's own revision and the released source are
+distinct; the source-specific plan, artifact and notifications use the latter.

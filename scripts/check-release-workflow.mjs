@@ -98,6 +98,48 @@ export function validateReleaseWorkflows({
     "non-cancelling release concurrency",
     errors,
   );
+  requireText(
+    releaseSource,
+    /node scripts\/check-release-source\.mjs source/,
+    "validated main-ancestor release source",
+    errors,
+  );
+  requireText(
+    releaseSource,
+    /ref: \$\{\{ steps\.source\.outputs\.commit \}\}/,
+    "artifact checkout of the validated source",
+    errors,
+  );
+  requireText(
+    releaseSource,
+    /node "\$RUNNER_TEMP\/mira-check-release-source\.mjs" selection \.release\/release-plan\.json/,
+    "exact requested package-version selection",
+    errors,
+  );
+  if (
+    (
+      releaseSource.match(
+        /ref: \$\{\{ needs\.artifact\.outputs\.source_commit \}\}/g,
+      ) ?? []
+    ).length !== 3
+  )
+    errors.push(
+      "publish, verification and notes must check out the artifact source",
+    );
+  for (const command of ["plan", "prepare", "publish", "verify", "notes"]) {
+    requireText(
+      releaseSource,
+      new RegExp(`GITHUB_SHA="\\$MIRA_RELEASE_SOURCE" pnpm release:${command}`),
+      `source-bound release:${command}`,
+      errors,
+    );
+  }
+  requireText(
+    releaseSource,
+    /source-sha: \$\{\{ needs\.artifact\.outputs\.source_commit \}\}/,
+    "source-bound dependency notification",
+    errors,
+  );
   if (/run:\s*(?:npm|pnpm changeset) publish\b/.test(releaseSource)) {
     errors.push("workflow must publish only through release:publish");
   }
@@ -146,7 +188,7 @@ export function validateReleaseWorkflows({
     );
     requireText(
       notes,
-      /run: pnpm release:notes \.release\/release-manifest\.json/,
+      /run: GITHUB_SHA="\$MIRA_RELEASE_SOURCE" pnpm release:notes \.release\/release-manifest\.json/,
       "release notes command uses the verified manifest",
       errors,
     );

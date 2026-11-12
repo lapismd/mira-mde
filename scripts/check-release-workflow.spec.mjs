@@ -154,7 +154,7 @@ test("rejects token credentials in production and direct publication", () => {
   const releaseSource = readFileSync(".github/workflows/release.yml", "utf8")
     .replace('MIRA_RELEASE_APPROVED: "1"', "NODE_AUTH_TOKEN: unsafe")
     .replace(
-      "run: pnpm release:publish .release/release-manifest.json",
+      'run: GITHUB_SHA="$MIRA_RELEASE_SOURCE" pnpm release:publish .release/release-manifest.json',
       "run: npm publish",
     );
   const ciSource = readFileSync(
@@ -245,7 +245,7 @@ test("rejects release workflows that skip package GitHub releases", () => {
       "name: Skip package GitHub releases",
     )
     .replace(
-      "run: pnpm release:notes .release/release-manifest.json",
+      'run: GITHUB_SHA="$MIRA_RELEASE_SOURCE" pnpm release:notes .release/release-manifest.json',
       "run: echo omitted",
     );
   const ciSource = readFileSync(
@@ -264,4 +264,49 @@ test("rejects release workflows that skip package GitHub releases", () => {
   assert.equal(result.ok, false);
   assert.match(result.errors.join("\n"), /package GitHub releases job/);
   assert.match(result.errors.join("\n"), /verified manifest/);
+});
+
+test("rejects maintenance workflows without source or exact-version guards", () => {
+  const sources = {
+    releaseSource: readFileSync(".github/workflows/release.yml", "utf8"),
+    ciSource: readFileSync(".github/workflows/mira-spec-first.yml", "utf8"),
+    pagesSource: readFileSync(
+      ".github/workflows/publish-storybook-pages.yml",
+      "utf8",
+    ),
+  };
+  for (const [before, after, error] of [
+    [
+      "node scripts/check-release-source.mjs source",
+      "echo omitted",
+      /validated main-ancestor/,
+    ],
+    [
+      'node "$RUNNER_TEMP/mira-check-release-source.mjs" selection .release/release-plan.json',
+      "echo omitted",
+      /exact requested package-version/,
+    ],
+    [
+      "ref: ${{ needs.artifact.outputs.source_commit }}",
+      "ref: main",
+      /artifact source/,
+    ],
+    [
+      'GITHUB_SHA="$MIRA_RELEASE_SOURCE" pnpm release:prepare',
+      "pnpm release:prepare",
+      /source-bound release:prepare/,
+    ],
+    [
+      "source-sha: ${{ needs.artifact.outputs.source_commit }}",
+      "source-sha: ${{ github.sha }}",
+      /source-bound dependency/,
+    ],
+  ]) {
+    const result = validateReleaseWorkflows({
+      ...sources,
+      releaseSource: sources.releaseSource.replace(before, after),
+    });
+    assert.equal(result.ok, false);
+    assert.match(result.errors.join("\n"), error);
+  }
 });
