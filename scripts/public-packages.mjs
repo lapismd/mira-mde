@@ -6,7 +6,9 @@ import semver from "semver";
 
 const SCRIPT_DIRECTORY = path.dirname(fileURLToPath(import.meta.url));
 
-export const DEFAULT_REPO_ROOT = path.resolve(SCRIPT_DIRECTORY, "..");
+export const DEFAULT_REPO_ROOT = process.env.MIRA_RELEASE_SOURCE_ROOT
+  ? path.resolve(process.env.MIRA_RELEASE_SOURCE_ROOT)
+  : path.resolve(SCRIPT_DIRECTORY, "..");
 
 export const PUBLIC_PACKAGE_GRAPH = Object.freeze([
   Object.freeze({ name: "@lapismd/mira", directory: "mira", dependencies: [] }),

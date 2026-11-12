@@ -83,13 +83,7 @@ export function validateReleaseWorkflows({
   if ((releaseSource.match(/id-token: write/g) ?? []).length !== 1) {
     errors.push("only the production publish job may request OIDC permission");
   }
-  for (const command of [
-    "pnpm release:plan",
-    "pnpm release:prepare",
-    "pnpm release:publish",
-    "pnpm release:verify",
-    "pnpm release:notes",
-  ]) {
+  for (const command of ["pnpm release:plan", "pnpm release:prepare"]) {
     requireText(releaseSource, new RegExp(command), command, errors);
   }
   requireText(
@@ -126,13 +120,45 @@ export function validateReleaseWorkflows({
     errors.push(
       "publish, verification and notes must check out the artifact source",
     );
-  for (const command of ["plan", "prepare", "publish", "verify", "notes"]) {
+  for (const command of ["plan", "prepare"]) {
     requireText(
       releaseSource,
       new RegExp(`GITHUB_SHA="\\$MIRA_RELEASE_SOURCE" pnpm release:${command}`),
       `source-bound release:${command}`,
       errors,
     );
+  }
+  for (const [job, command] of [
+    ["publish-production", "publish"],
+    ["verify", "verify"],
+    ["notes", "notes"],
+  ]) {
+    const block =
+      releaseSource.match(
+        new RegExp(`\\n  ${job}:[\\s\\S]*?(?=\\n {2}[a-z][\\w-]*:|$)`),
+      )?.[0] ?? "";
+    requireText(
+      block,
+      /ref: \$\{\{ github\.sha \}\}\n\s+path: \.release\/tooling/,
+      `${job} reviewed workflow tooling`,
+      errors,
+    );
+    requireText(
+      block,
+      /MIRA_RELEASE_SOURCE_ROOT: \$\{\{ github\.workspace \}\}/,
+      `${job} selected product checkout`,
+      errors,
+    );
+    requireText(
+      block,
+      new RegExp(
+        `pnpm --dir \\.release/tooling release:${command} "\\$GITHUB_WORKSPACE/\\.release/release-manifest\\.json"`,
+      ),
+      `reviewed release:${command}`,
+      errors,
+    );
+    if (/\bGITHUB_SHA\s*[:=]/.test(block))
+      errors.push(`${job} must preserve the OIDC workflow identity`);
   }
   requireText(
     releaseSource,
@@ -188,7 +214,7 @@ export function validateReleaseWorkflows({
     );
     requireText(
       notes,
-      /run: GITHUB_SHA="\$MIRA_RELEASE_SOURCE" pnpm release:notes \.release\/release-manifest\.json/,
+      /run: pnpm --dir \.release\/tooling release:notes "\$GITHUB_WORKSPACE\/\.release\/release-manifest\.json"/,
       "release notes command uses the verified manifest",
       errors,
     );

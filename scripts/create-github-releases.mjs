@@ -6,6 +6,7 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 
 import { DEFAULT_MANIFEST_PATH } from "./release-manifest.mjs";
+import { resolveReleaseCommit } from "./release-plan.mjs";
 
 export function packageReleaseTag(record) {
   const packageName = record.name.slice("@lapismd/".length);
@@ -112,7 +113,7 @@ function main() {
       "GitHub release creation requires lapismd/mira-mde CI credentials",
     );
   }
-  if (!process.env.GITHUB_SHA || process.env.GITHUB_SHA !== manifest.commit) {
+  if (!process.env.GITHUB_SHA || resolveReleaseCommit() !== manifest.commit) {
     throw new Error(
       "GitHub release commit does not match the verified manifest",
     );

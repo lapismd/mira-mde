@@ -154,7 +154,7 @@ test("rejects token credentials in production and direct publication", () => {
   const releaseSource = readFileSync(".github/workflows/release.yml", "utf8")
     .replace('MIRA_RELEASE_APPROVED: "1"', "NODE_AUTH_TOKEN: unsafe")
     .replace(
-      'run: GITHUB_SHA="$MIRA_RELEASE_SOURCE" pnpm release:publish .release/release-manifest.json',
+      'run: pnpm --dir .release/tooling release:publish "$GITHUB_WORKSPACE/.release/release-manifest.json"',
       "run: npm publish",
     );
   const ciSource = readFileSync(
@@ -245,7 +245,7 @@ test("rejects release workflows that skip package GitHub releases", () => {
       "name: Skip package GitHub releases",
     )
     .replace(
-      'run: GITHUB_SHA="$MIRA_RELEASE_SOURCE" pnpm release:notes .release/release-manifest.json',
+      'run: pnpm --dir .release/tooling release:notes "$GITHUB_WORKSPACE/.release/release-manifest.json"',
       "run: echo omitted",
     );
   const ciSource = readFileSync(
@@ -300,6 +300,41 @@ test("rejects maintenance workflows without source or exact-version guards", () 
       "source-sha: ${{ needs.artifact.outputs.source_commit }}",
       "source-sha: ${{ github.sha }}",
       /source-bound dependency/,
+    ],
+  ]) {
+    const result = validateReleaseWorkflows({
+      ...sources,
+      releaseSource: sources.releaseSource.replace(before, after),
+    });
+    assert.equal(result.ok, false);
+    assert.match(result.errors.join("\n"), error);
+  }
+});
+
+test("rejects publication that replaces OIDC identity or bypasses reviewed tooling", () => {
+  const sources = {
+    releaseSource: readFileSync(".github/workflows/release.yml", "utf8"),
+    ciSource: readFileSync(".github/workflows/mira-spec-first.yml", "utf8"),
+    pagesSource: readFileSync(
+      ".github/workflows/publish-storybook-pages.yml",
+      "utf8",
+    ),
+  };
+  for (const [before, after, error] of [
+    [
+      "run: pnpm --dir .release/tooling release:publish",
+      'run: GITHUB_SHA="$MIRA_RELEASE_SOURCE" pnpm --dir .release/tooling release:publish',
+      /OIDC workflow identity/,
+    ],
+    [
+      "path: .release/tooling",
+      "path: .release/unreviewed",
+      /reviewed workflow tooling/,
+    ],
+    [
+      "MIRA_RELEASE_SOURCE_ROOT: ${{ github.workspace }}",
+      "MIRA_RELEASE_SOURCE_ROOT: wrong",
+      /selected product checkout/,
     ],
   ]) {
     const result = validateReleaseWorkflows({

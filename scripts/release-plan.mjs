@@ -77,8 +77,13 @@ function run(command, args, cwd = DEFAULT_REPO_ROOT) {
   return result;
 }
 
-export function resolveReleaseCommit() {
-  if (process.env.GITHUB_SHA) return process.env.GITHUB_SHA;
+export function resolveReleaseCommit(env = process.env) {
+  if (env.MIRA_RELEASE_SOURCE) {
+    if (!/^[a-f0-9]{40}$/.test(env.MIRA_RELEASE_SOURCE))
+      throw new Error("Selected release source must be immutable");
+    return env.MIRA_RELEASE_SOURCE;
+  }
+  if (env.GITHUB_SHA) return env.GITHUB_SHA;
   const result = run("jj", [
     "--no-pager",
     "log",
