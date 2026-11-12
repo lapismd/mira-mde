@@ -1,5 +1,13 @@
 # @lapismd/mira-vanilla
 
+## 0.0.4
+
+### Patch Changes
+
+- Updated dependencies [[`4298823`](https://github.com/lapismd/mira-mde/commit/42988233a4d68e5ec8c6dfbd2d92e97868a4ad62)]:
+  - @lapismd/mira@0.2.0
+  - @lapismd/mira-editor@0.0.4
+
 ## 0.0.3
 
 ### Patch Changes
