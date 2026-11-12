@@ -1,5 +1,10 @@
 # Styling and CSS Tokens
 
+MIRA-MD-007 checkbox text alignment uses the same inline-flex control shell in
+reading and Live Preview. The authored separator retains normal prose metrics
+and its existing source ownership. Incidental whitespace inside the control
+MUST NOT change the gap. Changed task stories remain visual-pending.
+
 Live-preview collapse controls MUST center on their inline marker without a
 fixed upward font offset, retaining the existing 1.5px browser alignment bound
 on both Linux and macOS.

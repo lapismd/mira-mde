@@ -1,5 +1,10 @@
 # Architecture and Boundaries
 
+Host-controlled Markdown previews retain their existing adapter and writer
+ownership under MIRA-MD-026. Removing inactive button semantics introduces no
+host integration or persistence authority. Specification discovery aliases use
+the installed Deno-free validator without changing runtime package boundaries.
+
 <!-- dependency-automation-policy -->
 
 Dependency update PRs from the trusted LapisMD App, Dependabot or Renovate MAY skip specification checks using the PR author rather than the rerun actor. Functional checks remain required. The shared `lapismd/dependency-automation` coordinator proposes published first-party npm updates with Changeset release intent where required; it does not merge, publish, sign or deploy. This CI policy changes no runtime or public contract in this chapter.

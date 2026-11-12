@@ -1,5 +1,6 @@
 <script lang="ts">
   import { tick } from "svelte";
+  import { accessibleScrollRegion } from "./scroll-region";
   import rehypeHighlight from "rehype-highlight";
   import { rehypeKatex, remarkMath } from "./math-plugins";
   import rehypeRaw from "rehype-raw";
@@ -482,6 +483,9 @@
 {:else}
   <div
     class={`mira-markdown-preview markdown-reading-view markdown-preview-surface markdown-preview-surface--reading markdown-rendered ${embed ? "markdown-preview-surface--embedded markdown-embed-surface" : ""} ${className}`.trim()}
+    use:accessibleScrollRegion={sourcePath
+      ? `Markdown preview: ${sourcePath}`
+      : "Markdown preview"}
     data-markdown-embed={embed ? true : undefined}
   >
     <div class="cm-sizer">

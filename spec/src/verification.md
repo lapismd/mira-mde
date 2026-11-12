@@ -1,5 +1,11 @@
 # Verification
 
+MIRA-MD-026 controlled activation is covered by controlled-activation.test.ts
+and the Host-controlled preview accessibility Storybook play. The source test
+first failed once because a disabled preview retained role=button. Its repaired
+target and all 17 existing portable-surface cases pass. The play also checks
+task persistence, explicit host activation and Escape returning to preview.
+
 MIRA-MD-002 directive-fence qualification is recorded in
 [the source and consumer record](../records/2026-10-30-directive-fences.md).
 The narrow Source regression initially passed for ordinary JavaScript fences
