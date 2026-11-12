@@ -14,6 +14,7 @@ import ScrollingPreviewStory from "./ScrollingPreviewStory.svelte";
 import EditingProtectionStory from "./EditingProtectionStory.svelte";
 import PortableSurfacesStory from "./PortableSurfacesStory.svelte";
 import RecursiveEmbedsStory from "./RecursiveEmbedsStory.svelte";
+import AsyncRendererStory from "./AsyncRendererStory.svelte";
 
 const meta = {
   title: "Markdown/Embeds",
@@ -38,6 +39,60 @@ const meta = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
+
+export const AsyncRenderer: Story = {
+  name: "Async renderer",
+  render: () => ({ Component: AsyncRendererStory }),
+  tags: ["visual-pending"],
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Custom renderers can load on demand while retaining ordinary fallback and cancellation.",
+      },
+      source: {
+        type: "code",
+        language: "svelte",
+        code: `<script lang="ts">\nimport { MarkdownPreview } from "@lapismd/mira/preview";\nimport type { MiraFileAdapter } from "@lapismd/mira/extensions";\nconst adapter: MiraFileAdapter = {\n  resolveLink: ({ path }) => ({ path, name: path, kind: "markdown" }),\n  async renderEmbed(target, element, context) {\n    const renderer = await import("./custom-renderer");\n    if (context?.signal.aborted) return false;\n    return renderer.mount(target, element);\n  }\n};\n</script>\n<MarkdownPreview value="![[Example.md]]" fileAdapter={adapter} />`,
+      },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await waitFor(() =>
+      expect(canvas.getByText("Ordinary fallback content.")).toBeVisible(),
+    );
+    await expect(
+      canvas.queryByText("Activated custom content."),
+    ).not.toBeInTheDocument();
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Remove pending embed" }),
+    );
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Activate embedded renderer" }),
+    );
+    await waitFor(() =>
+      expect(canvas.getByLabelText("Cancelled renders")).toHaveTextContent("1"),
+    );
+    await expect(canvas.getByLabelText("Mounted renders")).toHaveTextContent(
+      "1",
+    );
+    await expect(canvas.getAllByText("Activated custom content.")).toHaveLength(
+      1,
+    );
+    await expect(canvas.getByText("Ordinary fallback content.")).toBeVisible();
+    await userEvent.click(
+      canvas.getByRole("button", { name: "Remove active embed" }),
+    );
+    await waitFor(() =>
+      expect(canvas.getByLabelText("Destroyed renders")).toHaveTextContent("1"),
+    );
+    await expect(
+      canvas.queryByText("Activated custom content."),
+    ).not.toBeInTheDocument();
+    await expect(canvas.getByText("Ordinary fallback content.")).toBeVisible();
+  },
+};
 
 export const RecursiveEmbeds: Story = {
   name: "Recursive embeds",

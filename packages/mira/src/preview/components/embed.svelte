@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { createCustomEmbedLease } from "../custom-embed-lease";
   import type { Snippet } from "svelte";
   import {
     parseMiraFileTarget,
@@ -143,7 +144,8 @@
     }
 
     host.replaceChildren();
-    const cleanup = adapter.renderEmbed(
+    return createCustomEmbedLease(
+      adapter.renderEmbed.bind(adapter),
       {
         ...parsedTarget,
         file,
@@ -152,16 +154,13 @@
         height: imageDetails.height,
       },
       host,
+      (handled) => {
+        customRendered = handled;
+      },
+      (error) => {
+        console.error("Custom embed rendering failed", error);
+      },
     );
-    if (cleanup === false) {
-      return;
-    }
-    customRendered = true;
-
-    return () => {
-      cleanup?.();
-      host.replaceChildren();
-    };
   });
 
   $effect(() => {

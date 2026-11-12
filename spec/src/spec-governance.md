@@ -1,5 +1,10 @@
 # Specification Governance
 
+Public asynchronous embed changes retain a packed declaration guard that accepts
+the cancellation and cleanup contract and rejects invalid async results. The
+full package-consumer lane qualifies all six public outputs; source, hosted CI,
+publication and actual Lapis consumer evidence remain distinct.
+
 The Canvas accessibility release candidate consumes one patch Changeset and
 selects only @lapismd/mira 0.1.5. Exact-source artifact preparation, verification
 and approval remain required before publication. Source and versioning PRs are

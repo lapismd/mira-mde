@@ -1,5 +1,10 @@
 # Public Packages and Entry Points
 
+The packed public-API fixture compiles asynchronous custom embed rendering,
+its optional cancellation signal and returned cleanup through public Mira
+exports. It MUST reject an asynchronous result outside the renderer contract;
+source-only type resolution does not replace that package-boundary check.
+
 The reviewed Canvas intake selects only @lapismd/mira 0.1.5. Its changelog and
 consumed Changeset carry the controlled-preview, scrolling and task-shell fixes.
 The five other public versions remain unchanged; publication is a separate gate.
