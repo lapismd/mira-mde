@@ -1,5 +1,9 @@
 # Portable Markdown and Editor
 
+The Canvas accessibility candidate versions the existing MIRA-MD-026 and
+MIRA-MD-007 repairs as @lapismd/mira 0.1.5. No Markdown behavior changes in this
+versioning slice; its source qualification remains authoritative.
+
 MIRA-MD-026 controlled activation: when `activateOnPreviewInteraction` is false,
 the preview MUST NOT advertise an edit button or add a tab stop around rendered
 links, task controls or embeds. Explicit host activation MUST remain available,

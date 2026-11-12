@@ -1,5 +1,10 @@
 # Specification Governance
 
+The Canvas accessibility release candidate consumes one patch Changeset and
+selects only @lapismd/mira 0.1.5. Exact-source artifact preparation, verification
+and approval remain required before publication. Source and versioning PRs are
+separate; preparing or merging source does not authorize registry publication.
+
 Controlled-preview qualification records the exact MIRA-MD-026 regression in
 the Mira source package before Canvas consumer acceptance. The standard
 spec:search and spec:index aliases expose the existing validator; QMD remains

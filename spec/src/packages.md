@@ -1,5 +1,9 @@
 # Public Packages and Entry Points
 
+The reviewed Canvas intake selects only @lapismd/mira 0.1.5. Its changelog and
+consumed Changeset carry the controlled-preview, scrolling and task-shell fixes.
+The five other public versions remain unchanged; publication is a separate gate.
+
 The MIRA-MD-026 controlled-preview repair uses the existing public
 `activateOnPreviewInteraction` input. It adds no entry point or host dependency.
 Packed source acceptance remains distinct from a released npm version.

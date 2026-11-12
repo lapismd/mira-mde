@@ -1,5 +1,9 @@
 # Architecture and Boundaries
 
+The Canvas accessibility intake prepares only @lapismd/mira 0.1.5 from the
+qualified controlled-preview source. The other five public package versions,
+host contracts and runtime graph remain unchanged. Preparation does not publish.
+
 Host-controlled Markdown previews retain their existing adapter and writer
 ownership under MIRA-MD-026. Removing inactive button semantics introduces no
 host integration or persistence authority. Specification discovery aliases use
