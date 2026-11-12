@@ -1,5 +1,9 @@
 # Architecture and Boundaries
 
+Verification-only recovery under MIRA-GOV-019 executes reviewed release tooling
+against the original product checkout and digest-checked publication artifact.
+It does not rebuild or publish a package or alter the six-package runtime graph.
+
 The Canvas accessibility intake prepares only @lapismd/mira 0.1.5 from the
 qualified controlled-preview source. The other five public package versions,
 host contracts and runtime graph remain unchanged. Preparation does not publish.
