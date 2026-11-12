@@ -1,5 +1,11 @@
 # @lapismd/mira
 
+## 0.2.0
+
+### Minor Changes
+
+- [#34](https://github.com/lapismd/mira-mde/pull/34) [`4298823`](https://github.com/lapismd/mira-mde/commit/42988233a4d68e5ec8c6dfbd2d92e97868a4ad62) Thanks [@stevejuma](https://github.com/stevejuma)! - Allow custom file embed renderers to load asynchronously with cancellation, ordinary fallback and owned cleanup.
+
 ## 0.1.5
 
 ### Patch Changes
