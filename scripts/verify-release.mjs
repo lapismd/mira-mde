@@ -2,8 +2,10 @@
 
 import { spawnSync } from "node:child_process";
 import {
+  closeSync,
   mkdtempSync,
   mkdirSync,
+  openSync,
   readFileSync,
   rmSync,
   writeFileSync,
@@ -20,19 +22,31 @@ import { publishedIntegrity } from "./publish-release.mjs";
 import { resolveReleaseCommit } from "./release-plan.mjs";
 import { verifyNpmProvenance } from "./verify-npm-provenance.mjs";
 
-function run(command, args, cwd) {
-  const result = spawnSync(command, args, {
-    cwd,
-    encoding: "utf8",
-    stdio: ["ignore", "pipe", "pipe"],
-  });
-  if (result.error) throw result.error;
-  if (result.status !== 0) {
-    throw new Error(
-      `${command} ${args.join(" ")} failed:\n${result.stdout}${result.stderr}`,
-    );
+export function runVerificationCommand(command, args, cwd) {
+  const directory = mkdtempSync(path.join(os.tmpdir(), "mira-verify-output-"));
+  const stdoutPath = path.join(directory, "stdout");
+  const stderrPath = path.join(directory, "stderr");
+  let stdout;
+  let stderr;
+  try {
+    stdout = openSync(stdoutPath, "w");
+    stderr = openSync(stderrPath, "w");
+    const result = spawnSync(command, args, {
+      cwd,
+      stdio: ["ignore", stdout, stderr],
+    });
+    if (result.error) throw result.error;
+    if (result.status !== 0) {
+      throw new Error(
+        `${command} ${args.join(" ")} failed:\n${readFileSync(stdoutPath, "utf8")}${readFileSync(stderrPath, "utf8")}`,
+      );
+    }
+    return readFileSync(stdoutPath, "utf8");
+  } finally {
+    if (stdout !== undefined) closeSync(stdout);
+    if (stderr !== undefined) closeSync(stderr);
+    rmSync(directory, { recursive: true, force: true });
   }
-  return result.stdout;
 }
 
 export function verifyRegistryIntegrity(manifest) {
@@ -75,7 +89,7 @@ function main() {
       path.join(temporaryRoot, "package.json"),
       `${JSON.stringify({ name: "mira-release-verification", private: true })}\n`,
     );
-    run(
+    runVerificationCommand(
       "npm",
       [
         "install",
@@ -100,7 +114,7 @@ function main() {
       }
     }
 
-    const audit = run(
+    const audit = runVerificationCommand(
       "npm",
       ["audit", "signatures", "--json", "--include-attestations"],
       temporaryRoot,
@@ -110,6 +124,10 @@ function main() {
     const provenance = verifyNpmProvenance(
       JSON.parse(audit),
       manifest.packages,
+      {
+        workflowCommit: process.env.MIRA_PROVENANCE_WORKFLOW_SOURCE,
+        runId: process.env.MIRA_PROVENANCE_RUN_ID,
+      },
     );
     if (!provenance.ok) throw new Error(provenance.errors.join("\n"));
   } finally {

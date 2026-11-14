@@ -79,6 +79,7 @@ satisfy a plugin or package contract change.
 | MIRA-GOV-016 | A historical release source MUST be an immutable commit already merged into main, selected by a manual main dispatch and revalidated before publication. Build, manifest, package tags and dependency notifications MUST retain that exact source. The protected source approval and OIDC requirements remain mandatory.                                                                                |
 | MIRA-GOV-017 | A historical release dispatch MUST provide an explicit set of exact package versions. Planning MUST reject any missing, additional or different version before protected publication. An empty selection MUST NOT authorize a historical release.                                                                                                                                                       |
 | MIRA-GOV-018 | Trusted publication MUST preserve GitHub's actual workflow identity for OIDC provenance. The approved product source and its checkout MUST use separate explicit context. Publishing, registry verification and package tags MUST run reviewed workflow tooling against that selected product context, without rebinding the publisher's GitHub SHA.                                                    |
+| MIRA-GOV-019 | Post-publication verification MUST retain complete npm signature evidence without a child-process output limit. A manual main recovery MAY verify an existing successful publication from its exact-source, digest-checked artifact and create matching release metadata only after clean installation and provenance pass. Recovery MUST NOT publish packages or request npm credentials.              |
 
 The configured shared `spec:validate` command also enforces a one-to-one
 relationship between every chapter link indexed by `SUMMARY.md`, raw Markdown
@@ -178,6 +179,14 @@ package. Post-publish verification performs a clean exact-version install and
 validates npm signatures plus SLSA provenance before the release notes command
 may create commit-bound package tags and GitHub releases with npm, source,
 changelog, verified-integrity, and commit metadata.
+
+MIRA-GOV-019 permits verification-only recovery when publication succeeded but
+later verification failed. Recovery validates the original manual main release,
+its successful artifact and publisher jobs, the immutable artifact's run/source
+identity and ZIP digest, and the product source's main ancestry. Current reviewed
+tooling verifies that original artifact against the selected product checkout;
+no package rebuild or publication occurs. Complete stdout and stderr are spooled
+to files so large npm attestation responses cannot overflow a pipe buffer.
 
 Pull-request CI runs the canonical specification and release-intent gates,
 repository/package validation, `pnpm audit`, packed-consumer checks, a static

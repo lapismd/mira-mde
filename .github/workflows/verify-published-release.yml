@@ -1,0 +1,99 @@
+name: Verify existing public release
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_commit:
+        description: Immutable product source of the original publication
+        required: true
+        type: string
+      publication_run:
+        description: Completed release.yml run whose publisher succeeded
+        required: true
+        type: string
+      artifact_id:
+        description: Original immutable publication artifact ID
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  MIRA_VALIDATION_RUNTIME: native
+
+concurrency:
+  group: mira-public-release
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    name: Verify original publication and release metadata
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      actions: read
+      contents: write
+    env:
+      MIRA_RELEASE_SOURCE: ${{ inputs.source_commit }}
+      MIRA_RELEASE_SOURCE_ROOT: ${{ github.workspace }}/.release/product
+    steps:
+      - name: Check out reviewed recovery tooling
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Validate and download the original publication artifact
+        id: original
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          MIRA_RECOVERY_SOURCE: ${{ inputs.source_commit }}
+          MIRA_RECOVERY_RUN: ${{ inputs.publication_run }}
+          MIRA_RECOVERY_ARTIFACT: ${{ inputs.artifact_id }}
+        run: node scripts/check-release-recovery.mjs
+
+      - name: Check out the original product source
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ steps.original.outputs.source }}
+          path: .release/product
+
+      - name: Install verification tooling and current npm
+        run: |
+          pnpm install --frozen-lockfile
+          npm install --global npm@12.0.2
+
+      - name: Verify clean installation, integrity and original provenance
+        env:
+          MIRA_PROVENANCE_WORKFLOW_SOURCE: ${{ steps.original.outputs.workflow_source }}
+          MIRA_PROVENANCE_RUN_ID: ${{ inputs.publication_run }}
+        run: pnpm release:verify .release/original/release-manifest.json .release/npm-signatures.json
+
+      - name: Create matching package tags and GitHub releases
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: pnpm release:notes .release/original/release-manifest.json
+
+      - name: Retain original identity and signature evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: mira-verification-recovery-${{ github.run_id }}
+          path: |
+            .release/recovery-source.json
+            .release/original/release-manifest.json
+            .release/npm-signatures.json
+          include-hidden-files: true
+          if-no-files-found: warn
+          retention-days: 90

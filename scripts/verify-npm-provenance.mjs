@@ -41,6 +41,8 @@ export function verifyNpmProvenance(
     repository = PUBLISH_REPOSITORY,
     workflow = PUBLISH_WORKFLOW,
     ref = "refs/heads/main",
+    workflowCommit,
+    runId,
   } = {},
 ) {
   const errors = [];
@@ -95,6 +97,28 @@ export function verifyNpmProvenance(
     }
     if (source?.ref !== ref) {
       errors.push(`${record.name}: provenance ref must be ${ref}`);
+    }
+    if (
+      workflowCommit &&
+      !statement.predicate?.buildDefinition?.resolvedDependencies?.some(
+        (dependency) =>
+          dependency.uri === `git+${repository}@${ref}` &&
+          dependency.digest?.gitCommit === workflowCommit,
+      )
+    ) {
+      errors.push(
+        `${record.name}: provenance must match the original workflow commit`,
+      );
+    }
+    if (
+      runId &&
+      !new RegExp(
+        `^${repository.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}/actions/runs/${runId}/attempts/[1-9]\\d*$`,
+      ).test(statement.predicate?.runDetails?.metadata?.invocationId ?? "")
+    ) {
+      errors.push(
+        `${record.name}: provenance must match the original publication run`,
+      );
     }
   }
   return { ok: errors.length === 0, errors };
