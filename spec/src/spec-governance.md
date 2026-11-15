@@ -250,3 +250,9 @@ has advanced to a separately versioned release. Its dispatch names the exact
 source and package versions, revalidates that source, and retains protected
 source approval. The workflow's own revision and the released source are
 distinct; the source-specific plan, artifact and notifications use the latter.
+
+## Version pull request authority
+
+| ID           | Requirement                                                                                                                                                                                                                                                                                                                                                                                      |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| MIRA-GOV-020 | The version job MUST mint a disposable existing-App token only on canonical main pushes, scoped to this repository and contents/pull-request writes, and pass it as the sole Changesets credential. Its workflow token MUST be read-only, checkout MUST disable persisted credentials, and versioning MUST preserve the existing recipe and GitHub API commits without creating GitHub releases. |
