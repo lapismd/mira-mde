@@ -51,7 +51,7 @@ export function validateReleaseWorkflows({
   }
   requireText(
     releaseSource,
-    /uses: changesets\/action@v1\.8\.0/,
+    /uses: changesets\/action@63a615b9cd06ba9a3e6d13796c7fbcb080a60a0b/,
     "pinned Changesets action",
     errors,
   );
