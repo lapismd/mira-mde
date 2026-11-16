@@ -33,9 +33,15 @@ function createFixture(mutate) {
           files: ["CHANGELOG.md", "dist"],
           exports: { ".": "./dist/index.js" },
           sideEffects: false,
-          dependencies: Object.fromEntries(
-            [...dependencies].map((dependency) => [dependency, "workspace:~"]),
-          ),
+          dependencies: Object.fromEntries([
+            ...[...dependencies].map((dependency) => [
+              dependency,
+              "workspace:~",
+            ]),
+            ...(packageName === "@lapismd/mira-plugin-mermaid"
+              ? [["mermaid", "^12.3.0"]]
+              : []),
+          ]),
           publishConfig: { access: "public" },
         },
         null,
@@ -76,6 +82,23 @@ test("accepts the six-package public graph and private adapters", () => {
     assert.equal(result.stats.publicPackages, 6);
     assert.equal(result.stats.internalAdapters, 1);
   });
+});
+
+test("rejects the public Mermaid 11 and legacy ELK peer closure that retains vulnerable KaTeX", () => {
+  withFixture(
+    (root) => {
+      const file = path.join(root, "packages/mira-plugin-mermaid/package.json");
+      const manifest = JSON.parse(readFileSync(file, "utf8"));
+      manifest.dependencies.mermaid = "^11.16.1";
+      manifest.dependencies["@mermaid-js/layout-elk"] = "^0.1.9";
+      writeFileSync(file, JSON.stringify(manifest));
+    },
+    (result) => {
+      assert.equal(result.ok, false);
+      assert.match(result.errors.join("\n"), /Mermaid.*patched public runtime/);
+      assert.match(result.errors.join("\n"), /ELK.*Mermaid 12/);
+    },
+  );
 });
 
 test("accepts independent stable versions after the first release", () => {

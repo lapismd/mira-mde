@@ -3,6 +3,7 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import semver from "semver";
 
 import {
   isStableVersion,
@@ -144,6 +145,21 @@ export function validatePackageBoundaries({
       ...manifest.dependencies,
       ...manifest.optionalDependencies,
     };
+    if (manifest.name === "@lapismd/mira-plugin-mermaid") {
+      const mermaid = runtimeDependencies.mermaid;
+      const elk = runtimeDependencies["@mermaid-js/layout-elk"];
+      if (
+        !semver.validRange(mermaid) ||
+        !semver.subset(mermaid, ">=12.3.0 <13")
+      )
+        errors.push(
+          `${manifest.name}: Mermaid must retain the patched public runtime >=12.3.0 <13`,
+        );
+      if (elk !== undefined)
+        errors.push(
+          `${manifest.name}: ELK must use the bundled Mermaid 12 layout, without a separate peer runtime`,
+        );
+    }
     for (const dependencyName of Object.keys(runtimeDependencies)) {
       if (
         dependencyName.startsWith("@lapismd/mira") &&

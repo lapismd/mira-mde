@@ -1,13 +1,12 @@
-import elkLayouts from "@mermaid-js/layout-elk";
 import mermaid, { type MermaidConfig, type RenderResult } from "mermaid";
 
-mermaid.registerLayoutLoaders(elkLayouts);
 const mermaidExternalDiagrams = mermaid.registerExternalDiagrams([]);
 
 const defaultMermaidConfig = {
   startOnLoad: false,
   securityLevel: "strict",
   theme: "default",
+  layout: "dagre",
 } satisfies MermaidConfig;
 
 mermaid.initialize(defaultMermaidConfig);

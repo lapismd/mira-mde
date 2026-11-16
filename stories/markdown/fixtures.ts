@@ -263,3 +263,16 @@ flowchart TB
   Dialog --> Reset[Reset view]
 ~~~
 `;
+
+export const mermaidElkMathFeature = String.raw`# Mermaid ELK and math
+
+~~~mermaid
+---
+layout: elk
+---
+flowchart LR
+  accTitle: ELK math compatibility
+  accDescr: A square expression leads to the patched renderer.
+  A["$$x^2$$"] --> B["Patched runtime"]
+~~~
+`;

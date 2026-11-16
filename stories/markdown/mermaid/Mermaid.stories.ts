@@ -7,7 +7,7 @@ import {
   markdownEditorDocsSource,
   markdownPreviewDocsSource,
 } from "../_shared/docs-source";
-import { mermaidMarkdownFeature } from "../fixtures";
+import { mermaidElkMathFeature, mermaidMarkdownFeature } from "../fixtures";
 import MermaidDialogStory from "./MermaidDialogStory.svelte";
 
 const meta = {
@@ -37,8 +37,8 @@ type Story = StoryObj<typeof meta>;
 
 export const Preview: Story = {
   tags: [
-    "visual-approved",
-    "!visual-pending",
+    "visual-pending",
+    "!visual-approved",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -70,8 +70,8 @@ export const Preview: Story = {
 
 export const LivePreview: Story = {
   tags: [
-    "visual-approved",
-    "!visual-pending",
+    "visual-pending",
+    "!visual-approved",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -108,8 +108,8 @@ export const LivePreview: Story = {
 
 export const SourceMode: Story = {
   tags: [
-    "visual-approved",
-    "!visual-pending",
+    "visual-pending",
+    "!visual-approved",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -158,8 +158,8 @@ export const DialogControls: Story = {
     Component: MermaidDialogStory,
   }),
   tags: [
-    "visual-approved",
-    "!visual-pending",
+    "visual-pending",
+    "!visual-approved",
     "!visual-ready",
     "!visual-failed",
   ],
@@ -174,5 +174,32 @@ export const DialogControls: Story = {
       await userEvent.click(canvas.getByRole("button", { name: "Pan right" }));
       await userEvent.click(canvas.getByRole("button", { name: "Reset view" }));
     });
+  },
+};
+
+export const ElkMath: Story = {
+  name: "ELK and math",
+  args: { value: mermaidElkMathFeature },
+  tags: ["visual-pending", "!visual-approved"],
+  parameters: {
+    docs: {
+      source: { code: markdownPreviewDocsSource("mermaidElkMathFeature") },
+    },
+  },
+  play: async ({ canvasElement }) => {
+    await waitFor(() => {
+      expect(canvasElement.querySelector(".mermaid svg")).toBeTruthy();
+      expect(canvasElement.querySelector(".mermaid .katex")).toBeTruthy();
+    });
+    await userEvent.click(
+      within(canvasElement).getByRole("button", {
+        name: "Expand Mermaid diagram",
+      }),
+    );
+    await expect(
+      within(canvasElement.ownerDocument.body).getByRole("dialog", {
+        name: "Mermaid diagram",
+      }),
+    ).toBeVisible();
   },
 };

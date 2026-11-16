@@ -1,5 +1,7 @@
 # Architecture and Boundaries
 
+The Mermaid runtime security intake updates only the owning plugin to Mermaid 12.3+ with bundled ELK. Its explicit Dagre default preserves the existing layout choice. Public consumers receive the repaired runtime through normal released npm ranges; workspace overrides do not qualify that public closure.
+
 Verification-only recovery under MIRA-GOV-019 executes reviewed release tooling
 against the original product checkout and digest-checked publication artifact.
 It does not rebuild or publish a package or alter the six-package runtime graph.
@@ -88,9 +90,10 @@ nonzero transfer exits MUST remain errors.
 
 Packed-consumer audit policy remains separate from the committed workspace
 audit under MIRA-ARCH-039. Base Mira's packed production graph MUST contain zero
-findings. Only the existing unchanged Mermaid 11/layout-ELK cohort scope in
-[Public packages](packages.md) MAY retain its recorded finding; workspace
-`ignoreGhsas` entries do not weaken either gate. The private math bundle
+findings. The six-product peer cohort MUST also contain zero findings under
+[Public packages](packages.md); the historical Mermaid 11/layout-ELK acceptance
+is retired for newly packed outputs. Workspace `ignoreGhsas` entries do not
+weaken either production gate. The private math bundle
 uses unchanged released adapters and parser helpers while resolving patched
 KaTeX through Mira's explicit runtime dependency. Conditional parsing,
 development assertions and Node diagnostics remain external runtime boundaries.

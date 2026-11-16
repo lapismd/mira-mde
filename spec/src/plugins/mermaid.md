@@ -6,14 +6,14 @@ controls. The package is licensed Apache-2.0.
 
 ## Requirements
 
-| ID               | Requirement                                                                                                                 |
-| ---------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| MIRA-MERMAID-001 | Mermaid fences MUST render in reading and live-preview surfaces when the plugin is enabled and remain source when disabled. |
-| MIRA-MERMAID-002 | Inline diagrams MUST use responsive SVG layout and unique render IDs across simultaneous editor surfaces.                   |
-| MIRA-MERMAID-003 | Expanded diagrams MUST expose accessible zoom, pan, reset, copy, close, and source controls with deterministic teardown.    |
-| MIRA-MERMAID-004 | Render failures MUST preserve the source path and expose a usable error state rather than removing the Markdown content.    |
-| MIRA-MERMAID-005 | Storybook MUST cover inline, dialog, source fallback, disabled, and representative layout modes with interactions.          |
-| MIRA-MERMAID-006 | The published `@lapismd/mira-plugin-mermaid` manifest MUST depend on `mermaid` at `^11.16.1` or a later patched 11.x range. |
+| ID               | Requirement                                                                                                                                                                                                                                                                           |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| MIRA-MERMAID-001 | Mermaid fences MUST render in reading and live-preview surfaces when the plugin is enabled and remain source when disabled.                                                                                                                                                           |
+| MIRA-MERMAID-002 | Inline diagrams MUST use responsive SVG layout and unique render IDs across simultaneous editor surfaces.                                                                                                                                                                             |
+| MIRA-MERMAID-003 | Expanded diagrams MUST expose accessible zoom, pan, reset, copy, close, and source controls with deterministic teardown.                                                                                                                                                              |
+| MIRA-MERMAID-004 | Render failures MUST preserve the source path and expose a usable error state rather than removing the Markdown content.                                                                                                                                                              |
+| MIRA-MERMAID-005 | Storybook MUST cover inline, dialog, source fallback, disabled, and representative layout modes with interactions.                                                                                                                                                                    |
+| MIRA-MERMAID-006 | The published Mermaid runtime MUST use reviewed Mermaid 12.3+ with its bundled ELK layout, preserve Mira's Dagre default and rendering/control contract, and pass a fresh production peer-closure audit with zero findings without consumer overrides or the former KaTeX acceptance. |
 
 Mermaid configuration is portable. Application-wide registration and persisted
 settings remain consumer responsibilities.

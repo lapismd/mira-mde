@@ -34,16 +34,13 @@ test("reads import-only cohort identities without executing browser modules", ()
   try {
     writeFileSync(path.join(directory, "package.json"), "{}");
     const adapter = install(directory, "@lapismd/mira-plugin-mermaid", "0.0.3");
-    const mermaid = install(adapter, "mermaid", "11.17.2");
-    install(adapter, "@mermaid-js/layout-elk", "0.1.9", {
-      peerDependencies: { mermaid: "^11.0.2" },
-    });
-    install(mermaid, "katex", "0.16.47");
+    const mermaid = install(adapter, "mermaid", "12.3.0");
+    install(mermaid, "katex", "0.18.10");
     assert.deepEqual(readMermaidRuntime(directory), {
-      mermaid: "11.17.2",
-      layoutElk: "0.1.9",
-      layoutElkPeer: "^11.0.2",
-      katex: "0.16.47",
+      mermaid: "12.3.0",
+      layoutElk: "bundled",
+      layoutElkPeer: null,
+      katex: "0.18.10",
     });
   } finally {
     rmSync(directory, { recursive: true, force: true });
@@ -92,15 +89,22 @@ test("rejects the formerly accepted KaTeX advisory", () => {
   assert.throws(() => checkPackedAudit(result(report())), /finding|advisory/);
 });
 
-test("retains only the recorded unchanged Mermaid cohort path", () => {
+test("newly repacked cohorts cannot inherit the historical Mermaid KaTeX acceptance", () => {
+  assert.throws(
+    () => checkPackedAudit(result(mermaidReport()), runtime),
+    /finding|advisory/,
+  );
+});
+
+test("retires the recorded unchanged Mermaid acceptance on every producer path", () => {
   for (const path of [
     ".>@lapismd/mira-plugin-mermaid>mermaid>katex",
     ".>@lapismd/mira-editor>@lapismd/mira-plugin-mermaid>mermaid>katex",
     ".>@lapismd/mira-react>@lapismd/mira-editor>@lapismd/mira-plugin-mermaid>@mermaid-js/layout-elk>mermaid>katex",
   ]) {
-    assert.match(
-      checkPackedAudit(result(mermaidReport([path])), runtime),
-      /existing Mira cohort exception/,
+    assert.throws(
+      () => checkPackedAudit(result(mermaidReport([path])), runtime),
+      /finding/,
     );
   }
 });

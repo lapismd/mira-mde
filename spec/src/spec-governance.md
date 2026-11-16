@@ -1,5 +1,7 @@
 # Specification Governance
 
+MIRA-MERMAID-006 qualification requires zero findings in both fresh packed production cohorts. The former exact Mermaid 11 KaTeX acceptance is retired for newly packed outputs; historical receipts remain historical. A genuine plugin patch Changeset records the changed public runtime dependency and preserves the normal version/publication gates.
+
 Public asynchronous embed changes retain a packed declaration guard that accepts
 the cancellation and cleanup contract and rejects invalid async results. The
 full package-consumer lane qualifies all six public outputs; source, hosted CI,
@@ -130,10 +132,10 @@ Apache-2.0 license metadata.
 six tarballs as consumers see them, compiles adapter-specific fixtures, resolves
 CSS exports, and rejects legacy or internal imports in packed output.
 Its base Mira audit retains complete JSON evidence and rejects every finding.
-The existing 2026-10-11 cohort acceptance remains restricted to the verified,
-unchanged Mermaid 11/layout-ELK path in `packages.md`. Release-policy tests MUST
-reject findings in base math or downstream consumers, changed runtime identities,
-all other advisories or severities, muted findings and failed or malformed audits.
+Its six-product cohort likewise rejects every finding. The historical
+2026-10-11 Mermaid acceptance is retired for newly packed output under
+`packages.md`. Release-policy tests MUST reject every production advisory,
+muted findings, failed commands and malformed or inconsistent audits.
 Private math-build guards verify declared
 external imports, bundled license notices, portable declarations and the clean
 production graph. Their source map protects the build boundary under

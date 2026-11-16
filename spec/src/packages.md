@@ -54,8 +54,8 @@ development audit gate; they do not change the public package graph.
 Workspace `auditConfig.ignoreGhsas` MAY list only
 [GHSA-gcqx-w48m-w2h4](https://github.com/advisories/GHSA-gcqx-w48m-w2h4)
 (deepmerge via `@sveltejs/vite-plugin-svelte`) while no patched release exists.
-That advisory is development-tooling only; packed-production audit policy and
-the KaTeX exception below stay unchanged.
+That advisory is development-tooling only and does not authorize findings in
+either zero-finding packed-production cohort.
 
 MIRA-ARCH-008 includes the additive `MiraProps.lineNumbers` boolean, defaulting
 to true. A false value MUST omit MiraCodeEditor's line-number extension rather
@@ -223,8 +223,9 @@ and ignored configuration MUST NOT enter public archives.
 `@lapismd/mira-editor` depends on Mira and the Mermaid plugin because Mermaid
 is part of its default feature set. The AI plugin remains opt-in. React and
 Vanilla depend only on the public products they adapt. The Mermaid plugin's
-published range MUST stay on the patched 11.16 line so consumers do not resolve
-known-vulnerable Mermaid or DOMPurify releases. Workspace `pnpm audit` is part
+published range MUST select the reviewed Mermaid 12.3+ line and its bundled ELK
+layout without a separate Mermaid 11 peer, so fresh consumers avoid the vulnerable
+KaTeX 0.16 closure without root overrides. Workspace `pnpm audit` is part
 of root `check` and `check:all`; a public-range or lockfile change that
 reintroduces an advisory fails that gate. Audit overrides that pin `js-yaml`
 MUST keep 3.x consumers on patched 3.x and 4.x consumers on patched 4.x so
@@ -246,19 +247,19 @@ math, source positions, safe/trusted HTML handling and trust protections remain
 unchanged. Declarations MUST resolve without build-only adapters installed.
 
 The packed fixture MUST audit base Mira independently without renderer overrides
-and reject every finding. The 2026-10-11 user acceptance remains valid only for
-low GHSA-238p-pmpm-9mq7 at KaTeX 0.16.47 reached through unchanged Mermaid
-`^11.16.1` and layout-ELK 0.1.9 with Mermaid peer `^11.0.2`, inside the six-product
-Mira cohort. The gate MUST verify installed identities and every finding path.
+and reject every finding. Its six-product peer cohort MUST also reject every
+finding. The historical 2026-10-11 unchanged Mermaid 11/layout-ELK0.1.9 acceptance
+is retired for newly packed output; it cannot authorize a downstream runtime
+exception or a repaired cohort. The gate MUST retain installed runtime identities.
 Identity inspection MUST follow the installed package roots without executing
 browser modules or requiring a CommonJS condition from import-only exports.
-Base math, downstream consumer paths, changed identities or advisories, severity
-increases, failed commands, muted findings, malformed responses and inconsistent
-counts remain blocking. Full JSON evidence remains at
+Base math, downstream consumer paths, advisories at every severity, failed
+commands, muted findings, malformed responses and inconsistent counts remain
+blocking. Full JSON evidence remains at
 `.release/production-consumer-audit.json`; the separate base report and installed
-Mermaid identities remain beside it. Current registry 0.1.3 still carries
-the upstream adapters' KaTeX 0.16 constraints; source qualification and a new
-verified registry release are required before consumers may raise their floors.
+Mermaid identities remain beside it. Published Mermaid plugin 0.0.4 still carries
+the Mermaid 11 KaTeX constraint; a verified plugin patch release is required
+before consumers can resolve the repaired public runtime.
 
 The user explicitly accepted one existing packed-production compiler diagnostic
 on 2026-10-31, through 2026-11-30: `@dnd-kit/svelte@0.4.0`, file

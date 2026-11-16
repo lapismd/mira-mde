@@ -365,3 +365,15 @@ test("the Mermaid dialog settles inside its Storybook iframe", async ({
   expect(box!.x + box!.width).toBeLessThanOrEqual(viewport!.width);
   expect(box!.y + box!.height).toBeLessThanOrEqual(viewport!.height);
 });
+
+test("the Mermaid ELK math runtime renders and expands without a legacy peer", async ({
+  page,
+}) => {
+  await gotoStory(page, "markdown-mermaid--elk-math");
+  await expect(page.locator(".mermaid svg").first()).toBeVisible();
+  await expect(page.locator(".mermaid .katex").first()).toBeVisible();
+  const dialog = page.getByRole("dialog", { name: "Mermaid diagram" });
+  await expect(dialog).toBeVisible();
+  await expect(dialog.locator(".mermaid .katex").first()).toBeVisible();
+  await expect(dialog.getByRole("button", { name: "Zoom in" })).toBeVisible();
+});
