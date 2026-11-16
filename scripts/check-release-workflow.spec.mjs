@@ -1,6 +1,128 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
+import { createRequire } from "node:module";
+import { realpathSync } from "node:fs";
 import { readFileSync } from "node:fs";
 import test from "node:test";
+
+test("completion caller is a parsed read-only pinned wake-up without recursion", () => {
+  const require = createRequire(
+    realpathSync(
+      new URL("../node_modules/@changesets/cli/package.json", import.meta.url),
+    ),
+  );
+  const { parse } = require("yaml");
+  const caller = parse(
+    readFileSync(
+      new URL("../.github/workflows/dependency-completed.yml", import.meta.url),
+      "utf8",
+    ),
+  );
+  assert.deepEqual(Object.keys(caller).sort(), [
+    "jobs",
+    "name",
+    "on",
+    "permissions",
+  ]);
+  assert.equal(caller.name, "Notify dependency completion");
+  assert.deepEqual(caller.on, {
+    workflow_run: {
+      workflows: [
+        "Mira CI",
+        "Publish Storybook to GitHub Pages",
+        "Release public packages",
+        "Verify existing public release",
+      ],
+      types: ["completed"],
+    },
+  });
+  assert.deepEqual(caller.permissions, {
+    contents: "read",
+    actions: "read",
+    "pull-requests": "read",
+  });
+  assert.deepEqual(caller.jobs, {
+    notify: {
+      if: "github.event.workflow_run.conclusion == 'success'",
+      uses: "lapismd/dependency-automation/.github/workflows/completion.yml@e3c91cb3bc19f19299842054a9309b0ca44da5b6",
+      with: { "automation-ref": "e3c91cb3bc19f19299842054a9309b0ca44da5b6" },
+      secrets: {
+        "app-private-key": "${{ secrets.LAPIS_DEPENDENCY_APP_PRIVATE_KEY }}",
+      },
+    },
+  });
+});
+
+test("qualified runtime guard precedes writer authority without changing the version recipe", () => {
+  const workflow = readFileSync(
+    new URL("../.github/workflows/release.yml", import.meta.url),
+    "utf8",
+  );
+  const version = workflow.match(
+    /\n {2}version:[\s\S]*?(?=\n {2}[\w-]+:|$)/,
+  )?.[0];
+  const guard = version?.match(
+    /- name: Guard qualified version runtime[\s\S]*?(?=\n {6}- )/,
+  )?.[0];
+  assert.ok(guard, "source-owned shared runtime guard exists");
+  assert.match(
+    guard,
+    /uses: lapismd\/lapis-ci\/actions\/guard-version-runtime@6511f29ec5ecd5f5dd0bd90287e3f7761e6886a3/,
+  );
+  const condition =
+    "if: github.event_name == 'push' && github.repository == 'lapismd/mira-mde' && github.ref == 'refs/heads/main'";
+  assert(guard.includes(condition));
+  assert.match(guard, /qualification-file: \.github\/versioning-runtime\.json/);
+  assert.doesNotMatch(
+    guard,
+    /continue-on-error|secrets\.|GITHUB_TOKEN|create-github-app-token/,
+  );
+  assert(
+    version.indexOf("Install dependencies") <
+      version.indexOf("Guard qualified version runtime"),
+  );
+  assert(
+    version.indexOf("Guard qualified version runtime") <
+      version.indexOf("Create repository version token"),
+  );
+  assert.equal(
+    (
+      version.match(
+        new RegExp(condition.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g"),
+      ) ?? []
+    ).length,
+    3,
+  );
+  assert.match(
+    version,
+    /has_changesets: \$\{\{ steps\.changesets\.outputs\.hasChangesets \|\| 'false' \}\}/,
+  );
+  assert.match(
+    workflow,
+    /if: needs\.version\.outputs\.has_changesets != 'true'/,
+  );
+  const qualification = JSON.parse(
+    readFileSync(
+      new URL("../.github/versioning-runtime.json", import.meta.url),
+    ),
+  );
+  const manifest = JSON.parse(
+    readFileSync(new URL("../package.json", import.meta.url)),
+  );
+  assert.equal(qualification.cliVersion, "3.0.3");
+  assert.equal(qualification.packageManager, manifest.packageManager);
+  assert.equal(
+    qualification.scripts["release:version"],
+    manifest.scripts["release:version"],
+  );
+  const hash = (file) =>
+    createHash("sha256")
+      .update(readFileSync(new URL("../" + file, import.meta.url)))
+      .digest("hex");
+  assert.equal(qualification.configSha256, hash(".changeset/config.json"));
+  for (const [file, digest] of Object.entries(qualification.files))
+    assert.equal(digest, hash(file), file);
+});
 
 import {
   checkReleaseWorkflows,
