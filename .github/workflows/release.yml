@@ -60,6 +60,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Guard qualified version runtime
+        if: github.event_name == 'push' && github.repository == 'lapismd/mira-mde' && github.ref == 'refs/heads/main'
+        uses: lapismd/lapis-ci/actions/guard-version-runtime@6511f29ec5ecd5f5dd0bd90287e3f7761e6886a3 # reviewed actual-recipe proof
+        with:
+          qualification-file: .github/versioning-runtime.json
+
       - name: Create repository version token
         id: version-app
         if: github.event_name == 'push' && github.repository == 'lapismd/mira-mde' && github.ref == 'refs/heads/main'

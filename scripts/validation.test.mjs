@@ -1,7 +1,39 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import { realpathSync } from "node:fs";
+import { createRequire } from "node:module";
 import { archiveMember, ciToolDirectory } from "./validation/install-tools.mjs";
+
+const require = createRequire(
+  realpathSync(
+    new URL("../node_modules/@changesets/cli/package.json", import.meta.url),
+  ),
+);
+const { parse } = require("yaml");
+
+function assertHostedRuntime(workflow) {
+  const jobs = Object.values(workflow.jobs ?? {});
+  assert(jobs.length > 0, "Hosted workflows must declare jobs");
+  if (
+    jobs.every(
+      (job) => typeof job.uses === "string" && !job.steps && !job["runs-on"],
+    )
+  ) {
+    for (const job of jobs)
+      assert.match(
+        job.uses,
+        /^[\w.-]+\/[\w.-]+\/\.github\/workflows\/[\w.-]+\.ya?ml@[a-f0-9]{40}$/,
+        "Delegated workflows must pin their runtime owner",
+      );
+    return;
+  }
+  assert.equal(
+    workflow.env?.MIRA_VALIDATION_RUNTIME,
+    "native",
+    "Workflows executing local steps must explicitly select their provisioned native runtime",
+  );
+}
 
 test("hosted CI installs Jujutsu only into runner-owned temporary paths", () => {
   assert.throws(() => ciToolDirectory({}), /runner-owned/);
@@ -69,11 +101,34 @@ test("all hosted workflows explicitly select their provisioned native runtime", 
   const dir = new URL("../.github/workflows/", import.meta.url);
   for (const name of await readdir(dir)) {
     if (!/\.ya?ml$/.test(name)) continue;
-    assert.match(
-      await readFile(new URL(name, dir), "utf8"),
-      /MIRA_VALIDATION_RUNTIME: native/,
-    );
+    assertHostedRuntime(parse(await readFile(new URL(name, dir), "utf8")));
   }
+});
+test("delegation cannot conceal local execution or an unpinned runtime owner", () => {
+  const workflow = {
+    jobs: {
+      notify: {
+        uses: `lapismd/dependency-automation/.github/workflows/completion.yml@${"a".repeat(40)}`,
+      },
+    },
+  };
+  assert.doesNotThrow(() => assertHostedRuntime(workflow));
+  const local = structuredClone(workflow);
+  local.jobs.check = {
+    "runs-on": "ubuntu-latest",
+    steps: [{ run: "pnpm check" }],
+  };
+  assert.throws(() => assertHostedRuntime(local), /explicitly select/);
+  local.env = { MIRA_VALIDATION_RUNTIME: "native" };
+  assert.doesNotThrow(() => assertHostedRuntime(local));
+  const unpinned = structuredClone(workflow);
+  unpinned.jobs.notify.uses =
+    "lapismd/dependency-automation/.github/workflows/completion.yml@main";
+  assert.throws(() => assertHostedRuntime(unpinned), /pin their runtime owner/);
+  const spoof = parse(
+    "# MIRA_VALIDATION_RUNTIME: native\njobs:\n  check:\n    runs-on: ubuntu-latest\n    steps:\n      - run: pnpm check\n",
+  );
+  assert.throws(() => assertHostedRuntime(spoof), /explicitly select/);
 });
 test("remote resource limits are bounded positive numbers", () => {
   assert.equal(validationConfig({}, {}).cpus, 8);
