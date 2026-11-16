@@ -75,7 +75,11 @@ the original native commands, exact tracked source and parent history, frozen
 registry dependencies, bounded resources, reusable toolchain images and caches,
 and collected failure reports. Native execution requires an explicit override;
 Docker failures never silently run a suite on the host. Hosted CI explicitly
-selects its already provisioned native runner. Development servers and manual
+selects its already provisioned native runner for jobs executing local steps.
+Pure reusable-workflow callers instead pin their external runtime owner to an
+immutable revision; mixed workflows still require the native selection for local
+execution, and comments cannot substitute for the parsed runtime declaration.
+Development servers and manual
 Visual Delta commands retain their existing platform and approval boundaries.
 Source export MUST support colocated checkouts and separate Jujutsu workspaces.
 Report collection MUST receive the complete archive before extraction so macOS

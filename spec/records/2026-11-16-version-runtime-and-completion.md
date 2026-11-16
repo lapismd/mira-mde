@@ -106,3 +106,13 @@ Full applicable hosted CI must pass on the actual PR head. Genuine post-merge
 version-job and completion-callback execution, pre-App qualification and final
 coordinator wake-up remain operational acceptance. No callback run is fabricated
 and no unrelated source/publication workflow is rerun merely to create evidence.
+
+Hosted Mira CI43796738324 exposed the existing runtime audit's assumption that
+every workflow executes local steps: the new pinned reusable caller has none.
+The exact `all hosted workflows explicitly` target reproduced1 failure locally.
+The parsed audit now verifies an immutable external runtime owner for pure
+delegation and still requires the real native environment for local/mixed jobs.
+Negative controls reject an added local job, an unpinned delegate and a comment
+spoofing the runtime. The original target plus controls pass2/2, and the complete
+runner suite passes17/17. No native marker is fabricated on the caller, and no
+runtime selection, product assertion or functional lane is changed.
