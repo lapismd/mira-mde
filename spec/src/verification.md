@@ -1,5 +1,11 @@
 # Verification
 
+MIRA-GOV-011 publication visibility is covered by the real-driver regression
+and exhaustion/conflict/error controls in `scripts/publish-release.spec.mjs`.
+The delayed-read target changes from one failure to one pass; all ten publisher
+tests pass. [Propagation evidence](../records/2026-11-16-publication-propagation.md)
+keeps the actual hosted failure separate from source and delivery qualification.
+
 MIRA-MD-026 controlled activation is covered by controlled-activation.test.ts
 and the Host-controlled preview accessibility Storybook play. The source test
 first failed once because a disabled preview retained role=button. Its repaired

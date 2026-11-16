@@ -133,14 +133,20 @@ export function assertPublicationApproval(manifest, env = process.env) {
   }
 }
 
-async function waitForPublishedIntegrity(record, registry) {
-  for (let attempt = 1; attempt <= 12; attempt += 1) {
-    const integrity = publishedIntegrity(record.name, record.version, {
-      registry,
-    });
+export async function waitForPublishedIntegrity(
+  record,
+  registry,
+  {
+    getIntegrity = ({ name, version }) =>
+      publishedIntegrity(name, version, { registry }),
+    sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
+  } = {},
+) {
+  for (let attempt = 1; attempt <= 36; attempt += 1) {
+    const integrity = await getIntegrity(record);
     if (integrity) return integrity;
-    if (attempt < 12) {
-      await new Promise((resolve) => setTimeout(resolve, 10_000));
+    if (attempt < 36) {
+      await sleep(10_000);
     }
   }
   return null;

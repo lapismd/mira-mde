@@ -344,6 +344,12 @@ and retains npm's response before waiting for registry integrity. A successful
 process exit alone never counts as publication. Exact-source approval, protected
 CI, OIDC, immutable tarballs and post-publication integrity checks remain required.
 
+Registry processing may outlast the former two-minute window. Publication now
+allows up to36 read-only integrity probes with ten seconds between missing
+results, without repeating the write. A conflicting result or lookup error
+still rejects; exhaustion leaves verification incomplete for exact-artifact
+recovery rather than claiming success.
+
 Package release tags use the unscoped package name plus exact version, for
 example `mira-editor@0.2.0`. Tags target the commit recorded in the artifact and
 their GitHub release body is the exact package changelog entry. Existing tags or

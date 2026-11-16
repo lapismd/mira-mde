@@ -90,6 +90,12 @@ composition only; they do not copy normative prose.
 
 ## Release preflight
 
+MIRA-GOV-011 permits at most36 read-only registry visibility probes, ten seconds
+apart, after an acknowledged publication. Missing metadata may exhaust that
+bounded wait; conflicting integrity or unavailable evidence still fails. The
+wait MUST NOT reissue publication or advance a dependent before exact integrity
+qualifies. Failed-job recovery retains the original verified artifact.
+
 MIRA-GOV-013 also governs release preparation and pushing: agents must inventory
 all registered Jujutsu workspaces against the candidate, integrate relevant
 unmerged work before versioning, and record any unresolved scope. Before each

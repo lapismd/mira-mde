@@ -6,6 +6,7 @@ import * as publishing from "./publish-release.mjs";
 import {
   parsePublishedIntegrity,
   publishVerifiedPackages,
+  waitForPublishedIntegrity,
 } from "./publish-release.mjs";
 
 const packageRecord = {
@@ -58,6 +59,79 @@ test("makes an exact-integrity rerun idempotent", async () => {
   );
   assert.equal(publishCalls, 0);
   assert.equal(results[0].status, "already-published");
+});
+
+test("an acknowledged publication may become visible after the original two-minute window without another write", async () => {
+  let reads = 0,
+    writes = 0,
+    elapsed = 0;
+  const results = await publishVerifiedPackages(
+    { packages: [packageRecord] },
+    {
+      getIntegrity: () => null,
+      publish: () => {
+        writes += 1;
+      },
+      waitForIntegrity: (record) =>
+        waitForPublishedIntegrity(record, "https://registry.npmjs.org", {
+          getIntegrity: () => (++reads > 12 ? record.integrity : null),
+          sleep: async (ms) => {
+            elapsed += ms;
+          },
+        }),
+    },
+  );
+  assert.equal(results[0].status, "published");
+  assert.equal(writes, 1);
+  assert.equal(reads, 13);
+  assert(elapsed >= 120_000 && elapsed <= 360_000);
+});
+
+test("missing publication stays bounded and a conflicting or unavailable registry never qualifies", async () => {
+  let elapsed = 0;
+  assert.equal(
+    await waitForPublishedIntegrity(
+      packageRecord,
+      "https://registry.npmjs.org",
+      {
+        getIntegrity: () => null,
+        sleep: async (ms) => {
+          elapsed += ms;
+        },
+      },
+    ),
+    null,
+  );
+  assert(elapsed > 120_000 && elapsed <= 360_000);
+  let writes = 0;
+  await assert.rejects(
+    publishVerifiedPackages(
+      { packages: [packageRecord] },
+      {
+        getIntegrity: () => null,
+        publish: () => {
+          writes += 1;
+        },
+        waitForIntegrity: (record) =>
+          waitForPublishedIntegrity(record, "https://registry.npmjs.org", {
+            getIntegrity: () => "sha512-conflicting",
+            sleep: async () =>
+              assert.fail("Conflicting identity must fail immediately"),
+          }),
+      },
+    ),
+    /verified integrity/,
+  );
+  assert.equal(writes, 1);
+  await assert.rejects(
+    waitForPublishedIntegrity(packageRecord, "https://registry.npmjs.org", {
+      getIntegrity: () => {
+        throw Error("registry unavailable");
+      },
+      sleep: async () => assert.fail("Unknown registry failures remain fatal"),
+    }),
+    /registry unavailable/,
+  );
 });
 
 test("rejects an existing version with different bytes", async () => {
