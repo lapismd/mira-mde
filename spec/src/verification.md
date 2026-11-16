@@ -6,6 +6,13 @@ The delayed-read target changes from one failure to one pass; all ten publisher
 tests pass. [Propagation evidence](../records/2026-11-16-publication-propagation.md)
 keeps the actual hosted failure separate from source and delivery qualification.
 
+MIRA-GOV-011/019 shared installation readiness is covered by
+`scripts/verify-release.spec.mjs`: complete exact batch, npm12 policy and finite
+budget, no fallback, both workflow setup paths, unchanged source/integrity/
+signature/provenance order and the complete large audit-output controls.
+[Shared readiness evidence](../records/2026-11-16-shared-registry-readiness.md)
+separates owning-source checks, retained artifact acceptance and hosted delivery.
+
 MIRA-MD-026 controlled activation is covered by controlled-activation.test.ts
 and the Host-controlled preview accessibility Storybook play. The source test
 first failed once because a disabled preview retained role=button. Its repaired
