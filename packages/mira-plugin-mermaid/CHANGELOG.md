@@ -1,5 +1,11 @@
 # @lapismd/mira-plugin-mermaid
 
+## 0.0.5
+
+### Patch Changes
+
+- [#43](https://github.com/lapismd/mira-mde/pull/43) [`98db960`](https://github.com/lapismd/mira-mde/commit/98db960d69519c0ff6698d3fed9a7dc18c2e81d7) Thanks [@stevejuma](https://github.com/stevejuma)! - Use maintained Mermaid 12 with its bundled ELK layout so published editor consumers no longer inherit the vulnerable KaTeX 0.16 chain. Preserve Mira's Dagre default, inline/dialog rendering, source fallback and controls, and require zero production audit findings without the historical Mermaid cohort exception. Raise the published Mira Editor dependency floor to the repaired plugin patch so consumers can require a safe Editor minimum. Mermaid 12 requires Node 22.12 or later for Node-based tooling; this release is qualified on Node 24.
+
 ## 0.0.4
 
 ### Patch Changes
