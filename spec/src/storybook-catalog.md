@@ -1,5 +1,7 @@
 # Storybook Catalog
 
+Mermaid runtime qualification includes the actual bundled ELK layout and mathematical labels in reading and expanded-dialog surfaces. Changed Mermaid stories remain visual-pending; existing images are retained unchanged while functional, interaction and accessibility gates remain required.
+
 Cold table typography acceptance MUST await the owning document's font faces
 before comparing pipe-column geometry, while preserving the existing pixel
 alignment assertions and complete interaction coverage.

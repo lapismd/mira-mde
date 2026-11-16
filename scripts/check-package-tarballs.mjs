@@ -349,7 +349,7 @@ console.log("All public stylesheet imports resolve without hoisted dependencies.
       path.join(evidenceDirectory, "mermaid-runtime-identity.json"),
       mermaidRuntime,
     );
-    console.log(checkPackedAudit(audit, mermaidRuntime));
+    console.log(checkPackedAudit(audit));
 
     console.log(
       "Mira tarballs validated: six packages installed together; Svelte, React, Vanilla, CSS, and leak checks passed.",
