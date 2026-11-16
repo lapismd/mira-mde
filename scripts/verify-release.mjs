@@ -64,7 +64,58 @@ export function verifyRegistryIntegrity(manifest) {
   return { ok: errors.length === 0, errors };
 }
 
-function main() {
+export const MIRA_INSTALL_READINESS_BUDGET_MS = 300000;
+
+export async function loadRegistryReadiness(
+  modulePath = process.env.LAPIS_REGISTRY_READINESS_MODULE,
+) {
+  if (
+    !modulePath ||
+    !path.isAbsolute(modulePath) ||
+    path.basename(modulePath) !== "registry-readiness.mjs"
+  )
+    throw Error(
+      "Mira verification requires the source-pinned shared registry readiness setup",
+    );
+  const api = await import(pathToFileURL(modulePath).href);
+  if (
+    typeof api.installPublishedConsumer !== "function" ||
+    typeof api.registryInstaller !== "function"
+  )
+    throw Error("Shared registry readiness contract is unavailable");
+  return api;
+}
+
+/** Called only after source/tarball and independent registry-integrity checks. */
+export async function installVerifiedConsumer(manifest, cwd, readiness) {
+  readiness ??= await loadRegistryReadiness();
+  writeFileSync(
+    path.join(cwd, "package.json"),
+    `${JSON.stringify({
+      name: "mira-release-verification",
+      private: true,
+      dependencies: Object.fromEntries(
+        manifest.packages.map(({ name, version }) => [name, version]),
+      ),
+    })}\n`,
+  );
+  await readiness.installPublishedConsumer({
+    cwd,
+    entries: manifest.packages.map(({ name, version, integrity }) => ({
+      name,
+      version,
+      integrity,
+    })),
+    registry: manifest.registry,
+    policy: {
+      budgetMs: MIRA_INSTALL_READINESS_BUDGET_MS,
+      delaysMs: Array(29).fill(10000),
+    },
+    installer: readiness.registryInstaller("npm12-default-peers", "12.0.2"),
+  });
+}
+
+async function main() {
   const manifestPath = path.resolve(process.argv[2] ?? DEFAULT_MANIFEST_PATH);
   const auditPath = path.resolve(
     process.argv[3] ??
@@ -85,21 +136,7 @@ function main() {
     path.join(os.tmpdir(), "mira-release-verify-"),
   );
   try {
-    writeFileSync(
-      path.join(temporaryRoot, "package.json"),
-      `${JSON.stringify({ name: "mira-release-verification", private: true })}\n`,
-    );
-    runVerificationCommand(
-      "npm",
-      [
-        "install",
-        "--ignore-scripts",
-        "--package-lock=true",
-        `--registry=${manifest.registry}`,
-        ...manifest.packages.map(({ name, version }) => `${name}@${version}`),
-      ],
-      temporaryRoot,
-    );
+    await installVerifiedConsumer(manifest, temporaryRoot);
     for (const record of manifest.packages) {
       const installedManifest = JSON.parse(
         readFileSync(
@@ -143,7 +180,7 @@ if (
   import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
 ) {
   try {
-    main();
+    await main();
   } catch (error) {
     console.error(
       `Post-publish verification failed: ${error instanceof Error ? error.message : String(error)}`,

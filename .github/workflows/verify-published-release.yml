@@ -74,6 +74,9 @@ jobs:
           pnpm install --frozen-lockfile
           npm install --global npm@12.0.2
 
+      - name: Prepare source-pinned npm12 registry readiness
+        uses: lapismd/lapis-ci/actions/setup-registry-readiness@69a81e05ca32dc5b7024ef2cd0711860b1813926
+
       - name: Verify clean installation, integrity and original provenance
         env:
           MIRA_PROVENANCE_WORKFLOW_SOURCE: ${{ steps.original.outputs.workflow_source }}

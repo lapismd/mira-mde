@@ -325,6 +325,9 @@ jobs:
           name: ${{ needs.artifact.outputs.artifact_name }}
           path: .release
 
+      - name: Prepare source-pinned npm12 registry readiness
+        uses: lapismd/lapis-ci/actions/setup-registry-readiness@69a81e05ca32dc5b7024ef2cd0711860b1813926
+
       - name: Verify clean install, integrity, and provenance
         run: >-
           pnpm --dir .release/tooling release:verify "$GITHUB_WORKSPACE/.release/release-manifest.json" "$GITHUB_WORKSPACE/.release/npm-signatures.json"

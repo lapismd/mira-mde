@@ -96,6 +96,21 @@ bounded wait; conflicting integrity or unavailable evidence still fails. The
 wait MUST NOT reissue publication or advance a dependent before exact integrity
 qualifies. Failed-job recovery retains the original verified artifact.
 
+MIRA-GOV-011/019 clean installation MUST use the source-pinned shared registry
+readiness helper after existing source, tarball and independent registry
+integrity checks. The entire selected package batch MUST retain exact versions
+and SHA512 identities. Install-v1 observation and initial installation share
+one300000ms deadline, with at most29 ten-second retry delays and per-attempt
+fresh caches. The qualified npm12.0.2 default-peer profile MUST disable lifecycle
+scripts and retain an explicit package lock. Only the shared exact-candidate
+propagation/transient policy may retry; identity, integrity, authority, peer,
+tool and unrelated failures MUST block. Missing shared setup MUST NOT fall back
+to an unguarded install. Both normal verification and existing-publication
+recovery MUST prepare the same immutable helper before verification. Exact
+installed versions, complete signature audit output, original provenance,
+source approval and release-metadata gates remain mandatory. This readiness
+policy MUST NOT retry publication or change the36 publisher visibility probes.
+
 MIRA-GOV-013 also governs release preparation and pushing: agents must inventory
 all registered Jujutsu workspaces against the candidate, integrate relevant
 unmerged work before versioning, and record any unresolved scope. Before each
