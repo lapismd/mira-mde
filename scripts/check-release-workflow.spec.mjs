@@ -67,12 +67,22 @@ test("qualified runtime guard precedes writer authority without changing the ver
   assert.ok(guard, "source-owned shared runtime guard exists");
   assert.match(
     guard,
-    /uses: lapismd\/lapis-ci\/actions\/guard-version-runtime@6511f29ec5ecd5f5dd0bd90287e3f7761e6886a3/,
+    /uses: lapismd\/lapis-ci\/actions\/guard-version-runtime@dc81ff65ba812bf005fb2a806eb3308bb8b5f71f/,
   );
   const condition =
     "if: github.event_name == 'push' && github.repository == 'lapismd/mira-mde' && github.ref == 'refs/heads/main'";
   assert(guard.includes(condition));
   assert.match(guard, /qualification-file: \.github\/versioning-runtime\.json/);
+  assert.match(guard, /detect-release-intent: "true"/);
+  assert.equal(
+    (
+      version.match(
+        /steps\.version-runtime\.outputs\.hasChangesets == 'true'/g,
+      ) ?? []
+    ).length,
+    2,
+    "both writer steps require genuine release intent",
+  );
   assert.doesNotMatch(
     guard,
     /continue-on-error|secrets\.|GITHUB_TOKEN|create-github-app-token/,

@@ -50,7 +50,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Validate canonical specification
-        run: pnpm spec:validate && pnpm spec:build
+        run: pnpm check:dependency-intake && pnpm test:dependency-intake && pnpm spec:validate && pnpm spec:build
 
       - name: Enforce specification-first changes
         if: >-
@@ -70,6 +70,8 @@ jobs:
     steps:
       - name: Check out the repository
         uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v6

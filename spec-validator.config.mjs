@@ -18,9 +18,17 @@ export default defineConfig(tableRequirements(), {
     markdownlint: "MIRA-GOV-001",
     specFirst: "MIRA-GOV-003",
     internal: "MIRA-GOV-006",
+    qmd: "MIRA-GOV-006",
   },
   check: {
-    lanes: [{ name: "markdownlint", command: "pnpm", args: ["spec:lint"] }],
+    lanes: [
+      {
+        name: "dependency-intake",
+        command: "node",
+        args: ["scripts/dependency-automation/check-workspace-intake.mjs"],
+      },
+      { name: "markdownlint", command: "pnpm", args: ["spec:lint"] },
+    ],
   },
   validators: {
     summary: true,
@@ -49,6 +57,10 @@ export default defineConfig(tableRequirements(), {
       rowMultiplicity: "at-least-one",
     }),
     book: true,
+    qmd: {
+      collection: "mira-mde-spec",
+      configPath: ".qmd/index.yml",
+    },
     storybookMirrors: {
       style: "stories-spec",
       directory: "stories/spec",
@@ -77,6 +89,15 @@ export default defineConfig(tableRequirements(), {
         "\\.(?:actual|diff)\\.png$",
       ],
       rules: [
+        {
+          pattern:
+            "^(?:scripts/dependency-automation/|\\.github/dependency-automation/|\\.qmd/)",
+          chapters: [
+            "spec/src/architecture.md",
+            "spec/src/packages.md",
+            "spec/src/spec-governance.md",
+          ],
+        },
         {
           pattern: "^packages/mira/licenses/math-adapters/",
           chapters: ["spec/src/architecture.md", "spec/src/packages.md"],
@@ -154,6 +175,7 @@ export default defineConfig(tableRequirements(), {
         },
       ],
       protected: [
+        "^(?:scripts/dependency-automation/|\\.github/dependency-automation/|\\.qmd/)",
         "^packages/mira/licenses/math-adapters/",
         "^scripts/check-package-tarballs\\.mjs$",
         "^scripts/(?:build|check)-math-adapters(?:\\.spec)?\\.mjs$",

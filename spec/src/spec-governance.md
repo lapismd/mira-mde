@@ -1,5 +1,35 @@
 # Specification Governance
 
+<!-- dependency-intake:framework-registry:start -->
+
+Current registry dependency coordinates; qualification remains separate.
+
+<!-- prettier-ignore -->
+| Manifest | Dependency | Range | Locked version |
+| --- | --- | --- | --- |
+| `package.json` (devDependencies) | `@lapismd/spec-validator` | `^0.2.1` | `0.2.1` |
+| `package.json` (devDependencies) | `@lapismd/storybook-addon-visual-delta` | `0.1.5` | `0.1.5` |
+
+Manifest, peer and integrity facts SHA256: `0173bad47c4839f53074b3bf5f5eac623d68c869b996a9d10d5e10e2d19f271c`.
+
+<!-- dependency-intake:framework-registry:end -->
+
+## Bounded dependency intake
+
+| ID           | Requirement                                                                                                                                                                                                                                                                                                                                        |
+| ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| MIRA-GOV-023 | Dependency automation MUST preserve the source-owned active root/registry map, independently verify compatible patches and manifest/lock/canonical closure outside bot exemptions, reject unsupported migrations, stale policy, immutable-version mutation and unrelated source changes, and retain the full audit, release and publication gates. |
+
+The current external Lapis inputs are the Node-only specification validator and
+Visual Delta development tools; internal Mira workspaces remain source-owned.
+Normal check, aggregate specification and version preparation run the independent
+guard before writer authority. Repository-owned QMD configuration supports local
+lexical discovery without executing searches or downloading models in CI.
+The existing two HIGH Changesets/picomatch findings still block the full-audit
+gate under [Mira48](https://github.com/lapismd/mira-mde/issues/48). This source
+proposal adds no suppression, exception or activation and changes no package
+version, public export or publication intent.
+
 MIRA-MERMAID-006 qualification requires zero findings in both fresh packed production cohorts. The former exact Mermaid 11 KaTeX acceptance is retired for newly packed outputs; historical receipts remain historical. A genuine plugin patch Changeset records the changed public runtime dependency and preserves the normal version/publication gates.
 
 Public asynchronous embed changes retain a packed declaration guard that accepts

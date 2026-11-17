@@ -1,0 +1,244 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import { readFileSync } from "node:fs";
+import YAML from "yaml";
+import { intakeFacts, intakeSlot, verifyIntake } from "./workspace-intake.mjs";
+
+const policyBytes = JSON.stringify({
+  schemaVersion: 2,
+  kind: "workspace-dependency-intake",
+  repository: "lapismd/mira-mde",
+  slot: "framework-registry",
+  dependencies: [
+    "@lapismd/spec-validator",
+    "@lapismd/storybook-addon-visual-delta",
+  ],
+  manifests: ["package.json"],
+  chapters: [
+    "spec/src/architecture.md",
+    "spec/src/packages.md",
+    "spec/src/spec-governance.md",
+  ],
+  lockClosure: "registry-transitives",
+});
+const sdk = "@lapismd/spec-validator";
+const integrity = (letter) => `sha512-${letter.repeat(86)}==`;
+function input(version = "0.2.0") {
+  const policy = JSON.parse(policyBytes);
+  const manifests = Object.fromEntries(
+    policy.manifests.map((path) => [
+      path,
+      JSON.parse(
+        readFileSync(new URL(`../../${path}`, import.meta.url), "utf8"),
+      ),
+    ]),
+  );
+  manifests["package.json"].devDependencies[sdk] = `^${version}`;
+  const source = Object.fromEntries(
+    ["pnpm-workspace.yaml", "pnpm-lock.yaml", ...policy.manifests].map(
+      (path) => [
+        path,
+        readFileSync(new URL(`../../${path}`, import.meta.url), "utf8"),
+      ],
+    ),
+  );
+  const actual = intakeFacts(policy, source);
+  const importerEntries = {},
+    packages = {},
+    snapshots = {};
+  for (const [path, manifest] of Object.entries(manifests)) {
+    const importer = path === "package.json" ? "." : path.slice(0, -13),
+      entry = {};
+    for (const type of [
+      "dependencies",
+      "optionalDependencies",
+      "devDependencies",
+    ])
+      for (const name of policy.dependencies) {
+        if (!manifest[type]?.[name]) continue;
+        const v =
+          name === sdk ? version : actual.manifests[path][type][name].version;
+        (entry[type] ??= {})[name] = {
+          specifier: manifest[type][name],
+          version: v,
+        };
+        packages[`${name}@${v}`] = {
+          resolution: {
+            integrity: integrity(name === sdk && v === "0.2.1" ? "D" : "A"),
+          },
+        };
+        snapshots[`${name}@${v}`] = {};
+      }
+    importerEntries[importer] = entry;
+  }
+  return {
+    ...Object.fromEntries(
+      Object.entries(manifests).map(([path, manifest]) => [
+        path,
+        JSON.stringify(manifest),
+      ]),
+    ),
+    "pnpm-workspace.yaml": source["pnpm-workspace.yaml"],
+    "pnpm-lock.yaml": YAML.stringify({
+      lockfileVersion: "9.0",
+      settings: { autoInstallPeers: false },
+      importers: importerEntries,
+      packages,
+      snapshots,
+    }),
+  };
+}
+function data() {
+  const before = input(),
+    files = input("0.2.1"),
+    policy = JSON.parse(policyBytes);
+  return {
+    policyBytes,
+    basePolicyBytes: policyBytes,
+    before,
+    files,
+    changedFiles: ["package.json", "pnpm-lock.yaml", ...policy.chapters],
+    documents: Object.fromEntries(
+      policy.chapters.map((p) => [
+        p,
+        "# Contract\n\n" +
+          intakeSlot(policy, intakeFacts(policy, files)) +
+          "\n",
+      ]),
+    ),
+    baseDocuments: Object.fromEntries(
+      policy.chapters.map((p) => [
+        p,
+        "# Contract\n\n" +
+          intakeSlot(policy, intakeFacts(policy, before)) +
+          "\n",
+      ]),
+    ),
+  };
+}
+test("accepts a compatible SDK patch with independently derived source facts", () =>
+  assert.equal(
+    verifyIntake(data()).manifests["package.json"].devDependencies[sdk].version,
+    "0.2.1",
+  ));
+for (const [name, mutate] of [
+  [
+    "unsupported 0.x minor",
+    (d) => {
+      const p = JSON.parse(d.files["package.json"]);
+      p.devDependencies[sdk] = "^0.3.0";
+      d.files["package.json"] = JSON.stringify(p);
+    },
+  ],
+  [
+    "unrelated public export",
+    (d) => {
+      const p = JSON.parse(d.files["package.json"]);
+      p.exports = { ".": "./other.js" };
+      d.files["package.json"] = JSON.stringify(p);
+    },
+  ],
+  ["unrelated source file", (d) => d.changedFiles.push("src/unrelated.ts")],
+  ["changed source policy", (d) => (d.basePolicyBytes = policyBytes + "\n")],
+  [
+    "manual canonical prose",
+    (d) => {
+      d.documents[JSON.parse(policyBytes).chapters[0]] += "Changed contract.\n";
+    },
+  ],
+  [
+    "unrelated direct importer",
+    (d) => {
+      const l = YAML.parse(d.files["pnpm-lock.yaml"]);
+      l.importers["."].devDependencies.other = {
+        specifier: "1.0.0",
+        version: "1.0.0",
+      };
+      d.files["pnpm-lock.yaml"] = YAML.stringify(l);
+    },
+  ],
+  [
+    "unrelated first-party metadata",
+    (d) => {
+      const l = YAML.parse(d.files["pnpm-lock.yaml"]);
+      l.packages["@lapismd/storybook-addon-visual-delta@0.1.5"].engines = {
+        node: ">=99",
+      };
+      d.files["pnpm-lock.yaml"] = YAML.stringify(l);
+    },
+  ],
+  [
+    "unapproved release intent",
+    (d) => {
+      d.changedFiles.push(".changeset/lapis-dependencies-123456789abc.md");
+      d.files[".changeset/lapis-dependencies-123456789abc.md"] =
+        '---\n"@lapismd/design-core": patch\n---\nUnexpected development-only release.\n';
+    },
+  ],
+])
+  test(`rejects ${name}`, () => {
+    const d = data();
+    mutate(d);
+    assert.throws(() => verifyIntake(d));
+  });
+test("same-version integrity mutation is rejected", () => {
+  const d = data();
+  d.files = input();
+  const l = YAML.parse(d.files["pnpm-lock.yaml"]);
+  l.packages[`${sdk}@0.2.0`].resolution.integrity = integrity("Z");
+  d.files["pnpm-lock.yaml"] = YAML.stringify(l);
+  const p = JSON.parse(policyBytes);
+  d.documents = Object.fromEntries(
+    p.chapters.map((x) => [
+      x,
+      "# Contract\n\n" + intakeSlot(p, intakeFacts(p, d.files)) + "\n",
+    ]),
+  );
+  assert.throws(() => verifyIntake(d), /integrity/);
+});
+test("source bootstrap checks actual installed catalog without inventing an update", () => {
+  const files = Object.fromEntries(
+    [
+      "pnpm-workspace.yaml",
+      "pnpm-lock.yaml",
+      ...JSON.parse(policyBytes).manifests,
+    ].map((p) => [
+      p,
+      readFileSync(new URL(`../../${p}`, import.meta.url), "utf8"),
+    ]),
+  );
+  const p = JSON.parse(policyBytes);
+  assert.equal(
+    intakeFacts(p, files).manifests["package.json"].devDependencies[sdk]
+      .version,
+    "0.2.1",
+  );
+});
+
+test("same-version first-party metadata mutation is rejected even without an update", () => {
+  const d = data();
+  d.files = input();
+  const lock = YAML.parse(d.files["pnpm-lock.yaml"]);
+  lock.packages["@lapismd/storybook-addon-visual-delta@0.1.5"].engines = {
+    node: ">=99",
+  };
+  d.files["pnpm-lock.yaml"] = YAML.stringify(lock);
+  d.documents = d.baseDocuments;
+  assert.throws(() => verifyIntake(d), /metadata/);
+});
+
+test("actual empty managed Changeset shape retains no publication intent", () => {
+  const d = data(),
+    note = ".changeset/lapis-dependencies-123456789abc.md";
+  d.changedFiles.push(note);
+  d.files[note] =
+    "---\n---\n\nRefresh first-party Lapis dependencies to the published versions recorded in this pull request.\n";
+  assert.doesNotThrow(() => verifyIntake(d));
+});
+test("null metadata is not an empty managed release map", () => {
+  const d = data(),
+    note = ".changeset/lapis-dependencies-123456789abc.md";
+  d.changedFiles.push(note);
+  d.files[note] = "---\nnull\n---\nUnexpected metadata.\n";
+  assert.throws(() => verifyIntake(d), /release intent/);
+});

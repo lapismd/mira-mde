@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 2,
+  "kind": "workspace-dependency-intake",
+  "repository": "lapismd/mira-mde",
+  "slot": "framework-registry",
+  "dependencies": [
+    "@lapismd/spec-validator",
+    "@lapismd/storybook-addon-visual-delta"
+  ],
+  "manifests": ["package.json"],
+  "chapters": [
+    "spec/src/architecture.md",
+    "spec/src/packages.md",
+    "spec/src/spec-governance.md"
+  ],
+  "lockClosure": "registry-transitives"
+}
