@@ -43,15 +43,53 @@ test("source delegates to actual immutable shared CLI with build scripts disable
     ".release/development-audit",
   );
 });
-test("source policy contains no active or inferred approval", () =>
-  assert.deepEqual(
-    JSON.parse(
-      readFileSync(
-        new URL("../.github/development-audit-policy.json", import.meta.url),
-      ),
+test("source policy binds only the exact explicit-user HIGH picomatch approvals", () => {
+  const policy = JSON.parse(
+    readFileSync(
+      new URL("../.github/development-audit-policy.json", import.meta.url),
     ),
-    { schemaVersion: 2, repository: "lapismd/mira-mde", approvals: [] },
-  ));
+  );
+  assert.equal(policy.schemaVersion, 2);
+  assert.equal(policy.repository, "lapismd/mira-mde");
+  assert.equal(policy.approvals.length, 2);
+  for (const entry of policy.approvals) {
+    assert.equal(entry.advisory, "GHSA-fc5q-39xc-vjpf");
+    assert.equal(entry.package, "picomatch");
+    assert.equal(entry.severity, "high");
+    assert.equal(entry.scope, "development-only");
+    assert.equal(entry.vulnerableRange, "<=4.0.7");
+    assert.equal(entry.patchedRange, "<0.0.0");
+    assert.equal(entry.sourceSha, "efd6eb0f6bb3dd90d314fc82e0fdb93ccd739b3c");
+    assert.equal(
+      entry.manifestSha256,
+      "b5ee695f16d307bdf936f5faa529a36bcf8e8179970c3778ecd232327fd69799",
+    );
+    assert.equal(
+      entry.lockSha256,
+      "da5000188deea37ad19e01bc875ae9258bd632b402680fe4da8a5ac737523c71",
+    );
+    assert.equal(entry.approvedAt, "2026-11-18T13:30:52.633Z");
+    assert.equal(entry.expiresAt, "2026-11-19T00:00:00.000Z");
+    assert.equal(entry.authority, "explicit-user");
+    assert.equal(
+      entry.record,
+      "spec/records/2026-11-18-development-high-decision.md",
+    );
+  }
+  assert.deepEqual(
+    policy.approvals.map(({ version, path }) => ({ version, path })),
+    [
+      {
+        version: "4.0.7",
+        path: ".>@changesets/cli>@changesets/config>picomatch",
+      },
+      {
+        version: "4.0.5",
+        path: ".>@changesets/cli>@changesets/git>picomatch",
+      },
+    ],
+  );
+});
 for (const result of [
   { status: 0 },
   { status: 1 },

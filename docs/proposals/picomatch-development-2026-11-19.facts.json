@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "kind": "disabled-source-review-facts",
-  "enabled": false,
+  "enabled": true,
   "repository": "lapismd/mira-mde",
   "adoptionBaselineSource": "fb07d9c6b004d34949c802407d540977b42854f6",
   "advisory": "GHSA-fc5q-39xc-vjpf",
@@ -10,11 +10,15 @@
   "findings": [
     {
       "version": "4.0.7",
-      "paths": [".>@changesets/cli>@changesets/config>picomatch"]
+      "paths": [
+        ".>@changesets/cli>@changesets/config>picomatch"
+      ]
     },
     {
       "version": "4.0.5",
-      "paths": [".>@changesets/cli>@changesets/git>picomatch"]
+      "paths": [
+        ".>@changesets/cli>@changesets/git>picomatch"
+      ]
     }
   ],
   "expiresAt": "2026-11-19T00:00:00Z",
@@ -28,7 +32,42 @@
     "merge": "5cb7a35031c7e83e0d41ef3ce3209e958076119b",
     "executable": "lapis-development-audit",
     "qualifiedTests": 309,
-    "operationalApprovals": [],
+    "operationalApprovals": [
+      {
+        "advisory": "GHSA-fc5q-39xc-vjpf",
+        "package": "picomatch",
+        "version": "4.0.7",
+        "severity": "high",
+        "path": ".>@changesets/cli>@changesets/config>picomatch",
+        "scope": "development-only",
+        "vulnerableRange": "<=4.0.7",
+        "patchedRange": "<0.0.0",
+        "sourceSha": "efd6eb0f6bb3dd90d314fc82e0fdb93ccd739b3c",
+        "manifestSha256": "b5ee695f16d307bdf936f5faa529a36bcf8e8179970c3778ecd232327fd69799",
+        "lockSha256": "da5000188deea37ad19e01bc875ae9258bd632b402680fe4da8a5ac737523c71",
+        "approvedAt": "2026-11-18T13:30:52.633Z",
+        "expiresAt": "2026-11-19T00:00:00.000Z",
+        "authority": "explicit-user",
+        "record": "spec/records/2026-11-18-development-high-decision.md"
+      },
+      {
+        "advisory": "GHSA-fc5q-39xc-vjpf",
+        "package": "picomatch",
+        "version": "4.0.5",
+        "severity": "high",
+        "path": ".>@changesets/cli>@changesets/git>picomatch",
+        "scope": "development-only",
+        "vulnerableRange": "<=4.0.7",
+        "patchedRange": "<0.0.0",
+        "sourceSha": "efd6eb0f6bb3dd90d314fc82e0fdb93ccd739b3c",
+        "manifestSha256": "b5ee695f16d307bdf936f5faa529a36bcf8e8179970c3778ecd232327fd69799",
+        "lockSha256": "da5000188deea37ad19e01bc875ae9258bd632b402680fe4da8a5ac737523c71",
+        "approvedAt": "2026-11-18T13:30:52.633Z",
+        "expiresAt": "2026-11-19T00:00:00.000Z",
+        "authority": "explicit-user",
+        "record": "spec/records/2026-11-18-development-high-decision.md"
+      }
+    ],
     "runtimeBindingFields": [
       "repository",
       "sourceSha",
@@ -50,9 +89,9 @@
       "scripts/development-audit-cli.test.mjs": "df033860e86c993cd85367810a2c79e995c5e3c0e366c1bd2131244ccd644e82"
     }
   },
-  "hashEnforcement": "shared specified approval fields; full review inventory is evidence only; approvals currently empty",
-  "approvalEvidence": null,
-  "bindingStatus": "no active exception",
+  "hashEnforcement": "shared specified approval fields; full review inventory is evidence only; exact explicit-user HIGH approvals active",
+  "approvalEvidence": "spec/records/2026-11-18-development-high-decision.md",
+  "bindingStatus": "exact explicit-user HIGH approvals active",
   "bindings": {
     "package.json": "b5ee695f16d307bdf936f5faa529a36bcf8e8179970c3778ecd232327fd69799",
     "pnpm-lock.yaml": "da5000188deea37ad19e01bc875ae9258bd632b402680fe4da8a5ac737523c71",
@@ -73,7 +112,7 @@
     ".github/versioning-runtime.json": "b5fe8013821675bf3d059661da9431e771893a56ad5b76e1b235c3085614b843",
     "scripts/development-audit.mjs": "4d069949f077479c329812ea9d05bc1f7616f65e01015e9fe7dfc8b295e6beda",
     "scripts/development-audit.spec.mjs": "39908a01f9d9f84b5f64971130d7af0a3cf72f4cace3dacb892ed92345387b1b",
-    ".github/development-audit-policy.json": "27624928163b50338280af5c51b970035e687f8da9ee6085e22c1af9e62d7ac3",
+    ".github/development-audit-policy.json": "68a8c586082ad2ba8299c48398f26e18375d2d36f9aa1a5b450183a69735bc8c",
     "spec-validator.config.mjs": "19ef5c662837ccb4eb55433fbb0a639b8ecec4392f4dd2a92e4d3af528e75a9f"
   },
   "reports": {
@@ -125,5 +164,41 @@
       "unchangedRootWorkspaceVersions": 9,
       "denoAbsentBeforeAndAfter": true
     }
-  }
+  },
+  "operationalApprovals": [
+    {
+      "advisory": "GHSA-fc5q-39xc-vjpf",
+      "package": "picomatch",
+      "version": "4.0.7",
+      "severity": "high",
+      "path": ".>@changesets/cli>@changesets/config>picomatch",
+      "scope": "development-only",
+      "vulnerableRange": "<=4.0.7",
+      "patchedRange": "<0.0.0",
+      "sourceSha": "efd6eb0f6bb3dd90d314fc82e0fdb93ccd739b3c",
+      "manifestSha256": "b5ee695f16d307bdf936f5faa529a36bcf8e8179970c3778ecd232327fd69799",
+      "lockSha256": "da5000188deea37ad19e01bc875ae9258bd632b402680fe4da8a5ac737523c71",
+      "approvedAt": "2026-11-18T13:30:52.633Z",
+      "expiresAt": "2026-11-19T00:00:00.000Z",
+      "authority": "explicit-user",
+      "record": "spec/records/2026-11-18-development-high-decision.md"
+    },
+    {
+      "advisory": "GHSA-fc5q-39xc-vjpf",
+      "package": "picomatch",
+      "version": "4.0.5",
+      "severity": "high",
+      "path": ".>@changesets/cli>@changesets/git>picomatch",
+      "scope": "development-only",
+      "vulnerableRange": "<=4.0.7",
+      "patchedRange": "<0.0.0",
+      "sourceSha": "efd6eb0f6bb3dd90d314fc82e0fdb93ccd739b3c",
+      "manifestSha256": "b5ee695f16d307bdf936f5faa529a36bcf8e8179970c3778ecd232327fd69799",
+      "lockSha256": "da5000188deea37ad19e01bc875ae9258bd632b402680fe4da8a5ac737523c71",
+      "approvedAt": "2026-11-18T13:30:52.633Z",
+      "expiresAt": "2026-11-19T00:00:00.000Z",
+      "authority": "explicit-user",
+      "record": "spec/records/2026-11-18-development-high-decision.md"
+    }
+  ]
 }

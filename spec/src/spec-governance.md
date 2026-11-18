@@ -22,8 +22,12 @@ The source audit lane invokes the private source-distributed Lapis CI executable
 at reviewed source `63e64958e9b271d36feba06a162ee02b079a3206`, with build scripts
 disabled, Node24 and the exact caller pnpm version. Normal checks, CI and release
 use this same lane; raw full and production evidence is retained independently.
-The source-owned schema2 policy has `approvals: []`: both Mira HIGH findings stay
-blocking. This integration grants no exception or publication authority.
+The source-owned schema2 policy now carries the exact explicit-user HIGH
+picomatch approvals recorded in
+[the HIGH decision](../records/2026-11-18-development-high-decision.md).
+Production findings and every unmatched full finding remain blocking. This
+integration grants no publication authority beyond that exact temporary
+development admission.
 
 The shared evaluator enforces approved repository/dependency-source/manifest/lock,
 path/version/severity, record, time and fresh official-registry constraints, then
@@ -31,12 +35,11 @@ rechecks immutable graph and decision evidence after collection. Full-source,
 workspace-manifest and checker/test review hashes recorded in the proposal are
 not additional runtime hash checks; the executable itself is commit-pinned.
 
-The [disabled development-audit proposal](https://github.com/lapismd/mira-mde/blob/main/docs/proposals/picomatch-development-2026-11-19.md)
-records Mira's exact two-path HIGH findings and source review hashes. It grants
-no exception: raw full audit remains blocking. Its hashes are review evidence
-for the recorded inventory. The pinned shared checker enforces its specified
-source bindings only for an explicitly approved entry; the empty operational
-policy grants none. The coordinator's separate approval cannot transfer here.
+The [development-audit proposal](https://github.com/lapismd/mira-mde/blob/main/docs/proposals/picomatch-development-2026-11-19.md)
+recorded Mira's exact two-path HIGH findings and source review hashes before
+activation. Its hashes remain review evidence for the recorded inventory. The
+pinned shared checker enforces its specified source bindings only for those
+explicit-user entries; the coordinator's separate approval cannot transfer here.
 
 | ID           | Requirement                                                                                                                                                                                                                                                                                                                                        |
 | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -47,10 +50,10 @@ Visual Delta development tools; internal Mira workspaces remain source-owned.
 Normal check, aggregate specification and version preparation run the independent
 guard before writer authority. Repository-owned QMD configuration supports local
 lexical discovery without executing searches or downloading models in CI.
-The existing two HIGH Changesets/picomatch findings still block the full-audit
-gate under [Mira48](https://github.com/lapismd/mira-mde/issues/48). This source
-proposal adds no suppression, exception or activation and changes no package
-version, public export or publication intent.
+The exact two HIGH Changesets/picomatch findings are admitted only through the
+explicit-user entries under [Mira48](https://github.com/lapismd/mira-mde/issues/48)
+and the HIGH decision record. No other suppression is added, and package
+versions, public exports and publication intent remain unchanged.
 
 MIRA-MERMAID-006 qualification requires zero findings in both fresh packed production cohorts. The former exact Mermaid 11 KaTeX acceptance is retired for newly packed outputs; historical receipts remain historical. A genuine plugin patch Changeset records the changed public runtime dependency and preserves the normal version/publication gates.
 
