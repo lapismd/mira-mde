@@ -91,6 +91,11 @@ export default defineConfig(tableRequirements(), {
       rules: [
         {
           pattern:
+            "^(?:scripts/development-audit(?:\\.spec)?\\.mjs$|\\.github/development-audit-policy\\.json$)",
+          chapters: ["spec/src/spec-governance.md"],
+        },
+        {
+          pattern:
             "^(?:scripts/dependency-automation/|\\.github/dependency-automation/|\\.qmd/)",
           chapters: [
             "spec/src/architecture.md",
@@ -175,6 +180,7 @@ export default defineConfig(tableRequirements(), {
         },
       ],
       protected: [
+        "^(?:scripts/development-audit(?:\\.spec)?\\.mjs$|\\.github/development-audit-policy\\.json$)",
         "^(?:scripts/dependency-automation/|\\.github/dependency-automation/|\\.qmd/)",
         "^packages/mira/licenses/math-adapters/",
         "^scripts/check-package-tarballs\\.mjs$",

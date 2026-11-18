@@ -1,7 +1,8 @@
 # Disabled Mira development-audit proposal
 
 This proposal is **disabled** and grants no audit exception. Mira's normal check,
-CI and release workflows still run raw `pnpm audit`; the two HIGH findings remain
+CI and release workflows delegate to the same pinned shared executable, which
+retains complete raw full and production `pnpm audit` reports. The two HIGH findings remain
 blocking under [issue 48](https://github.com/lapismd/mira-mde/issues/48). Production
 audit and every other functional, browser, packaging, publication and activation
 gate remain unchanged.
@@ -32,22 +33,31 @@ fixtures preserve the security-relevant fields without copying advisory prose.
 The full raw reports remain in local qualification evidence; their SHA256 values
 are recorded in the facts file.
 
-Dependency/adoption source is
+The adoption baseline is
 [`fb07d9c6b004d34949c802407d540977b42854f6`](https://github.com/lapismd/mira-mde/commit/fb07d9c6b004d34949c802407d540977b42854f6).
-This proposal changes documentation only. The facts file records actual root and
+The private source root also declares its exact GitHub repository identity for
+the shared probe's existing strict caller check; this changes no dependencies,
+versions, qualified recipe or audit behavior. The facts file records actual root and
 all eight workspace manifests, workspace policy, lockfile, audit entry points,
 workflow checker and qualification bindings. **These hashes are review evidence,
-not enforced exception bindings yet.** No shared checker is pinned or claimed.
+not additional runtime checks of that entire inventory.** The actual shared
+implementation is pinned to `63e64958e9b271d36feba06a162ee02b079a3206`, merged
+through [Lapis CI #30](https://github.com/lapismd/lapis-ci/pull/30). Its specified
+repository/dependency-source/manifest/lock, time, record and finding bindings are
+enforced when an approved entry is used. The operational policy is schema2 with
+`approvals: []`, so no development finding is currently admitted.
 
-Before requesting an operator decision, the owning Lapis CI repository must
-provide its reviewed shared checker extension. Mira must integrate that actual
-immutable implementation into normal portable checks and CI/release, retain raw
-full and production reports, and prove these recorded hashes are enforced. The
-checker must reject malformed/failed/muted reports, unknown or additional
+The source-owned adapter invokes the dependency-free private GitHub source tool
+with pnpm build scripts disabled. It neither installs Mira's graph nor changes
+its manifests/lock. Normal portable checks and CI/release share that adapter;
+the original direct `pnpm audit` command remains available for raw diagnostics.
+The shared checker rejects malformed/failed/muted reports, unknown or additional
 findings, altered identities/severities/counts/versions/paths, any production
-finding, a known fix, expiry, and changed bound source. Captured exact cases and
-negative regressions must pass with the default proposal still disabled.
+finding, a known fix, expiry, and changed bound graph source. Immutable shared
+checker/test hashes and the final actual Mira probe are recorded separately in
+the facts/qualification evidence. Whole source, workspace-manifest and adapter
+review hashes are not claimed as extra runtime enforcement.
 
-Only after that integration and final immutable checker/test evidence exist may
-the operator consider this exact two-path source exception. Enabling anything
-now would bypass the outstanding review and is not part of this proposal.
+The operator decision remains outstanding. No approval from the coordinator or
+another consumer transfers here. Enabling any acceptance before that exact
+source decision is not part of this proposal.

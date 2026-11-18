@@ -3,7 +3,7 @@
   "kind": "disabled-source-review-facts",
   "enabled": false,
   "repository": "lapismd/mira-mde",
-  "dependencySource": "fb07d9c6b004d34949c802407d540977b42854f6",
+  "adoptionBaselineSource": "fb07d9c6b004d34949c802407d540977b42854f6",
   "advisory": "GHSA-fc5q-39xc-vjpf",
   "module": "picomatch",
   "severity": "high",
@@ -22,12 +22,39 @@
   "ceilingVersion": "4.0.7",
   "requireOfficialRegistryInstalledAndCeiling": true,
   "endsOnSuccessorBeyondCeiling": true,
-  "sharedChecker": null,
-  "hashEnforcement": false,
+  "sharedChecker": {
+    "repository": "lapismd/lapis-ci",
+    "source": "63e64958e9b271d36feba06a162ee02b079a3206",
+    "merge": "5cb7a35031c7e83e0d41ef3ce3209e958076119b",
+    "executable": "lapis-development-audit",
+    "qualifiedTests": 309,
+    "operationalApprovals": [],
+    "runtimeBindingFields": [
+      "repository",
+      "sourceSha",
+      "manifestSha256",
+      "lockSha256",
+      "record",
+      "path",
+      "version",
+      "severity",
+      "advisory",
+      "time",
+      "officialRegistry"
+    ],
+    "evidenceSha256": {
+      "scripts/run-development-audit.mjs": "c3de181ca3aa943d61ee070e572e1ea40086c13536c6162e5252c29679188796",
+      "scripts/development-audit.mjs": "df111eccbdfbed1c78b2e9da1ef7450f7f2fe105c29b7298698fa64dd11da2f5",
+      "scripts/development-audit-scope.mjs": "490d5cf72f1ee9466138d2cf2a964c5265399a37565a449cfe6ca8970be96c6b",
+      "scripts/development-audit-high.test.mjs": "3fc932b341bf391b1bf6696c730fd09076ad6f949e1200d668efb1ef7ce2100b",
+      "scripts/development-audit-cli.test.mjs": "df033860e86c993cd85367810a2c79e995c5e3c0e366c1bd2131244ccd644e82"
+    }
+  },
+  "hashEnforcement": "shared specified approval fields; full review inventory is evidence only; approvals currently empty",
   "approvalEvidence": null,
-  "bindingStatus": "review-evidence-only until reviewed shared-checker integration",
+  "bindingStatus": "no active exception",
   "bindings": {
-    "package.json": "880b66223f76f61788d6796845be8c561daeb9a08c47f01db64647bf1c1e7761",
+    "package.json": "b5ee695f16d307bdf936f5faa529a36bcf8e8179970c3778ecd232327fd69799",
     "pnpm-lock.yaml": "da5000188deea37ad19e01bc875ae9258bd632b402680fe4da8a5ac737523c71",
     "pnpm-workspace.yaml": "9c5f116aa1ff65a8307393496e0f7e426a7d86469eef4692bd22447afb51bbdf",
     "internal/adapters/solid/package.json": "bd2129a00fb19bcaa145c084d2361e9977f5d989982483822e8f3a1730879fe1",
@@ -38,12 +65,16 @@
     "packages/mira-plugin-mermaid/package.json": "fbdca3216d46401466ef8ef551f53d6ab4cd5bdf20cbc7e7e84213172c47da0c",
     "packages/mira-react/package.json": "5025c80cbb0b14049840186ffd201454469084963ca32455f0be879b7bfa7884",
     "packages/mira-vanilla/package.json": "ffc784cb28bf16623455469e8cb040d2685b6d714d290c19ebf4d28623088933",
-    "scripts/validation/lanes.json": "3c92cab06342674e53615ffa37ade83a59b8f5e9cd3a40d5f3b04acb88492975",
-    "scripts/check-release-workflow.mjs": "c198f35c2f5c03a6827bb7a83fc7faf3441227727bed04441585aeb180948f15",
+    "scripts/validation/lanes.json": "dacec45deacaf21ecc6f9e2c78f9df7accab43d68702d96b29be9eeec76963b9",
+    "scripts/check-release-workflow.mjs": "489b9e64682107f97ca291549762cb294fe78c3641ce2181688f7fa310fa5231",
     "scripts/check-release-workflow.spec.mjs": "d65efbaf60a51518cf5d73369d272d1f7d071d3ac3c4826cdc440a8ababbe695",
-    ".github/workflows/mira-spec-first.yml": "9e9d7e646efef48cbab60b79ea1a3a61e1791ad89c8b329fb0f945633f6f672a",
-    ".github/workflows/release.yml": "33a3b047fb220750aa43e374202763b146d1e019e2eb958e1dc62430da23dad1",
-    ".github/versioning-runtime.json": "b5fe8013821675bf3d059661da9431e771893a56ad5b76e1b235c3085614b843"
+    ".github/workflows/mira-spec-first.yml": "cfa1fb182866f41afff31aa3c88df431ded1bfaaf7f37b4c1c263bce89f261b7",
+    ".github/workflows/release.yml": "ca65616312de3b9eadb1fef0653595d6d594676635ac5f9a2d1c9aa3eb09436e",
+    ".github/versioning-runtime.json": "b5fe8013821675bf3d059661da9431e771893a56ad5b76e1b235c3085614b843",
+    "scripts/development-audit.mjs": "4d069949f077479c329812ea9d05bc1f7616f65e01015e9fe7dfc8b295e6beda",
+    "scripts/development-audit.spec.mjs": "39908a01f9d9f84b5f64971130d7af0a3cf72f4cace3dacb892ed92345387b1b",
+    ".github/development-audit-policy.json": "27624928163b50338280af5c51b970035e687f8da9ee6085e22c1af9e62d7ac3",
+    "spec-validator.config.mjs": "19ef5c662837ccb4eb55433fbb0a639b8ecec4392f4dd2a92e4d3af528e75a9f"
   },
   "reports": {
     "full": {
@@ -56,5 +87,6 @@
       "exit": 0,
       "sha256": "b1de92466613de47f76511ba9fb528582fabd16b4ab580c43b3aff84b1b83e34"
     }
-  }
+  },
+  "vulnerableVersions": "<=4.0.7"
 }

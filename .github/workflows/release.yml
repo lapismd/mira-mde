@@ -164,9 +164,18 @@ jobs:
           pnpm spec:check
           pnpm catalog:check
           pnpm packages:check
-          pnpm audit
+          pnpm run audit
           pnpm check:all
           pnpm packages:pack
+
+      - name: Retain raw development audit evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: mira-development-audit-release
+          path: .release/development-audit
+          if-no-files-found: error
+          retention-days: 7
 
       - name: Retain packed production audit evidence
         if: always() && hashFiles('.release/*-audit.json', '.release/math-*-compile-diagnostics.json') != ''

@@ -2,6 +2,10 @@
   "name": "mira-workspace",
   "version": "0.0.0",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lapismd/mira-mde.git"
+  },
   "license": "Apache-2.0",
   "type": "module",
   "packageManager": "pnpm@10.32.1",

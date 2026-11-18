@@ -15,7 +15,8 @@
           "version": "4.0.5",
           "paths": [".>@changesets/cli>@changesets/git>picomatch"]
         }
-      ]
+      ],
+      "vulnerable_versions": "<=4.0.7"
     }
   },
   "muted": [],

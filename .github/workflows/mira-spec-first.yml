@@ -89,7 +89,16 @@ jobs:
         run: pnpm catalog:check && pnpm packages:check
 
       - name: Audit dependencies
-        run: pnpm audit
+        run: pnpm run audit
+
+      - name: Retain raw development audit evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: mira-development-audit-ci
+          path: .release/development-audit
+          if-no-files-found: error
+          retention-days: 7
 
       - name: Install checksum-verified Jujutsu for runner regressions
         run: node scripts/validation/install-tools.mjs --ci
