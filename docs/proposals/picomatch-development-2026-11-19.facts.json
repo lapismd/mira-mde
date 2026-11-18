@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "kind": "disabled-source-review-facts",
+  "enabled": false,
+  "repository": "lapismd/mira-mde",
+  "dependencySource": "fb07d9c6b004d34949c802407d540977b42854f6",
+  "advisory": "GHSA-fc5q-39xc-vjpf",
+  "module": "picomatch",
+  "severity": "high",
+  "findings": [
+    {
+      "version": "4.0.7",
+      "paths": [".>@changesets/cli>@changesets/config>picomatch"]
+    },
+    {
+      "version": "4.0.5",
+      "paths": [".>@changesets/cli>@changesets/git>picomatch"]
+    }
+  ],
+  "expiresAt": "2026-11-19T00:00:00Z",
+  "endsOnKnownFix": true,
+  "ceilingVersion": "4.0.7",
+  "requireOfficialRegistryInstalledAndCeiling": true,
+  "endsOnSuccessorBeyondCeiling": true,
+  "sharedChecker": null,
+  "hashEnforcement": false,
+  "approvalEvidence": null,
+  "bindingStatus": "review-evidence-only until reviewed shared-checker integration",
+  "bindings": {
+    "package.json": "880b66223f76f61788d6796845be8c561daeb9a08c47f01db64647bf1c1e7761",
+    "pnpm-lock.yaml": "da5000188deea37ad19e01bc875ae9258bd632b402680fe4da8a5ac737523c71",
+    "pnpm-workspace.yaml": "9c5f116aa1ff65a8307393496e0f7e426a7d86469eef4692bd22447afb51bbdf",
+    "internal/adapters/solid/package.json": "bd2129a00fb19bcaa145c084d2361e9977f5d989982483822e8f3a1730879fe1",
+    "internal/adapters/vue/package.json": "f1dfb9b77199f61959ebffe8c7b390bd45d77cb473a136ccbc506c0f6a30844a",
+    "packages/mira/package.json": "446d81c386bc8407fcc4a124a5e6789bc45cfe19984955677b7b70b0ea97415e",
+    "packages/mira-editor/package.json": "a3009d0a405be043f3a5b3c756c548c9519330a1c12cf8ed39e587c25bf5d964",
+    "packages/mira-plugin-ai/package.json": "613b5ece54c4284b0fe6c3d95ab623e11ab64a64aad07ebb624a5b3b492b2979",
+    "packages/mira-plugin-mermaid/package.json": "fbdca3216d46401466ef8ef551f53d6ab4cd5bdf20cbc7e7e84213172c47da0c",
+    "packages/mira-react/package.json": "5025c80cbb0b14049840186ffd201454469084963ca32455f0be879b7bfa7884",
+    "packages/mira-vanilla/package.json": "ffc784cb28bf16623455469e8cb040d2685b6d714d290c19ebf4d28623088933",
+    "scripts/validation/lanes.json": "3c92cab06342674e53615ffa37ade83a59b8f5e9cd3a40d5f3b04acb88492975",
+    "scripts/check-release-workflow.mjs": "c198f35c2f5c03a6827bb7a83fc7faf3441227727bed04441585aeb180948f15",
+    "scripts/check-release-workflow.spec.mjs": "d65efbaf60a51518cf5d73369d272d1f7d071d3ac3c4826cdc440a8ababbe695",
+    ".github/workflows/mira-spec-first.yml": "9e9d7e646efef48cbab60b79ea1a3a61e1791ad89c8b329fb0f945633f6f672a",
+    ".github/workflows/release.yml": "33a3b047fb220750aa43e374202763b146d1e019e2eb958e1dc62430da23dad1",
+    ".github/versioning-runtime.json": "b5fe8013821675bf3d059661da9431e771893a56ad5b76e1b235c3085614b843"
+  },
+  "reports": {
+    "full": {
+      "command": "pnpm audit --json",
+      "exit": 1,
+      "sha256": "6d872c623f48c1c42f1424a88a2550709a4fc1827bef2324f1224cafeec6c86d"
+    },
+    "production": {
+      "command": "pnpm audit --prod --json",
+      "exit": 0,
+      "sha256": "b1de92466613de47f76511ba9fb528582fabd16b4ab580c43b3aff84b1b83e34"
+    }
+  }
+}

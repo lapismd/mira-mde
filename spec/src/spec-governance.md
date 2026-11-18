@@ -16,6 +16,12 @@ Manifest, peer and integrity facts SHA256: `0173bad47c4839f53074b3bf5f5eac623d68
 
 ## Bounded dependency intake
 
+The [disabled development-audit proposal](../../docs/proposals/picomatch-development-2026-11-19.md)
+records Mira's exact two-path HIGH findings and source review hashes. It grants
+no exception: raw full audit remains blocking. Its hashes are review evidence
+until an actual reviewed shared checker and enforced source bindings are wired;
+the coordinator's separate runtime approval cannot transfer here.
+
 | ID           | Requirement                                                                                                                                                                                                                                                                                                                                        |
 | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | MIRA-GOV-023 | Dependency automation MUST preserve the source-owned active root/registry map, independently verify compatible patches and manifest/lock/canonical closure outside bot exemptions, reject unsupported migrations, stale policy, immutable-version mutation and unrelated source changes, and retain the full audit, release and publication gates. |

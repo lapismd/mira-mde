@@ -1,0 +1,31 @@
+{
+  "actions": [],
+  "advisories": {
+    "1247710": {
+      "github_advisory_id": "GHSA-fc5q-39xc-vjpf",
+      "module_name": "picomatch",
+      "severity": "high",
+      "patched_versions": "<0.0.0",
+      "findings": [
+        {
+          "version": "4.0.7",
+          "paths": [".>@changesets/cli>@changesets/config>picomatch"]
+        },
+        {
+          "version": "4.0.5",
+          "paths": [".>@changesets/cli>@changesets/git>picomatch"]
+        }
+      ]
+    }
+  },
+  "muted": [],
+  "metadata": {
+    "vulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 2,
+      "critical": 0
+    }
+  }
+}
