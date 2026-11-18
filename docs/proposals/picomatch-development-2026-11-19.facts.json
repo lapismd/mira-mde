@@ -10,15 +10,11 @@
   "findings": [
     {
       "version": "4.0.7",
-      "paths": [
-        ".>@changesets/cli>@changesets/config>picomatch"
-      ]
+      "paths": [".>@changesets/cli>@changesets/config>picomatch"]
     },
     {
       "version": "4.0.5",
-      "paths": [
-        ".>@changesets/cli>@changesets/git>picomatch"
-      ]
+      "paths": [".>@changesets/cli>@changesets/git>picomatch"]
     }
   ],
   "expiresAt": "2026-11-19T00:00:00Z",
