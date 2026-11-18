@@ -61,3 +61,8 @@ review hashes are not claimed as extra runtime enforcement.
 The operator decision remains outstanding. No approval from the coordinator or
 another consumer transfers here. Enabling any acceptance before that exact
 source decision is not part of this proposal.
+
+The [actual disabled qualification](../../spec/records/2026-11-18-shared-development-audit.md)
+records the final committed dependency source, actual raw HIGH2/production0
+blocked decision, immutable shared checker/test evidence, and refreshed whole
+version-recipe/no-release proof. It does not simulate operator approval.

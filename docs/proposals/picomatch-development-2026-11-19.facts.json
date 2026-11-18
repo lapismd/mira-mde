@@ -88,5 +88,42 @@
       "sha256": "b1de92466613de47f76511ba9fb528582fabd16b4ab580c43b3aff84b1b83e34"
     }
   },
-  "vulnerableVersions": "<=4.0.7"
+  "vulnerableVersions": "<=4.0.7",
+  "sourceSha": "efd6eb0f6bb3dd90d314fc82e0fdb93ccd739b3c",
+  "manifestSha256": "b5ee695f16d307bdf936f5faa529a36bcf8e8179970c3778ecd232327fd69799",
+  "lockSha256": "da5000188deea37ad19e01bc875ae9258bd632b402680fe4da8a5ac737523c71",
+  "actualQualification": {
+    "allowed": false,
+    "reason": "unapproved-finding",
+    "accepted": [],
+    "rawFullExitCode": 1,
+    "rawProductionExitCode": 0,
+    "rawVulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 2,
+      "critical": 0
+    },
+    "productionVulnerabilities": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0
+    },
+    "reportSha256": {
+      "decision.json": "85bd03434b93e19b57fc897f016acefdeecc315fc9bcc7ee18f03119295f95ef",
+      "full-audit.json": "6d872c623f48c1c42f1424a88a2550709a4fc1827bef2324f1224cafeec6c86d",
+      "production-audit.json": "b1de92466613de47f76511ba9fb528582fabd16b4ab580c43b3aff84b1b83e34"
+    },
+    "versioning": {
+      "reviewedSource": "dc81ff65ba812bf005fb2a806eb3308bb8b5f71f",
+      "guardSha256": "4db2bd02294da3f03e654301177fe67cfc9bfea22cb65c7aded575382d89cd70",
+      "hasChangesets": false,
+      "wholeOriginalRecipeExit": 0,
+      "unchangedRootWorkspaceVersions": 9,
+      "denoAbsentBeforeAndAfter": true
+    }
+  }
 }

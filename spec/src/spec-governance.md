@@ -31,7 +31,7 @@ rechecks immutable graph and decision evidence after collection. Full-source,
 workspace-manifest and checker/test review hashes recorded in the proposal are
 not additional runtime hash checks; the executable itself is commit-pinned.
 
-The [disabled development-audit proposal](../../docs/proposals/picomatch-development-2026-11-19.md)
+The [disabled development-audit proposal](https://github.com/lapismd/mira-mde/blob/main/docs/proposals/picomatch-development-2026-11-19.md)
 records Mira's exact two-path HIGH findings and source review hashes. It grants
 no exception: raw full audit remains blocking. Its hashes are review evidence
 for the recorded inventory. The pinned shared checker enforces its specified
