@@ -1,4 +1,5 @@
 node_modules
+.qmd/index.sqlite*
 dist
 build
 .svelte-kit

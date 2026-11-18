@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 2,
+  "repository": "lapismd/mira-mde",
+  "approvals": [
+    {
+      "advisory": "GHSA-fc5q-39xc-vjpf",
+      "package": "picomatch",
+      "version": "4.0.7",
+      "severity": "high",
+      "path": ".>@changesets/cli>@changesets/config>picomatch",
+      "scope": "development-only",
+      "vulnerableRange": "<=4.0.7",
+      "patchedRange": "<0.0.0",
+      "sourceSha": "efd6eb0f6bb3dd90d314fc82e0fdb93ccd739b3c",
+      "manifestSha256": "b5ee695f16d307bdf936f5faa529a36bcf8e8179970c3778ecd232327fd69799",
+      "lockSha256": "da5000188deea37ad19e01bc875ae9258bd632b402680fe4da8a5ac737523c71",
+      "approvedAt": "2026-11-18T13:30:52.633Z",
+      "expiresAt": "2026-11-19T00:00:00.000Z",
+      "authority": "explicit-user",
+      "record": "spec/records/2026-11-18-development-high-decision.md"
+    },
+    {
+      "advisory": "GHSA-fc5q-39xc-vjpf",
+      "package": "picomatch",
+      "version": "4.0.5",
+      "severity": "high",
+      "path": ".>@changesets/cli>@changesets/git>picomatch",
+      "scope": "development-only",
+      "vulnerableRange": "<=4.0.7",
+      "patchedRange": "<0.0.0",
+      "sourceSha": "efd6eb0f6bb3dd90d314fc82e0fdb93ccd739b3c",
+      "manifestSha256": "b5ee695f16d307bdf936f5faa529a36bcf8e8179970c3778ecd232327fd69799",
+      "lockSha256": "da5000188deea37ad19e01bc875ae9258bd632b402680fe4da8a5ac737523c71",
+      "approvedAt": "2026-11-18T13:30:52.633Z",
+      "expiresAt": "2026-11-19T00:00:00.000Z",
+      "authority": "explicit-user",
+      "record": "spec/records/2026-11-18-development-high-decision.md"
+    }
+  ]
+}

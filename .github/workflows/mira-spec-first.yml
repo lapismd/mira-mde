@@ -50,7 +50,7 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Validate canonical specification
-        run: pnpm spec:validate && pnpm spec:build
+        run: pnpm check:dependency-intake && pnpm test:dependency-intake && pnpm spec:validate && pnpm spec:build
 
       - name: Enforce specification-first changes
         if: >-
@@ -70,6 +70,8 @@ jobs:
     steps:
       - name: Check out the repository
         uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v6
@@ -87,7 +89,16 @@ jobs:
         run: pnpm catalog:check && pnpm packages:check
 
       - name: Audit dependencies
-        run: pnpm audit
+        run: pnpm run audit
+
+      - name: Retain raw development audit evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: mira-development-audit-ci
+          path: .release/development-audit
+          if-no-files-found: error
+          retention-days: 7
 
       - name: Install checksum-verified Jujutsu for runner regressions
         run: node scripts/validation/install-tools.mjs --ci

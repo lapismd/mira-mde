@@ -239,7 +239,7 @@ export function validateReleaseWorkflows({
     "pnpm release:intent",
     "pnpm packages:check",
     "pnpm packages:pack",
-    "pnpm audit",
+    "pnpm run audit",
     "pnpm check:all",
     "pnpm build-storybook",
     "pnpm test:storybook",
@@ -247,6 +247,7 @@ export function validateReleaseWorkflows({
   ]) {
     requireText(ciSource, new RegExp(command), `CI ${command}`, errors);
   }
+  requireText(releaseSource, /pnpm run audit/, "release source audit", errors);
   for (const [name, source, key] of [
     ["CI", ciSource, "packages"],
     ["release", releaseSource, "artifact"],

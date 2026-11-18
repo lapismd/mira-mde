@@ -1,5 +1,27 @@
 # Architecture and Boundaries
 
+<!-- dependency-intake:framework-registry:start -->
+
+Current registry dependency coordinates; qualification remains separate.
+
+<!-- prettier-ignore -->
+| Manifest | Dependency | Range | Locked version |
+| --- | --- | --- | --- |
+| `package.json` (devDependencies) | `@lapismd/spec-validator` | `^0.2.1` | `0.2.1` |
+| `package.json` (devDependencies) | `@lapismd/storybook-addon-visual-delta` | `0.1.5` | `0.1.5` |
+
+Manifest, peer and integrity facts SHA256: `0173bad47c4839f53074b3bf5f5eac623d68c869b996a9d10d5e10e2d19f271c`.
+
+<!-- dependency-intake:framework-registry:end -->
+
+The private tooling root declares its exact GitHub repository identity for
+strict read-only shared audit probes. This metadata does not change public
+entry points, workspace boundaries, dependency coordinates or audit authority.
+Normal quality checks delegate development-audit collection to the reviewed,
+dependency-free Lapis CI source executable at an immutable GitHub commit. The
+execution environment disables package build scripts and leaves Mira's manifests
+and lockfile untouched; no collector implementation is copied into Mira.
+
 The Mermaid runtime security intake updates only the owning plugin to Mermaid 12.3+ with bundled ELK. Its explicit Dagre default preserves the existing layout choice. Public consumers receive the repaired runtime through normal released npm ranges; workspace overrides do not qualify that public closure.
 
 Verification-only recovery under MIRA-GOV-019 executes reviewed release tooling

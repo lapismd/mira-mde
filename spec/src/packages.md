@@ -1,5 +1,26 @@
 # Public Packages and Entry Points
 
+<!-- dependency-intake:framework-registry:start -->
+
+Current registry dependency coordinates; qualification remains separate.
+
+<!-- prettier-ignore -->
+| Manifest | Dependency | Range | Locked version |
+| --- | --- | --- | --- |
+| `package.json` (devDependencies) | `@lapismd/spec-validator` | `^0.2.1` | `0.2.1` |
+| `package.json` (devDependencies) | `@lapismd/storybook-addon-visual-delta` | `0.1.5` | `0.1.5` |
+
+Manifest, peer and integrity facts SHA256: `0173bad47c4839f53074b3bf5f5eac623d68c869b996a9d10d5e10e2d19f271c`.
+
+<!-- dependency-intake:framework-registry:end -->
+
+The private workspace root's repository metadata identifies `lapismd/mira-mde`
+for shared source-tool validation. Public package identities, versions, ranges,
+release cohorts and publication gates remain unchanged.
+The source audit lane uses the shared private tool ephemerally rather than adding
+it to any published dependency closure. It preserves the source-owned package
+manager, raw full/production reports and every packed production audit.
+
 The packed public-API fixture compiles asynchronous custom embed rendering,
 its optional cancellation signal and returned cleanup through public Mira
 exports. It MUST reject an asynchronous result outside the renderer contract;
