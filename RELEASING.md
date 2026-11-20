@@ -43,8 +43,8 @@ release workflow. Perform this sequence once:
    those baselines without separate visual acceptance.
 4. Download the release artifact and inspect `.release/release-manifest.json`
    plus every `.release/tarballs/*.tgz`. Publish one tarball at a time, in
-   manifest order, with public access and the v1 staging tag:
-   `npm publish .release/tarballs/<name>.tgz --access public --tag next
+   manifest order, with public access and the stable tag:
+   `npm publish .release/tarballs/<name>.tgz --access public --tag latest
 --registry https://registry.npmjs.org`.
 5. After every package resolves from npm with the manifest integrity, configure a
    GitHub Actions trusted publisher for every package with organization
@@ -56,6 +56,9 @@ release workflow. Perform this sequence once:
 
 The normal workflow detects an empty registry and reports that bootstrap is
 required; it cannot silently fall back to a token path.
+
+Every stable publication moves `latest` to the newly published highest version.
+Stable Mira releases MUST NOT create or retain a `next` dist-tag.
 
 ## Recovery and safety
 
